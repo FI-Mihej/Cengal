@@ -319,7 +319,11 @@ def main():
                         path_to_editor_exe, editor_cmd_template, default_editor = \
                             context.read_block_result_link('get editor').result
                         full_file_name, line_number = lines_dict[line_id]
-                        run_editor_on_line(editor_cmd_template, path_to_editor_exe, full_file_name, line_number)
+                        with change_current_dir(os.path.dirname(full_file_name)):
+                            run_editor_on_line(editor_cmd_template,
+                                               path_to_editor_exe,
+                                               os.path.basename(full_file_name),
+                                               line_number)
                     except KeyError:
                         print()
                         print('{}Wrong Line ID{} (# {}{}{})!'.format(
