@@ -30,6 +30,17 @@ TOTAL:                                                                    14724
 ```
 Counted with [cloc](https://github.com/AlDanial/cloc) util.
 
+# Installation
+
+1. Clone repo or download and unpack archive.
+2. Add root folder (that contains this Readme) to PYTHONPATH environment variable.
+
+Now you can import modules from it:
+* `import check_is_in_pycharm`
+* `import code_inspection`
+* `from code_flow_control import ResultExistence`
+* etc.
+
 # Some of the Modules (most interesting)
 
 * **IO**:
