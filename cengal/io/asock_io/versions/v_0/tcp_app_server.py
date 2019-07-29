@@ -2,8 +2,9 @@ import os
 import sys
 import traceback
 import select
+import time
 # from fileinput import input
-from typing import Set, Iterable
+from typing import Set, Iterable, Optional, Tuple, Dict
 import copy
 from collections import deque
 
@@ -18,6 +19,7 @@ from code_flow_control import ResultExistence
 from contextlib import contextmanager
 from code_inspection import set_profiler
 from .recv_buff_size_computer import RecvBuffSizeComputer
+from math import ceil
 
 """
 Module Docstring
@@ -33,7 +35,7 @@ set_profiler(False)
 
 
 class IoIterationResult:
-    '''
+    """
     ([1] подключившиеся ожидаемые клиенты (ОКл); [2] ОКл сокет которых был отключен по причине ошибки
     (сами ОКл еще небыли удалены - удаление нужно инициировать явно); [3] ОКл имеет очередь непрочитанных принятых
     сообщений; [4] размер очереди неотправленных сообщений ОКл меньше порогового, а значит в нее можно записывать
@@ -42,7 +44,7 @@ class IoIterationResult:
     при котором актор отправляет запрос не требуя ответа об успешном окончании операции (без какого-либо контроля
     успешности, или же с ручным контролем путем вызова спец-метода, который-бы и проводил проверку, или же
     считывание имеющихся результатов операций)))
-    '''
+    """
 
     def __init__(self):
         self.newly_connected_expected_clients = set()
@@ -50,6 +52,33 @@ class IoIterationResult:
         self.clients_with_disconnected_connection = set()
         self.clients_have_data_to_read = set()
         self.clients_with_empty_output_fifo = set()
+
+    def update(self, other):
+        self.newly_connected_expected_clients.update(other.newly_connected_expected_clients)
+        self.newly_connected_unknown_clients.update(other.newly_connected_unknown_clients)
+        self.clients_with_disconnected_connection.update(
+            other.clients_with_disconnected_connection)
+        self.clients_have_data_to_read.update(other.clients_have_data_to_read)
+        self.clients_with_empty_output_fifo.update(other.clients_with_empty_output_fifo)
+
+    def remove(self, item):
+        if item in self.newly_connected_expected_clients:
+            self.newly_connected_expected_clients.remove(item)
+        if item in self.newly_connected_unknown_clients:
+            self.newly_connected_unknown_clients.remove(item)
+        if item in self.clients_with_disconnected_connection:
+            self.clients_with_disconnected_connection.remove(item)
+        if item in self.clients_have_data_to_read:
+            self.clients_have_data_to_read.remove(item)
+        if item in self.clients_with_empty_output_fifo:
+            self.clients_with_empty_output_fifo.remove(item)
+
+    def clear(self):
+        self.newly_connected_expected_clients.clear()
+        self.newly_connected_unknown_clients.clear()
+        self.clients_with_disconnected_connection.clear()
+        self.clients_have_data_to_read.clear()
+        self.clients_with_empty_output_fifo.clear()
 
 
 class ASockIOCoreMemoryManagement(IOCoreMemoryManagement):
@@ -73,12 +102,12 @@ class Connection:
                  connection__conn_addr: tuple = None,
                  global_memory_management: ASockIOCoreMemoryManagement = None
                  ):
-        '''
+        """
         
         :param connection_id: ID for this connection
         :param connection__conn_addr: tuple(conn, addr) where conn is a socket, addr is an address
         :param global_memory_management: global memory management obj
-        '''
+        """
         self.id = connection_id
         if connection__conn_addr is None:
             self.conn = ResultExistence(False, None)
@@ -134,7 +163,7 @@ class InlineProcessor:
 
     def __init__(self, client_id=None, keyword: bytes = None, socket_family=None, socket_type=None, socket_proto=None,
                  addr_info=None, host_names=None, external_parameters_set_trigger: Set = None):
-        '''
+        """
 
         :param keyword: client keyword. You may check for a known keywords to act appropriately
         :param socket_family:
@@ -142,7 +171,7 @@ class InlineProcessor:
         :param socket_proto:
         :param addr_info: result of socket.getaddrinfo() call
         :param host_names: result of socket.gethostbyaddr() call
-        '''
+        """
         self.client_id = client_id
         self.keyword = keyword
         self.socket_family = socket_family
@@ -162,28 +191,28 @@ class InlineProcessor:
         # self.output_messages = list()
 
     def on__data_received(self, data: bytes):
-        '''
+        """
         Use self.output_messages (self.output_messages.append(out_message)) to store output messages or raw output data
         Any unhandled exception will lead to force destroying of current Inline Processor object. Also situation will 
         be logged
         :param data: piece of input data if connection is in RAW-mode and full message otherwise.
-        '''
+        """
         pass
 
     def on__output_buffers_are_empty(self):
-        '''
+        """
         Will be called immediately when all output data was send.
         Use self.output_messages (self.output_messages.append(out_message)) to store output messages or raw output data
         Any unhandled exception will lead to force destroying of current Inline Processor object. Also situation will 
         be logged
-        '''
+        """
         pass
 
     def on__connection_lost(self):
-        '''
+        """
         Will be called after connection was closed. Current Inline Processor object will be destroyed after this call.
         Situation with unhandled exception will be logged.
-        '''
+        """
         pass
 
     def set__is_in_raw_mode(self, is_in_raw_mode: bool):
@@ -201,16 +230,16 @@ class InlineProcessor:
 
 class Client:
     def __init__(self, connection_settings: ConnectionSettings, client_id=None, client_tcp_id=None):
-        '''
+        """
 
         :param client_id: ID of the expected client
         :param client_tcp_id: ID of the connection
         :param connection_settings: useful ConnectionSettings parameters are {direction_role, keyword} - for a client,
             and all - for the super server.
-        '''
+        """
         self.id = client_id
         self.connection_id = client_tcp_id
-        self.__connection = None
+        self.__connection = None  # type: Optional[Connection]
         self.connection_settings = connection_settings
         self.connection_settings.check()
 
@@ -220,15 +249,27 @@ class Client:
 
         self.obj_for_inline_processing = None
 
+    def get_connection(self)->Connection:
+        return self.__connection
+
 
 class ASockIOCore(ASockIOCoreMemoryManagement):
     def __init__(self, gates_connections_settings: Set[ConnectionSettings]):
-        '''
+        """
         Port should not be open to a external world!
         :param gates_connections_settings: set() of ConnectionSettings()
         :return:
-        '''
+        """
         super(ASockIOCore, self).__init__()
+
+        if os.name != 'nt':
+            self.po = select.poll()
+        self.last_all_sockets = set()  # type: Set[int]
+        self.socket_by_fd = dict()  # type: Dict[int, socket.socket]
+
+        self.check_sockets_sum_time = 0.0
+        self.check_sockets_qnt = 0
+        self.check_sockets_max_time = 0.0
 
         self.gates_connections_settings = gates_connections_settings
         if not self.gates_connections_settings:
@@ -307,23 +348,203 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
 
         self._clients_with_inline_processors_that_need_to_apply_parameters = set()
 
+    @staticmethod
+    def check_sockets_select(read: Set[int], write: Set[int], error: Set[int],
+                             timeout: float)->Tuple[Set[int], Set[int], Set[int]]:
+        all_sockets = read | write | error
+        if all_sockets:
+            return select.select(read,
+                                 write,
+                                 error,
+                                 timeout)
+        else:
+            return set(), set(), set()
+
+    def check_sockets_poll(self, read: Set[int], write: Set[int], error: Set[int],
+                           timeout: float)->Tuple[Set[int], Set[int], Set[int]]:
+        read_events = select.POLLIN | select.POLLPRI
+        write_events = select.POLLOUT
+        except_events = select.POLLERR | select.POLLHUP | select.POLLNVAL
+        if hasattr(select, 'POLLRDHUP'):
+            except_events |= select.POLLRDHUP
+        readable_events = {select.POLLIN, select.POLLPRI}
+        writable_events = {select.POLLOUT}
+        exceptional_events = {select.POLLERR, select.POLLHUP, select.POLLNVAL}
+        if hasattr(select, 'POLLRDHUP'):
+            exceptional_events.add(select.POLLRDHUP)
+        all_events_set = readable_events | writable_events | exceptional_events
+
+        timeout = int(timeout * 1000)
+
+        # print('>>> POLL {}: last_all_sockets: {}'.format(time.perf_counter(), self.last_all_sockets))
+        all_sockets = read | write | error
+        # print('>>> POLL {}: all_sockets: {}'.format(time.perf_counter(), all_sockets))
+        new_sockets = all_sockets - self.last_all_sockets
+        # print('>>> POLL {}: new_sockets: {}'.format(time.perf_counter(), new_sockets))
+        still_sockets = all_sockets & self.last_all_sockets
+        # print('>>> POLL {}: still_sockets: {}'.format(time.perf_counter(), still_sockets))
+        deleted_sockets = self.last_all_sockets - all_sockets
+        # print('>>> POLL {}: deleted_sockets: {}'.format(time.perf_counter(), deleted_sockets))
+        self.last_all_sockets = all_sockets
+
+        for socket_fd in new_sockets:
+            event_mask = 0
+            if socket_fd in read:
+                event_mask |= read_events
+            if socket_fd in write:
+                event_mask |= write_events
+            if socket_fd in error:
+                event_mask |= except_events
+            # print('>>> POLL {}: new_socket: {}; event_mask: {}'.format(time.perf_counter(), socket_fd, event_mask))
+            self.po.register(socket_fd, event_mask)
+
+        for socket_fd in still_sockets:
+            event_mask = 0
+            if socket_fd in read:
+                event_mask |= read_events
+            if socket_fd in write:
+                event_mask |= write_events
+            if socket_fd in error:
+                event_mask |= except_events
+            # print('>>> POLL {}: still_socket: {}; event_mask: {}'.format(time.perf_counter(), socket_fd, event_mask))
+            self.po.modify(socket_fd, event_mask)
+
+        for socket_fd in deleted_sockets:
+            # print('>>> POLL {}: deleted_socket: {}'.format(time.perf_counter(), socket_fd))
+            self.po.unregister(socket_fd)
+
+        poll_result = self.po.poll(timeout)
+        # print('>>> POLL {}: result: {}'.format(time.perf_counter(), poll_result))
+        # sys.stdout.flush()
+
+        readable = set()
+        writable = set()
+        exceptional = set()
+        for socket_fd, event_mask in poll_result:
+            socket_events_set = set()
+            for another_event in all_events_set:
+                if event_mask & another_event:
+                    socket_events_set.add(another_event)
+
+            if socket_events_set & readable_events:
+                readable.add(socket_fd)
+            if socket_events_set & writable_events:
+                writable.add(socket_fd)
+            if socket_events_set & exceptional_events:
+                exceptional.add(socket_fd)
+
+        return readable, writable, exceptional
+
+    def check_sockets(self, read: Set[socket.socket], write: Set[socket.socket], error: Set[socket.socket],
+                      timeout: float)->Tuple[Set[socket.socket], Set[socket.socket], Set[socket.socket]]:
+        all_sockets = read | write | error
+        if all_sockets:
+            read_fd = set()
+            write_fd = set()
+            error_fd = set()
+            for conn in read:
+                read_fd.add(conn.fileno())
+            for conn in write:
+                write_fd.add(conn.fileno())
+            for conn in error:
+                error_fd.add(conn.fileno())
+
+            check_sockets = self.check_sockets_select
+            if os.name != 'nt':
+                check_sockets = self.check_sockets_poll
+
+            readable_fd, writable_fd, exceptional_fd = check_sockets(read_fd,
+                                                                     write_fd,
+                                                                     error_fd,
+                                                                     timeout)
+            readable = set()
+            writable = set()
+            exceptional = set()
+            for fd in readable_fd:
+                readable.add(self.socket_by_fd[fd])
+            for fd in writable_fd:
+                writable.add(self.socket_by_fd[fd])
+            for fd in exceptional_fd:
+                exceptional.add(self.socket_by_fd[fd])
+            return readable, writable, exceptional
+        else:
+            return set(), set(), set()
+
+    def gate_io_iteration(self, timeout=0.0):
+        result = self._io_iteration_result
+        if self._gate:
+            readable, writable, exceptional = self.check_sockets_select(self._gate,
+                                                                        set(),
+                                                                        set(),
+                                                                        timeout)
+
+            # Handle inputs
+            for s in readable:
+                self._read_data_from_socket(s)
+
+        self._io_iteration_result = IoIterationResult()
+        return result
+
     # @profile
     def io_iteration(self, timeout=0.0):
-        '''
+        """
 
         :param timeout: timeout in seconds
         :return:
-        '''
+        """
         result = self._io_iteration_result
 
         if self._we_have_connections_for_select:
+            # need_to_process = False
+            # all_sockets = self._input_check_sockets | self._output_check_sockets | self._exception_check_sockets
+            # if not (all_sockets - self._gate):
+            #     timeout = 0.01
+
             need_to_repeat = True
 
             while need_to_repeat:
-                readable, writable, exceptional = select.select(self._input_check_sockets,
-                                                                self._output_check_sockets,
-                                                                self._exception_check_sockets,
-                                                                timeout)
+                output_check_sockets = set()
+
+                # Is need to check writable sockets
+                need_to_check_writable_sockets = False
+                for s in self._output_check_sockets:
+                    curr_client_info = self._connections[self._connection_by_conn[s]]
+                    if curr_client_info.output_to_client.size():
+                        need_to_check_writable_sockets = True
+                        break
+
+                if need_to_check_writable_sockets:
+                    output_check_sockets = self._output_check_sockets
+
+                # print('>>> POLL {}: ri: {}, wi: {}, ei: {}'.format(time.perf_counter(),
+                #                                                    len(self._input_check_sockets),
+                #                                                    len(self._output_check_sockets),
+                #                                                    len(self._exception_check_sockets)))
+                # sys.stdout.flush()
+                check_sockets_start_time = time.perf_counter()
+                readable, writable, exceptional = self.check_sockets(self._input_check_sockets,
+                                                                     output_check_sockets,
+                                                                     self._exception_check_sockets,
+                                                                     timeout)
+                check_sockets_finish_time = time.perf_counter()
+                check_sockets_delta_time = check_sockets_finish_time - check_sockets_start_time
+                self.check_sockets_sum_time += check_sockets_delta_time
+                self.check_sockets_qnt += 1
+                if self.check_sockets_max_time < check_sockets_delta_time:
+                    self.check_sockets_max_time = check_sockets_delta_time
+                check_socket_average_time = self.check_sockets_sum_time / self.check_sockets_qnt
+                # print('>>> CHECK SOCKET: DELTA {}: AVG: {}; SUM: {}; MAX: {}'.format(
+                #     check_sockets_delta_time,
+                #     check_socket_average_time,
+                #     self.check_sockets_sum_time,
+                #     self.check_sockets_max_time
+                # ))
+                # print('>>> POLL {}: ro: {}, wo: {}, eo: {}'.format(time.perf_counter(),
+                #                                                    len(readable),
+                #                                                    len(writable),
+                #                                                    len(exceptional)))
+                # sys.stdout.flush()
+
                 read_is_forbidden = True
                 if (self.global_in__data_full_size.result - self.global_in__deletable_data_full_size.result) \
                         <= self.global_in__data_size_limit.result:
@@ -412,6 +633,7 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
             try:
                 gate = socket.socket(gate_connection_settings.socket_family, gate_connection_settings.socket_type,
                                      gate_connection_settings.socket_protocol, gate_connection_settings.socket_fileno)
+                self.socket_by_fd[gate.fileno()] = gate
                 gate.setblocking(0)
                 # gate.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
             except (socket.error, OSError) as err:
@@ -427,6 +649,7 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
                 self._check_for_initial_af_unix_socket_unlink(gate_connection_settings)
                 gate.bind(gate_connection_settings.socket_address)
             except (socket.error, OSError) as err:
+                del self.socket_by_fd[gate.fileno()]
                 gate.close()
                 gate = None
                 if __debug__: self._log('EXCEPTION: GATE: BIND:"{}", {}, {}'.format(
@@ -435,6 +658,7 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
             try:
                 gate.listen(backlog)
             except (socket.error, OSError) as err:
+                del self.socket_by_fd[gate.fileno()]
                 gate.close()
                 gate = None
                 if __debug__: self._log('EXCEPTION: GATE: LISTEN:"{}", {}, {}'.format(
@@ -478,6 +702,7 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
 
     def close(self):
         for gate in self._gate:
+            del self.socket_by_fd[gate.fileno()]
             gate.close()
 
             if gate in self._input_check_sockets:
@@ -490,12 +715,12 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
         self._unlink_good_af_unix_sockets()
 
     def destroy(self):
+        self.close()
         self.close_all_connections()
         self.remove_all_connections()
-        self.close()
 
     def add_client(self, expected_client_info: Client):
-        '''
+        """
         Добавляет новый expected client в список. Это может быть как клиент (который сам подключился или подключится в
         будущем), так и супер-сервер, попытка подключения к которому будет осуществлена тут же - на месте.
         При этом если произойдет какая-либо ошибка при подключении к супер-серверу - expected client не будет
@@ -504,7 +729,7 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
         перед закрытием и уничтожением сервера) цикл обработки io_iteration().
         :param expected_client_info: link to Client()
         :return: expected_client_id
-        '''
+        """
         if (expected_client_info.connection_settings.keyword is None) \
                 and (ConnectionDirectionRole.client == expected_client_info.connection_settings.direction_role):
             raise Exception('Keyword in Client.connection_settings should not be None for a Client connection!')
@@ -559,17 +784,17 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
         return expected_client_info.id
 
     def get_client_id_by_keyword(self, expected_client_keyword):
-        '''
+        """
         :param expected_client_keyword: expected_client_keyword
         :return: link to Client()
-        '''
+        """
         return self._keywords_for_expected_clients[expected_client_keyword]
 
     def get_client_info(self, expected_client_id):
-        '''
+        """
         :param expected_client_id: expected_client_id
         :return: link to Client()
-        '''
+        """
         return self._expected_clients[expected_client_id]
 
     def get_connection_input_fifo_size_for_client(self, expected_client_id):
@@ -664,12 +889,12 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
                                               class_for_unknown_clients_inline_processing)
 
     def close_client_connection(self, expected_client_id, raise_if_already_closed=True):
-        '''
+        """
         Connection will be closed immediately (inside this method)
         :param expected_client_id:
         :param raise_if_already_closed:
         :return:
-        '''
+        """
         if __debug__: self._log('CLOSE EXPECTED CLIENT SOCKET:')
         expected_client_info = self._expected_clients[expected_client_id]
         connection_info = expected_client_info._Client__connection
@@ -679,12 +904,12 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
 
     def mark_client_connection_as_should_be_closed_immediately(self, expected_client_id,
                                                                raise_if_already_closed=True):
-        '''
+        """
         Connection will be closed immediately (inside main IO loop)
         :param expected_client_id:
         :param raise_if_already_closed:
         :return:
-        '''
+        """
         if __debug__: self._log('MARK EXPECTED CLIENT SOCKET AS SHOULD BE CLOSED IMMEDIATELY:')
         expected_client_info = self._expected_clients[expected_client_id]
         connection_info = expected_client_info._Client__connection
@@ -693,12 +918,12 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
         self._mark_connection_to_be_closed_immediately(connection_info)
 
     def mark_client_connection_as_ready_to_be_closed(self, expected_client_id, raise_if_already_closed=True):
-        '''
+        """
         Connection will be closed when all output will be sent (inside main IO loop).
         :param expected_client_id:
         :param raise_if_already_closed:
         :return:
-        '''
+        """
         if __debug__: self._log('MARK EXPECTED CLIENT SOCKET AS READY TO BE CLOSED:')
         expected_client_info = self._expected_clients[expected_client_id]
         connection_info = expected_client_info._Client__connection
@@ -716,14 +941,15 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
         self.remove_connection(connection_id)
 
     def add_connection(self, conn, address):
-        '''
+        """
         :param conn: socket
         :param address: address
         :return: client ID
-        '''
+        """
         if conn is None:
             raise TypeError('conn should not be None!')
 
+        self.socket_by_fd[conn.fileno()] = conn
         conn.setblocking(0)
         if self.use_nodelay_inet and (conn.family in INET_TYPE_CONNECTIONS):
             conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
@@ -741,6 +967,19 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
 
         return new_client_id
 
+    def check_connection_existance(self, connection_id):
+        if connection_id not in self._expected_clients:
+            return False
+        if connection_id not in self._connections:
+            return False
+        client_info = self._connections[connection_id]
+        if not client_info.conn.existence:
+            return False
+        conn = client_info.conn.result
+        if conn is None:
+            return False
+        return True
+
     def close_connection(self, connection_id):
         if __debug__: self._log('CLOSE CLIENT {}:'.format(connection_id))
         client_info = self._connections[connection_id]
@@ -752,6 +991,7 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
             if __debug__: self._log('CLIENT {} CONN IS NONE.'.format(connection_id))
             return
 
+        del self.socket_by_fd[conn.fileno()]
         conn.close()
         client_info.conn.existence = False
         client_info.output_to_client = copy.copy(client_info.output_to_client)  # clear all output data to free some
@@ -832,6 +1072,7 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
         self._internal_log.append(log_string)
         if self.echo_log:
             print(log_string)
+            sys.stdout.flush()
 
     def _create_unknown_client_from_connection(self, client_info: Connection):
         keyword = None
@@ -879,19 +1120,20 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
         self._inline_processor__init_parameters(connection_info, expected_client_info)
 
     def _connect_to_super_server(self, expected_client_info: Client):
-        '''
+        """
         Подключение происходит в блокируещем режиме (неблокирующий режим включается позже - в методе add_connection()).
         Для реализации неблокирующего режима надо оттестировать текущий код и ввести дополнительную неблокирующую
         логику через select/poll/epoll:
         http://man7.org/linux/man-pages/man2/connect.2.html
         :param expected_client_info:
         :return:
-        '''
+        """
         connection_settings = expected_client_info.connection_settings
         conn = None
         try:
             conn = socket.socket(connection_settings.socket_family, connection_settings.socket_type,
                                  connection_settings.socket_protocol, connection_settings.socket_fileno)
+            self.socket_by_fd[conn.fileno()] = conn
             # conn.setblocking(0)
         except (socket.error, OSError) as err:
             if __debug__: self._log('EXCEPTION: SUPER SERVER: CONNECT TO: CREATE SOCKET: {}, {}'.format(
@@ -900,7 +1142,9 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
 
         try:
             conn.connect(connection_settings.socket_address)
-        except (socket.error, OSError) as err:
+        except (TimeoutError, socket.error, OSError) as err:
+            # https://stackoverflow.com/questions/16772519/socket-recv-on-selected-socket-failing-with-etimedout
+            del self.socket_by_fd[conn.fileno()]
             conn.close()
             if __debug__: self._log('EXCEPTION: SUPER SERVER: CONNECT TO: CONNECT:"{}", {}, {}'.format(
                 connection_settings.socket_address, err.errno, err.strerror))
@@ -1039,6 +1283,7 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
             client_address = None
             try:
                 connection, client_address = readable_socket.accept()
+                self.socket_by_fd[connection.fileno()] = connection
                 connection_id = self.add_connection(connection, client_address)
                 client_info = self._connections[connection_id]
             except BlockingIOError as err:
@@ -1166,7 +1411,13 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
         ok = True
 
         if curr_client_info.current_memoryview_input:
-            nbytes = curr_client_info.conn.result.recv_into(curr_client_info.current_memoryview_input)
+            nbytes = 0
+            try:
+                nbytes = curr_client_info.conn.result.recv_into(curr_client_info.current_memoryview_input)
+            except TimeoutError:
+                # https://stackoverflow.com/questions/16772519/socket-recv-on-selected-socket-failing-with-etimedout
+                pass
+
             if nbytes > 0:
                 data = curr_client_info.current_memoryview_input[:nbytes]
                 curr_client_info.current_memoryview_input = curr_client_info.current_memoryview_input[nbytes:]
@@ -1250,10 +1501,37 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
                                 curr_client_info.addr.result, err.errno, err.strerror))
                             self._mark_connection_to_be_closed_immediately(curr_client_info)
                             ok = False
+                        elif errno.EHOSTUNREACH == err.errno:
+                            # OSError: [Errno 113] No route to host
+                            if __debug__: self._log(
+                                'CLOSING {}: No route to host'.format(curr_client_info.addr.result))
+                            if __debug__: self._log('EXCEPTION: READ DATA FROM SOCKET: "{}", {}, {}'.format(
+                                curr_client_info.addr.result, err.errno, err.strerror))
+                            self._mark_connection_to_be_closed_immediately(curr_client_info)
+                            ok = False
                         else:
+                            if __debug__: self._log(
+                                'CLOSING {}: Unknown reason'.format(curr_client_info.addr.result))
+                            if __debug__: self._log('EXCEPTION: READ DATA FROM SOCKET: "{}", {}, {}'.format(
+                                curr_client_info.addr.result, err.errno, err.strerror))
                             raise err
                     else:
-                        raise err
+                        if errno.WSAEHOSTUNREACH == err.errno:
+                            # OSError: [Errno 113] No route to host
+                            if __debug__: self._log(
+                                'CLOSING {}: No route to host'.format(curr_client_info.addr.result))
+                            if __debug__: self._log('EXCEPTION: READ DATA FROM SOCKET: "{}", {}, {}'.format(
+                                curr_client_info.addr.result, err.errno, err.strerror))
+                            self._mark_connection_to_be_closed_immediately(curr_client_info)
+                            ok = False
+                        else:
+                            if __debug__: self._log(
+                                'CLOSING {}: Unknown reason'.format(curr_client_info.addr.result))
+                            if __debug__: self._log('EXCEPTION: READ DATA FROM SOCKET: "{}", {}, {}'.format(
+                                curr_client_info.addr.result, err.errno, err.strerror))
+                            self._mark_connection_to_be_closed_immediately(curr_client_info)
+                            ok = False
+                            # raise err
 
             read_is_forbidden = False
             if (self.global_in__data_full_size.result - self.global_in__deletable_data_full_size.result) \
@@ -1346,6 +1624,17 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
                         curr_client_info.current_memoryview_output = memoryview(curr_client_info.output_to_client.get())
 
                     if curr_client_info.current_memoryview_output is None:
+                        # if curr_client_info.ready_to_be_closed:
+                        #     if first_pass:
+                        #         # Т.е. если данных на отправку небыло даже при первом проходе цикла - т.е. изначально.
+                        #         # Это значит что все данные были отправлены, и можно закрывать соединение.
+                        #         self._output_check_sockets.remove(writable_socket)
+                        #         self._mark_connection_to_be_closed_immediately(curr_client_info)
+                        #     # Если соединение помечено как "Готово к закрытию" - то нам надо дождаться момента когда
+                        #     # данные будут отправлены, и только в этот момент закрывать соединение. Поэтому надо
+                        #     # сохранить сокет в списке проверяемых для отправки.
+                        # else:
+                        #     self._output_check_sockets.remove(writable_socket)
                         if not curr_client_info.ready_to_be_closed:
                             # Если соединение помечено как "Готово к закрытию" - то нам надо дождаться момента когда
                             # данные будут отправлены, и только в этот момент закрывать соединение. Поэтому надо
@@ -1409,6 +1698,7 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
 
     def _mark_connection_to_be_closed_immediately(self, client_info: Connection):
         client_info.should_be_closed = True
+        client_info.current_memoryview_input = None
         self._connections_marked_to_be_closed_immediately.add(client_info.conn.result)
         if client_info.connected_expected_client_id is not None:
             self._io_iteration_result.clients_with_disconnected_connection.add(
@@ -1728,16 +2018,28 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
                     if __debug__: self._log('EXCEPTION: INITIATION: GATE: AF_UNIX SOCKET IS ALREADY EXIST: {}'.format(
                         connection_settings.socket_address))
 
+class ThereAreNoGateConections(Exception):
+    pass
+
+class NotEnoughGateConnections(Exception):
+    pass
 
 @contextmanager
-def asock_io_core_connect(asock_io_core_obj: ASockIOCore, should_have_gate_connections: bool=False, backlog: int=1):
+def asock_io_core_connect(asock_io_core_obj: ASockIOCore, should_have_gate_connections: bool=False, backlog: int=1,
+                          should_have_all_desired_gate_connections: bool=False):
     try:
+        desired_amount_of_gate_connections = len(asock_io_core_obj.gates_connections_settings)
         gate_connections_num = asock_io_core_obj.listen(backlog)
         if should_have_gate_connections and (not gate_connections_num):
             error_text = 'ERROR: CONTEXTMANAGER: BASIC INITIATION: THERE IS NO GOOD GATE CONNECTIONS!'
             asock_io_core_obj._log(error_text)
-            raise Exception(error_text)
+            raise ThereAreNoGateConections(error_text)
         else:
+            if should_have_all_desired_gate_connections:
+                if desired_amount_of_gate_connections != gate_connections_num:
+                    error_text = 'ERROR: CONTEXTMANAGER: BASIC INITIATION: NOT ENOUGH GOOD GATE CONNECTIONS!'
+                    asock_io_core_obj._log(error_text)
+                    raise NotEnoughGateConnections(error_text)
             print('THERE ARE CREATED {} GOOD GATE CONNECTIONS'.format(gate_connections_num))
         yield asock_io_core_obj
     except:
@@ -1752,11 +2054,11 @@ def asock_io_core_connect(asock_io_core_obj: ASockIOCore, should_have_gate_conne
 
 class CheckIsRawConnection:
     def __call__(self, asock_io_core: ASockIOCore, connection_info: Connection)->bool:
-        '''
+        """
         :param asock_io_core:
         :param connection_info:
         :return: "True" if it is RAW connection for Unknow Client. "False" otherwise.
-        '''
+        """
         result = False
         try:
             if connection_info.conn.result.family in {socket.AF_INET, socket.AF_INET6}:
