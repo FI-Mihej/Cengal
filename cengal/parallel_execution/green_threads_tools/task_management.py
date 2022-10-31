@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2017 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 from typing import Callable, Any, Hashable
 from collections import deque
 from greenlet import greenlet
-from cengal.id_generator import IDGenerator, GeneratorType
+from cengal.data_generation.id_generator import IDGenerator, GeneratorType
 from cengal.data_containers.simple_tree import Tree
 import copy
 
@@ -28,14 +28,14 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2017 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.1"
+__version__ = "0.0.8"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
-__status__ = "Prototype"
-# __status__ = "Development"
+# __status__ = "Prototype"
+__status__ = "Development"
 # __status__ = "Production"
 
 
@@ -48,7 +48,7 @@ class InitialData:
 
 class TaskManager:
     def __init__(self):
-        self.id_gen = IDGenerator(GeneratorType.INTEGER)
+        self.id_gen = IDGenerator(GeneratorType.integer)
         self.root_id = self.id_gen.get_new_id()
         self.api_per_child_id = dict()
         self.greenlen_per_child_id = dict()

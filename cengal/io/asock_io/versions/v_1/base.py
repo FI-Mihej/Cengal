@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2016 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
-#
+# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-#
+# 
 #     http://www.apache.org/licenses/LICENSE-2.0
-#
+# 
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,9 +17,9 @@
 
 import socket
 import errno
-from cengal.code_flow_control import ResultExistence
+from cengal.code_flow_control.smart_values.versions.v_0 import ResultExistence
 from cengal.base import BaseClassSettings
-from cengal.hardware_info import l2_cache_per_core
+from cengal.hardware_info.cpu.versions.v_0 import l2_cache_per_core
 from cengal.data_containers import DynamicListOfPiecesDequeWithLengthControl, \
     FIFODequeWithLengthControl
 from .abstract import *
@@ -31,10 +31,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2016 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "1.0.0"
+__version__ = "0.0.8"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -165,7 +165,16 @@ class ASockIOCoreMemoryManagement(IOCoreMemoryManagement):
 
         self.socket_read_fixed_buffer_size = ResultExistence(True,
                                                              int(l2_cache_per_core() / 2) or 1024 ** 2)
-        # 1024**2 is the fastest fixed read buffer. Also it should be the half of the CPU cache per core.
+        # 1024**2 is the fastest fixed read buffer on my CPU.
+        # Also ingeneral, it should be the half of the CPU cache per core (UPD: I don't remember why. Maybe to save other memory to instructions when we are dealing with big amount of connections).
+        # 
+        # My CPU is Intel Core i5 3570:
+        # Architecture	x86-64
+        # Threads	4 threads
+        # L2 cache	1 MB
+        # L2 cache per core	0.25 MB/core
+        # L3 cache	6 MB
+        # L3 cache per core	1.5 MB/core
 
     def link_to(self, parent):
         super(ASockIOCoreMemoryManagement, self).link_to(parent)
@@ -352,7 +361,7 @@ class Client:
 
 
 class CheckIsRawConnection:
-    def __call__(self, asock_io_core: ASockIOCore, connection_info: Connection)->bool:
+    def __call__(self, asock_io_core: 'ASockIOCore', connection_info: Connection)->bool:
         """
         :param asock_io_core:
         :param connection_info:

@@ -11,26 +11,28 @@ It is made for [CPython 2/3 and PyPy 2/3; Linux, Win32 and OS X]
 
 How much of your time you can save if you'll use Cengal?
 
-That much:
+That much (at the moment of 27 Oct 2022):
+
+161 modules
 
 ```
 
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Python                          81           2050           3005           8760
-Cython                           2            120             69            435
-Markdown                         2             49              0            236
+Python                         397          10291          12906          35398
+Cython                           5            423            284           1411
 -------------------------------------------------------------------------------
-SUM:                            85           2219           3074           9431
--------------------------------------------------------------------------------
-TOTAL:                                                                    14724
+SUM:                           402          10714          13190          36809
 -------------------------------------------------------------------------------
 
 ```
+
 Counted with [cloc](https://github.com/AlDanial/cloc) util.
 
-# Installation
+It's at very least is 260 man-days of work or at very least is a 1 man-year of of work (8 hours per day, 5 days per week, without vacations/holidays/seakleaves). I've used widly known industry standard for this measurement: +142 lines of code to the codebase per day by the year of measurements.
+
+# [Outdated] Installation
 
 1. Clone repo or download and unpack archive.
 2. Add root folder (that contains this Readme) to PYTHONPATH environment variable.
@@ -42,7 +44,10 @@ Now you can import modules from it:
 * etc.
 
 # Some of the Modules (most interesting)
+* **parallel_execution**:
+    * **"coroutines"** - [coroutines](/cengal/parallel_execution/coroutines/__init__.py) modern async/await or greenlets based coroutine loop with an easily extendable service based architecture. Made to be an easily integratable to any other loops (asyncio loops, gui loops, etc.). Greenlets based coroutines are handy when you do not want to split your codebase between async and usual versions of same/similar code. Async/await based coroutines are handy when you prefer to explicitly mark your coroutines by an "async" word. Both types of coroutines can be used in the same loop if needed.
 
+# [Outdated] Some of the Modules (most interesting)
 * **IO**:
     * **"simple_network"** (will be renamed to **"ASockIO"**) - high-level, fast, powerful and robust IO library. 
     * **"net_io"** - simple async TCP server/client. It's much closer to raw sockets and not isolates "connection" objects from the user's code.
@@ -99,6 +104,6 @@ All tools will memorise last used inputs and configurations inside User Dir fold
 
 # License
 
-Copyright © 2016 ButenkoMS. All rights reserved.
+Copyright © 2012-2022 ButenkoMS. All rights reserved.
 
 Licensed under the Apache License, Version 2.0.

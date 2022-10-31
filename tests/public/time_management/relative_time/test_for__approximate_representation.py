@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2017 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,23 +24,24 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2017 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.1"
+__version__ = "0.0.8"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
-__status__ = "Prototype"
-
-
-# __status__ = "Development"
+# __status__ = "Prototype"
+__status__ = "Development"
 # __status__ = "Production"
 class TestApproximateTimeRepresentation(unittest.TestCase):
     def test_all_parameters_are_present(self):
         tr = ApproximateTimeRepresentation(3.045678, crop=False)
         tr_res = tr.format()
+        print(tr_res)
         tr_res = tr.format_cropped()
+        print(tr_res)
         tr_res = str(tr)
+        print(tr_res)
         expected_result = '|(years)%4%; - %2%; - %1%|.'
         self.assertEqual(1, 1, 'incorrect result')
 

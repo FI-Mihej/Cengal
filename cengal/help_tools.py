@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2016 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
-#
+# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-#
+# 
 #     http://www.apache.org/licenses/LICENSE-2.0
-#
+# 
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,13 +16,8 @@
 # limitations under the License.
 
 from cengal.system import PLATFORM_NAME, PYTHON_VERSION, PYTHON_VERSION_INT
-from cengal.base import BaseClassSettings, none_or
-
-from cengal.text_processing import get_text_in_brackets_offset
-
+from cengal.text_processing.help_tools import get_text_in_brackets_offset
 from cengal.system import PLATFORM_NAME
-if 'PyPy' != PLATFORM_NAME:
-    import requests
 import binascii
 import os, os.path
 import pickle
@@ -33,8 +28,7 @@ from inspect import currentframe, getframeinfo, getouterframes
 import traceback
 import sys
 import struct
-
-from cengal.modules_management import alt_import
+from cengal.modules_management.alternative_import import alt_import
 
 with alt_import('lzma') as lzma:
     if lzma is None:
@@ -48,10 +42,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2016 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "1.0.0"
+__version__ = "0.0.8"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -72,6 +66,11 @@ def join_path_example(a, b):
 
 def json_to_printable_string(json_obj):
     result = json.dumps(json_obj, sort_keys=True, indent=4, separators=(',', ': '))
+    return result
+
+
+def make_readable_json(json_string):
+    result = json.dumps(json.loads(json_string), indent=4)
     return result
 
 
@@ -199,11 +198,6 @@ def bisect_search(data, max_value):
     return result
 
 
-def make_readable_json(json_string):
-    result = json.dumps(json.loads(json_string), indent=4)
-    return result
-
-
 def current_line():
     (frame, filename, line_number, function_name, lines, index) = getouterframes(currentframe())[1]
     result = (filename, function_name, line_number, lines, index)
@@ -243,26 +237,6 @@ def parse_cmd_input_dir_list(search_dir_list_raw):
     else:
         search_dir_list.append(search_dir_list_raw.strip())
     return search_dir_list
-
-
-def dict_by_id_list_limiter(dict_data, list_data, limit, max_limit):
-    result_dict = dict_data
-    result_list = list_data
-    list_data_len = len(list_data)
-    keys_to_delete = None
-    if list_data_len > max_limit:
-        keys_to_delete = list_data[:list_data_len - limit]
-        result_list = list_data[list_data_len - limit:]
-    if keys_to_delete is not None:
-        for key_to_delete in keys_to_delete:
-            # del result_dict[key_to_delete]
-            if key_to_delete in result_dict:
-                del result_dict[key_to_delete]
-            else:
-                # print('WRONG:', key_to_delete, '; ', result_dict.items())
-                pass
-    result_data = (result_dict, result_list)
-    return result_data
 
 
 def check_int_value(value, value_size=4):

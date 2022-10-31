@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2017 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,11 @@ import binascii
 import os, os.path
 import pickle
 import datetime
+# try to import C parser then fallback in pure python parser.
+try:
+    from http_parser.parser import HttpParser
+except ImportError:
+    from http_parser.pyparser import HttpParser
 
 from cengal.modules_management import alt_import
 
@@ -39,14 +44,14 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2017 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.1"
+__version__ = "0.0.8"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
-__status__ = "Prototype"
-# __status__ = "Development"
+# __status__ = "Prototype"
+__status__ = "Development"
 # __status__ = "Production"
 
 
@@ -167,7 +172,7 @@ def is_path_is_not_safe(string):
     return result
 
 
-def web_server__is_redirection_to_the_main_domain_needed(httpParser, prefix=None):
+def web_server__is_redirection_to_the_main_domain_needed(httpParser: HttpParser, prefix=None):
     functionResult = False
 
     host = httpParser.get_headers()['Host']

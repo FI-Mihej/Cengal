@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2017 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from time import clock
-perf_counter = process_time = clock
+try:
+    from time import clock
+    perf_counter = process_time = clock
+except ImportError:
+    pass
 
 try:
     from time import perf_counter
@@ -34,12 +37,12 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2017 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.1"
+__version__ = "0.0.8"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
-__status__ = "Prototype"
-# __status__ = "Development"
+# __status__ = "Prototype"
+__status__ = "Development"
 # __status__ = "Production"

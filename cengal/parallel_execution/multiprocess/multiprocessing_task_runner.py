@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2016 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
-#
+# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-#
+# 
 #     http://www.apache.org/licenses/LICENSE-2.0
-#
+# 
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,11 +21,11 @@ from multiprocessing import Process, Queue, Pipe
 from threading import Thread
 import sys
 import traceback
-from queue import Empty
+from queue import Empty, Full
 import marshal
 import pickle
 import os
-from cengal.data_containers import FrontTriggerableVariable, FrontTriggerableVariableType
+from cengal.data_manipulation.front_triggerable_variable import FrontTriggerableVariable, FrontTriggerableVariableType
 from cengal.base import BaseClassSettings
 
 # import time
@@ -36,10 +36,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2016 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "1.0.0"
+__version__ = "0.0.8"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -372,7 +372,7 @@ class SubprocessWorker:
         # print('<<===>>', self.settings.process_name, '_subprocess_wrapper')
 
     def start(self):
-        if self.subprocess_was_initiated:
+        if not self.subprocess_was_initiated:
             if self.queue_to_subprocess is None:
                 if Transport.pipe == self.settings.transport:
                     self.queue_to_subprocess = Pipe()
@@ -395,9 +395,9 @@ class SubprocessWorker:
                 arguments = tuple()
             self.subprocess = None
             if self.settings.need_multithreading:
-                self.subprocess = Thread(target=target, args=arguments)
+                self.subprocess = Thread(target=target, args=arguments, daemon=True)
             else:
-                self.subprocess = Process(target=target, args=arguments)
+                self.subprocess = Process(target=target, args=arguments, daemon=True)
             self.subprocess.start()
             self.subprocess_was_initiated = True
 

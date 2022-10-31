@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2016 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
-#
+# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-#
+# 
 #     http://www.apache.org/licenses/LICENSE-2.0
-#
+# 
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,12 +24,12 @@ from typing import Set, Iterable
 import copy
 from collections import deque
 
-from cengal.IDGenerator import IDGenerator, TypeOfGenerator
+from cengal.data_generation.id_generator import IDGenerator, GeneratorType
 from .base import *
 
-from cengal.data_containers import FIFOIsEmpty, \
-    FrontTriggerableVariable, FrontTriggerableVariableType
-from cengal.code_flow_control import ResultExistence
+from cengal.data_containers.fast_fifo import FIFOIsEmpty
+from cengal.data_manipulation.front_triggerable_variable import FrontTriggerableVariable, FrontTriggerableVariableType
+from cengal.code_flow_control.smart_values.versions.v_0 import ResultExistence
 from contextlib import contextmanager
 from cengal.code_inspection import set_profiler
 from .abstract import *
@@ -39,10 +39,10 @@ CAUTION: some code here is optimized for speed - not for readability or beauty.
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2016 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "1.0.0"
+__version__ = "0.0.8"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -136,7 +136,7 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
         self.raw_checker_for_new_incoming_connections = CheckIsRawConnection()
         self.need_to_auto_check_incoming_raw_connection = False
         self.unknown_clients_are_allowed = False
-        self._unknown_clients_keyword_gen = IDGenerator(TypeOfGenerator.GUID_STRING)
+        self._unknown_clients_keyword_gen = IDGenerator(GeneratorType.guid_string)
         self.prefix_for_unknown_client_keywords = b'UNKNOWN CLIENT: '
 
         self.echo_log = False

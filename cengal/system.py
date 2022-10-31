@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2017 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,8 +16,13 @@
 # limitations under the License.
 
 
+__all__ = ['PLATFORM_NAME', 'PYTHON_VERSION', 'PYTHON_VERSION_INT', 'IS_RUNNING_IN_PYCHARM', 'IS_RUNNING_IN_EMSCRIPTEN', 'IS_RUNNING_IN_PYODIDE', 'IS_BUILDING_FOR_PYODIDE']
+
+
 import platform
 import sys
+import os
+from typing import Tuple
 
 
 """
@@ -26,20 +31,26 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2017 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.1"
+__version__ = "0.0.8"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
-__status__ = "Prototype"
-# __status__ = "Development"
+# __status__ = "Prototype"
+__status__ = "Development"
 # __status__ = "Production"
 
 
-PLATFORM_NAME = platform.python_implementation()  # can be 'PyPy', 'CPython', etc.
-PYTHON_VERSION = platform.python_version_tuple()  # tuple() of str(); for example: ('3', '5', '1')
-PYTHON_VERSION_INT = sys.version_info  # sys.version_info == (major=3, minor=2, micro=5, releaselevel='final', serial=0)
-#   Usage: sys.version_info[0] == 3
+PLATFORM_NAME: str = platform.python_implementation()  # can be 'PyPy', 'CPython', etc.
+PYTHON_VERSION: Tuple[str, str, str] = platform.python_version_tuple()  # tuple() of str(); for example: ('3', '5', '1')
+PYTHON_VERSION_INT = sys.version_info  # named typle sys.version_info(major=3, minor=7, micro=9, releaselevel='final', serial=0)
+#   Usage: 
+#       sys.version_info[0] == 3
+#       (3,) > sys.version_info  # Is Python 2
+#       (3, 6) <= sys.version_info  # Is Python 3.6+
 
-
+IS_RUNNING_IN_PYCHARM: bool = "PYCHARM_HOSTED" in os.environ
+IS_RUNNING_IN_EMSCRIPTEN: bool = 'emscripten' == sys.platform
+IS_RUNNING_IN_PYODIDE: bool = "pyodide" in sys.modules
+IS_BUILDING_FOR_PYODIDE: bool = "PYODIDE" in os.environ  # for setup.py execution time

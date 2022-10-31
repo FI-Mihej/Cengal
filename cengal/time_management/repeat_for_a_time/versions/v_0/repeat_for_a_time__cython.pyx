@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2017 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,14 +36,14 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2017 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.1"
+__version__ = "0.0.8"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
-__status__ = "Prototype"
-# __status__ = "Development"
+# __status__ = "Prototype"
+__status__ = "Development"
 # __status__ = "Production"
 
 
@@ -54,7 +54,9 @@ else:
 
 
 class TimeLimitIsTooSmall(Exception):
-    pass
+    def __init__(self, min_time, *args):
+        super().__init__(*args)
+        self.min_time = min_time
 
 
 class ClockType(Enum):
@@ -68,11 +70,12 @@ cdef inline clock_t _fake():
     return 0
 
 
-cdef inline clock_t _clock():
+cdef inline clock_t _cpython__clock():
     return clock()
 
-def c_clock():
-    return <float>_clock() / <float>CLOCKS_PER_SEC
+
+cdef c_clock():
+    return <float>_cpython__clock() / <float>CLOCKS_PER_SEC
 
 
 cdef inline clock_t _perf_counter():
@@ -112,41 +115,44 @@ cdef class BaseTracer:
     """
 
     cdef:
-        clock_t _run_time
-        unsigned int _number_of_iterations
-        unsigned int _last_tracked_number_of_iterations
-        clock_t _start_time
-        clock_t _end_time
-        clock_t _relevant_stop_time
-        bint _last_run_was_made
+        clock_t _cpython__run_time
+        unsigned int _cpython__number_of_iterations
+        unsigned int _cpython__last_tracked_number_of_iterations
+        clock_t _cpython__start_time
+        clock_t _cpython__end_time
+        clock_t _cpython__relevant_stop_time
+        bint _cpython__last_run_was_made
         object _iter_impl
-        object _clock
-        object _clock_type
+        object _cpython__clock
+        object _cpython__clock_type
 
-    def __init__(self, float run_time: float, object clock_type=ClockType.perf_counter):
+    def __init__(self, float run_time, object clock_type=ClockType.perf_counter):
         self._iter_impl = None
-        self._number_of_iterations = 0
-        self._last_tracked_number_of_iterations = 0
-        self._start_time = 0
-        self._end_time = 0
-        self._relevant_stop_time = 0
-        self._last_run_was_made = False
-        self._clock_type = clock_type
-        self._clock = None
-        if ClockType.fake == self._clock_type:
-            self._clock = _fake
-        elif ClockType.clock == self._clock_type:
-            self._clock = _clock
-        elif ClockType.perf_counter == self._clock_type:
-            self._clock = _perf_counter
-        elif ClockType.process_time == self._clock_type:
-            self._clock = _process_time
-        self._run_time = <clock_t>round(run_time * <float>CLOCKS_PER_SEC)
-        if not self._run_time:
-            raise TimeLimitIsTooSmall()
+        self._cpython__number_of_iterations = 0
+        self._cpython__last_tracked_number_of_iterations = 0
+        self._cpython__start_time = 0
+        self._cpython__end_time = 0
+        self._cpython__relevant_stop_time = 0
+        self._cpython__last_run_was_made = False
+        self._cpython__clock_type = clock_type
+        self._cpython__clock = None
+        self._init_clock()
+        self._cpython__run_time = <clock_t>round(run_time * <float>CLOCKS_PER_SEC)
+        if not self._cpython__run_time:
+            raise TimeLimitIsTooSmall(1.0 / <float>CLOCKS_PER_SEC)
 
     def __call__(self, *args, **kwargs):
-        return self._last_run_was_made
+        return self._cpython__last_run_was_made
+    
+    def _init_clock(self):
+        if ClockType.fake == self._cpython__clock_type:
+            self._cpython__clock = _fake
+        elif ClockType.clock == self._cpython__clock_type:
+            self._cpython__clock = _cpython__clock
+        elif ClockType.perf_counter == self._cpython__clock_type:
+            self._cpython__clock = _perf_counter
+        elif ClockType.process_time == self._cpython__clock_type:
+            self._cpython__clock = _process_time
 
     def iter(self):
         raise NotImplemented()
@@ -157,23 +163,100 @@ cdef class BaseTracer:
 
     @property
     def iterations_made(self):
-        return self._last_tracked_number_of_iterations
+        return self._cpython__last_tracked_number_of_iterations
 
     @property
     def total_number_of_iterations_made(self):
-        return self._number_of_iterations
+        return self._cpython__number_of_iterations
 
     @property
     def time_spent(self):
-        return <float>(self._relevant_stop_time - self._start_time) / <float>CLOCKS_PER_SEC
+        return <float>(self._cpython__relevant_stop_time - self._cpython__start_time) / <float>CLOCKS_PER_SEC
 
     @property
     def total_amount_of_time_spent(self):
-        return <float>(self._end_time - self._start_time) / <float>CLOCKS_PER_SEC
+        return <float>(self._cpython__end_time - self._cpython__start_time) / <float>CLOCKS_PER_SEC
 
     @property
     def clock_type(self):
-        raise self._clock_type
+        return self._cpython__clock_type
+
+    # ===============
+    @property
+    def _clock_type(self):
+        return self._cpython__clock_type
+
+    @property
+    def _last_tracked_number_of_iterations(self):
+        return self._cpython__last_tracked_number_of_iterations
+
+    @property
+    def _number_of_iterations(self):
+        return self._cpython__number_of_iterations
+    
+    @property
+    def _start_time(self):
+        return <float>self._cpython__start_time / <float>CLOCKS_PER_SEC
+    
+    @property
+    def _end_time(self):
+        return <float>self._cpython__end_time / <float>CLOCKS_PER_SEC
+    
+    @property
+    def _relevant_stop_time(self):
+        return <float>self._cpython__relevant_stop_time / <float>CLOCKS_PER_SEC
+    
+    @property
+    def _last_run_was_made(self):
+        return self._cpython__last_run_was_made
+    
+    def _clock_py(self):
+        return <float>self._cpython__clock() / <float>CLOCKS_PER_SEC
+    
+    @property
+    def _clock(self):
+        return self._clock_py
+    
+    @property
+    def _run_time(self):
+        return <float>self._cpython__run_time / <float>CLOCKS_PER_SEC
+
+    @clock_type.setter
+    def clock_type(self, value: ClockType):
+        self._cpython__clock_type = value
+        self._init_clock()
+
+    @_last_tracked_number_of_iterations.setter
+    def _last_tracked_number_of_iterations(self, value):
+        self._cpython__last_tracked_number_of_iterations = value
+
+    @_number_of_iterations.setter
+    def _number_of_iterations(self, value):
+        self._cpython__number_of_iterations = value
+
+    @_clock_type.setter
+    def _clock_type(self, value: ClockType):
+        self._cpython__clock_type = value
+    
+    @_start_time.setter
+    def _start_time(self, value):
+        self._cpython__start_time = <clock_t>round(value * <float>CLOCKS_PER_SEC)
+    
+    @_end_time.setter
+    def _end_time(self, value):
+        self._cpython__end_time = <clock_t>round(value * <float>CLOCKS_PER_SEC)
+    
+    @_relevant_stop_time.setter
+    def _relevant_stop_time(self, value):
+        self._cpython__relevant_stop_time = <clock_t>round(value * <float>CLOCKS_PER_SEC)
+    
+    @_last_run_was_made.setter
+    def _last_run_was_made(self, value):
+        self._cpython__last_run_was_made = value
+    
+    @_run_time.setter
+    def _run_time(self, value):
+        self._cpython__run_time = <clock_t>round(value * <float>CLOCKS_PER_SEC)
 
 
 cdef class Tracer(BaseTracer):
@@ -193,24 +276,24 @@ cdef class Tracer(BaseTracer):
     """
 
     cdef:
-        clock_t _half_of_the_run_time
-        clock_t _relevant_start_time
-        unsigned int _relevant_number_of_iterations_at_start
-        unsigned int _relevant_number_of_iterations_at_end
-        unsigned int _next_test_stop_on
-        object _testing_worker
+        clock_t _cpython__half_of_the_run_time
+        clock_t _cpython__relevant_start_time
+        unsigned int _cpython__relevant_number_of_iterations_at_start
+        unsigned int _cpython__relevant_number_of_iterations_at_end
+        unsigned int _cpython__next_test_stop_on
+        object _cpython__testing_worker
 
-    def __init__(self, float run_time: float, object clock_type=ClockType.clock):
+    def __init__(self, float run_time, object clock_type=ClockType.perf_counter):
         super().__init__(run_time, clock_type)
         self._iter_impl = self._first_run
-        self._testing_worker = self._test_runs
-        self._relevant_start_time = 0
-        self._relevant_number_of_iterations_at_start = 0
-        self._relevant_number_of_iterations_at_end = 0
-        self._next_test_stop_on = 1
-        self._half_of_the_run_time = <clock_t>round(<float>self._run_time / 2.0)
-        if not self._half_of_the_run_time:
-            raise TimeLimitIsTooSmall()
+        self._cpython__testing_worker = self._test_runs
+        self._cpython__relevant_start_time = 0
+        self._cpython__relevant_number_of_iterations_at_start = 0
+        self._cpython__relevant_number_of_iterations_at_end = 0
+        self._cpython__next_test_stop_on = 1
+        self._cpython__half_of_the_run_time = <clock_t>round(<float>self._cpython__run_time / 2.0)
+        if not self._cpython__half_of_the_run_time:
+            raise TimeLimitIsTooSmall(2.0 / <float>CLOCKS_PER_SEC)
 
     def iter(self):
         return self._iter_impl()
@@ -220,32 +303,32 @@ cdef class Tracer(BaseTracer):
         cdef:
             float divider
 
-        if self._last_run_was_made:
-            divider = <float>(self._relevant_stop_time - self._relevant_start_time) / <float>CLOCKS_PER_SEC
+        if self._cpython__last_run_was_made:
+            divider = <float>(self._cpython__relevant_stop_time - self._cpython__relevant_start_time) / <float>CLOCKS_PER_SEC
             if 0.0 != divider:
-                return <float>(self._relevant_number_of_iterations_at_end - self._relevant_number_of_iterations_at_start) \
+                return <float>(self._cpython__relevant_number_of_iterations_at_end - self._cpython__relevant_number_of_iterations_at_start) \
                        / divider
             return 0.0
         else:
-            divider = <float>(self._end_time - self._start_time) / <float>CLOCKS_PER_SEC
+            divider = <float>(self._cpython__end_time - self._cpython__start_time) / <float>CLOCKS_PER_SEC
             if 0.0 != divider:
-                return <float>self._last_tracked_number_of_iterations / divider
+                return <float>self._cpython__last_tracked_number_of_iterations / divider
             return 0.0
 
     def _first_run(self):
-        self._number_of_iterations += 1
-        self._relevant_start_time = self._start_time = self._clock()
+        self._cpython__number_of_iterations += 1
+        self._cpython__relevant_start_time = self._cpython__start_time = self._cpython__clock()
         self._iter_impl = self._subsequent_runs
-        return self._test_sub_runs(self._start_time)
+        return self._test_sub_runs(self._cpython__start_time)
 
     def _subsequent_runs(self):
-        self._number_of_iterations += 1
-        if self._number_of_iterations >= self._next_test_stop_on:
-            return self._testing_worker()
+        self._cpython__number_of_iterations += 1
+        if self._cpython__number_of_iterations >= self._cpython__next_test_stop_on:
+            return self._cpython__testing_worker()
         return True
 
     def _test_runs(self):
-        return self._test_sub_runs(self._clock())
+        return self._test_sub_runs(self._cpython__clock())
 
     def _test_sub_runs(self, clock_t current_time):
         cdef:
@@ -254,41 +337,89 @@ cdef class Tracer(BaseTracer):
             float iterations_per_second
             float iterations_left
 
-        self._relevant_stop_time = self._end_time = current_time
-        self._last_tracked_number_of_iterations = self._number_of_iterations
-        delta_time = current_time - self._start_time
-        if delta_time >= self._half_of_the_run_time:
-            time_left = self._run_time - delta_time
+        self._cpython__relevant_stop_time = self._cpython__end_time = current_time
+        self._cpython__last_tracked_number_of_iterations = self._cpython__number_of_iterations
+        delta_time = current_time - self._cpython__start_time
+        if delta_time >= self._cpython__half_of_the_run_time:
+            time_left = self._cpython__run_time - delta_time
             # No need to:
             # if time_left < 0:
             #     time_left = 0
-            iterations_per_second = <float>self._number_of_iterations / <float>delta_time
+            iterations_per_second = <float>self._cpython__number_of_iterations / <float>delta_time
             iterations_left = iterations_per_second * time_left
             if iterations_left > 0.0:
-                self._next_test_stop_on = self._number_of_iterations + round(iterations_left)
-                self._testing_worker = self._last_run
-                self._relevant_start_time = current_time
-                self._relevant_number_of_iterations_at_start = self._number_of_iterations
+                self._cpython__next_test_stop_on = self._cpython__number_of_iterations + round(iterations_left)
+                self._cpython__testing_worker = self._last_run
+                self._cpython__relevant_start_time = current_time
+                self._cpython__relevant_number_of_iterations_at_start = self._cpython__number_of_iterations
                 return True
             else:
                 return self._last_sub_run(current_time)
-        self._next_test_stop_on *= 2
+        self._cpython__next_test_stop_on *= 2
         return True
 
     def _last_run(self):
-        return self._last_sub_run(self._clock())
+        return self._last_sub_run(self._cpython__clock())
 
     def _last_sub_run(self, clock_t current_time):
-        self._relevant_stop_time = self._end_time = current_time
-        self._last_tracked_number_of_iterations = self._number_of_iterations
-        self._relevant_number_of_iterations_at_end = self._number_of_iterations
-        self._testing_worker = self._after_last_runs
-        self._last_run_was_made = 1
+        self._cpython__relevant_stop_time = self._cpython__end_time = current_time
+        self._cpython__last_tracked_number_of_iterations = self._cpython__number_of_iterations
+        self._cpython__relevant_number_of_iterations_at_end = self._cpython__number_of_iterations
+        self._cpython__testing_worker = self._after_last_runs
+        self._cpython__last_run_was_made = 1
         return False
 
     def _after_last_runs(self):
-        self._end_time = self._clock()
+        self._cpython__end_time = self._cpython__clock()
         return False
+    
+    @property
+    def _testing_worker(self):
+        return self._cpython__testing_worker
+    
+    @property
+    def _relevant_start_time(self):
+        return <float>self._cpython__relevant_start_time / <float>CLOCKS_PER_SEC
+    
+    @property
+    def _relevant_number_of_iterations_at_start(self):
+        return self._cpython__relevant_number_of_iterations_at_start
+    
+    @property
+    def _relevant_number_of_iterations_at_end(self):
+        return self._cpython__relevant_number_of_iterations_at_end
+    
+    @property
+    def _next_test_stop_on(self):
+        return self._cpython__next_test_stop_on
+    
+    @property
+    def _half_of_the_run_time(self):
+        return <float>self._cpython__half_of_the_run_time / <float>CLOCKS_PER_SEC
+    
+    @_testing_worker.setter
+    def _testing_worker(self, value):
+        self._cpython__testing_worker = value
+    
+    @_relevant_start_time.setter
+    def _relevant_start_time(self, value):
+        self._cpython__relevant_start_time = <clock_t>round(value * <float>CLOCKS_PER_SEC)
+    
+    @_relevant_number_of_iterations_at_start.setter
+    def _relevant_number_of_iterations_at_start(self, value):
+        self._cpython__relevant_number_of_iterations_at_start = value
+    
+    @_relevant_number_of_iterations_at_end.setter
+    def _relevant_number_of_iterations_at_end(self, value):
+        self._cpython__relevant_number_of_iterations_at_end = value
+    
+    @_next_test_stop_on.setter
+    def _next_test_stop_on(self, value):
+        self._cpython__next_test_stop_on = value
+    
+    @_half_of_the_run_time.setter
+    def _half_of_the_run_time(self, value):
+        self._cpython__half_of_the_run_time = <clock_t>round(value * <float>CLOCKS_PER_SEC)
 
 
 cdef class GreedyTracer(BaseTracer):
@@ -309,25 +440,25 @@ cdef class GreedyTracer(BaseTracer):
         return self._iter_impl()
 
     def _first_run(self):
-        self._start_time = self._clock()
+        self._cpython__start_time = self._cpython__clock()
         self._iter_impl = self._subsequent_runs
         return self._subsequent_runs()
 
     def _subsequent_runs(self):
-        self._relevant_stop_time = self._end_time = self._clock()
-        self._number_of_iterations += 1
-        self._last_tracked_number_of_iterations = self._number_of_iterations
+        self._cpython__relevant_stop_time = self._cpython__end_time = self._cpython__clock()
+        self._cpython__number_of_iterations += 1
+        self._cpython__last_tracked_number_of_iterations = self._cpython__number_of_iterations
 
-        if (self._relevant_stop_time - self._start_time) < self._run_time:
+        if (self._cpython__relevant_stop_time - self._cpython__start_time) < self._cpython__run_time:
             return True
         else:
-            self._last_run_was_made = True
+            self._cpython__last_run_was_made = True
             self._iter_impl = self._after_last_runs
             return False
 
     def _after_last_runs(self):
-        self._number_of_iterations += 1
-        self._end_time = self._clock()
+        self._cpython__number_of_iterations += 1
+        self._cpython__end_time = self._cpython__clock()
         return False
 
     @property
@@ -335,9 +466,9 @@ cdef class GreedyTracer(BaseTracer):
         cdef:
             float divider
 
-        divider = <float>(self._relevant_stop_time - self._start_time) / <float>CLOCKS_PER_SEC
+        divider = <float>(self._cpython__relevant_stop_time - self._cpython__start_time) / <float>CLOCKS_PER_SEC
         if 0 != divider:
-            return <float>self._last_tracked_number_of_iterations / divider
+            return <float>self._cpython__last_tracked_number_of_iterations / divider
         return 0
 
 
@@ -384,37 +515,37 @@ cdef class TracerCounter(BaseTracer):
     """
 
     cdef:
-        float _iter_per_time_unit
-        unsigned int _number_of_iterations_needed
+        float _cpython__iter_per_time_unit
+        unsigned int _cpython__number_of_iterations_needed
 
     def __init__(self, iter_per_time_unit: float, run_time: float, object clock_type=ClockType.fake):
         super().__init__(run_time, clock_type)
-        self._iter_per_time_unit = iter_per_time_unit
+        self._cpython__iter_per_time_unit = iter_per_time_unit
         self._iter_impl = self._first_run
-        self._number_of_iterations_needed = <clock_t>round(self._iter_per_time_unit * (<float>self._run_time / <float>CLOCKS_PER_SEC))
+        self._cpython__number_of_iterations_needed = <clock_t>round(self._cpython__iter_per_time_unit * (<float>self._cpython__run_time / <float>CLOCKS_PER_SEC))
 
     def iter(self):
         return self._iter_impl()
 
     def _first_run(self):
-        self._start_time = self._clock()
+        self._cpython__start_time = self._cpython__clock()
         self._iter_impl = self._subsequent_runs
         return self._subsequent_runs()
 
     def _subsequent_runs(self):
-        self._number_of_iterations += 1
-        self._last_tracked_number_of_iterations = self._number_of_iterations
-        if self._number_of_iterations < self._number_of_iterations_needed:
+        self._cpython__number_of_iterations += 1
+        self._cpython__last_tracked_number_of_iterations = self._cpython__number_of_iterations
+        if self._cpython__number_of_iterations < self._cpython__number_of_iterations_needed:
             return True
         else:
-            self._relevant_stop_time = self._end_time = self._clock()
-            self._last_run_was_made = True
+            self._cpython__relevant_stop_time = self._cpython__end_time = self._cpython__clock()
+            self._cpython__last_run_was_made = True
             self._iter_impl = self._after_last_runs
             return False
 
     def _after_last_runs(self):
-        self._number_of_iterations += 1
-        self._end_time = self._clock()
+        self._cpython__number_of_iterations += 1
+        self._cpython__end_time = self._cpython__clock()
         return False
 
     @property
@@ -422,13 +553,29 @@ cdef class TracerCounter(BaseTracer):
         cdef:
             float divider
 
-        if self._last_run_was_made:
-            divider = <float>(self._relevant_stop_time - self._start_time) / <float>CLOCKS_PER_SEC
+        if self._cpython__last_run_was_made:
+            divider = <float>(self._cpython__relevant_stop_time - self._cpython__start_time) / <float>CLOCKS_PER_SEC
             if 0.0 != divider:
-                return <float>self._last_tracked_number_of_iterations / divider
+                return <float>self._cpython__last_tracked_number_of_iterations / divider
             return 0.0
         else:
-            return self._iter_per_time_unit
+            return self._cpython__iter_per_time_unit
+
+    @property
+    def _iter_per_time_unit(self):
+        return self._cpython__iter_per_time_unit
+    
+    @property
+    def _number_of_iterations_needed(self):
+        return self._cpython__number_of_iterations_needed
+
+    @_iter_per_time_unit.setter
+    def _iter_per_time_unit(self, value):
+        self._cpython__iter_per_time_unit = value
+    
+    @_number_of_iterations_needed.setter
+    def _number_of_iterations_needed(self, value):
+        self._cpython__number_of_iterations_needed = value
 
 
 cdef class TracerIterator:

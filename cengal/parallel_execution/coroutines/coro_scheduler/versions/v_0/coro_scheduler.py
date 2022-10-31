@@ -1,0 +1,2511 @@
+#!/usr/bin/env python
+# coding=utf-8
+
+# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+"""
+Module Docstring
+Docstrings: http://www.python.org/dev/peps/pep-0257/
+"""
+
+
+__author__ = "ButenkoMS <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
+__license__ = "Apache License, Version 2.0"
+__version__ = "0.0.8"
+__maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
+__email__ = "gtalk@butenkoms.space"
+# __status__ = "Prototype"
+__status__ = "Development"
+# __status__ = "Production"
+
+
+__all__ = [
+    'Counter', 'Iterable', 'ServiceType', 'ItemID', 'CoroID', 'Worker', 'GreenetCoro', 'ACoro', 'Coro', 'OnCoroDelHandler',
+    'OutsideCoroSchedulerContext', 'current_coro_scheduler', 'get_current_coro_scheduler', 'set_primary_coro_scheduler', 'PrimaryCoroSchedulerWasNotSet', 'primary_coro_scheduler', 'get_primary_coro_scheduler', 'CoroSchedulerContextIsNotAvailable', 'available_coro_scheduler', 'get_available_coro_scheduler', 'WrongTypeOfShedulerError', 'InterfaceIsNotAvailableError', 'CurrentCoroIsNotAliveError', 'loop_with_backup_loop', 'get_loop_with_backup_loop', 'loop_with_explicit_loop', 'get_loop_with_explicit_loop', 'interface_and_loop_with_backup_loop', 'get_interface_and_loop_with_backup_loop', 'interface_and_loop_with_explicit_loop', 'get_interface_and_loop_with_explicit_loop', 'interface_for_an_explicit_loop', 'get_interface_for_an_explicit_loop', 'service_with_backup_loop', 'get_service_with_backup_loop', 'service_with_explicit_loop', 'get_service_with_explicit_loop', 'service_fast_with_backup_loop', 'get_service_fast_with_backup_loop', 'service_fast_with_explicit_loop', 'get_service_fast_with_explicit_loop', 'CoroType', 'ExplicitWorker', 'AnyWorker', 'CoroScheduler', 'current_interface', 'execute_coro', 'exec_coro', 'ecoro', 'aexecute_coro', 'aexec_coro', 'aecoro', 'around_await', 'Request', 'Response', 'Interface', 'InterfaceGreenlet', 'find_coro_type', 'InterfaceAsyncAwait', 'CallerCoroInfo', 'ServiceRequest', 'ServiceRequestMethodMixin', 'DualImmediateProcessingServiceMixin', 'WrongServiceRequestError', 'Service', 'CoroWrapperBase', 'dlog', 'log_exception_traceback_info', 'log_uncatched_exception', 'func_info', 'ServiceProcessingResultExists', 'ServiceProcessingResult', 'ServiceProcessingException', 'ServiceProcessingResponse', 'full_func_info_to_dict', 'full_func_info_to_printable_dict', 'GreenletWorkerWrapper', 'EntityStatsMixin', 'greenlet_awailable'
+]
+
+# TODO:
+# * add ability to automatically use service_id from all appropriate requests
+# * 
+
+import sys
+import os
+import inspect
+from cengal.time_management.timer import Timer
+from contextlib import contextmanager
+from typing import Coroutine, Dict, Tuple, List, Callable, Awaitable, Any, Optional, Type, Set, Union, Generator, AsyncGenerator
+from enum import Enum
+import types
+from cengal.time_management.load_best_timer import perf_counter
+import traceback
+from contextlib import contextmanager
+from time import sleep
+from copy import copy
+import logging
+from cengal.introspection.inspect import get_exception, exception_to_printable_text
+from threading import local
+from cengal.time_management.sleep_tools import try_sleep
+
+greenlet_awailable: bool = True
+try:
+    from greenlet import greenlet, GreenletExit
+except ImportError:
+    greenlet_awailable = False
+
+class Counter:
+    def __init__(self):
+        self._index = -1  # type: int
+
+    def get(self) -> int:
+        self._index += 1
+        return self._index
+
+
+class Iterable:
+    def iteration(self) -> bool:
+        """
+        should return False if ready to stop looping
+        :return:
+        """
+        raise NotImplementedError
+
+
+ServiceType = Type['Service']
+ItemID = int
+CoroID = ItemID
+Worker = Callable[['Interface'], None]
+GreenetCoro = greenlet
+ACoro = Union[Awaitable, Coroutine, Generator, AsyncGenerator, Callable]
+Coro = Union[GreenetCoro, ACoro]
+OnCoroDelHandler = Callable[['CoroWrapperBase'], bool]
+
+
+class _ThreadLocalCoroScheduler(local):
+    scheduler: Optional['CoroScheduler'] = None
+
+
+_primary_coro_scheduler: _ThreadLocalCoroScheduler = _ThreadLocalCoroScheduler()
+_current_coro_scheduler: _ThreadLocalCoroScheduler = _ThreadLocalCoroScheduler()
+
+
+_debug_log_counter = 0
+
+
+def _debug_log(*args, **kwargs):
+    print(*args, **kwargs)
+    global _debug_log_counter
+    _debug_log_counter += 1
+
+
+def _fake_debug_log(*args, **kwargs):
+    pass
+
+
+dlog = _fake_debug_log
+if False and __debug__:
+    dlog = _debug_log
+
+
+def log_exception_traceback_info():
+    exception = sys.exc_info()
+    formattedTraceback = traceback.format_exception(exception[0], exception[1], exception[2])
+    exception = exception[:2] + (formattedTraceback,)
+    trace = ''
+    for line in exception[2]:
+        trace += line
+    if __debug__: dlog(trace, file=sys.stderr)
+    if __debug__: dlog(exception[0])
+    if __debug__: dlog(exception[1])
+
+
+@contextmanager
+def log_uncatched_exception():
+    try:
+        yield
+    except:
+        log_exception_traceback_info()
+        raise
+
+
+def func_info(func, full_name: Optional[bool]=True):
+    if full_name:
+        # return f'{func.__class__}({func.__module__}.{func.__qualname__}) @ {func.__code__.co_filename}:{func.__code__.co_firstlineno}'
+        return f'{func.__class__}({func.__qualname__}) @ {func.__code__.co_filename}:{func.__code__.co_firstlineno}'
+    else:
+        return f'{func.__class__}({func.__qualname__}) @ {os.path.basename(func.__code__.co_filename)}:{func.__code__.co_firstlineno}'
+
+
+def full_func_info(my):
+    if __debug__: dlog(repr(my), 
+        my.__module__, 
+        my.__name__, 
+        my.__qualname__, 
+        my.__annotations__, 
+        my.__class__, 
+        my.__closure__, 
+        my.__code__, 
+        my.__code__.co_argcount,
+        my.__code__.co_cellvars,
+        my.__code__.co_code,
+        my.__code__.co_consts,
+        my.__code__.co_filename,
+        my.__code__.co_firstlineno,
+        my.__code__.co_flags,
+        my.__code__.co_freevars,
+        my.__code__.co_kwonlyargcount,
+        my.__code__.co_lnotab,
+        my.__code__.co_name,
+        my.__code__.co_names,
+        my.__code__.co_nlocals,
+        my.__code__.co_stacksize,
+        my.__code__.co_varnames,
+        )
+
+
+def full_func_info_to_dict(my):
+    return {
+        'repr': repr(my), 
+        'module': str(my.__module__), 
+        'name': str(my.__name__), 
+        'qualname': str(my.__qualname__), 
+        'annotations': str(my.__annotations__), 
+        'class': str(my.__class__), 
+        'closure': str(my.__closure__), 
+        'code': str(my.__code__), 
+        'co_argcount': str(my.__code__.co_argcount),
+        'co_cellvars': str(my.__code__.co_cellvars),
+        'co_code': str(my.__code__.co_code),
+        'co_consts': str(my.__code__.co_consts),
+        'co_filename': str(my.__code__.co_filename),
+        'co_firstlineno': str(my.__code__.co_firstlineno),
+        'co_flags': str(my.__code__.co_flags),
+        'co_freevars': str(my.__code__.co_freevars),
+        'co_kwonlyargcount': str(my.__code__.co_kwonlyargcount),
+        'co_lnotab': str(my.__code__.co_lnotab),
+        'co_name': str(my.__code__.co_name),
+        'co_names': str(my.__code__.co_names),
+        'co_nlocals': str(my.__code__.co_nlocals),
+        'co_stacksize': str(my.__code__.co_stacksize),
+        'co_varnames': str(my.__code__.co_varnames),
+    }
+
+
+def full_func_info_to_printable_dict(func: Callable) -> Dict[str, str]:
+    func_info: Dict[str, str] = full_func_info_to_dict(func)
+    good_keys = {'module', 'qualname', 'class', 'co_filename', 'co_firstlineno'}
+    result: Dict[str, str] = dict()
+    for key, value in func_info.items():
+        if key in good_keys:
+            result[key] = value
+    
+    return result
+
+
+class OutsideCoroSchedulerContext(Exception):
+    pass
+
+
+def current_coro_scheduler() -> 'CoroScheduler':
+    if _current_coro_scheduler.scheduler is None:
+        raise OutsideCoroSchedulerContext
+    
+    return _current_coro_scheduler.scheduler
+
+
+def get_current_coro_scheduler() -> Optional['CoroScheduler']:
+    return _current_coro_scheduler.scheduler
+
+
+def set_primary_coro_scheduler(coro_scheduler: 'CoroScheduler'):
+    _primary_coro_scheduler.scheduler = coro_scheduler
+
+
+class PrimaryCoroSchedulerWasNotSet(Exception):
+    pass
+
+
+def primary_coro_scheduler() -> 'CoroScheduler':
+    if _primary_coro_scheduler.scheduler is None:
+        raise PrimaryCoroSchedulerWasNotSet
+    
+    return _primary_coro_scheduler.scheduler
+
+
+def get_primary_coro_scheduler() -> Optional['CoroScheduler']:
+    return _primary_coro_scheduler.scheduler
+
+
+class CoroSchedulerContextIsNotAvailable(Exception):
+    pass
+
+
+def available_coro_scheduler() -> 'CoroScheduler':
+    if _current_coro_scheduler.scheduler:
+        return _current_coro_scheduler.scheduler
+    elif _primary_coro_scheduler.scheduler:
+        return _primary_coro_scheduler.scheduler
+    else:
+        raise CoroSchedulerContextIsNotAvailable
+
+
+def get_available_coro_scheduler() -> Optional['CoroScheduler']:
+    if _current_coro_scheduler.scheduler:
+        return _current_coro_scheduler.scheduler
+    elif _primary_coro_scheduler.scheduler:
+        return _primary_coro_scheduler.scheduler
+    else:
+        return None
+
+
+class WrongTypeOfShedulerError(Exception):
+    pass
+
+
+class InterfaceIsNotAvailableError(Exception):
+    pass
+
+
+class CurrentCoroIsNotAliveError(Exception):
+    pass
+
+
+# ==========================================================
+
+
+def loop_with_backup_loop(backup_scheduler: Optional['CoroScheduler'] = None) -> 'CoroScheduler':
+    if backup_scheduler is not None:
+        if not isinstance(backup_scheduler, CoroScheduler):
+            raise WrongTypeOfShedulerError(f'Wrong type of the backup_scheduler ({repr(backup_scheduler)}): {type(backup_scheduler)}')
+
+    loop = CoroScheduler.current_loop()
+    if loop is None:
+        # Outside the loop
+        loop = get_available_coro_scheduler()
+        if loop is None:
+            loop = backup_scheduler
+
+    if loop is None:
+        raise CoroSchedulerContextIsNotAvailable
+    
+    return loop
+
+
+def get_loop_with_backup_loop(backup_scheduler: Optional['CoroScheduler'] = None) -> Optional['CoroScheduler']:
+    if backup_scheduler is not None:
+        if not isinstance(backup_scheduler, CoroScheduler):
+            raise WrongTypeOfShedulerError(f'Wrong type of the backup_scheduler ({repr(backup_scheduler)}): {type(backup_scheduler)}')
+
+    loop = CoroScheduler.current_loop()
+    if loop is None:
+        # Outside the loop
+        loop = get_available_coro_scheduler()
+        if loop is None:
+            loop = backup_scheduler
+    
+    return loop
+
+
+def loop_with_explicit_loop(explicit_scheduler: Optional['CoroScheduler'] = None) -> 'CoroScheduler':
+    loop = explicit_scheduler
+    current_loop = CoroScheduler.current_loop()
+    if loop is None:
+        loop = current_loop
+        if loop is None:
+            # Outside the loop
+            loop = get_available_coro_scheduler()
+    else:
+        if not isinstance(loop, CoroScheduler):
+            raise WrongTypeOfShedulerError(f'Wrong type of the explicit_scheduler ({repr(loop)}): {type(loop)}')
+
+    if loop is None:
+        raise CoroSchedulerContextIsNotAvailable
+    
+    return loop
+
+
+def get_loop_with_explicit_loop(explicit_scheduler: Optional['CoroScheduler'] = None) -> Optional['CoroScheduler']:
+    loop = explicit_scheduler
+    current_loop = CoroScheduler.current_loop()
+    if loop is None:
+        loop = current_loop
+        if loop is None:
+            # Outside the loop
+            loop = get_available_coro_scheduler()
+    else:
+        if not isinstance(loop, CoroScheduler):
+            raise WrongTypeOfShedulerError(f'Wrong type of the explicit_scheduler ({repr(loop)}): {type(loop)}')
+    
+    return loop
+# ==========================================================
+
+
+def interface_and_loop_with_backup_loop(backup_scheduler: Optional['CoroScheduler'] = None) -> Tuple['CoroScheduler', 'Interface', bool]:
+    if backup_scheduler is not None:
+        if not isinstance(backup_scheduler, CoroScheduler):
+            raise WrongTypeOfShedulerError(f'Wrong type of the backup_scheduler ({repr(backup_scheduler)}): {type(backup_scheduler)}')
+
+    loop = CoroScheduler.current_loop()
+    if loop is None:
+        # Outside the loop
+        interface = None
+        loop = get_available_coro_scheduler()
+        if loop is None:
+            loop = backup_scheduler
+    else:
+        # In the loop (in coroutine or in the service)
+        interface = loop.current_interface()
+
+    if loop is None:
+        raise CoroSchedulerContextIsNotAvailable
+    
+    if interface is None:
+        raise InterfaceIsNotAvailableError
+    
+    coro_alive: bool = False
+    if interface is not None:
+        if interface._coro:
+            coro_alive = True
+    
+    if not coro_alive:
+        raise CurrentCoroIsNotAliveError
+    
+    return loop, interface, coro_alive
+
+
+def get_interface_and_loop_with_backup_loop(backup_scheduler: Optional['CoroScheduler'] = None) -> Tuple[Optional['CoroScheduler'], Optional['Interface'], bool]:
+    if backup_scheduler is not None:
+        if not isinstance(backup_scheduler, CoroScheduler):
+            raise WrongTypeOfShedulerError(f'Wrong type of the backup_scheduler ({repr(backup_scheduler)}): {type(backup_scheduler)}')
+
+    loop = CoroScheduler.current_loop()
+    if loop is None:
+        # Outside the loop
+        interface = None
+        loop = get_available_coro_scheduler()
+        if loop is None:
+            loop = backup_scheduler
+    else:
+        # In the loop (in coroutine or in the service)
+        interface = loop.current_interface()
+    
+    coro_alive: bool = False
+    if interface is not None:
+        if interface._coro:
+            coro_alive = True
+    
+    return loop, interface, coro_alive
+
+
+def interface_and_loop_with_explicit_loop(explicit_scheduler: Optional['CoroScheduler'] = None) -> Tuple['CoroScheduler', 'Interface', bool]:
+    loop = explicit_scheduler
+    current_loop = CoroScheduler.current_loop()
+    interface = None
+    if loop is None:
+        loop = current_loop
+        if loop is None:
+            # Outside the loop
+            loop = get_available_coro_scheduler()
+        else:
+            # In the loop (in coroutine or in the service)
+            interface = loop.current_interface()
+    else:
+        if isinstance(loop, CoroScheduler):
+            if loop is current_loop:
+                interface = loop.current_interface()
+        else:
+            raise WrongTypeOfShedulerError(f'Wrong type of the explicit_scheduler ({repr(loop)}): {type(loop)}')
+
+    if loop is None:
+        raise CoroSchedulerContextIsNotAvailable
+    
+    if interface is None:
+        raise InterfaceIsNotAvailableError
+    
+    coro_alive: bool = False
+    if interface is not None:
+        if interface._coro:
+            coro_alive = True
+    
+    if not coro_alive:
+        raise CurrentCoroIsNotAliveError
+    
+    return loop, interface, coro_alive
+
+
+def get_interface_and_loop_with_explicit_loop(explicit_scheduler: Optional['CoroScheduler'] = None) -> Tuple[Optional['CoroScheduler'], Optional['Interface'], bool]:
+    loop = explicit_scheduler
+    current_loop = CoroScheduler.current_loop()
+    interface = None
+    if loop is None:
+        loop = current_loop
+        if loop is None:
+            # Outside the loop
+            loop = get_available_coro_scheduler()
+        else:
+            # In the loop (in coroutine or in the service)
+            interface = loop.current_interface()
+    else:
+        if isinstance(loop, CoroScheduler):
+            if loop is current_loop:
+                interface = loop.current_interface()
+        else:
+            raise WrongTypeOfShedulerError(f'Wrong type of the explicit_scheduler ({repr(loop)}): {type(loop)}')
+    
+    coro_alive: bool = False
+    if interface is not None:
+        if interface._coro:
+            coro_alive = True
+    
+    return loop, interface, coro_alive
+
+
+def interface_for_an_explicit_loop(explicit_scheduler: 'CoroScheduler') -> Tuple['CoroScheduler', 'Interface', bool]:
+    loop = explicit_scheduler
+    interface = None
+    if loop is None:
+        raise CoroSchedulerContextIsNotAvailable
+    else:
+        if isinstance(loop, CoroScheduler):
+            if loop is CoroScheduler.current_loop():
+                interface = loop.current_interface()
+        else:
+            raise WrongTypeOfShedulerError(f'Wrong type of the explicit_scheduler ({repr(loop)}): {type(loop)}')
+    
+    if interface is None:
+        raise InterfaceIsNotAvailableError
+    
+    coro_alive: bool = False
+    if interface is not None:
+        if interface._coro:
+            coro_alive = True
+    
+    if not coro_alive:
+        raise CurrentCoroIsNotAliveError
+    
+    return loop, interface, coro_alive
+
+
+def get_interface_for_an_explicit_loop(explicit_scheduler: 'CoroScheduler') -> Tuple[Optional['CoroScheduler'], Optional['Interface'], bool]:
+    loop = explicit_scheduler
+    interface = None
+    if loop is not None:
+        if isinstance(loop, CoroScheduler):
+            if loop is CoroScheduler.current_loop():
+                interface = loop.current_interface()
+        else:
+            raise WrongTypeOfShedulerError(f'Wrong type of the explicit_scheduler ({repr(loop)}): {type(loop)}')
+    
+    coro_alive: bool = False
+    if interface is not None:
+        if interface._coro:
+            coro_alive = True
+    
+    return loop, interface, coro_alive
+
+
+# ==========================================================
+
+def service_with_backup_loop(service_type: Type['Service'], backup_scheduler: Optional['CoroScheduler'] = None) -> 'Service':
+    if backup_scheduler is not None:
+        if not isinstance(backup_scheduler, CoroScheduler):
+            raise WrongTypeOfShedulerError(f'Wrong type of the backup_scheduler ({repr(backup_scheduler)}): {type(backup_scheduler)}')
+
+    loop = CoroScheduler.current_loop()
+    if loop is None:
+        # Outside the loop
+        loop = get_available_coro_scheduler()
+        if loop is None:
+            loop = backup_scheduler
+
+    if loop is None:
+        raise CoroSchedulerContextIsNotAvailable
+
+    return loop.get_service_instance(service_type)
+
+
+def get_service_with_backup_loop(service_type: Type['Service'], backup_scheduler: Optional['CoroScheduler'] = None) -> Optional['Service']:
+    if backup_scheduler is not None:
+        if not isinstance(backup_scheduler, CoroScheduler):
+            raise WrongTypeOfShedulerError(f'Wrong type of the backup_scheduler ({repr(backup_scheduler)}): {type(backup_scheduler)}')
+
+    loop = CoroScheduler.current_loop()
+    if loop is None:
+        # Outside the loop
+        loop = get_available_coro_scheduler()
+        if loop is None:
+            loop = backup_scheduler
+
+    if loop is None:
+        return None
+    else:
+        return loop.get_service_instance(service_type)
+
+
+def service_with_explicit_loop(service_type: Type['Service'], explicit_scheduler: Optional['CoroScheduler'] = None) -> 'Service':
+    loop = explicit_scheduler
+    current_loop = CoroScheduler.current_loop()
+    if loop is None:
+        loop = current_loop
+        if loop is None:
+            # Outside the loop
+            loop = get_available_coro_scheduler()
+    else:
+        if not isinstance(loop, CoroScheduler):
+            raise WrongTypeOfShedulerError(f'Wrong type of the explicit_scheduler ({repr(loop)}): {type(loop)}')
+
+    if loop is None:
+        raise CoroSchedulerContextIsNotAvailable
+
+    return loop.get_service_instance(service_type)
+
+
+def get_service_with_explicit_loop(service_type: Type['Service'], explicit_scheduler: Optional['CoroScheduler'] = None) -> Optional['Service']:
+    loop = explicit_scheduler
+    current_loop = CoroScheduler.current_loop()
+    if loop is None:
+        loop = current_loop
+        if loop is None:
+            # Outside the loop
+            loop = get_available_coro_scheduler()
+    else:
+        if not isinstance(loop, CoroScheduler):
+            raise WrongTypeOfShedulerError(f'Wrong type of the explicit_scheduler ({repr(loop)}): {type(loop)}')
+
+    if loop is None:
+        return None
+    else:
+        return loop.get_service_instance(service_type)
+# ==========================================================
+
+
+def service_fast_with_backup_loop(service_type: Type['Service'], backup_scheduler: Optional['CoroScheduler'] = None) -> 'Service':
+    if backup_scheduler is not None:
+        if not isinstance(backup_scheduler, CoroScheduler):
+            raise WrongTypeOfShedulerError(f'Wrong type of the backup_scheduler ({repr(backup_scheduler)}): {type(backup_scheduler)}')
+
+    loop = CoroScheduler.current_loop()
+    if loop is None:
+        # Outside the loop
+        loop = get_available_coro_scheduler()
+        if loop is None:
+            loop = backup_scheduler
+
+    if loop is None:
+        raise CoroSchedulerContextIsNotAvailable
+
+    return loop.get_service_instance_fast(service_type)
+
+
+def get_service_fast_with_backup_loop(service_type: Type['Service'], backup_scheduler: Optional['CoroScheduler'] = None) -> Optional['Service']:
+    if backup_scheduler is not None:
+        if not isinstance(backup_scheduler, CoroScheduler):
+            raise WrongTypeOfShedulerError(f'Wrong type of the backup_scheduler ({repr(backup_scheduler)}): {type(backup_scheduler)}')
+
+    loop = CoroScheduler.current_loop()
+    if loop is None:
+        # Outside the loop
+        loop = get_available_coro_scheduler()
+        if loop is None:
+            loop = backup_scheduler
+
+    if loop is None:
+        return None
+    else:
+        return loop.get_service_instance_fast(service_type)
+
+
+def service_fast_with_explicit_loop(service_type: Type['Service'], explicit_scheduler: Optional['CoroScheduler'] = None) -> 'Service':
+    loop = explicit_scheduler
+    current_loop = CoroScheduler.current_loop()
+    if loop is None:
+        loop = current_loop
+        if loop is None:
+            # Outside the loop
+            loop = get_available_coro_scheduler()
+    else:
+        if not isinstance(loop, CoroScheduler):
+            raise WrongTypeOfShedulerError(f'Wrong type of the explicit_scheduler ({repr(loop)}): {type(loop)}')
+
+    if loop is None:
+        raise CoroSchedulerContextIsNotAvailable
+
+    return loop.get_service_instance_fast(service_type)
+
+
+def get_service_fast_with_explicit_loop(service_type: Type['Service'], explicit_scheduler: Optional['CoroScheduler'] = None) -> Optional['Service']:
+    loop = explicit_scheduler
+    current_loop = CoroScheduler.current_loop()
+    if loop is None:
+        loop = current_loop
+        if loop is None:
+            # Outside the loop
+            loop = get_available_coro_scheduler()
+    else:
+        if not isinstance(loop, CoroScheduler):
+            raise WrongTypeOfShedulerError(f'Wrong type of the explicit_scheduler ({repr(loop)}): {type(loop)}')
+
+    if loop is None:
+        return None
+    else:
+        return loop.get_service_instance_fast(service_type)
+# ==========================================================
+
+
+class CoroType(Enum):
+    auto = 0
+    awaitable = 1
+    greenlet = 2
+
+
+class ExplicitWorker:
+    def __init__(self, coro_type: CoroType, worker: Worker) -> None:
+        self.coro_type: CoroType = coro_type
+        self.worker: Worker = worker
+
+
+AnyWorker = Union[ExplicitWorker, Worker]
+
+
+@types.coroutine
+def yield_task_from_asyncawait(request: 'Request') -> 'Response':
+    response = yield request  # type: Response
+    return response
+
+
+class EntityStatsMixin:
+    class StatsLevel(Enum):
+        info = 0
+        debug = 1
+    
+    def get_entity_stats(self, stats_level: 'EntityStatsMixin.StatsLevel') -> Tuple[str, Dict[str, Any]]:
+        raise NotImplementedError
+
+
+class CoroSchedulerIsCurrentlyDestroingError(Exception):
+    pass
+
+
+class CoroSchedulerBase(Iterable, EntityStatsMixin):
+    def __init__(self):
+        self.in_iteration = False
+        self.services = dict()                                    # type: Dict[ServiceType, Service]
+        self.live_services = dict()                               # type: Dict[ServiceType, Service]
+        self.live_low_latency_services = dict()                               # type: Dict[ServiceType, Service]
+        self.requests = list()                                    # type: List[Request]
+        self.responses = list()                                   # type: List[Response]
+        self.new_born_coroutines = list()                         # type: List[CoroWrapperBase]
+        self.coroutines = dict()                                  # type: Dict[CoroID, CoroWrapperBase]
+        self.coro_counter = Counter()                             # type: Counter
+        self.services_in_work = 0                                 # type: int
+        self.services_in_active_state = 0                                 # type: int
+        self.services_in_active_state_list = list()               # uncomment lines in code for a debutting purposes (when some service prevents loop to go to sleep)
+        self.time_left_before_next_event: Optional[float] = None  # type: Optional[float]
+        self.coro_on_del_handlers = set()                         # type: Set[Callable]
+        self.current_coro_interface = None                        # type: Optional['Interface']
+        self.current_coro_wrapper: CoroWrapperBase = None
+        self.suppress_coro_exceptions = True                      # type: bool
+        self.context_switches = 0                                 # type: int
+        self.current_coro_start_time: Optional[float] = None
+        self.coro_execution_time: Dict[int, float] = dict()
+        self.coro_longest_execution_time: Dict[int, float] = dict()
+        self.loop_iteration_start_time = 0.0
+        self.need_to_measure_loop_iteration_time = False          # type: bool
+        self.need_to_measure_coro_time = False                    # type: bool
+        self.need_to_gather_coro_history = False                  # type: bool
+        self.permitted_use_put_coro_from_coro = False             # type: bool
+        self.get_coro_start_time = self._fake_perf_counter
+        self.get_loop_iteration_start_time = self._fake_perf_counter
+        self.coro_history_gatherer = self._fake_method
+        self.on_woke_up_callback = self._fake_method
+        self.coro_on_start_handlers = set()
+        self.global_on_start_handlers_turned_on = False
+        self.execute_global_on_start_handlers = self._fake_execute_global_on_start_handlers
+        self.coro_workers_history = dict()                                # type: Dict[Worker, Set[CoroID]]
+        self.coro_full_history = dict()                                # type: Dict[CoroID, CoroWrapperBase]
+        self.run_low_latency_services = self._fake_run_low_latency_services
+        self.logger = logging.getLogger('cengal.coro_scheduler')
+        self._in_work: bool = None
+        self._destroyed: bool = False
+        self.services_impostrors: Dict = dict()
+        self.keep_coro_execution_time_between_iterations = False
+        self.keep_coro_longest_execution_time_between_iterations = False
+        self.keep_coro_workers_history_between_iterations = False
+        self.keep_coro_full_history_between_iterations = False
+        self.loop_iteration_delta_time = 0.0
+        self.suppress_warnings_about_responses_to_not_existant_coroutines: bool = False
+        self.use_internal_sleep: bool = True
+        self.on_idle_handlers: List[Callable] = list()
+        self.get_service_by_type: Callable = self.get_service_by_type_impl
+        self.get_service_instance_fast: Callable = self.get_service_instance_fast_impl
+        self.get_service_instance: Callable = self.get_service_instance_impl
+        self.make_service_live_fast: Callable = self.make_service_live_fast_impl
+        self.make_service_live: Callable = self.make_service_live_impl
+        self.make_service_dead_fast: Callable = self.make_service_dead_fast_impl
+        self.make_service_dead: Callable = self.make_service_dead_impl
+
+    def get_entity_stats(self, stats_level: 'EntityStatsMixin.StatsLevel' = EntityStatsMixin.StatsLevel.debug) -> Tuple[str, Dict[str, Any]]:
+        if EntityStatsMixin.StatsLevel.info == stats_level:
+            func_info = full_func_info_to_printable_dict
+        else:
+            func_info = full_func_info_to_dict
+        
+        services_stats = dict()
+        for service in self.services.values():
+            if isinstance(service, EntityStatsMixin):
+                name, info = service.get_entity_stats(stats_level)
+                services_stats[name] = info
+
+        return type(self).__name__, {
+            'loop': {
+                'services': {
+                    'num': len(self.services),
+                    'list': [service_type.__name__ for service_type in self.services.keys()],
+                },
+                'live services': {
+                    'in work num': self.services_in_work,
+                    'services in active state': self.services_in_active_state,
+                    'idleble services': self.services_in_work - self.services_in_active_state,
+                    'num': len(self.live_services),
+                    'list': [service_type.__name__ for service_type in self.live_services.keys()],
+                },
+                'live low latency services': {
+                    'num': len(self.live_low_latency_services),
+                    'list': [service_type.__name__ for service_type in self.live_low_latency_services.keys()],
+                },
+                'new born coroutines': {
+                    'num': len(self.new_born_coroutines),
+                    "list": {
+                        wrapper.coro_id: {
+                            "func_info": func_info(self.purify_worker(wrapper.worker)),
+                            "args": [repr(arg) for arg in wrapper.init_args],
+                            "kwargs": {
+                                repr(key): repr(value)
+                                for key, value in wrapper.init_kwargs.items()
+                            },
+                        }
+                        for wrapper in self.new_born_coroutines
+                    },
+                },
+                'coroutines': {
+                    'num': len(self.coroutines),
+                    "list": {
+                        coro_id: {
+                            "func_info": func_info(self.purify_worker(wrapper.worker)),
+                            "args": [repr(arg) for arg in wrapper.init_args],
+                            "kwargs": {
+                                repr(key): repr(value)
+                                for key, value in wrapper.init_kwargs.items()
+                            },
+                        }
+                        for coro_id, wrapper in self.coroutines
+                    },
+                },
+                'coro counter': self.coro_counter._index,
+                'coro on del handlers num': len(self.coro_on_del_handlers),
+                'coro on del handlers': {
+                    'num': len(self.coro_on_del_handlers),
+                    'list': [func_info(handler) for handler in self.coro_on_del_handlers]
+                },
+                'suppress coro exceptions': self.suppress_coro_exceptions,
+                'context switches num': self.context_switches,
+                'longest continuous execution time of coroutines': self.coro_longest_execution_time,
+                'coroutines execution times': self.coro_execution_time,
+                'need to measure loop iteration time': self.need_to_measure_loop_iteration_time,
+                'need to measure coro time': self.need_to_measure_coro_time,
+                'need to gather coro history': self.need_to_gather_coro_history,
+                'coro workers history': {
+                    'num': len(self.coro_workers_history),
+                    'list': [{
+                        'worker': func_info(self.purify_worker(worker)),
+                        'coroutines': coroutines,
+                    } for worker, coroutines in self.coro_workers_history.items()]
+                },
+                'coro full history': {
+                    'num': len(self.coro_full_history),
+                    'list': {coro_id: {
+                        'worker': func_info(self.purify_worker(wrapper.worker)),
+                        'args': [repr(arg) for arg in wrapper.init_args],
+                        'kwargs': {repr(key): repr(value) for key, value in wrapper.init_kwargs.items()},
+                    } for coro_id, wrapper in self.coro_full_history.items()}
+                },
+               'coro loop iteration delta time':self.loop_iteration_delta_time, 
+            },
+            'services': services_stats,
+        }
+
+    def loop(self):
+        raise NotImplementedError
+    
+    def iteration(self):
+        raise NotImplementedError
+    
+    def log_exc(self, coro: 'CoroWrapperBase', exception: Exception):
+        worker_info = full_func_info_to_printable_dict(self.purify_worker(coro.worker))
+        error_text = f'\nAn exception in coroutine "{worker_info["qualname"]}"\n\tModule "{worker_info["module"]}"\n\tFile "{worker_info["co_filename"]}", line {worker_info["co_firstlineno"]}:\n{exception_to_printable_text(exception)}'
+        self.logger.error(error_text)
+
+    # @property
+    # def root_coro(self):
+    #     return self._root_coro
+    
+    # @root_coro.setter
+    # def root_coro(self, root_coro):
+    #     if root_coro is None:
+    #         if __debug__: dlog('root_coro = None')
+    #     else:
+    #         if __debug__: dlog(f'root_coro = {root_coro}')
+    #     self._root_coro = root_coro
+    
+    def _fake_method(self, *args, **kwargs):
+        pass
+    
+    @staticmethod
+    def _fake_perf_counter():
+        return 0.0
+    
+    def get_service_instance_fast_impl(self, service_type: ServiceType):
+        return self.services[service_type]
+    
+    def get_service_instance_impl(self, service_type: ServiceType):
+        self.register_service(service_type)
+        return self.get_service_instance_fast_impl(service_type)
+    
+    def make_service_live_fast_impl(self, service_type: ServiceType, is_low_latency: bool = False):
+        self.live_services[service_type] = self.services[service_type]
+        self.live_low_latency_services[service_type] = self.services[service_type]
+    
+    def make_service_live_impl(self, service_type: ServiceType, is_low_latency: bool = False):
+        self.register_service(service_type)
+        self.make_service_live_fast_impl(service_type)
+    
+    def make_service_dead_fast_impl(self, service_type: ServiceType):
+        self.live_services.pop(service_type, None)
+        self.live_low_latency_services.pop(service_type, None)
+    
+    def make_service_dead_impl(self, service_type: ServiceType):
+        self.register_service(service_type)
+        self.make_service_dead_fast_impl(service_type)
+    
+    def get_service_instance_fast_impostor_impl(self, service_type: ServiceType):
+        return self.get_service_instance_fast_impl(self.services_impostrors.get(service_type, service_type))
+    
+    def get_service_instance_impostor_impl(self, service_type: ServiceType):
+        return self.get_service_instance_impl(self.services_impostrors.get(service_type, service_type))
+    
+    def make_service_live_fast_impostor_impl(self, service_type: ServiceType, is_low_latency: bool = False):
+        return self.make_service_live_fast_impl(self.services_impostrors.get(service_type, service_type))
+    
+    def make_service_live_impostor_impl(self, service_type: ServiceType, is_low_latency: bool = False):
+        return self.make_service_live_impl(self.services_impostrors.get(service_type, service_type))
+    
+    def make_service_dead_fast_impostor_impl(self, service_type: ServiceType):
+        return self.make_service_dead_fast_impl(self.services_impostrors.get(service_type, service_type))
+    
+    def make_service_dead_impostor_impl(self, service_type: ServiceType):
+        return self.make_service_dead_impl(self.services_impostrors.get(service_type, service_type))
+
+    def set_coro_time_measurement(self, need_to_measure_coro_time: bool):
+        self.need_to_measure_coro_time = need_to_measure_coro_time
+        if need_to_measure_coro_time:
+            self.get_coro_start_time = perf_counter
+        else:
+            self.get_coro_start_time = self._fake_perf_counter
+
+    def set_coro_history_gathering(self, need_to_gather_coro_history: bool):
+        self.need_to_gather_coro_history = need_to_gather_coro_history
+        if need_to_gather_coro_history:
+            self.coro_history_gatherer = self._default_coro_history_gatherer
+        else:
+            self.coro_history_gatherer = self._fake_method
+    
+    def _default_coro_history_gatherer(self, original_worker: Callable, coro_wrapper: 'CoroWrapperBase'):
+        coro_id: CoroID = coro_wrapper.coro_id
+        coro_worker: Worker = coro_wrapper.worker
+        
+        self.coro_full_history[coro_id] = coro_wrapper
+        
+        if original_worker not in self.coro_workers_history:
+            self.coro_workers_history[original_worker] = set()
+        
+        self.coro_workers_history[original_worker].add(coro_id)
+
+    def set_loop_iteration_time_measurement(self, need_to_measure_loop_iteration_time: bool):
+        self.need_to_measure_loop_iteration_time = need_to_measure_loop_iteration_time
+        if need_to_measure_loop_iteration_time:
+            self.get_loop_iteration_start_time = perf_counter
+        else:
+            self.get_loop_iteration_start_time = self._fake_perf_counter
+    
+    def _new_coro_type_normalizer(self, coro_type: Optional[CoroType]) -> CoroType:
+        raise NotImplementedError
+
+    def put_coro_fast(self, coro_type: Optional[CoroType], coro_worker: Worker, *args, **kwargs) -> 'CoroWrapperBase':
+        """Must not be called from coroutine. Use an appropriate service instead, since leads to incorrect greenlets switches
+        """
+        if (self.current_coro_interface is None) or self.permitted_use_put_coro_from_coro:
+            coro_type = self._new_coro_type_normalizer(coro_type)
+            coro_id = self.coro_counter.get()
+            self.coro_execution_time[coro_id] = 0.0
+            self.coro_longest_execution_time[coro_id] = 0.0
+            coro = coro_wrapper_factory(coro_type, self, coro_id, coro_worker, *args, **kwargs)
+            self.coro_history_gatherer(coro_worker, coro)
+            self.new_born_coroutines.append(coro)
+            if not self.in_iteration:
+                self.on_woke_up_callback()
+            
+            return coro
+        else:
+            raise RuntimeError('CoroScheduler.put_coro() method must not be called from coroutine. Use an appropriate service instead')
+
+    def put_coro(self, coro_worker: AnyWorker, *args, **kwargs) -> 'CoroWrapperBase':
+        if isinstance(coro_worker, ExplicitWorker):
+            return self.put_coro_fast(coro_worker.coro_type, coro_worker.worker, *args, **kwargs)
+        else:
+            return self.put_coro_fast(None, coro_worker, *args, **kwargs)
+
+    def register_service(self, service_type: ServiceType) -> bool:
+        if service_type in self.services:
+            return False
+        else:
+            service = service_type(self)
+            self.services[service_type] = service
+            self.live_services[service_type] = service
+            return True
+    
+    def unregister_service(self, service_type: ServiceType) -> bool:
+        if service_type not in self.services:
+            return True
+        
+        service = self.services[service_type]
+        self.services.pop(service_type, None)
+        self.live_services.pop(service_type, None)
+        self.live_low_latency_services.pop(service_type, None)
+        try:
+            service.destroy()
+        except:
+            self.logger.exception(f'Service {service_type} failed to destroy')
+            return False
+        
+        return True
+    
+    def destroy_services(self):
+        services_bak = copy(self.services)
+        for service_type in services_bak:
+            self.unregister_service(service_type)
+    
+    def get_service_by_type_impl(self, service_type: Type['Service']) -> 'Service':
+        try:
+            return self.services[service_type]
+        except KeyError:
+            self.register_service(service_type)
+            return self.services[service_type]
+    
+    def get_service_by_type_impostor_impl(self, service_type: Type['Service']) -> 'Service':
+        return self.get_service_by_type_impl(self.services_impostrors.get(service_type, service_type))
+    
+    def register_service_impostor(self, service_type: Type['Service'], service_impostor_type: Optional[Type['Service']]) -> Optional[Type['Service']]:
+        if service_impostor_type is None:
+            an_old_impostor: Optional[Type['Service']] = self.services_impostrors.pop(service_type, None)
+        else:
+            an_old_impostor = self.services_impostrors.get(service_type, None)
+            self.services_impostrors[service_type] = service_impostor_type
+        
+        if self.services_impostrors:
+            self.get_service_by_type = self.get_service_by_type_impostor_impl
+            self.get_service_instance_fast = self.get_service_instance_fast_impostor_impl
+            self.get_service_instance = self.get_service_instance_impostor_impl
+            self.make_service_live_fast = self.make_service_live_fast_impostor_impl
+            self.make_service_live = self.make_service_live_impostor_impl
+            self.make_service_dead_fast = self.make_service_dead_fast_impostor_impl
+            self.make_service_dead = self.make_service_dead_impostor_impl
+        else:
+            self.get_service_by_type = self.get_service_by_type_impl
+            self.get_service_instance_fast = self.get_service_instance_fast_impl
+            self.get_service_instance = self.get_service_instance_impl
+            self.make_service_live_fast = self.make_service_live_fast_impl
+            self.make_service_live = self.make_service_live_impl
+            self.make_service_dead_fast = self.make_service_dead_fast_impl
+            self.make_service_dead = self.make_service_dead_impl
+        
+        return an_old_impostor
+
+    def find_new_born_coroutine(self, coro_id: CoroID) -> int:
+        for index, coro in enumerate(self.new_born_coroutines):
+            if coro.coro_id == coro_id:
+                return index
+        
+        return None
+    
+    def get_coro(self, coro_id: CoroID) -> Optional['CoroWrapperBase']:
+        if coro_id in self.coroutines:
+            return self.coroutines[coro_id]
+        else:
+            new_born_coro_index = self.find_new_born_coroutine(coro_id)
+            if new_born_coro_index is None:
+                return None
+            
+            return self.new_born_coroutines[new_born_coro_index]
+    
+    @staticmethod
+    def purify_worker(worker: Union[Callable, 'GreenletWorkerWrapper']) -> Callable:
+        if isinstance(worker, GreenletWorkerWrapper):
+            return worker.worker
+        else:
+            return worker
+
+    def set_global_on_start_handlers(self, turn_on_global_on_start_handlers: bool):
+        self.global_on_start_handlers_turned_on = turn_on_global_on_start_handlers
+        if turn_on_global_on_start_handlers:
+            self.execute_global_on_start_handlers = self._execute_global_on_start_handlers
+        else:
+            self.execute_global_on_start_handlers = self._fake_execute_global_on_start_handlers
+
+    def add_on_global_on_start_handler(self, handler: Callable):
+        self.coro_on_start_handlers.add(handler)
+
+    def _execute_global_on_start_handlers(self, coro: 'CoroWrapperBase') -> bool:
+        # executes before new born corotine execution
+        # if at least one of the handlers will return False - coro will not be started at all and removed from the coroutines list
+        result = True
+        for handler in self.coro_on_start_handlers:
+            result &= handler(coro)
+        
+        return result
+    
+    def _fake_execute_global_on_start_handlers(self, coro: 'CoroWrapperBase') -> bool:
+        # executes before new born corotine execution
+        # if at least one of the handlers will return False - coro will not be started at all and removed from the coroutines list
+        return True
+    
+    
+    def process_coro_exit_status(self, coro: 'CoroWrapperBase', coro_exit_status: 'CoroExitStatus'):
+        try:
+            if coro_exit_status is None:
+                self._run_global_on_coro_del_handlers(coro)
+            else:
+                if coro_exit_status.exception and (not coro_exit_status.properly_handled) and (not self.coro_on_del_handlers) and (not self.suppress_coro_exceptions):
+                    raise coro_exit_status.exception
+
+                coro_exit_status.properly_handled = self._run_global_on_coro_del_handlers(coro) or coro_exit_status.properly_handled
+
+                if coro_exit_status.exception and (not coro_exit_status.properly_handled):
+                    if self.suppress_coro_exceptions:
+                        # if __debug__: dlog(coro_exit_status.exception)
+                        dlog(coro_exit_status.exception)
+                        self.log_exc(coro, coro_exit_status.exception)
+                    else:
+                        raise coro_exit_status.exception
+        finally:
+            coro.destroy()
+            del coro
+    
+    def kill_coro(self, coro: 'CoroWrapperBase'):
+        coro.request_close()
+        coro_exit_status: 'CoroExitStatus' = coro()
+        if not coro:
+            self.process_coro_exit_status(coro, coro_exit_status)
+    
+    def throw_coro(self, coro: 'CoroWrapperBase', ex_type, ex_value=None, ex_traceback=None):
+        coro.request_close()
+        coro_exit_status: 'CoroExitStatus' = coro(ex_type, ex_value, ex_traceback)
+        if not coro:
+            self.process_coro_exit_status(coro, coro_exit_status)
+    
+    def forget_coro_by_id(self, coro: 'CoroWrapperBase') -> Optional['CoroWrapperBase']:
+        return self.forget_coro_by_id(coro.coro_id)
+    
+    def find_coro_by_id(self, coro_id: CoroID) -> Tuple[Optional['CoroWrapperBase'], bool]:
+        coro = None
+        if coro_id in self.coroutines:
+            was_new_born: bool = False
+            coro = self.coroutines[coro_id]
+            return coro, was_new_born, None
+        else:
+            was_new_born = True
+            new_born_index = self.find_new_born_coroutine(coro_id)
+            if new_born_index is not None:
+                coro = self.new_born_coroutines[new_born_index]
+        
+            return coro, was_new_born, new_born_index
+
+    def del_coro_by_id(self, coro_id: CoroID, was_new_born: bool, new_born_index: Optional[int] = None, request: Optional['Request'] = None):
+        if was_new_born:
+            del self.new_born_coroutines[new_born_index]
+        else:
+            self.coroutines.pop(coro_id, None)
+            if isinstance(request, Request):
+                try:
+                    self.requests.remove(request)
+                except ValueError:
+                    pass
+    
+    def kill_coro_by_id(self, coro_id: CoroID) -> bool:
+        if self.current_coro_interface is not None:
+            raise RuntimeError('CoroScheduler.kill_coro_by_id() Must not be called from the coroutine')
+        
+        coro, was_new_born, new_born_index = self.find_coro_by_id(coro_id)
+        if coro is not None:
+            request: Optional[Request] = coro.last_result
+            if was_new_born:
+                self.process_coro_exit_status(coro, None)
+            else:
+                self.kill_coro(coro)
+            
+            self.del_coro_by_id(coro_id, was_new_born, new_born_index, request=request)
+            return True
+        
+        return False
+    
+    def throw_coro_by_id(self, coro_id: CoroID, ex_type, ex_value=None, ex_traceback=None) -> bool:
+        if self.current_coro_interface is not None:
+            raise RuntimeError('CoroScheduler.throw_coro_by_id() Must not be called from the coroutine')
+        
+        coro, was_new_born, new_born_index = self.find_coro_by_id(coro_id)
+        if coro is not None:
+            request: Optional[Request] = coro.last_result
+            if was_new_born:
+                self.process_coro_exit_status(coro, None)
+            else:
+                self.throw_coro(coro, ex_type, ex_value, ex_traceback)
+            
+            if not coro:
+                self.del_coro_by_id(coro_id, was_new_born, new_born_index, request=request)
+
+            return True
+        
+        return False
+    
+    def request_coro_throw_by_id(self, coro_id: CoroID, *args, **kwargs) -> Optional['CoroWrapperBase']:
+        coro, _, _ = self.find_coro_by_id(coro_id)
+        if coro is not None:
+            coro.request_throw(*args, **kwargs)
+        
+        return coro
+
+    def request_coro_close_by_id(self, coro_id: CoroID) -> Optional['CoroWrapperBase']:
+        coro, _, _ = self.find_coro_by_id(coro_id)
+        if coro is not None:
+            coro.request_close()
+        
+        return coro
+    
+    def _real_run_low_latency_services(self):
+        live_low_latency_services_buff = copy(self.live_low_latency_services)
+        for service_type, service in live_low_latency_services_buff.items():
+            if service.in_work():
+                results = service.iteration()
+                if results:
+                    if __debug__:
+                        for result in results:
+                            if __debug__: dlog(f'λ <<< {repr(result)}')
+                    self.responses.extend(results)
+    
+    def _fake_run_low_latency_services(self):
+        pass
+    
+    def turn_on_embedded_mode(self, turn_on: bool = False):
+        if turn_on:
+            self.run_low_latency_services = self._real_run_low_latency_services
+        else:
+            self.run_low_latency_services = self._fake_run_low_latency_services
+
+    def add_global_on_coro_del_handler(self, callback: OnCoroDelHandler):
+        self.coro_on_del_handlers.add(callback)
+
+    def _run_global_on_coro_del_handlers(self, coro: 'CoroWrapperBase') -> bool:
+        if not self.coro_on_del_handlers:
+            return False
+
+        exception_properly_handled = False
+        for handler in self.coro_on_del_handlers:
+            exception_properly_handled = handler(coro) or exception_properly_handled
+        return exception_properly_handled
+
+    def restore_global_state(self):
+        """
+        Must be run immediately after `await ...` from inside Coro or Service when running from inside external
+        async loop
+        :return:
+        """
+        _current_coro_scheduler.scheduler = self
+
+    @staticmethod
+    def current_loop() -> Optional['CoroScheduler']:
+        return _current_coro_scheduler.scheduler
+
+    def current_interface(self) -> Optional['Interface']:
+        return self.current_coro_interface
+
+    def current_wrapper(self) -> Optional['CoroWrapperBase']:
+        return self.current_coro_wrapper
+    
+    def destroy_all_coroutines(self):
+        while self.new_born_coroutines or self.coroutines:
+            new_born_coroutines_buff = self.new_born_coroutines
+            self.new_born_coroutines = type(new_born_coroutines_buff)()
+            for coro in new_born_coroutines_buff:
+                coro: 'CoroWrapperBase' = coro
+                self.kill_coro(coro)
+
+            coroutines_buff = self.coroutines
+            self.coroutines = type(coroutines_buff)()
+            for coro in coroutines_buff.values():
+                coro: 'CoroWrapperBase' = coro
+                self.kill_coro(coro)
+    
+    def destroy_new_born_coroutines(self):
+        while self.new_born_coroutines:
+            new_born_coroutines_buff = self.new_born_coroutines
+            self.new_born_coroutines = type(new_born_coroutines_buff)()
+            for coro in new_born_coroutines_buff:
+                coro: 'CoroWrapperBase' = coro
+                self.kill_coro(coro)
+    
+    def destroy_coroutines(self):
+        while self.coroutines:
+            coroutines_buff = self.coroutines
+            self.coroutines = type(coroutines_buff)()
+            coroutines_buff_values = coroutines_buff.values()
+            for coro_wrapper in coroutines_buff_values:
+                coro_wrapper: 'CoroWrapperBase' = coro_wrapper
+                self.kill_coro(coro_wrapper)
+    
+    def destroy(self):
+        if not self._destroyed:
+            def create_entity_during_destroy(*args, **kwargs):
+                raise CoroSchedulerIsCurrentlyDestroingError
+            
+            put_coro_fast_buf = self.put_coro_fast
+            self.put_coro_fast = create_entity_during_destroy
+            register_service_bak = self.register_service
+            self.register_service = create_entity_during_destroy
+
+            try:
+                while self.new_born_coroutines or self.coroutines:
+                    new_born_coroutines_buff = self.new_born_coroutines
+                    self.new_born_coroutines = type(new_born_coroutines_buff)()
+                    for coro in new_born_coroutines_buff:
+                        coro: 'CoroWrapperBase' = coro
+                        try:
+                            self.kill_coro(coro)
+                        except CoroSchedulerIsCurrentlyDestroingError:
+                            self.logger.warning(f'Uncandled `CoroSchedulerIsCurrentlyDestroingError` exception during kill new born coroutine')
+                            pass
+
+                    coroutines_buff = self.coroutines
+                    self.coroutines = type(coroutines_buff)()
+                    for coro in coroutines_buff.values():
+                        coro: 'CoroWrapperBase' = coro
+                        try:
+                            self.kill_coro(coro)
+                        except CoroSchedulerIsCurrentlyDestroingError:
+                            self.logger.warning(f'Uncandled `CoroSchedulerIsCurrentlyDestroingError` exception during kill coroutine')
+                            pass
+
+                    self.requests = type(self.requests)()
+                    self.responses = type(self.responses)()
+                
+                services_bak = copy(self.services)
+                for service_type in services_bak:
+                    try:
+                        self.unregister_service(service_type)
+                    except CoroSchedulerIsCurrentlyDestroingError:
+                        self.logger.warning(f'Uncandled `CoroSchedulerIsCurrentlyDestroingError` exception during destroy service "{service_type}"')
+                        pass
+
+                self.requests = type(self.requests)()
+                self.responses = type(self.responses)()
+            finally:
+                self.put_coro_fast = put_coro_fast_buf
+                self.register_service = register_service_bak
+                self._destroyed = True
+    
+    def _update_in_work(self):
+        self._in_work = self.new_born_coroutines or self.coroutines or self.services_in_work
+        return self._in_work
+
+    def in_work(self):
+        in_work_result = self._in_work
+        return self._update_in_work() if in_work_result is None else in_work_result
+
+    def _update_is_awake(self):
+        self._is_awake = self.new_born_coroutines or self.coroutines or self.live_services or self.live_low_latency_services
+        return self._is_awake
+
+    def is_awake(self):
+        is_awake_result = self._is_awake
+        return self._update_is_awake() if is_awake_result is None else is_awake_result
+
+    def is_idle(self) -> bool:
+        return (self.next_event_after() is not None) and (not self.new_born_coroutines) and (not self.services_in_active_state) and (not self.responses)
+
+    def next_event_after(self) -> Optional[Union[float, int]]:
+        return self.time_left_before_next_event
+
+    def _loop_imp(self):
+        try:
+            next_event_after = None
+            while self.in_work() or (next_event_after is not None):
+                self._iteration_imp()
+                next_event_after = self.next_event_after()
+                if (next_event_after is not None) and (not self.new_born_coroutines) and (not self.services_in_active_state) and (not self.responses):
+                    if self.use_internal_sleep or (not self.on_idle_handlers):
+                        try_sleep(next_event_after, None, sleep)
+                    else:
+                        for handler in self.on_idle_handlers:
+                            handler(next_event_after)
+                # else:
+                #     print(self.services_in_active_state_list)
+        finally:
+            self.destroy()
+    
+    def _iteration_imp(self):
+        current_coro_scheduler_buff = _current_coro_scheduler.scheduler
+        _current_coro_scheduler.scheduler = self
+        
+        self.in_iteration = True
+        
+        try:
+            self.context_switches += len(self.new_born_coroutines) + len(self.responses)
+            self.loop_iteration_start_time = self.get_loop_iteration_start_time()
+
+            if not self.keep_coro_execution_time_between_iterations:
+                self.coro_execution_time = type(self.coro_execution_time)()
+            if not self.keep_coro_longest_execution_time_between_iterations:
+                self.coro_longest_execution_time = type(self.coro_longest_execution_time)()
+            if not self.keep_coro_workers_history_between_iterations:
+                self.coro_workers_history = type(self.coro_workers_history)()
+            if not self.keep_coro_full_history_between_iterations:
+                self.coro_full_history = type(self.coro_full_history)()
+
+            self.run_low_latency_services()
+
+            new_born_coroutines_buff = self.new_born_coroutines
+            self.new_born_coroutines = type(new_born_coroutines_buff)()
+            for coro in new_born_coroutines_buff:
+                coro: CoroWrapperBase = coro
+                if self.execute_global_on_start_handlers(coro):
+                    self.current_coro_start_time = self.get_coro_start_time()
+                    self.current_coro_wrapper = coro
+                    coro_exit_status: CoroExitStatus = coro.init(self.root_coro)
+                    self.current_coro_wrapper = None
+                    coro_execution_piece_delta_time = self.get_coro_start_time() - self.current_coro_start_time
+                    self.current_coro_start_time = None
+                    coro_id = coro.coro_id
+                    if coro_id not in self.coro_execution_time:
+                        self.coro_execution_time[coro_id] = 0
+
+                    self.coro_execution_time[coro_id] += coro_execution_piece_delta_time
+                    if coro_id not in self.coro_longest_execution_time:
+                        self.coro_longest_execution_time[coro_id] = 0
+
+                    self.coro_longest_execution_time[coro_id] = max(self.coro_longest_execution_time[coro_id], coro_execution_piece_delta_time)
+                    if coro:
+                        self.requests.append(coro.last_result)
+                        self.coroutines[coro_id] = coro
+                        continue
+                    else:
+                        self.process_coro_exit_status(coro, coro_exit_status)
+
+            responses_buff = self.responses
+            self.responses = type(responses_buff)()
+            for response in responses_buff:
+                coro_id = response.coro_id
+                if coro_id not in self.coroutines:
+                    if not self.suppress_warnings_about_responses_to_not_existant_coroutines:
+                        self.logger.warning(f'Coroutine {coro_id} has a response but does not exists: {repr(response)}')
+                    
+                    continue
+                
+                coro = self.coroutines[coro_id]
+
+                self.current_coro_start_time = self.get_coro_start_time()
+                self.current_coro_wrapper = coro
+                coro_exit_status: CoroExitStatus = coro(response)
+                self.current_coro_wrapper = None
+                coro_execution_piece_delta_time = self.get_coro_start_time() - self.current_coro_start_time
+                self.current_coro_start_time = None
+                coro_id = coro.coro_id
+                if coro_id not in self.coro_execution_time:
+                    self.coro_execution_time[coro_id] = 0
+
+                self.coro_execution_time[coro_id] += coro_execution_piece_delta_time
+                if coro_id not in self.coro_longest_execution_time:
+                    self.coro_longest_execution_time[coro_id] = 0
+
+                self.coro_longest_execution_time[coro_id] = max(self.coro_longest_execution_time[coro_id], coro_execution_piece_delta_time)
+                if coro:
+                    self.requests.append(coro.last_result)
+                    continue
+                else:
+                    del self.coroutines[coro_id]
+                    self.process_coro_exit_status(coro, coro_exit_status)
+
+            requests_buff = self.requests
+            self.requests = type(requests_buff)()
+            for request in requests_buff:
+                if __debug__: dlog(f'λ >>> {repr(request)}')
+                service_type = request.service_type
+                service: 'Service' = self.get_service_by_type(service_type)
+                result = service.put_task(request)
+                if result is not None:
+                    if __debug__: dlog(f'λ <<< {repr(result)}')
+                    self.responses.append(result)
+
+            self.services_in_work = 0
+            self.services_in_active_state = 0
+            # self.services_in_active_state_list = list()
+            self.time_left_before_next_event = None
+            live_services_buff = copy(self.live_services)
+            for service_type, service in live_services_buff.items():
+                if service.in_work():
+                    self.services_in_work += 1
+                    self.services_in_active_state += 1
+                    results = service.iteration()
+                    if service.in_work():
+                        has_planned_events, time_left_before_next_event = service.time_left_before_next_event()
+                        if has_planned_events and (time_left_before_next_event is not None):
+                            self.services_in_active_state -= 1
+                            if self.time_left_before_next_event is None:
+                                self.time_left_before_next_event = time_left_before_next_event
+                            elif time_left_before_next_event < self.time_left_before_next_event:
+                                self.time_left_before_next_event = time_left_before_next_event
+                        # else:
+                        #     self.services_in_active_state_list.append(service_type)
+                    else:
+                        self.services_in_work -= 1
+                        self.services_in_active_state -= 1
+                        # self.services_in_active_state_list.append(service_type)
+                    
+                    if results:
+                        if __debug__:
+                            for result in results:
+                                if __debug__: dlog(f'λ <<< {repr(result)}')
+                        self.responses.extend(results)
+        except:
+            if __debug__: dlog('Loop Exception')
+            self.logger.exception('Loop Exception')
+            raise
+        finally:
+            self.loop_iteration_delta_time = self.get_loop_iteration_start_time() - self.loop_iteration_start_time
+            self._update_in_work()
+            self._update_is_awake()
+            _current_coro_scheduler.scheduler = current_coro_scheduler_buff
+            self.in_iteration = False
+
+
+class CoroSchedulerGreenlet(CoroSchedulerBase):
+    def __init__(self):
+        super().__init__()
+        self.root_coro_loop = greenlet(self._loop_imp)            # type: Coro
+        # self.root_coro_iteration = greenlet(self._iteration_imp)  # type: Coro
+        self.root_coro_iteration = greenlet(self._iter_wrapper)  # type: Coro
+        # self._root_coro = None                                     # type: Optional[Coro]
+        self.root_coro = None                                     # type: Optional[Coro]
+    
+    def _new_coro_type_normalizer(self, coro_type: Optional[CoroType]) -> CoroType:
+        return coro_type or CoroType.auto
+
+    def loop(self):
+        self.root_coro = self.root_coro_loop
+
+        # if __debug__: dlog('Switch to root_coro')
+        self.root_coro.switch()
+        # if __debug__: dlog('Switch from root_coro')
+        self.root_coro = None
+        self.root_coro_loop = greenlet(self._loop_imp)
+    
+    def iteration(self):
+        global _debug_log_counter
+        last_debug_log_counter = _debug_log_counter
+        if __debug__: dlog(f'^ λ ({id(self)}, {self}). root_coro: {self.root_coro}; root_coro_iteration: {self.root_coro_iteration}; current_loop: {self.current_loop()}; current_interface: {self.current_interface()}')
+        
+        self.root_coro = self.root_coro_iteration
+        in_work = False
+        try:
+            # if __debug__: dlog('Switch to root_coro (iteration)')
+            in_work = self.root_coro.switch(True)
+            # if __debug__: dlog('Switch from root_coro (iteration)')
+        except GreenletExit:
+            self.stop_iteration()
+            if __debug__: dlog('Switch from root_coro (GreenletExit)')
+        except:
+            self.stop_iteration()
+            if __debug__: dlog('Switch from root_coro (Exception):')
+            if __debug__: dlog(sys.exc_info())
+            raise
+        finally:
+            self.root_coro = None
+            
+            if __debug__:
+                if last_debug_log_counter < _debug_log_counter:
+                    if __debug__: dlog(f'_ λ ({id(self)}, {self}). root_coro: {self.root_coro}; root_coro_iteration: {self.root_coro_iteration}; current_loop: {self.current_loop()}; current_interface: {self.current_interface()}')
+        return in_work
+    
+    def stop_iteration(self):
+        try:
+            in_work = self.root_coro.switch(False)
+        except GreenletExit:
+            self.stop_iteration()
+            if __debug__: dlog('Stop root_coro (GreenletExit)')
+        except:
+            self.stop_iteration()
+            if __debug__: dlog('Stop root_coro (Exception):')
+            if __debug__: dlog(sys.exc_info())
+            raise
+        finally:
+            self.root_coro = None
+            self.root_coro_iteration = greenlet(self._iter_wrapper)
+    
+    def _iter_wrapper(self, proceed: bool=True):
+        try:
+            while proceed:
+                self._iteration_imp()
+                proceed = greenlet.getcurrent().parent.switch(self.in_work())
+        finally:
+            self.destroy()
+
+
+class CoroSchedulerAwaitable(CoroSchedulerBase):
+    def __init__(self):
+        super().__init__()
+    
+    def _new_coro_type_normalizer(self, coro_type: Optional[CoroType]) -> CoroType:
+        return CoroType.awaitable
+
+    def loop(self):
+        self._loop_imp()
+    
+    def iteration(self):
+        global _debug_log_counter
+        last_debug_log_counter = _debug_log_counter
+        if __debug__: dlog(f'^ λ ({id(self)}, {self}). root_coro: {self.root_coro}; root_coro_iteration: {self.root_coro_iteration}; current_loop: {self.current_loop()}; current_interface: {self.current_interface()}')
+        
+        need_to_destroy = False
+        try:
+            self._iteration_imp()
+            return self.in_work()
+        except:
+            need_to_destroy = True
+            raise
+        finally:
+            if __debug__:
+                if last_debug_log_counter < _debug_log_counter:
+                    if __debug__: dlog(f'_ λ ({id(self)}, {self}). root_coro: {self.root_coro}; root_coro_iteration: {self.root_coro_iteration}; current_loop: {self.current_loop()}; current_interface: {self.current_interface()}')
+            
+            if need_to_destroy:
+                self.destroy()
+
+
+if greenlet_awailable:
+    CoroScheduler = CoroSchedulerGreenlet
+else:
+    CoroScheduler = CoroSchedulerAwaitable
+
+
+def current_interface() -> Optional['Interface']:
+    return current_coro_scheduler().current_interface()
+
+
+def execute_coro(coro_worker: AnyWorker, *args, **kwargs) -> Any:
+    return coro_worker(current_interface(), *args, **kwargs)
+
+
+exec_coro = execute_coro
+ecoro = execute_coro
+
+
+async def aexecute_coro(coro_worker: AnyWorker, *args, **kwargs) -> Any:
+    return await coro_worker(current_interface(), *args, **kwargs)
+
+
+aexec_coro = aexecute_coro
+aecoro = aexecute_coro
+
+
+@contextmanager
+def around_await():
+    """
+    It is very bad idea to await from inside the greenlet since it might lead to problems with stack
+    state in an outside awaitable code and it's loop.
+    Must be run around `await ...` from inside Coro or Service when running from inside external async loop
+    :return:
+    """
+    loop = _current_coro_scheduler.scheduler
+    try:
+        yield
+    finally:
+        _current_coro_scheduler.scheduler = loop
+
+
+class Request:
+    def __init__(self, coro: 'CoroWrapperBase', service_type: ServiceType, *args, **kwargs):
+        self.coro = coro
+        self.coro_id = coro.coro_id
+        self.service_type = service_type
+        self.args = args
+        self.kwargs = kwargs
+    
+    def __repr__(self):
+        return f'<{self.__class__.__name__}(coro: {self.coro}, coro_id: {self.coro_id}, service_type: {self.service_type}, args: {self.args}, kwargs: {self.kwargs})>'
+
+
+class Response:
+    def __init__(self, coro_id: CoroID, service_type: ServiceType, response: Any, exception: Optional[BaseException]=None):
+        self.coro_id = coro_id
+        self.service_type = service_type
+        self.response = response
+        self.exception = exception
+
+    def __call__(self) -> Any:
+        if self.exception:
+            raise self.exception
+        return self.response
+    
+    def __repr__(self):
+        return f'<{self.__class__.__name__}(coro_id: {self.coro_id}, service_type: {self.service_type}, response: {self.response}, exception: {self.exception})>'
+
+
+class CoroExitStatus:
+    def __init__(self, exception, properly_handled):
+        self.exception = exception
+        self.properly_handled = properly_handled
+
+
+class CoroWrapperBase:
+    def __init__(self, loop: CoroScheduler, coro_id: CoroID, worker: Worker, *args, **kwargs):
+        self.init_args = args              # type: Tuple[Any, ...]
+        self.init_kwargs = kwargs          # type: Dict
+        self.coro_id = coro_id             # type: CoroID
+        self.worker = worker               # type: Worker
+        self.loop = loop                   # type: CoroScheduler
+        self.coro = None                   # type: Optional[Coro]
+        self.parent_coro = None            # type: Optional[Coro]
+        self.interface = None              # type: Optional[Interface]
+        self.last_result = None            # type: Optional[Union[Request, Any]] # return value can be any
+        self.exception = None              # type: Optional[Exception] # If there was an exception
+        self.coro_on_del_handlers = set()  # type: Set[Callable]
+        self._make_coro_method = self._raise_not_implemented_error  # type: Callable
+        self._make_interface = self._raise_not_implemented_error  # type: Callable
+        self._init_method = self._raise_not_implemented_error  # type: Callable
+        self._call_method = self._raise_not_implemented_error  # type: Callable
+        self._throw_method = self._raise_not_implemented_error  # type: Callable
+        self._close_method = self._raise_not_implemented_error  # type: Callable
+        self._current_call_method = self._call_method  # type: Callable
+    
+    def _travers_through_coro_on_del_handlers(self, coro_exit_status: 'CoroExitStatus'):
+        if not self.coro_on_del_handlers:
+            return coro_exit_status
+
+        exception_properly_handled = coro_exit_status.properly_handled
+        for handler in self.coro_on_del_handlers:
+            exception_properly_handled = handler(self) or exception_properly_handled
+        coro_exit_status.properly_handled = exception_properly_handled
+        return coro_exit_status
+
+    def init(self, parent_coro: Optional[Coro] = None) -> Union[None, 'CoroExitStatus']:
+        self.parent_coro = parent_coro
+        self.coro = self._make_coro_method()
+        self.interface = self._make_interface()
+        current_coro_interface_buff = self.loop.current_coro_interface
+        self.loop.current_coro_interface = self.interface
+        try:
+            self._init_method(*self.init_args, **self.init_kwargs)
+            if self:
+                return None
+            else:
+                # if __debug__: dlog(f'LAST_RESULT. Type: {type(self.last_result)}; Value: {self.last_result}')
+                return self._travers_through_coro_on_del_handlers(CoroExitStatus(None, True))
+        except:
+            self.exception = get_exception()
+            if not self.coro_on_del_handlers:
+                return CoroExitStatus(self.exception, False)
+            return self._travers_through_coro_on_del_handlers(CoroExitStatus(self.exception, False))
+        finally:
+            self.loop.current_coro_interface = current_coro_interface_buff
+
+    def __call__(self, *args, **kwargs) -> Union[None, 'CoroExitStatus']:
+        current_coro_interface_buff = self.loop.current_coro_interface
+        self.loop.current_coro_interface = self.interface
+        try:
+            self._current_call_method(*args, **kwargs)
+            if self:
+                return None
+            else:
+                # if __debug__: dlog(f'LAST_RESULT. Type: {type(self.last_result)}; Value: {self.last_result}')
+                return self._travers_through_coro_on_del_handlers(CoroExitStatus(None, True))
+        except:
+            self.exception = get_exception()
+            if not self.coro_on_del_handlers:
+                return CoroExitStatus(self.exception, False)
+            return self._travers_through_coro_on_del_handlers(CoroExitStatus(self.exception, False))
+        finally:
+            self.loop.current_coro_interface = current_coro_interface_buff
+    
+    def __bool__(self) -> bool:
+        raise NotImplementedError
+
+    def add_on_coro_del_handler(self, callback: OnCoroDelHandler):
+        self.coro_on_del_handlers.add(callback)
+    
+    def _raise_not_implemented_error(self, *args, **kwargs):
+        pass
+        raise NotImplementedError
+        return self._raise_not_implemented_error  # Suppressing lint error
+    
+    def _current_throw_method_helper(self, *args, **kwargs):
+        self._throw_method(*args, **kwargs)
+        self._current_call_method = self._call_method
+    
+    def request_throw(self, *args, **kwargs) -> Any:
+        self._current_call_method = self._current_throw_method_helper
+    
+    def _current_close_method_helper(self, *args, **kwargs):
+        self._close_method()
+        self._current_call_method = self._call_method
+    
+    def request_close(self) -> Any:
+        self._current_call_method = self._current_close_method_helper
+
+    def destroy(self):
+        if self.interface is not None:
+            if isinstance(self.interface, Interface):
+                self.interface.destroy()
+        
+        self.init_args = None
+        self.init_kwargs = None
+        self.coro_id = None
+        self.worker = None
+        self.loop = None
+        self.coro = None
+        self.parent_coro = None
+        self.interface = None
+        self.last_result = None
+        self.exception = None
+        self.coro_on_del_handlers = None
+        self._make_coro_method = None
+        self._make_interface = None
+        self._init_method = None
+        self._call_method = None
+        self._throw_method = None
+        self._close_method = None
+        self._current_call_method = None
+
+
+class CoroWrapperGreenlet(CoroWrapperBase):
+    def __init__(self, loop: CoroScheduler, coro_id: CoroID, worker: Worker, *args, **kwargs):
+        super(CoroWrapperGreenlet, self).__init__(loop, coro_id, worker, *args, **kwargs)
+        self._make_coro_method = self._make_coro_method_imp
+        self._make_interface = self._make_interface_imp
+        self._init_method = self._init_method_imp
+        self._call_method = self._call_method_imp
+        self._throw_method = self._throw_method_imp  # type: Callable
+        self._close_method = self._close_method_imp  # type: Callable
+        self._current_call_method = self._call_method  # type: Callable
+    
+    def _make_coro_method_imp(self):
+        return greenlet(self.worker, self.parent_coro)
+    
+    def _make_interface_imp(self):
+        return InterfaceGreenlet(self.loop, self)
+
+    def _init_method_imp(self, *init_args, **init_kwargs):
+        try:
+            if __debug__: dlog(f'λ => (init): {func_info(self.worker.worker)}')
+            self.last_result = self.coro.switch(self.interface, *init_args, **init_kwargs)  # TODO: wrong
+            if __debug__: dlog(f'λ <= (init): {repr(self.worker.worker)}')
+        except GreenletExit:
+            if __debug__: dlog(f'λ <= (init; GreenletExit): {repr(self.worker.worker)}')
+            self.last_result = self.interface.result
+        except:
+            if __debug__: dlog(f'λ <= (init; Exception): {repr(self.worker.worker)}')
+            self.last_result = None
+            raise
+
+    def _call_method_imp(self, *args, **kwargs):
+        try:
+            if __debug__: dlog(f'λ => (call): {func_info(self.worker.worker)}')
+            self.last_result = self.coro.switch(*args, **kwargs)  # TODO: wrong
+            if __debug__: dlog(f'λ <= (call): {repr(self.worker.worker)}')
+        except GreenletExit:
+            if __debug__: dlog(f'λ <= (init; GreenletExit): {repr(self.worker.worker)}')
+            self.last_result = self.interface.result
+        except:
+            if __debug__: dlog(f'λ <= (init; Exception): {repr(self.worker.worker)}')
+            self.last_result = None
+            raise
+
+    # def _throw_method_imp(self, *args, **kwargs):
+    def _throw_method_imp(self, ex_type, ex_value=None, ex_traceback=None):
+        try:
+            if __debug__: dlog(f'λ => (throw): {func_info(self.worker.worker)}')
+            self.last_result = self.coro.throw(ex_type, ex_value, ex_traceback)
+            if __debug__: dlog(f'λ <= (throw): {repr(self.worker.worker)}')
+        except GreenletExit:
+            if __debug__: dlog(f'λ <= (init; GreenletExit): {repr(self.worker.worker)}')
+            self.last_result = self.interface.result
+        except:
+            if __debug__: dlog(f'λ <= (init; Exception): {repr(self.worker.worker)}')
+            self.last_result = None
+            raise
+
+    def _close_method_imp(self):
+        try:
+            if __debug__: dlog(f'λ => (close): {func_info(self.worker.worker)}')
+            self.last_result = self.coro.throw()
+            if __debug__: dlog(f'λ <= (close): {repr(self.worker.worker)}')
+        except GreenletExit:
+            if __debug__: dlog(f'λ <= (init; GreenletExit): {repr(self.worker.worker)}')
+            self.last_result = self.interface.result
+        except:
+            if __debug__: dlog(f'λ <= (init; Exception): {repr(self.worker.worker)}')
+            self.last_result = None
+            raise
+    
+    def __bool__(self) -> bool:
+        return bool(self.coro)
+
+    def destroy(self):
+        if isinstance(self.worker, GreenletWorkerWrapper):
+            self.worker.destroy()
+        
+        return super().destroy()
+
+
+async def init_asyncgenerator(entity: Callable):
+    try:
+        result = await entity.asend(None)
+        return (result, None)
+    except:
+        exception = get_exception()
+        return (None, exception)
+
+
+async def call_asyncgenerator(entity: Callable, *args, **kwargs):
+    try:
+        result = await entity.asend(*args, **kwargs)
+        return (result, None)
+    except:
+        exception = get_exception()
+        return (None, exception)
+
+
+async def throw_asyncgenerator(entity: Callable, *args, **kwargs):
+    try:
+        result = await entity.athrow(*args, **kwargs)  # await entity.athrow(type[, value[, traceback]]) ; https://docs.python.org/3/reference/expressions.html#agen.asend
+        return (result, None)
+    except:
+        exception = get_exception()
+        return (None, exception)
+
+
+async def close_asyncgenerator(entity: Callable):
+    try:
+        result = await entity.aclose()
+        return (result, None)
+    except:
+        exception = get_exception()
+        return (None, exception)
+
+
+async def init_asyncgeneratorfunction(entity: Callable, *args, **kwargs):
+    try:
+        entity = entity(*args, **kwargs)
+        result = await entity.asend(None)
+        return (entity, result, None)
+    except:
+        exception = get_exception()
+        return (entity, None, exception)
+
+
+async def awaitable_wrapper(entity: Awaitable):
+    return await entity
+
+
+async def callable_wrapper(entity: Callable, *args, **kwargs):
+    return entity(*args, **kwargs)
+
+
+class CoroWrapperAsyncAwait(CoroWrapperBase):
+    def __init__(self, loop: CoroScheduler, coro_id: CoroID, worker: Worker, *args, **kwargs):
+        super(CoroWrapperAsyncAwait, self).__init__(loop, coro_id, worker, *args, **kwargs)
+        self._make_coro_method = self._make_coro_method_imp
+        self._make_interface = self._make_interface_imp
+        self.in_run_state = False
+        self.subtype = self._setup_subtype()
+        self._current_call_method = self._call_method  # type: Callable
+
+    def _make_coro_method_imp(self):
+        return self.worker
+    
+    def _make_interface_imp(self):
+        return InterfaceAsyncAwait(self.loop, self)
+
+    def __bool__(self) -> bool:
+        return self.in_run_state
+    
+    def _setup_subtype(self):
+        if inspect.iscoroutine(self.worker):
+            # if __debug__: dlog('λ >>>\tCOROUTINE')
+            self._init_method = self._init_coroutine
+            self._call_method = self._call_coroutine
+            self._throw_method = self._throw_coroutine
+            self._close_method = self._close_coroutine
+            return 0
+        elif inspect.isgenerator(self.worker):
+            # if __debug__: dlog('λ >>>\tGENERATOR')
+            self._init_method = self._init_generator
+            self._call_method = self._call_coroutine
+            self._throw_method = self._throw_coroutine
+            self._close_method = self._close_coroutine
+            return 1
+        elif inspect.iscoroutinefunction(self.worker):
+            # if __debug__: dlog('λ >>>\tCOROUTINE FUNCTION')
+            self._init_method = self._init_coroutinefunction
+            self._call_method = self._call_coroutine
+            self._throw_method = self._throw_coroutine
+            self._close_method = self._close_coroutine
+            return 2
+        elif inspect.isgeneratorfunction(self.worker):
+            # if __debug__: dlog('λ >>>\tGENERATOR FUNCTION')
+            self._init_method = self._init_generatorfunction
+            self._call_method = self._call_coroutine
+            self._throw_method = self._throw_coroutine
+            self._close_method = self._close_coroutine
+            return 3
+        elif inspect.isasyncgen(self.worker):
+            # if __debug__: dlog('λ >>>\tASYNC GENERATOR')
+            self._init_method = self._init_asyncgenerator
+            self._call_method = self._call_asyncgenerator
+            self._throw_method = self._throw_asyncgenerator
+            self._close_method = self._close_asyncgenerator
+            return 4
+        elif inspect.isasyncgenfunction(self.worker):
+            # if __debug__: dlog('λ >>>\tASYNC GENERATOR FUNCTION')
+            self._init_method = self._init_asyncgeneratorfunction
+            self._call_method = self._call_asyncgenerator
+            self._throw_method = self._throw_asyncgenerator
+            self._close_method = self._close_asyncgenerator
+            return 5
+        elif inspect.isawaitable(self.worker):
+            # if __debug__: dlog('λ >>>\tAWAITABLE')
+            self._init_method = self._init_awaitable
+            self._call_method = self._call_coroutine
+            self._throw_method = self._throw_coroutine
+            self._close_method = self._close_coroutine
+            return 6
+        elif callable(self.worker):
+            # if __debug__: dlog('λ >>>\tCALLABLE')
+            self._init_method = self._init_callable
+            self._call_method = self._call_coroutine
+            self._throw_method = self._throw_coroutine
+            self._close_method = self._close_coroutine
+            return 7
+        else:
+            raise TypeError(f'{self.worker} is neither an awaitable nor a wrapper for an awaitable')
+    
+    def _init_coroutine(self, *init_args, **init_kwargs):
+        try:
+            self.in_run_state = True
+            self.last_result = self.coro.send(None)
+        except StopIteration as ex:
+            self.in_run_state = False
+            self.last_result = ex.value
+        except:
+            self.in_run_state = False
+            raise
+            
+    def _call_coroutine(self, *args, **kwargs):
+        try:
+            self.in_run_state = True
+            self.last_result = self.coro.send(*args, **kwargs)
+        except StopIteration as ex:
+            self.in_run_state = False
+            self.last_result = ex.value
+        except:
+            self.in_run_state = False
+            raise
+            
+    # def _throw_coroutine(self, *args, **kwargs):
+    def _throw_coroutine(self, ex_type, ex_value=None, ex_traceback=None):
+        try:
+            self.in_run_state = True
+            self.last_result = self.coro.throw(ex_type, ex_value, ex_traceback)  # self.coro.throw(type[, value[, traceback]])
+        except StopIteration as ex:
+            self.in_run_state = False
+            self.last_result = ex.value
+        except:
+            self.in_run_state = False
+            raise
+            
+    def _close_coroutine(self, *args, **kwargs):
+        try:
+            self.in_run_state = True
+            self.last_result = self.coro.close()
+        except StopIteration as ex:
+            self.in_run_state = False
+            self.last_result = ex.value
+        except:
+            self.in_run_state = False
+            raise
+
+    def _init_generator(self, *args, **kwargs):
+        try:
+            self.in_run_state = True
+            self.last_result = next(self.coro)  # ToDo: investigate how to provide an initial parameters
+        except StopIteration as ex:
+            self.in_run_state = False
+            self.last_result = ex.value
+        except:
+            self.in_run_state = False
+            raise
+
+    def _init_coroutinefunction(self, *init_args, **init_kwargs):
+        self.coro = self.coro(self.interface, *init_args, **init_kwargs)
+        self._init_coroutine()
+
+    def _init_generatorfunction(self, *init_args, **init_kwargs):
+        self.coro = self.coro(self.interface, *init_args, **init_kwargs)
+        self._init_generator()
+
+    def _init_asyncgenerator(self, *init_args, **init_kwargs):
+        try:
+            self.in_run_state = True
+            entity = init_asyncgenerator(self.coro)
+            result = entity.send(None)
+        except StopIteration as ex:
+            self.in_run_state = False
+            result = ex.value
+        except:
+            self.in_run_state = False
+            raise
+        
+        self.last_result, exception = result
+        if exception is not None:
+            self.in_run_state = False
+            if not isinstance(exception, StopAsyncIteration):
+                raise exception
+
+    def _call_asyncgenerator(self, *args, **kwargs):
+        try:
+            self.in_run_state = True
+            entity = call_asyncgenerator(self.coro, *args, **kwargs)
+            result = entity.send(None)
+        except StopIteration as ex:
+            self.in_run_state = False
+            result = ex.value
+        except:
+            self.in_run_state = False
+            raise
+        
+        self.last_result, exception = result
+        if exception is not None:
+            self.in_run_state = False
+            if not isinstance(exception, StopAsyncIteration):
+                raise exception
+
+    def _throw_asyncgenerator(self, *args, **kwargs):
+        try:
+            self.in_run_state = True
+            entity = throw_asyncgenerator(self.coro, *args, **kwargs)
+            result = entity.send(None)
+        except StopIteration as ex:
+            self.in_run_state = False
+            result = ex.value
+        except:
+            self.in_run_state = False
+            raise
+        
+        self.last_result, exception = result
+        if exception is not None:
+            self.in_run_state = False
+            if not isinstance(exception, StopAsyncIteration):
+                raise exception
+
+    def _close_asyncgenerator(self):
+        try:
+            self.in_run_state = True
+            entity = close_asyncgenerator(self.coro)
+            result = entity.send(None)
+        except StopIteration as ex:
+            self.in_run_state = False
+            result = ex.value
+        except:
+            self.in_run_state = False
+            raise
+        
+        self.last_result, exception = result
+        if exception is not None:
+            self.in_run_state = False
+            if not isinstance(exception, StopAsyncIteration):
+                raise exception
+
+    def _init_asyncgeneratorfunction(self, *args, **kwargs):
+        try:
+            self.in_run_state = True
+            entity = init_asyncgeneratorfunction(self.coro, self.interface, *args, **kwargs)
+            result = entity.send(None)
+        except StopIteration as ex:
+            self.in_run_state = False
+            result = ex.value
+        except:
+            self.in_run_state = False
+            raise
+        
+        self.coro, self.last_result, exception = result
+        if exception is not None:
+            self.in_run_state = False
+            if not isinstance(exception, StopAsyncIteration):
+                raise exception
+
+    def _init_awaitable(self, *init_args, **init_kwargs):
+        self.coro = awaitable_wrapper(self.coro)
+        self._init_coroutine()
+
+    def _init_callable(self, *init_args, **init_kwargs):
+        self.coro = callable_wrapper(self.coro, self.interface, *init_args, **init_kwargs)
+        self._init_coroutine()
+
+    def destroy(self):
+        self._make_coro_method = None
+        self._make_interface = None
+        self.in_run_state = None
+        self.subtype = None
+
+
+class GreenletWorkerWrapper:
+    def __init__(self, worker: Worker):
+        self.worker = worker
+        
+    def __call__(self, interface: 'InterfaceGreenlet', *args, **kwargs):
+        result = None
+        try:
+            result = self.worker(interface, *args, **kwargs)
+        finally:
+            interface.register_result(result)  # in case if GreenletExit will be raised by greenlet framework
+        return result
+
+    def destroy(self):
+        self.worker = None
+
+
+def find_coro_type(entity) -> CoroType:
+    if inspect.iscoroutine(entity) or inspect.isgenerator(entity) or inspect.iscoroutinefunction(entity) or inspect.isgeneratorfunction(entity) or inspect.isasyncgen(entity) or inspect.isasyncgenfunction(entity) or inspect.isawaitable(entity):
+        return CoroType.awaitable
+    elif callable(entity):
+        return CoroType.greenlet
+    else:
+        raise TypeError(f'{entity} is neither an awaitable nor a greenlet')
+
+
+def coro_wrapper_factory(coro_type: CoroType, loop: CoroScheduler, coro_id: CoroID, worker: Worker, *args, **kwargs) -> 'CoroWrapperBase':
+    if CoroType.auto == coro_type:
+        coro_type = find_coro_type(worker)
+
+    if CoroType.greenlet == coro_type:
+        worker = GreenletWorkerWrapper(worker)
+        return CoroWrapperGreenlet(loop, coro_id, worker, *args, **kwargs)
+    elif CoroType.awaitable == coro_type:
+        return CoroWrapperAsyncAwait(loop, coro_id, worker, *args, **kwargs)
+    else:
+        raise NotImplementedError
+
+
+class Interface:
+    def __init__(self, loop: CoroScheduler, coro: CoroWrapperBase):
+        self._loop = loop                        # type: CoroScheduler
+        self._coro = coro                        # type: CoroWrapperBase
+        self.coro_id = coro.coro_id               # type: CoroID
+        self.in_work = False
+
+    # def __call__(self, service_type: ServiceType, *args, **kwargs) -> Any:
+    #     """
+    #     Should be called from inside coroutines only.
+    #     Will request some long running work to some service.
+
+    #     :param coro_id:
+    #     :param service_type:
+    #     :param args:
+    #     :param kwargs:
+    #     """
+
+    #     response = self.__put_task_method(self.__coro, service_type, *args, *kwargs)
+    #     return response()
+    def __call__(self, service_type: ServiceType, *args, **kwargs) -> Any:
+        raise NotImplementedError
+
+    # !!! Must not be present in interface since leads to incorrect greenlets switches
+    # def put_coro(self, coro_type: CoroType, coro_worker: Worker, *args, **kwargs) -> CoroID:
+    #     self.in_work = True
+    #     coro = self._loop.put_coro(coro_type, coro_worker, *args, **kwargs)
+    #     self.in_work = False
+    #     return coro.coro_id
+
+    def destroy(self):
+        self._loop = None
+        self._coro = None
+        self.coro_id = None
+        self.in_work = None
+
+
+class InterfaceGreenlet(Interface):
+    def __init__(self, loop: CoroScheduler, coro: CoroWrapperBase):
+        super(InterfaceGreenlet, self).__init__(loop, coro)
+        self.result = None
+
+    def __call__(self, service_type: ServiceType, *args, **kwargs) -> Any:
+        """
+        Should be called from inside coroutines only.
+        Will request some long running work to some service.
+
+        :param coro_id:
+        :param service_type:
+        :param args:
+        :param kwargs:
+        """
+
+        self.in_work = True
+        if __debug__: dlog(f'λ <= (request): <{func_info(self._coro.worker.worker, False)}>: {service_type}, {args}, {kwargs}')
+        try:
+            response: Response = self._loop.root_coro.switch(Request(self._coro, service_type, *args, **kwargs))
+        except AttributeError:
+            if __debug__: dlog(f'x λ: {id(self._loop)}, {self._loop}, root_coro: {self._loop.root_coro}; root_coro_iteration: {self._loop.root_coro_iteration}; current_loop: {self._loop.current_loop()}; current_interface: {self._loop.current_interface()}')
+            raise
+        if __debug__: dlog(f'λ => (response): <{func_info(self._coro.worker.worker)}>: {repr(response)}')
+        self.in_work = False
+        if isinstance(response, Response):
+            return response()
+        
+        dlog(f"ERROR:\n\tRESPONSE TYPE: {type(response)}\n\tRESPONSE REPR: {repr(response)}\n\tRESPONSE STR: {str(response)}")
+        raise RuntimeError(f'Wrong type of response from the service: {type(response)}; {repr(response)}.')
+    
+    def register_result(self, result: Any):
+        self.result = result
+
+    def destroy(self):
+        self.result = None
+        return super().destroy()
+
+
+class InterfaceAsyncAwait(Interface):
+    def __init__(self, loop: CoroScheduler, coro: CoroWrapperBase):
+        super(InterfaceAsyncAwait, self).__init__(loop, coro)
+
+    async def __call__(self, service_type: ServiceType, *args, **kwargs) -> Any:
+        """
+        Should be called from inside coroutines only.
+        Will request some long running work to some service.
+
+        :param coro_id:
+        :param service_type:
+        :param args:
+        :param kwargs:
+        """
+
+        self.in_work = True
+        response = await yield_task_from_asyncawait(Request(self._coro, service_type, *args, **kwargs))
+        self.in_work = False
+        if isinstance(response, Response):
+            return response()
+        
+        dlog(f"ERROR:\n\tRESPONSE TYPE: {type(response)}\n\tRESPONSE REPR: {repr(response)}\n\tRESPONSE STR: {str(response)}")
+        raise RuntimeError('Wrong type of response from the service')
+
+
+class CallerCoroInfo:
+    def __init__(self, coro: CoroWrapperBase):
+        self.coro: CoroWrapperBase = coro
+        self.coro_id: CoroID = coro.coro_id
+        self.coro_type: Type = type(coro)
+
+
+class WrongServiceRequestError(Exception):
+    pass
+
+
+class ServiceRequest:
+    def __init__(self):
+        self.request_type: int = None  # type: Optional[int]
+        self.args: Optional[Tuple] = None          # type: Optional[Tuple]
+        self.kwargs: Optional[Dict] = None        # type: Optional[Dict]
+        self.provide_to_request_handler: bool = False
+
+    def _save(self, __request__type__: int, *args, **kwargs) -> 'ServiceRequest':
+        self.request_type = __request__type__
+        self.args = args
+        self.kwargs = kwargs
+        return self
+    
+    def __repr__(self):
+        return f'<{self.__class__.__name__}(request_type: {self.request_type}, args: {self.args}, kwargs: {self.kwargs})>'
+
+
+class ServiceRequestMethodMixin:
+    def __init__(self, service: 'Service') -> None:
+        self.service = service
+
+    def __call__(self, *args: Any, **kwds: Any) -> Any:
+        raise NotImplementedError
+
+    def full_processing_iteration(self):
+        raise NotImplementedError
+
+    def in_work(self) -> bool:
+        raise NotImplementedError
+
+    def _on_coro_del_handler(self, coro: CoroWrapperBase) -> bool:
+        raise NotImplementedError
+
+
+class DualImmediateProcessingServiceMixin:
+    def single_task_registration_or_immediate_processing(self, *args, **kwargs) -> Tuple[bool, Any, None]:
+        if (len(args) == 1) and (len(kwargs) == 0) and (isinstance(args[0], ServiceRequest)) or ((len(args) == 0) and (len(kwargs) == 1) and ('request' in kwargs) and isinstance(kwargs['request'], ServiceRequest)):
+            return self.single_task_registration_or_immediate_processing_multiple(*args, **kwargs)
+        else:
+            return self.single_task_registration_or_immediate_processing_single(*args, **kwargs)
+
+    def single_task_registration_or_immediate_processing_multiple(self, request: ServiceRequest
+                                                         ) -> Tuple[bool, Any, None]:
+        return self.resolve_request(request)
+
+    def single_task_registration_or_immediate_processing_single(
+            self, *args, **kwargs
+    ) -> Tuple[bool, Optional[CoroID], Any]:
+        raise NotImplementedError
+
+
+ServiceProcessingResultExists = bool
+ServiceProcessingResult = Any
+ServiceProcessingException = Optional[BaseException]
+ServiceProcessingResponse = Tuple[ServiceProcessingResultExists, ServiceProcessingResult, ServiceProcessingException]
+
+
+class Service(Iterable):
+    def __init__(self, loop: CoroScheduler):
+        super(Service, self).__init__()
+        self._loop: CoroScheduler = loop                     # type: CoroScheduler
+        # self._requests = list()               # type: List[Request]
+        self._responses: List[Response] = list()              # type: List[Response]
+        self.current_caller_coro_info: Optional[CallerCoroInfo] = None  # type: Optional[CallerCoroInfo]
+        self._request_workers = dict()        # type: Dict[int, Callable]
+
+    def iteration(self) -> Optional[List[Response]]:
+        # requests = self._requests
+        # self._requests = type(self._requests)()
+        self._responses = list()
+        # for request in requests:
+        #     self.current_caller_coro_info = CallerCoroInfo(request.coro_id)
+        #     result_exists, result = \
+        #         self.single_task_registration_or_immediate_processing(*request.args, **request.kwargs)
+        #     if result_exists:
+        #         self.register_response(request.coro_id, result)
+        # self.current_caller_coro_info = None
+        try:
+            self.full_processing_iteration()
+        except:
+            if __debug__: dlog(sys.exc_info())
+            raise
+        return self._responses
+
+    def make_response(self, coro_id: CoroID, response: Any, exception: Optional[BaseException]=None):
+        return Response(coro_id, type(self), response, exception)
+
+    def register_response(self, coro_id: CoroID, response: Any, exception: Optional[BaseException]=None):
+        self._responses.append(self.make_response(coro_id, response, exception))
+
+    def put_task(self, request: Request) -> Optional[Response]:
+        self.current_caller_coro_info = CallerCoroInfo(request.coro)
+        result_exists, result, exception = \
+            self.single_task_registration_or_immediate_processing(*request.args, **request.kwargs)
+        self.current_caller_coro_info = None
+        if result_exists or exception:
+            return self.make_response(request.coro_id, result, exception)
+        return None
+
+    def resolve_request(self, request: ServiceRequest):
+        try:
+            if request.provide_to_request_handler:
+                return self._request_workers[request.request_type](request, *request.args, **request.kwargs)
+            else:
+                return self._request_workers[request.request_type](*request.args, **request.kwargs)
+        except:
+            return True, None, get_exception()
+
+    def try_resolve_request(self, *args, **kwargs):
+        possible_request: Optional[ServiceRequest] = None
+        if (len(args) == 1) and (len(kwargs) == 0):
+            possible_request = args[0]
+        elif (len(kwargs) == 1) and (len(args) == 0):
+            possible_request = kwargs.pop('request', None)
+
+        if possible_request is not None:
+            if isinstance(possible_request, ServiceRequest):
+                return self.resolve_request(possible_request)
+
+        return None
+
+    def single_task_registration_or_immediate_processing(self, *args, **kwargs) -> ServiceProcessingResponse:
+        raise NotImplementedError
+
+    def full_processing_iteration(self):
+        raise NotImplementedError
+
+    def in_work(self) -> bool:
+        """Will be executed twice per iteration: once before and once after the full_processing_iteration() execution
+
+        Raises:
+            NotImplementedError: _description_
+
+        Returns:
+            bool: _description_
+        """        
+        raise NotImplementedError
+
+    def thrifty_in_work(self, result: bool) -> bool:
+        if result:
+            return True
+        else:
+            self.make_dead()
+            return False
+    
+    def time_left_before_next_event(self) -> Tuple[bool, Optional[Union[int, float]]]:
+        return False, None
+    
+    def is_low_latency(self) -> bool:
+        return False
+    
+    def make_live(self):
+        self._loop.make_service_live_fast(type(self), self.is_low_latency())
+    
+    def make_dead(self):
+        self._loop.make_service_dead_fast(type(self))
+    
+    @staticmethod
+    def service_id_impl():
+        return None
+    
+    @staticmethod
+    def service_id(service_type: Type):
+        service_id = service_type.service_id_impl()
+        if service_id is None:
+            service_id = service_type.__name__
+        
+        return service_id
+    
+    def destroy(self):
+        pass
