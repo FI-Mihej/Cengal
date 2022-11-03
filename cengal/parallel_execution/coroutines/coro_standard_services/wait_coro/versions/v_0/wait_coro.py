@@ -198,11 +198,11 @@ class PutListMethod(ServiceRequestMethodMixin):
         requester_id = self.service.current_caller_coro_info.coro_id
         try:
             put_coro: PutCoro = self.service._loop.get_service_instance(PutCoro)
-            for request in coro_list:
+            for coro_request in coro_list:
                 exception = None
                 result_coro_id = None
                 try:
-                    coro_worker, args, kwargs = request()
+                    coro_worker, args, kwargs = coro_request()
                     coro: CoroWrapperBase = put_coro.put_from_other_service(requester_id, coro_worker, *args, **kwargs)
                     coroutines_list.append(coro)
                     result_coro_id = coro.coro_id
