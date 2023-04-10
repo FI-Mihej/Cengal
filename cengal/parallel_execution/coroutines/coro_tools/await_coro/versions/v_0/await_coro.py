@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,11 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = ['await_coro_fast', 'await_coro', 'await_task_fast', 'await_task', 'RunSchedulerInAsyncioLoop',
+__all__ = ['await_coro_fast', 'await_coro', 'await_coro_prim', 'asyncio_coro', 'await_task_fast', 'await_task', 'await_task_prim', 'RunSchedulerInAsyncioLoop',
            'coro_interfaces_arg_manager', 'create_task', 'create_task_in_thread_pool', 'task_in_thread_pool']
 
 import sys
 import asyncio
+from inspect import signature, Signature, Parameter
 from cengal.parallel_execution.coroutines.coro_scheduler import *
 # from cengal.parallel_execution.coroutines.coro_standard_services import *
 from cengal.time_management.load_best_timer import perf_counter
@@ -27,7 +28,7 @@ from cengal.time_management.timer import Timer
 from cengal.code_flow_control.args_manager import ArgsManager, EArgs
 from enum import Enum
 from functools import partial
-from typing import Union, Optional, Callable, Awaitable, Any
+from typing import Union, Optional, Callable, Awaitable, Any, Coroutine
 from cengal.time_management.sleep_tools import get_min_sleep_interval, try_sleep, get_usable_min_sleep_interval, get_countable_delta_time
 from cengal.introspection.inspect import get_exception, get_exception_tripple
 from cengal.parallel_execution.coroutines.coro_standard_services_internal_lib.service_with_a_direct_request import *
@@ -41,10 +42,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -126,6 +127,23 @@ def await_coro_prim(coro_worker: Worker, *args, **kwargs) -> asyncio.Future:
     return await_coro_fast(asyncio.get_event_loop(), available_coro_scheduler(), CoroType.auto, coro_worker, *args, **kwargs)
 
 
+def asyncio_coro(coro_worker: Worker) -> Coroutine:
+    """Decorator. Without arguments. Gives an ability to await any decorated Cengal coroutine from the async code
+
+    Args:
+        coro_worker (Worker): _description_
+
+    Returns:
+        Coroutine: _description_
+    """    
+    async def wrapper(*args, **kwargs):
+        return await await_coro_prim(coro_worker, *args, **kwargs)
+    
+    coro_worker_sign: Signature = signature(coro_worker)
+    wrapper.__signature__ = coro_worker_sign.replace(parameters=tuple(coro_worker_sign.parameters.values())[1:], return_annotation=coro_worker_sign.return_annotation)
+    return wrapper
+
+
 def _async_task_runner_coro_worker(interface: Interface, service_type: ServiceType, *args, **kwargs):
     if __debug__: dlog(f'λ wrapper <_async_task_runner_coro_worker> => interface({service_type}, {args}, {kwargs})')
     result = interface(service_type, *args, **kwargs)
@@ -169,9 +187,12 @@ def coro_interfaces_arg_manager(event_loop, coro_scheduler: CoroScheduler):
 
 
 class RunSchedulerInAsyncioLoop:
-    def __init__(self, scheduler: CoroScheduler, idle_time: Optional[Union[int, float]]=None, loop: Optional[asyncio.AbstractEventLoop]=None):
+    def __init__(self, scheduler: CoroScheduler, idle_time: Optional[Union[int, float]]=None, loop: Optional[asyncio.AbstractEventLoop]=None, execute_every_X_iterations: int = 1):
         self.scheduler = scheduler
         self.scheduler.on_woke_up_callback = self.on_woke_up_callback
+        if idle_time is None:
+            idle_time = get_usable_min_sleep_interval()
+        
         self.idle_time = get_min_sleep_interval() * (idle_time // get_min_sleep_interval())
         self.min_sleep_interval = max(get_min_sleep_interval(), self.idle_time or 0)
         self.usable_idle_time = (get_min_sleep_interval() * (idle_time // get_min_sleep_interval())) + get_countable_delta_time()
@@ -181,6 +202,11 @@ class RunSchedulerInAsyncioLoop:
         self.need_to_stop_when_possible = False
         self.need_to_stop_now = False
         self.in_idle_state = False
+        if execute_every_X_iterations < 1:
+            execute_every_X_iterations = 1
+        
+        self.execute_every_X_iterations = execute_every_X_iterations
+        self.current_iteration = execute_every_X_iterations
     
     def on_woke_up_callback(self):
         if self.in_idle_state:
@@ -189,6 +215,13 @@ class RunSchedulerInAsyncioLoop:
             self.register()
 
     def __call__(self, *args, **kwargs):
+        self.current_iteration -= 1
+        if self.current_iteration:
+            self.register()
+            return
+        else:
+            self.current_iteration = self.execute_every_X_iterations
+        
         self.handle = None
         self.in_idle_state = False
         if self.need_to_stop_now:

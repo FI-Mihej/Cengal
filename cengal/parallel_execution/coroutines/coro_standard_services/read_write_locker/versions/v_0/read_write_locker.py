@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -54,16 +54,16 @@ class RWOperation(Enum):
 
 
 class RWLockerRequest(ServiceRequest):
-    def register(self, entity_id: Hashable, max_writers_in_progress: int, max_readers_in_progress: int, recursive: bool = True) -> ServiceRequest:
+    def register(self, entity_id: Hashable, max_writers_in_progress: int, max_readers_in_progress: int, recursive: bool = True) -> 'RWLockerContextManager':
         return self._save(0, entity_id, max_writers_in_progress, max_readers_in_progress, recursive)
 
-    def deregister(self, entity_id: Hashable, safe: bool = True) -> ServiceRequest:
+    def deregister(self, entity_id: Hashable, safe: bool = True) -> bool:
         return self._save(1, entity_id, safe)
     
-    def wait_for_write(self, entity_id: Hashable) -> ServiceRequest:
+    def wait_for_write(self, entity_id: Hashable) -> None:
         return self._save(2, entity_id)
     
-    def wait_for_read(self, entity_id: Hashable) -> ServiceRequest:
+    def wait_for_read(self, entity_id: Hashable) -> None:
         return self._save(3, entity_id)
 
 
@@ -527,9 +527,11 @@ class RWLocker(Service, EntityStatsMixin):
 
         return False
 
-    # TODO: still not used yet. See 'put_coro' service for an example
     def _on_coro_del_handler(self, coro: CoroWrapperBase) -> bool:
         return self._on_coro_del_handler_global(coro)
+
+
+RWLockerRequest.default_service_type = RWLocker
 
 
 def get_rw_lock(entity_id: Hashable, max_writers_in_progress: int, max_readers_in_progress: int, recursive: bool = True) -> Union[RWLockerContextManager, FakeRWLockerContextManager]:

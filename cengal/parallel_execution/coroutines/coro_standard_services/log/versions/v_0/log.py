@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,10 +41,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -59,7 +59,7 @@ class LogRequest(ServiceRequest):
         return self._save(1)
 
 
-class Log(Service, EntityStatsMixin):
+class Log(TypedService[None], EntityStatsMixin):
     def __init__(self, loop: CoroScheduler):
         super(Log, self).__init__(loop)
         self.log_queue: List[Tuple[Tuple, Dict]] = list()
@@ -213,12 +213,15 @@ class Log(Service, EntityStatsMixin):
         need_to_ensure_asyncio_loop = False
         try:
             asyncio_loop = self._loop.get_service_instance(AsyncioLoop).inline_get()
-        except AsyncioLoopWasNotSet:
+        except AsyncioLoopWasNotSetError:
             need_to_ensure_asyncio_loop = True
 
         coro: CoroWrapperBase = self._loop.put_coro(sync_db_coro, self, asyncio_loop, need_to_ensure_asyncio_loop)
         self.write_locked = True
         self.write_locked_coro_id = coro.coro_id
+
+
+LogRequest.default_service_type = Log
 
 
 def log_fast(i: Interface, *args, **kwargs):

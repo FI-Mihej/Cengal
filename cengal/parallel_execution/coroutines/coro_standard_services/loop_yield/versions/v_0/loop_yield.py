@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -62,31 +62,31 @@ class CoroPriority(Enum):
 
 
 class LoopYieldPrioritySchedulerRequest(ServiceRequest):
-    def register(self, default_priority: CoroPriority) -> ServiceRequest:
+    def register(self, default_priority: CoroPriority) -> 'LoopYieldManagedBase':
         return self._save(0, default_priority)
 
-    def setup(self, max_delay: float) -> ServiceRequest:
+    def setup(self, max_delay: float) -> None:
         return self._save(1, max_delay)
 
-    def change_priority(self, new_priority: CoroPriority, old_priority: CoroPriority) -> ServiceRequest:
+    def change_priority(self, new_priority: CoroPriority, old_priority: CoroPriority) -> None:
         return self._save(2, new_priority, old_priority)
 
-    def get(self):
+    def get(self) -> 'LoopYieldManagedBase':
         return self._save(3)
 
-    def register_external(self, asyncio_loop: asyncio.AbstractEventLoop, default_priority: CoroPriority) -> ServiceRequest:
+    def register_external(self, asyncio_loop: asyncio.AbstractEventLoop, default_priority: CoroPriority) -> 'LoopYieldManagedAsyncExternal':
         return self._save(4, asyncio_loop, default_priority)
 
-    def register_external_asyncio_task(self, asyncio_loop: asyncio.AbstractEventLoop, task: asyncio.Task, default_priority: CoroPriority) -> ServiceRequest:
+    def register_external_asyncio_task(self, asyncio_loop: asyncio.AbstractEventLoop, task: asyncio.Task, default_priority: CoroPriority) -> 'LoopYieldManagedAsyncExternal':
         return self._save(5, asyncio_loop, task, default_priority)
 
-    def change_priority_external(self, loop_yield: 'LoopYieldManagedAsyncExternal', new_priority: CoroPriority, old_priority: CoroPriority) -> ServiceRequest:
+    def change_priority_external(self, loop_yield: 'LoopYieldManagedAsyncExternal', new_priority: CoroPriority, old_priority: CoroPriority) -> None:
         return self._save(6, loop_yield, new_priority, old_priority)
 
-    def del_external(self, loop_yield: 'LoopYieldManagedAsyncExternal') -> ServiceRequest:
+    def del_external(self, loop_yield: 'LoopYieldManagedAsyncExternal') -> None:
         return self._save(7, loop_yield)
 
-    def request_coro_kill(self, coro_id: CoroID) -> ServiceRequest:
+    def request_coro_kill(self, coro_id: CoroID) -> None:
         """Make request for a coro kill asynchronously (immidiately returns). An exception ThisCoroWasRequestedToBeKilled will be emmited in coro with a requested coro_id during one of it's next requests to LoopYield service
 
         Args:
@@ -97,7 +97,7 @@ class LoopYieldPrioritySchedulerRequest(ServiceRequest):
         """        
         return self._save(8, coro_id)
     
-    def kill_coro(self, coro_id: CoroID) -> ServiceRequest:
+    def kill_coro(self, coro_id: CoroID) -> None:
         """Make request for a coro kill synchronously (waits for next steps). An exception ThisCoroWasRequestedToBeKilled will be emmited in coro with a requested coro_id during one of it's next requests to LoopYield service. After an exception was sent to the requested coro_id, current coro will receive an answer from the service (None).
 
         Args:
@@ -112,6 +112,7 @@ class LoopYieldPrioritySchedulerRequest(ServiceRequest):
 class LoopYieldManagedBase:
     def __init__(self, interface: Interface, time_atom: ValueExistence,
                  default_priority: CoroPriority, service: Type[Service]):
+        self._interface = None
         self.interface = interface
         self.time_atom = time_atom
         self.default_priority = default_priority
@@ -150,24 +151,24 @@ class LoopYieldManaged(LoopYieldManagedBase):
             except TimeLimitIsTooSmall as ex:
                 self.tracer = Tracer(ex.min_time if ex.min_time is not None else MIN_TIME)
         
-            if self.tracer is None:
-                exception = None
-                try:
-                    self.tracer = Tracer(self.time_atom.result)
-                except TimeLimitIsTooSmall as ex:
-                    exception = ex
+        if self.tracer is None:
+            exception = None
+            try:
+                self.tracer = Tracer(self.time_atom.result)
+            except TimeLimitIsTooSmall as ex:
+                exception = ex
 
-                if exception is not None:
-                    try:
-                        self.tracer = Tracer(exception.min_time if exception.min_time is not None else MIN_TIME)
-                    except TimeLimitIsTooSmall as ex:
-                        print(ex)
+            if exception is not None:
+                try:
+                    self.tracer = Tracer(exception.min_time if exception.min_time is not None else MIN_TIME)
+                except TimeLimitIsTooSmall as ex:
+                    print(ex)
                 
         if self.tracer is not None:
             if not self.tracer.iter():
                 self.tracer = None
                 self.interface = None
-                # self.interface(self.service)
+                self.interface(self.service)
 
 
 class LoopYieldManagedAsync(LoopYieldManagedBase):
@@ -242,7 +243,7 @@ class ThisCoroWasRequestedToBeKilled(Exception):
     pass
 
 
-class LoopYieldPriorityScheduler(Service, EntityStatsMixin):
+class LoopYieldPriorityScheduler(TypedService[None], EntityStatsMixin):
     def __init__(self, loop: CoroScheduler):
         super(LoopYieldPriorityScheduler, self).__init__(loop)
 
@@ -531,7 +532,6 @@ class LoopYieldPriorityScheduler(Service, EntityStatsMixin):
             self.make_live()
         return False
 
-    # TODO: still not used yet. See 'put_coro' service for an example
     def _on_coro_del_handler(self, coro: CoroWrapperBase) -> bool:
         coro_id = coro.coro_id
         priority = self.all_yield_objects[coro_id].priority
@@ -539,6 +539,9 @@ class LoopYieldPriorityScheduler(Service, EntityStatsMixin):
         self.yields_by_priority[priority] -= 1
         self.make_live()
         return False
+
+
+LoopYieldPrioritySchedulerRequest.default_service_type = LoopYieldPriorityScheduler
 
 
 def get_loop_yield(default_priority: CoroPriority) -> Union[LoopYieldManaged, FakeLoopYieldManaged]:

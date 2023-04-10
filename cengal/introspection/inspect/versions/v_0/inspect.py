@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 
 # __all__ = ['frame', 'get_exception', 'get_exception_tripple', 'exception_to_printable_text', 'is_async', 'is_callable', 'func_param_names', 'frame_param_names', 'intro_func_param_names', 'CodeParamsWithValues', 'intro_func_params_with_values', 'intro_func_all_params_with_values', 'intro_func_all_params_with_values_as_ordered_dict', 'code_params_with_values_to_signature_items_gen', 'code_params_with_values_to_signature']
 
-from typing import Any, Callable, Dict, Generator, List, Optional, Tuple, NamedTuple, OrderedDict as OrderedDictType, Type, Union
-from types import ModuleType, CodeType
+from typing import Any, Callable, Dict, Generator, List, Optional, Tuple, NamedTuple, OrderedDict as OrderedDictType, Type, Union, Set, Sequence
+from types import ModuleType, CodeType, FrameType
 import traceback
 import inspect
 import sys
@@ -32,10 +32,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -47,9 +47,12 @@ class WrongDepth(Exception):
     pass
 
 
-def frame(depth: Optional[int] = 1):
-    """
+class CanNotRetrieveFrame(Exception):
+    pass
 
+
+def frame(depth: Optional[int] = 1) -> FrameType:
+    """
     :param depth: 0 - frame of this function, 1 - frame of the caller function, etc.
     :return:
     """
@@ -58,6 +61,9 @@ def frame(depth: Optional[int] = 1):
         raise WrongDepth(depth)
 
     result = inspect.currentframe()
+    if result is None:
+        raise CanNotRetrieveFrame()
+
     for i in range(depth):
         result = result.f_back
 
@@ -88,6 +94,16 @@ def is_callable(entity) -> bool:
 
 def func_param_names(func) -> CodeParamNames:
     return code_param_names(get_code(func))
+
+
+def entity_arguments_description(entity: Callable) -> Tuple[Set[str], Sequence[str], Sequence[str], Sequence[str]]:
+    init_code = get_code(entity)
+    cpn: CodeParamNames = code_param_names(init_code)
+    positional = cpn.positional
+    positional_only = cpn.positional_only
+    keyword_only = cpn.keyword_only
+    all: Set[str] = set(positional) | set(positional_only) | set(keyword_only)
+    return all, positional, positional_only, keyword_only
 
 
 def func_code_name(func):
@@ -204,6 +220,11 @@ def entity_owning_module_info_and_owning_path(entity) -> Tuple[ModuleType, str, 
     
     module_importable_str, module_file_full_path = get_module_importable_str_and_path(module)
     return module, module_importable_str, module_file_full_path, owning_path
+
+
+def entity_owning_module_importable_str(entity) -> str:
+    _, module_importable_str, _, _ = entity_owning_module_info_and_owning_path(entity)
+    return module_importable_str
 
 
 module_repr_limited_bracket_pair: BracketPair = BracketPair([Bracket(" from '")], [Bracket("'>")])
@@ -397,6 +418,40 @@ def entity_repr(entity):
         return entity_repr_limited_try_qualname(entity)
 
 
+def entity_properties(entity) -> Set[str]:
+    """
+    Example:
+        from cengal.parallel_execution.coroutines.coro_standard_services.wait_coro import WaitCoroRequest
+        from cengal.introspection.inspect import entity_properties
+        
+        print(entity_properties(WaitCoroRequest))
+        >> {'__weakref__', 'put_list', 'fastest', 'atomic', 'list', 'single', 'put_fastest', '_save', 'put_single', 'put_atomic'}
+
+
+        print(entity_properties(WaitCoroRequest()))
+        >> {'result_required', 'args', 'tree', 'kill_on_timeout', 'timeout', 'request_type', 'kwargs', 'provide_to_request_handler'}
+
+
+        def my_func(a, b, *, c, d):
+            return a + b + c + d
+
+        my_func.my_property = 2
+
+        print(entity_properties(my_func))
+        >> {'my_property'}
+
+
+    Args:
+        entity (_type_): _description_
+
+    Returns:
+        Set[str]: _description_
+    """    
+    entity_type_items = set(dir(type(entity)))
+    entity_items = set(dir(entity))
+    return entity_items - entity_type_items
+
+
 def intro_frame_repr_limited(frame_instance, verbose: bool = False):
     func_name = code_name(frame_instance.f_code)
     params_with_values = intro_frame_params_with_values(frame_instance)
@@ -471,3 +526,101 @@ def print_data_info_by_name(name, depth: Optional[int] = 1):
 
 
 pdibn = print_data_info_by_name
+
+
+def is_descriptor(entity):
+    return hasattr(entity, '__get__') or hasattr(entity, '__set__') or hasattr(entity, '__delete__')
+
+
+def is_filled_descriptor(owning_object, entity):
+    """
+        class _foo:
+        __slots__ = ['foo', 'bar']
+
+        def __init__(self):
+            self.bar = 2
+
+    'foo' - not filled
+    'bar' - filled
+
+    Args:
+        owning_object (_type_): _description_
+        entity (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """    
+    try:
+        entity.__get__(owning_object)
+    except AttributeError:
+        return False
+    
+    return True
+
+
+def filled_slots_names(owning_object):
+    try:
+        slots_names = owning_object.__slots__
+    except AttributeError:
+        return None
+    
+    result = list()
+    for slot_name in slots_names:
+        slot = inspect.getattr_static(owning_object, slot_name)
+        if is_filled_descriptor(owning_object, slot):
+            result.append(slot_name)
+    
+    return result
+
+
+def filled_slots(owning_object):
+    try:
+        slots_names = owning_object.__slots__
+    except AttributeError:
+        return None
+    
+    result = list()
+    for slot_name in slots_names:
+        slot = inspect.getattr_static(owning_object, slot_name)
+        if is_filled_descriptor(owning_object, slot):
+            result.append(slot)
+    
+    return result
+
+
+def filled_slots_with_names(owning_object):
+    try:
+        slots_names = owning_object.__slots__
+    except AttributeError:
+        return None
+    
+    result = list()
+    for slot_name in slots_names:
+        slot = inspect.getattr_static(owning_object, slot_name)
+        if is_filled_descriptor(owning_object, slot):
+            result.append((slot_name, slot))
+    
+    return result
+
+
+def current_entity_name(depth: Optional[int] = 1):
+    fr = frame(depth + 1)
+    entity_name = code_name(fr.f_code)
+    # print(dir(fr.f_code))
+    # print(fr.f_code.__class__)
+    # print(dir(fr))
+    # print(fr.__class__)
+    return entity_name
+
+
+cen = current_entity_name
+
+
+# def current_entity_full_name(depth: Optional[int] = 1):
+#     fr = frame(depth + 1)
+#     entity_name = code_name(fr.f_code)
+#     return entity_name
+
+
+# cefn = current_entity_full_name
+

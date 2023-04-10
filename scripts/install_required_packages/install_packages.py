@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -120,7 +120,7 @@ class PyPiModules(ModulesLists):
             # 'pyOpenSSL',
             # 'pycurl',  # already preinstalled in Ubuntu 14.04 x64
             # 'pycrypto',  # outdated. Would not install on Windows easily
-            'http-parser',
+            # 'http-parser',
             # 'html5lib',  # already preinstalled in Ubuntu 14.04 x64
             'greenlet',
             # 'cryptography',  # already preinstalled in Ubuntu 14.04 x64
@@ -128,8 +128,8 @@ class PyPiModules(ModulesLists):
 
             # 'audioread',
             # 'beautifulsoup4',
-            'cchardet',
-            'charset_normalizer',
+            # 'cchardet',
+            # 'charset_normalizer',
             # 'cookies',
             # 'decorator',
             # 'httpagentparser',
@@ -181,6 +181,7 @@ class PyPiModules(ModulesLists):
             'orjson',
             'python3-dtls',
             'cloudpickle',
+            'psutil'
         ]
 
         self.windows_allowed = {
@@ -192,6 +193,10 @@ class PyPiModules(ModulesLists):
             'virtualenv',
             'rocksdb',
             'distex',
+        }
+
+        self.osx_allowed = {
+            'pyobjc'
         }
 
         self.emscripten_forbidden = {
@@ -211,6 +216,11 @@ class PyPiModules(ModulesLists):
 
         if ((PYTHON_VERSION_INT[0] == 3) and (PYTHON_VERSION_INT[1] < 5)) or (PYTHON_VERSION_INT[0] == 2):
             self.universal.insert(0, 'typing')  # for pypy3 and Python2 only: it is backport from python35
+        
+        if ((PYTHON_VERSION_INT[0] == 3) and (PYTHON_VERSION_INT[1] <= 11) and (PYTHON_VERSION_INT[2] < 1)) or (PYTHON_VERSION_INT[0] == 2):
+            self.universal.insert(0, 'charset_normalizer')  # 2023.01.27: 3.11.1 is not supported yet: error: longintrepr.h: No such file or directory
+            self.universal.insert(0, 'cchardet')  # 2023.01.27: 3.11.1 is not supported yet: error: longintrepr.h: No such file or directory
+            self.universal.insert(0, 'http-parser')  # 2023.01.27: 3.11.1 is not supported yet: error: longintrepr.h: No such file or directory
 
 
 class ExternalGitModules(ModulesLists):
@@ -227,12 +237,12 @@ class ExternalGitModules(ModulesLists):
             'git+https://github.com/FI-Mihej/fi-patched--progress.git',
         ]
 
-        self.arch__X86_64__allowed = {
+        self.arch__x86_64__allowed = {
             'git+https://github.com/YouCannotBurnMyShadow/rdtsc.git',
             'git+https://github.com/YouCannotBurnMyShadow/hwcounter.git',
         }
 
-        self.arch__X86_32__allowed = {
+        self.arch__x86_32__allowed = {
             'git+https://github.com/YouCannotBurnMyShadow/rdtsc.git',
             'git+https://github.com/YouCannotBurnMyShadow/hwcounter.git',
         }

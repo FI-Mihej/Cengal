@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -46,13 +46,13 @@ from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import
 
 
 class TimerCoroRunnerRequest(ServiceRequest):
-    def add(self, delay: float, coro_worker: AnyWorker, *args, **kwargs) -> ServiceRequest:
+    def add(self, delay: float, coro_worker: AnyWorker, *args, **kwargs) -> TimerRequest:
         return self._save(0, delay, coro_worker, args, kwargs)
-    def discard(self, timer_request: TimerRequest) -> ServiceRequest:
+    def discard(self, timer_request: TimerRequest) -> bool:
         return self._save(1, timer_request)
 
 
-class TimerCoroRunner(DualImmediateProcessingServiceMixin, ServiceWithADirectRequestMixin, Service):
+class TimerCoroRunner(DualImmediateProcessingServiceMixin, ServiceWithADirectRequestMixin, TypedService[TimerRequest]):
     def __init__(self, loop: CoroScheduler):
         super(TimerCoroRunner, self).__init__(loop)
         self.timer = Timer()
@@ -141,6 +141,9 @@ class TimerCoroRunner(DualImmediateProcessingServiceMixin, ServiceWithADirectReq
     
     def time_left_before_next_event(self) -> Tuple[bool, Optional[Union[int, float]]]:
         return True, self.timer.nearest_event()
+
+
+TimerCoroRunnerRequest.default_service_type = TimerCoroRunner
 
 
 def add_timer_coro_run_from_other_service(current_service: Service, delay: float, coro_worker: AnyWorker, *args, **kwargs) -> TimerRequest:

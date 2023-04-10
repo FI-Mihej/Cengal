@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 # limitations under the License.
 
 
-__all__ = ['Instance', 'InstanceRequest', 'view_log', 'clear_log', 'log_fast', 'log', 'put_log_fast', 'plog_fast', 'put_log', 'plog', 'alog_fast', 'alog', 'aput_log_fast', 'aplog_fast', 'aput_log', 'aplog']
+__all__ = ['Instance', 'InstanceRequest']
 
 from cengal.parallel_execution.coroutines.coro_scheduler import *
 from cengal.parallel_execution.coroutines.coro_tools.await_coro import *
@@ -34,10 +34,10 @@ from cengal.parallel_execution.asyncio.efficient_streams import StreamManagerIOC
 from cengal.code_flow_control.smart_values import ValueExistence
 from cengal.io.named_connections.named_connections_manager import NamedConnectionsManager
 from cengal.code_flow_control.args_manager import number_of_provided_args
-import sys
-import os
-import asyncio
-import lmdb
+from cengal.data_manipulation.conversion.reinterpret_cast_management.standard_library.copy_wrapper import CopyWrapper
+from cengal.data_manipulation.conversion.reinterpret_cast_management.standard_library.deep_copy_wrapper import DeepCopyWrapper
+from cengal.data_manipulation.conversion.reinterpret_cast_management.standard_library.uni_copy_wrapper import UniCopyWrapper
+from cengal.file_system.app_fs_structure.app_dir_path import AppDirPath, AppDirectoryType
 
 
 """
@@ -46,10 +46,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -58,15 +58,15 @@ __status__ = "Development"
 
 
 class InstanceRequest(ServiceRequest):
-    def set(self, key: Union[Type, Hashable], instance: Any) -> ServiceRequest:
+    def set(self, key: Union[Type, Hashable], instance: Any) -> None:
         return self._save(0, key, instance)
-    def get(self, key: Union[Type, Hashable]) -> ServiceRequest:
+    def get(self, key: Union[Type, Hashable]) -> Any:
         return self._save(1, key)
-    def wait(self, key: Union[Type, Hashable]) -> ServiceRequest:
+    def wait(self, key: Union[Type, Hashable]) -> Any:
         return self._save(2, key)
 
 
-class Instance(DualImmediateProcessingServiceMixin, Service, EntityStatsMixin):
+class Instance(DualImmediateProcessingServiceMixin, TypedService[Union[None, Any]], EntityStatsMixin):
     def __init__(self, loop: CoroScheduler):
         super(Instance, self).__init__(loop)
         self.instances: Dict = dict()
@@ -100,6 +100,11 @@ class Instance(DualImmediateProcessingServiceMixin, Service, EntityStatsMixin):
         udp_stream_manager.io_memory_management.global_in__data_full_size = in_data_full_size
         udp_stream_manager.io_memory_management.global_out__data_full_size = out_data_full_size
         named_connections_manager: NamedConnectionsManager = NamedConnectionsManager(data_full_size)
+        copy_wrapper = CopyWrapper()
+        deep_copy_wrapper = DeepCopyWrapper()
+        uni_copy_wrapper = UniCopyWrapper()
+        app_dir_path = AppDirPath()
+
         self.instances.update({
             'data_full_size': ValueExistence(True, 0),
             'other_data_full_size': ValueExistence(True, 0),
@@ -108,6 +113,20 @@ class Instance(DualImmediateProcessingServiceMixin, Service, EntityStatsMixin):
             TcpStreamManager: tcp_stream_manager,
             UdpStreamManager: udp_stream_manager,
             NamedConnectionsManager: named_connections_manager,
+            CopyWrapper: copy_wrapper,
+            DeepCopyWrapper: deep_copy_wrapper,
+            UniCopyWrapper: uni_copy_wrapper,
+            'app_name': str(),
+            'app_name_for_fs': str(),
+            'app_version': tuple(),
+            'app_version_str': str(),
+            AppDirPath: app_dir_path,
+            'app_data_dir_path_type': AppDirectoryType.local_data,
+            'app_cache_dir_path_type': AppDirectoryType.local_cache,
+            'app_temp_dir_path_type': AppDirectoryType.local_temp,
+            'app_log_dir_path_type': AppDirectoryType.local_log,
+            'app_cocnfig_dir_path_type': AppDirectoryType.local_config,
+            'app_runtime_dir_path_type': AppDirectoryType.local_runtime,
         })
 
     def single_task_registration_or_immediate_processing_single(
@@ -179,3 +198,6 @@ class Instance(DualImmediateProcessingServiceMixin, Service, EntityStatsMixin):
     
     def inline_get(self, key: Union[Type, Hashable]) -> Any:
         return self.instances[key]
+
+
+InstanceRequest.default_service_type = Instance

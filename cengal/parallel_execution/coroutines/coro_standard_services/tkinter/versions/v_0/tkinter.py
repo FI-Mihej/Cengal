@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -58,29 +58,32 @@ TkObjId = int
 
 
 class TkinterServiceRequest(ServiceRequest):
-    def create(self, tk_class: Type[Tk], *args, **kwargs) -> ServiceRequest:
+    def create(self, tk_class: Type[Tk], *args, **kwargs) -> TkObjId:
         return self._save(0, tk_class, *args, **kwargs)
 
-    def put(self, tk_obj: Tk) -> ServiceRequest:
+    def put(self, tk_obj: Tk) -> TkObjId:
         return self._save(1, tk_obj)
 
-    def get(self, tk_obj_id: TkObjId) -> ServiceRequest:
+    def get(self, tk_obj_id: TkObjId) -> Tk:
         return self._save(2, tk_obj_id)
 
-    def destroy(self, tk_obj_id: TkObjId, just_mark_as_destroyed: bool = False) -> ServiceRequest:
+    def destroy(self, tk_obj_id: TkObjId, just_mark_as_destroyed: bool = False) -> None:
         return self._save(3, tk_obj_id, just_mark_as_destroyed)
     
-    def wait_for_destroyed(self, tk_obj_id: TkObjId) -> ServiceRequest:
-        return self._save(4, tk_obj_id)
+    def destroy_and_wait_for_destroyed(self, tk_obj_id: TkObjId, just_mark_as_destroyed: bool = False) -> None:
+        return self._save(4, tk_obj_id, just_mark_as_destroyed)
     
-    def put_coro(self, tk_obj_id: TkObjId, coro_worker: AnyWorker, *args, **kwargs):
-        return self._save(5, tk_obj_id, coro_worker, *args, **kwargs)
+    def wait_for_destroyed(self, tk_obj_id: TkObjId) -> None:
+        return self._save(5, tk_obj_id)
     
-    def register_coro(self, tk_obj_id: TkObjId, coro_id: CoroID):
-        return self._save(6, tk_obj_id, coro_id)
+    def put_coro(self, tk_obj_id: TkObjId, coro_worker: AnyWorker, *args, **kwargs) -> CoroID:
+        return self._save(6, tk_obj_id, coro_worker, *args, **kwargs)
     
-    def set_update_period(self, tk_obj_id: TkObjId, period: float):
-        return self._save(7, tk_obj_id, period)
+    def register_coro(self, tk_obj_id: TkObjId, coro_id: CoroID) -> None:
+        return self._save(7, tk_obj_id, coro_id)
+    
+    def set_update_period(self, tk_obj_id: TkObjId, period: float) -> None:
+        return self._save(8, tk_obj_id, period)
 
 
 class TkObjDestroyedError(Exception):
@@ -238,10 +241,11 @@ class TkinterService(Service, EntityStatsMixin):
             1: self._on_put,
             2: self._on_get,
             3: self._on_destroy,
-            4: self._on_wait_for_destroyed,
-            5: self._on_put_coro,
-            6: self._on_register_coro,
-            7: self._on_set_update_period,
+            4: self._on_destroy_and_wait_for_destroyed,
+            5: self._on_wait_for_destroyed,
+            6: self._on_put_coro,
+            7: self._on_register_coro,
+            8: self._on_set_update_period,
         }
         
         self.standard_ui_update_interval: float = 1 / 60
@@ -325,6 +329,7 @@ class TkinterService(Service, EntityStatsMixin):
             if tk_obj_id in self.tk_users:
                 tk_users = self.tk_users[tk_obj_id]
                 for tk_user_coro_id in tk_users:
+                    # TODO: switch to an appropriate service
                     self._loop.kill_coro_by_id(tk_user_coro_id)
             
             if tk_obj_id in self.update_periods:
@@ -346,7 +351,7 @@ class TkinterService(Service, EntityStatsMixin):
     
     def _on_create(self, tk_class: Type[Tk], *args, **kwargs) -> ServiceProcessingResponse:
         tk = tk_class(*args, **kwargs)
-        tk_id = self.tk_counter.get()
+        tk_id: TkObjId = self.tk_counter.get()
         on_destroy = partial(self._on_create_on_destroyed, tk_id, tk)
         tk.bind("<Destroy>", on_destroy, '+')
         old_on_close = tk.protocol("WM_DELETE_WINDOW", None)
@@ -371,7 +376,7 @@ class TkinterService(Service, EntityStatsMixin):
     
     def _on_put(self, tk_obj: Tk) -> ServiceProcessingResponse:
         tk: Tk = tk_obj
-        tk_id = self.tk_counter.get()
+        tk_id: TkObjId = self.tk_counter.get()
         on_destroy = partial(self._on_put_on_destroyed, tk_id, tk)
         tk.bind("<Destroy>", on_destroy, '+')
         old_on_close = tk.protocol("WM_DELETE_WINDOW", None)
@@ -408,6 +413,10 @@ class TkinterService(Service, EntityStatsMixin):
         self.make_live()
         return True, None, None
     
+    def _on_destroy_and_wait_for_destroyed(self, tk_obj_id: TkObjId, just_mark_as_destroyed: bool = False) -> ServiceProcessingResponse:
+        self.new_destroyed[tk_obj_id] = just_mark_as_destroyed
+        return self._on_wait_for_destroyed(tk_obj_id)
+    
     def _on_wait_for_destroyed(self, tk_obj_id: TkObjId) -> ServiceProcessingResponse:
         if tk_obj_id in self.destroyed:
             return True, None, None
@@ -421,8 +430,9 @@ class TkinterService(Service, EntityStatsMixin):
     
     def _on_put_coro(self, tk_obj_id: TkObjId, coro_worker: AnyWorker, *args, **kwargs):
         exception = None
-        coro_id = None
+        coro_id: CoroID = None
         try:
+            # TODO: switch to an appropriate service
             coro_id = self._loop.put_coro(coro_worker, *args, **kwargs).coro_id
         except:
             exception = get_exception()
@@ -570,8 +580,12 @@ class TkinterService(Service, EntityStatsMixin):
 #         i(Sleep, tkinter_service.update_period)
     
 #     tkinter_service.updater_running = False
-    
 
+
+TkinterServiceRequest.default_service_type = TkinterService
+
+
+# TODO: currently it uses Yield if delay is bigger that a magic number `0.001` seconds. Maybe make it some how use TkinterService.update_periods or somethin like it instead?
 def tk_updater(i: Interface, tkinter_service: TkinterService):
     """
     https://stackoverflow.com/questions/4083796/how-do-i-run-unittest-on-a-tkinter-app

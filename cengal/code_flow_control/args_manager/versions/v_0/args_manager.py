@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,13 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = ['EntityWithExtendableArgs', 'ArgsManagerMixin', 'ExtendKwargsManager', 'EKwargs', 'ExtendArgsManager', 'EArgs', 'ArgsManager', 'merge_func_args', 'interested_args_to_kwargs', 'func_args_to_kwargs', 'number_of_provided_args']
+__all__ = ['EntityWithExtendableArgs', 'ArgsManagerMixin', 'ExtendKwargsManager', 'EKwargs', 'ExtendArgsManager', 'EArgs', 'ArgsManager', 'merge_func_args', 'interested_args_to_kwargs', 'func_args_to_kwargs', 'number_of_provided_args', 'args_kwargs', 'ArgsKwargs', 'prepare_arguments_positions', 'UnknownArgumentError', 'find_arg_position_and_value', 'try_find_arg_position_and_value']
 
 from enum import Enum
 from typing import Any, Dict, Type, Callable, Union, Optional, Sequence, Tuple, List
 import inspect
 import copy
-from pprint import pprint
 
 """
 Module Docstring
@@ -29,10 +28,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -301,3 +300,182 @@ def func_args_to_kwargs(func, args, kwargs):
 
 def number_of_provided_args(args, kwargs):
     return len(args) + len(kwargs)
+
+
+def args_kwargs(*args, **kwargs):
+    return args, kwargs
+
+
+class ArgsKwargs:
+    def __init__(self, *args, **kwargs) -> None:
+        self.args: Tuple = args
+        self.kwargs: Dict = kwargs
+    
+    def __call__(self) -> Any:
+        return self.args, self.kwargs
+
+
+def prepare_arguments_positions(positional: Sequence[str], keyword_only: Sequence[str]) -> Dict[str, Optional[int]]:
+    positions: Dict[str, Optional[int]] = dict()
+    for index, name in enumerate(positional):
+        positions[name] = index
+    
+    for index, name in enumerate(keyword_only):
+        positions[name] = None
+
+    return positions
+
+
+class UnknownArgumentError(Exception):
+    pass
+
+
+def find_arg_position_and_value(arg_name: str, positions: Dict[str, Optional[int]], args: Tuple, kwargs: Dict) -> Tuple[bool, Optional[int], Any]:
+    
+    """
+    Example:
+        from cengal.introspection.inspect import func_param_names, CodeParamNames
+        from cengal.code_flow_control.args_manager import prepare_arguments_positions, find_arg_position_and_value, UnknownArgumentError
+        
+        def wrapper(arg_name: str = 'b', *args, **kwargs):
+            def my_func(a, b, *, c, d):
+                ...
+
+            params: CodeParamNames = func_param_names(my_func)
+            positoins: Dict[str, Optional[int]] = prepare_arguments_positions(params.positional, params.keyword_only)
+            found, pos, value = find_arg_position_and_value(arg_name, positoins)
+            if found:
+                print(f'Value of <{arg_name}> : {value}')
+            
+            if pos is not None:
+                print(f'<{arg_name}> found as a positional argument at position {pos}')
+            
+            return my_func(*args, **kwargs)
+
+        wrapper('a')
+        wrapper('a', 1, 2, 3, 4)
+        wrapper('d')
+        wrapper('d', 1, 2, 3, 4)
+        try:
+            wrapper('asdf')
+        except UnknownArgumentError as ex:
+            print('<{ex.args[1]}> is not a valid argument for my_func(). Valid arguments are: {ex.args[2]}')
+            raise
+
+    Args:
+        arg_name (str): _description_
+        positions (Dict[str, Optional[int]]): _description_
+        args (Tuple): _description_
+        kwargs (Dict): _description_
+
+    Raises:
+        UnknownArgumentError: _description_
+
+    Returns:
+        Tuple[bool, bool, Optional[int], Any]: _description_
+    """    
+    found: bool = False
+    pos = None
+    value = None
+
+    original_arg_pos: Optional[int] = None
+    try:
+        original_arg_pos = positions[arg_name]
+    except KeyError:
+        valid_arguments = positions.keys()
+        raise UnknownArgumentError(f'<{arg_name}> is not in {valid_arguments}', arg_name, valid_arguments)
+    
+    if original_arg_pos is None:
+        found_in_args = False
+    else:
+        if len(args) > original_arg_pos:
+            found_in_args = True
+        else:
+            found_in_args = False
+    
+    if found_in_args:
+        pos = original_arg_pos
+        value = args[pos]
+        found = True
+    else:
+        try:
+            value = kwargs.get(arg_name, None)
+            found = True
+        except KeyError:
+            pass
+    
+    return found, pos, value
+
+
+def try_find_arg_position_and_value(arg_name: str, positions: Dict[str, Optional[int]], args: Tuple, kwargs: Dict) -> Tuple[bool, bool, Optional[int], Any]:
+    
+    """
+    Example:
+        from cengal.introspection.inspect import func_param_names, CodeParamNames
+        from cengal.code_flow_control.args_manager import prepare_arguments_positions, try_find_arg_position_and_value
+        
+        def wrapper(arg_name: str = 'b', *args, **kwargs):
+            def my_func(a, b, *, c, d):
+                ...
+
+            params: CodeParamNames = func_param_names(my_func)
+            positoins: Dict[str, Optional[int]] = find_entity_arguments_positions(params.positional, params.keyword_only)
+            valid, found, pos, value = find_arg_position_and_value(arg_name, positoins)
+            if valid:
+                if found:
+                    print(f'Value of <{arg_name}> : {value}')
+                
+                if pos is not None:
+                    print(f'<{arg_name}> found as a positional argument at position {pos}')
+            else:
+                print('<{arg_name}> is not a valid argument for my_func(). Valid arguments are: {positoins.keys()}')
+            
+            return my_func(*args, **kwargs)
+
+        wrapper('a')
+        wrapper('a', 1, 2, 3, 4)
+        wrapper('d')
+        wrapper('d', 1, 2, 3, 4)
+        wrapper('asdf')
+
+    Args:
+        arg_name (str): _description_
+        positions (Dict[str, Optional[int]]): _description_
+        args (Tuple): _description_
+        kwargs (Dict): _description_
+
+    Returns:
+        Tuple[bool, bool, Optional[int], Any]: _description_
+    """
+    valid: bool = False
+    found: bool = False
+    pos = None
+    value = None
+
+    original_arg_pos: Optional[int] = None
+    try:
+        original_arg_pos = positions[arg_name]
+        valid = True
+    except KeyError:
+        pass
+    
+    if original_arg_pos is None:
+        found_in_args = False
+    else:
+        if len(args) > original_arg_pos:
+            found_in_args = True
+        else:
+            found_in_args = False
+    
+    if found_in_args:
+        pos = original_arg_pos
+        value = args[pos]
+        found = True
+    else:
+        try:
+            value = kwargs.get(arg_name, None)
+            found = True
+        except KeyError:
+            pass
+    
+    return valid, found, pos, value

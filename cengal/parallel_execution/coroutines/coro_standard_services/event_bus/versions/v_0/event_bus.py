@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,10 +36,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -52,16 +52,16 @@ Handler = Callable[[EventID, Any], None]
 
 
 class EventBusRequest(ServiceRequest):
-    def register_handler(self, event: EventID, handler: Handler) -> ServiceRequest:
+    def register_handler(self, event: EventID, handler: Handler) -> None:
         return self._save(0, event, handler)
 
-    def remove_handler(self, event: EventID, handler: Handler) -> ServiceRequest:
+    def remove_handler(self, event: EventID, handler: Handler) -> None:
         return self._save(1, event, handler)
 
-    def send_event(self, event: EventID, data: Any) -> ServiceRequest:
+    def send_event(self, event: EventID, data: Any) -> None:
         return self._save(2, event, data)
 
-    def set_priority(self, priority: CoroPriority) -> ServiceRequest:
+    def set_priority(self, priority: CoroPriority) -> None:
         return self._save(3, priority)
 
 
@@ -145,9 +145,10 @@ class EventBus(Service, EntityStatsMixin):
                             
                             await ly()
 
-            coro = self._loop.put_coro(event_processing_coro,
+            coro: CoroWrapperBase = self._loop.put_coro(event_processing_coro,
                                        interested_events, events_buff, handlers_buff,
                                        self.priority)
+            # coro.is_background_coro = True  # must not be background coro: it is not an endless coro
             coro.add_on_coro_del_handler(self._on_coro_del_handler)
             self._in_processing = True
         
@@ -191,6 +192,9 @@ class EventBus(Service, EntityStatsMixin):
             self.make_live()
         
         return False
+
+
+EventBusRequest.default_service_type = EventBus
 
 
 def try_send_event(

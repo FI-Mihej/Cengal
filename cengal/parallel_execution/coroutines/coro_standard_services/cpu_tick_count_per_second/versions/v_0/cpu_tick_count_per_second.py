@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,15 +16,18 @@
 # limitations under the License.
 
 
-__all__ = ['CpuTickCountPerSecond']
+__all__ = ['CpuTickCountPerSecond', 'get_rdtsc']
 
-from cengal.parallel_execution.coroutines.coro_scheduler import *
-from cengal.modules_management.alternative_import import alt_import
-from cengal.statistics.normal_distribution import count_99_95_68
-from cengal.parallel_execution.coroutines.coro_standard_services.timer_func_runner import TimerFuncRunner, add_timer_func_run_from_other_service
 from collections import deque
 from time import perf_counter
 from typing import Tuple
+
+from cengal.modules_management.alternative_import import alt_import
+from cengal.parallel_execution.coroutines.coro_scheduler import *
+from cengal.parallel_execution.coroutines.coro_standard_services.timer_func_runner import (
+    TimerFuncRunner, add_timer_func_run_from_other_service)
+from cengal.statistics.normal_distribution import count_99_95_68
+from cengal.math.numbers import RationalNumber
 
 _rdtsc_present: bool = False
 with alt_import('rdtsc') as rdtsc:
@@ -38,10 +41,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -49,7 +52,7 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-class CpuTickCountPerSecond(Service):
+class CpuTickCountPerSecond(TypedService[Tuple[int, float, RationalNumber, RationalNumber, RationalNumber, RationalNumber, RationalNumber]]):
     def __init__(self, loop: CoroScheduler):
         super().__init__(loop)
         self.sliding_window_size: int = 100
@@ -61,7 +64,7 @@ class CpuTickCountPerSecond(Service):
             self.rdtsc = self._rdtsc_impl
         else:
             self.rdtsc = self._fake_rdtsc
-        
+
         self.val_99, self.val_95, self.val_68, self.max_deviation, self.min_deviation = 0, 0, 0, 0, 0
         self.last_rdtsc: int = self.rdtsc()
         self.last_time: float = perf_counter()
@@ -70,12 +73,18 @@ class CpuTickCountPerSecond(Service):
 
     def _fake_rdtsc(self):
         return 0
-    
+
     def _rdtsc_impl(self):
         return rdtsc.get_cycles()
 
-    def single_task_registration_or_immediate_processing(self) -> Tuple[bool, None, None]:
-        result = (self.rdtsc(), self.last_ticks_per_second, self.val_99, self.val_95, self.val_68, self.max_deviation, self.min_deviation)
+    def single_task_registration_or_immediate_processing(self, with_fresh_rdtsc: bool = True) -> Tuple[bool, None, None]:
+        if with_fresh_rdtsc:
+            rdtsc_val = self.rdtsc()
+        else:
+            rdtsc_val = self.last_rdtsc
+
+        result = (rdtsc_val, self.last_ticks_per_second, self.val_99,
+                  self.val_95, self.val_68, self.max_deviation, self.min_deviation)
         return True, result, None
 
     def full_processing_iteration(self):
@@ -91,18 +100,24 @@ class CpuTickCountPerSecond(Service):
             if last_ticks_per_second is not None:
                 self.last_ticks_per_second = last_ticks_per_second
                 self.sliding_window.append(last_ticks_per_second)
-                self.val_99, self.val_95, self.val_68, self.max_deviation, self.min_deviation = count_99_95_68(self.sliding_window)
+                self.val_99, self.val_95, self.val_68, self.max_deviation, self.min_deviation = count_99_95_68(
+                    self.sliding_window)
 
         self.last_rdtsc = self.rdtsc()
         self.last_time = perf_counter()
         self.measurement_required = False
+
         def timer_handler():
             self.measurement_required = True
             self.make_live()
-        
+
         add_timer_func_run_from_other_service(self, self.measurement_period, timer_handler)
         self.make_dead()
 
     def in_work(self) -> bool:
         result: bool = self.measurement_required
         return self.thrifty_in_work(result)
+
+
+def get_rdtsc():
+    return rdtsc.get_cycles()

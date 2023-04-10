@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,34 +15,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import copy
 import os
+import select
 import sys
 import traceback
-import select
-# from fileinput import input
-from typing import Set, Iterable
-import copy
 from collections import deque
-
-from cengal.data_generation.id_generator import IDGenerator, GeneratorType
-from .base import *
-
-from cengal.data_containers.fast_fifo import FIFOIsEmpty
-from cengal.data_manipulation.front_triggerable_variable import FrontTriggerableVariable, FrontTriggerableVariableType
-from cengal.code_flow_control.smart_values.versions.v_0 import ResultExistence
 from contextlib import contextmanager
-from cengal.code_inspection import set_profiler
+# from fileinput import input
+from typing import Iterable, Set
+
+from cengal.code_flow_control.smart_values.versions.v_0 import ResultExistence
+from cengal.code_inspection.line_profiling import set_profiler
+from cengal.data_containers.fast_fifo import FIFOIsEmpty
+from cengal.data_generation.id_generator import GeneratorType, IDGenerator
+from cengal.data_manipulation.front_triggerable_variable import (
+    FrontTriggerableVariable, FrontTriggerableVariableType)
+
 from .abstract import *
+from .base import *
 
 """
 CAUTION: some code here is optimized for speed - not for readability or beauty.
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -198,7 +199,7 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
                 if __debug__:
                     read_is_forbidden_test = \
                         self.show_inform_about_read_stop_because_of_in_buffer_size_limit.test_trigger(
-                                read_is_forbidden)
+                            read_is_forbidden)
                     if read_is_forbidden_test is not None:
                         if read_is_forbidden_test:
                             print('Read is suppressed until data will be processed.')
@@ -343,8 +344,9 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
                 # gate.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
             except (socket.error, OSError) as err:
                 gate = None
-                if __debug__: self._log('EXCEPTION: GATE: LISTEN: CREATE SOCKET: {}, {}'.format(
-                    err.errno, err.strerror))
+                if __debug__:
+                    self._log('EXCEPTION: GATE: LISTEN: CREATE SOCKET: {}, {}'.format(
+                        err.errno, err.strerror))
                 raise InternalNotCriticalError()
 
             if self.reuse_gate_port:
@@ -356,16 +358,18 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
             except (socket.error, OSError) as err:
                 gate.close()
                 gate = None
-                if __debug__: self._log('EXCEPTION: GATE: BIND:"{}", {}, {}'.format(
-                    gate_connection_settings.socket_address, err.errno, err.strerror))
+                if __debug__:
+                    self._log('EXCEPTION: GATE: BIND:"{}", {}, {}'.format(
+                        gate_connection_settings.socket_address, err.errno, err.strerror))
                 raise InternalNotCriticalError()
             try:
                 gate.listen(gate_connection_settings.backlog)
             except (socket.error, OSError) as err:
                 gate.close()
                 gate = None
-                if __debug__: self._log('EXCEPTION: GATE: LISTEN:"{}", {}, {}'.format(
-                    gate_connection_settings.socket_address, err.errno, err.strerror))
+                if __debug__:
+                    self._log('EXCEPTION: GATE: LISTEN:"{}", {}, {}'.format(
+                        gate_connection_settings.socket_address, err.errno, err.strerror))
                 raise InternalNotCriticalError()
 
             if self.reuse_gate_addr:
@@ -393,7 +397,8 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
                 return None
 
     def close_all_connections(self):
-        if __debug__: self._log('CLOSE ALL CONNECTIONS:')
+        if __debug__:
+            self._log('CLOSE ALL CONNECTIONS:')
         clients_list = dict(self._connections)
         for connection_id, client_info in clients_list.items():
             self.close_connection(connection_id)
@@ -429,7 +434,7 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
         зарегистрирован. Однако client может быть создан. В случае ошибки он будет помечен для закрытия и удаления.
         Поэтому исключения нужно перехватывать, и после этого проводить как минимум один (как минимум завершающий -
         перед закрытием и уничтожением сервера) цикл обработки io_iteration().
-        
+
         :param expected_client_info: link to Client()
         :return: expected_client_id
         """
@@ -608,7 +613,8 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
         :param raise_if_already_closed:
         :return:
         """
-        if __debug__: self._log('CLOSE EXPECTED CLIENT SOCKET:')
+        if __debug__:
+            self._log('CLOSE EXPECTED CLIENT SOCKET:')
         expected_client_info = self._expected_clients[expected_client_id]
         connection_info = expected_client_info._Client__connection
         # connection_info = self._connections.get(expected_client_info.connection_id)
@@ -624,7 +630,8 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
         :param raise_if_already_closed:
         :return:
         """
-        if __debug__: self._log('MARK EXPECTED CLIENT SOCKET AS SHOULD BE CLOSED IMMEDIATELY:')
+        if __debug__:
+            self._log('MARK EXPECTED CLIENT SOCKET AS SHOULD BE CLOSED IMMEDIATELY:')
         expected_client_info = self._expected_clients[expected_client_id]
         connection_info = expected_client_info._Client__connection
         # connection_info = self._connections.get(expected_client_info.connection_id)
@@ -639,7 +646,8 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
         :param raise_if_already_closed:
         :return:
         """
-        if __debug__: self._log('MARK EXPECTED CLIENT SOCKET AS READY TO BE CLOSED:')
+        if __debug__:
+            self._log('MARK EXPECTED CLIENT SOCKET AS READY TO BE CLOSED:')
         expected_client_info = self._expected_clients[expected_client_id]
         connection_info = expected_client_info._Client__connection
         # connection_info = self._connections.get(expected_client_info.connection_id)
@@ -648,9 +656,11 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
         self._mark_connection_as_ready_to_be_closed(connection_info)
 
     def remove_client(self, expected_client_id):
-        if __debug__: self._log('REMOVE EXPECTED CLIENT: {}'.format(expected_client_id))
+        if __debug__:
+            self._log('REMOVE EXPECTED CLIENT: {}'.format(expected_client_id))
         expected_client_info = self._expected_clients[expected_client_id]
-        if __debug__: self._log('\tWITH KEYWORD: {}'.format(expected_client_info.connection_settings.keyword))
+        if __debug__:
+            self._log('\tWITH KEYWORD: {}'.format(expected_client_info.connection_settings.keyword))
         connection_id = expected_client_info.connection_id
         if connection_id is None:
             self._remove_client(expected_client_id)
@@ -683,14 +693,17 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
         return new_client_id
 
     def close_connection(self, connection_id):
-        if __debug__: self._log('CLOSE CLIENT {}:'.format(connection_id))
+        if __debug__:
+            self._log('CLOSE CLIENT {}:'.format(connection_id))
         client_info = self._connections[connection_id]
         if not client_info.conn.existence:
-            if __debug__: self._log('CLIENT {} CONN IS NOT SET.'.format(connection_id))
+            if __debug__:
+                self._log('CLIENT {} CONN IS NOT SET.'.format(connection_id))
             return
         conn = client_info.conn.result
         if conn is None:
-            if __debug__: self._log('CLIENT {} CONN IS NONE.'.format(connection_id))
+            if __debug__:
+                self._log('CLIENT {} CONN IS NONE.'.format(connection_id))
             return
 
         conn.close()
@@ -714,22 +727,27 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
         if not self._input_check_sockets:
             self._we_have_connections_for_select = False
 
-        if __debug__: self._log('CLIENT {} NORMALLY CLOSED.'.format(connection_id))
+        if __debug__:
+            self._log('CLIENT {} NORMALLY CLOSED.'.format(connection_id))
 
     def close_connection_by_conn(self, conn):
         # Если conn не в списке - вылетет ошибка. Это предотвратит ошибочное закрытие незарегистрированного сокета.
         # И мы сможем обнаружить наличие соответствующей ошибки в коде.
-        if __debug__: self._log('CLOSE CLIENT BY CONN: {}'.format(repr(conn)))
+        if __debug__:
+            self._log('CLOSE CLIENT BY CONN: {}'.format(repr(conn)))
         connection_id = self._connection_by_conn[conn]
-        if __debug__: self._log('\t WITH CLIENT ID: {}'.format(connection_id))
+        if __debug__:
+            self._log('\t WITH CLIENT ID: {}'.format(connection_id))
         self.close_connection(connection_id)
 
     def remove_connection(self, connection_id):
         # client should NOT be removed immediately after connection close (close_connection):
         # code should do it by itself after reading all available input data
-        if __debug__: self._log('REMOVE CLIENT: {}'.format(connection_id))
+        if __debug__:
+            self._log('REMOVE CLIENT: {}'.format(connection_id))
         client_info = self._connections[connection_id]
-        if __debug__: self._log('\tWITH KEYWORD: {}'.format(client_info.keyword))
+        if __debug__:
+            self._log('\tWITH KEYWORD: {}'.format(client_info.keyword))
         if client_info.conn.existence:
             self.close_connection(connection_id)
         conn = client_info.conn.result
@@ -842,16 +860,18 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
                                  connection_settings.socket_protocol, connection_settings.socket_fileno)
             # conn.setblocking(0)
         except (socket.error, OSError) as err:
-            if __debug__: self._log('EXCEPTION: SUPER SERVER: CONNECT TO: CREATE SOCKET: {}, {}'.format(
-                err.errno, err.strerror))
+            if __debug__:
+                self._log('EXCEPTION: SUPER SERVER: CONNECT TO: CREATE SOCKET: {}, {}'.format(
+                    err.errno, err.strerror))
             raise
 
         try:
             conn.connect(connection_settings.socket_address)
         except (socket.error, OSError) as err:
             conn.close()
-            if __debug__: self._log('EXCEPTION: SUPER SERVER: CONNECT TO: CONNECT:"{}", {}, {}'.format(
-                connection_settings.socket_address, err.errno, err.strerror))
+            if __debug__:
+                self._log('EXCEPTION: SUPER SERVER: CONNECT TO: CONNECT:"{}", {}, {}'.format(
+                    connection_settings.socket_address, err.errno, err.strerror))
             raise
 
         super_server_client_id = self.add_connection(conn, connection_settings.socket_address)
@@ -864,32 +884,39 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
                 host_names = socket.gethostbyaddr(connection_settings.socket_address[0])
         except ConnectionError as err:
             # An established connection was aborted by the software in your host machine
-            if __debug__: self._log('CLOSING {}: Connection reset by peer'.format(connection_settings.socket_address))
-            if __debug__: self._log('EXCEPTION: CONNECT TO SUPER SERVER: GETTING CONNECTION INFO:"{}", {}, {}'.format(
-                connection_settings.socket_address, err.errno, err.strerror))
+            if __debug__:
+                self._log('CLOSING {}: Connection reset by peer'.format(connection_settings.socket_address))
+            if __debug__:
+                self._log('EXCEPTION: CONNECT TO SUPER SERVER: GETTING CONNECTION INFO:"{}", {}, {}'.format(
+                    connection_settings.socket_address, err.errno, err.strerror))
             self._mark_connection_to_be_closed_immediately(super_server_client_id)
             ok = False
         except (socket.error, OSError) as err:
-            if __debug__: self._log('EXCEPTION: CONNECT TO SUPER SERVER: GETTING CONNECTION INFO:"{}", {}, {}'.format(
-                connection_settings.socket_address, err.errno, err.strerror))
+            if __debug__:
+                self._log('EXCEPTION: CONNECT TO SUPER SERVER: GETTING CONNECTION INFO:"{}", {}, {}'.format(
+                    connection_settings.socket_address, err.errno, err.strerror))
             if err.errno in SET_OF_CONNECTION_ERRORS:
                 # An established connection was aborted by the software in your host machine
-                if __debug__: self._log(
-                    'CLOSING {}: Connection reset by peer'.format(connection_settings.socket_address))
-                if __debug__: self._log(
-                    'EXCEPTION: CONNECT TO SUPER SERVER: GETTING CONNECTION INFO:"{}", {}, {}'.format(
-                        connection_settings.socket_address, err.errno, err.strerror))
+                if __debug__:
+                    self._log(
+                        'CLOSING {}: Connection reset by peer'.format(connection_settings.socket_address))
+                if __debug__:
+                    self._log(
+                        'EXCEPTION: CONNECT TO SUPER SERVER: GETTING CONNECTION INFO:"{}", {}, {}'.format(
+                            connection_settings.socket_address, err.errno, err.strerror))
                 self._mark_connection_to_be_closed_immediately(super_server_client_id)
                 ok = False
             else:
                 if 'nt' == os.name:
                     if errno.WSAECONNRESET == err.errno:
                         # An existing connection was forcibly closed by the remote host
-                        if __debug__: self._log(
-                            'CLOSING {}: Connection reset by peer'.format(connection_settings.socket_address))
-                        if __debug__: self._log(
-                            'EXCEPTION: CONNECT TO SUPER SERVER: GETTING CONNECTION INFO:"{}", {}, {}'.format(
-                                connection_settings.socket_address, err.errno, err.strerror))
+                        if __debug__:
+                            self._log(
+                                'CLOSING {}: Connection reset by peer'.format(connection_settings.socket_address))
+                        if __debug__:
+                            self._log(
+                                'EXCEPTION: CONNECT TO SUPER SERVER: GETTING CONNECTION INFO:"{}", {}, {}'.format(
+                                    connection_settings.socket_address, err.errno, err.strerror))
                         self._mark_connection_to_be_closed_immediately(super_server_client_id)
                         ok = False
                     else:
@@ -1008,22 +1035,27 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
                 elif errno.ECONNABORTED == err.errno:
                     ok = False
                 elif errno.EMFILE == err.errno:
-                    if __debug__: self._log(
-                        'The per-process limit on the number of open file descriptors had been reached.')
+                    if __debug__:
+                        self._log(
+                            'The per-process limit on the number of open file descriptors had been reached.')
                     ok = False
                 elif errno.ENFILE == err.errno:
-                    if __debug__: self._log(
-                        'The system-wide limit on the total number of open files had been reached.')
+                    if __debug__:
+                        self._log(
+                            'The system-wide limit on the total number of open files had been reached.')
                     ok = False
                 elif (errno.ENOBUFS == err.errno) or (errno.ENOMEM == err.errno):
-                    if __debug__: self._log(
-                        'Not enough free memory. Allocation is limited by the socket buffer limits.')
+                    if __debug__:
+                        self._log(
+                            'Not enough free memory. Allocation is limited by the socket buffer limits.')
                     ok = False
                 elif errno.EPROTO == err.errno:
-                    if __debug__: self._log('Protocol error.')
+                    if __debug__:
+                        self._log('Protocol error.')
                     ok = False
                 elif errno.EPERM == err.errno:
-                    if __debug__: self._log('Firewall rules forbid connection.')
+                    if __debug__:
+                        self._log('Firewall rules forbid connection.')
                     ok = False
                 else:
                     raise err
@@ -1037,30 +1069,37 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
                         host_names = socket.gethostbyaddr(client_address[0])
                 except ConnectionError as err:
                     # An established connection was aborted by the software in your host machine
-                    if __debug__: self._log('CLOSING {}: Connection reset by peer'.format(client_address))
-                    if __debug__: self._log('EXCEPTION: ACCEPT CLIENT: GETTING CONNECTION INFO:"{}", {}, {}'.format(
-                        client_address, err.errno, err.strerror))
+                    if __debug__:
+                        self._log('CLOSING {}: Connection reset by peer'.format(client_address))
+                    if __debug__:
+                        self._log('EXCEPTION: ACCEPT CLIENT: GETTING CONNECTION INFO:"{}", {}, {}'.format(
+                            client_address, err.errno, err.strerror))
                     self._mark_connection_to_be_closed_immediately(client_info)
                     ok = False
                 except (socket.error, OSError) as err:
-                    if __debug__: self._log('EXCEPTION: ACCEPT CLIENT: GETTING CONNECTION INFO:"{}", {}, {}'.format(
-                        client_address, err.errno, err.strerror))
+                    if __debug__:
+                        self._log('EXCEPTION: ACCEPT CLIENT: GETTING CONNECTION INFO:"{}", {}, {}'.format(
+                            client_address, err.errno, err.strerror))
                     if err.errno in SET_OF_CONNECTION_ERRORS:
                         # An established connection was aborted by the software in your host machine
-                        if __debug__: self._log('CLOSING {}: Connection reset by peer'.format(client_address))
-                        if __debug__: self._log('EXCEPTION: ACCEPT CLIENT: GETTING CONNECTION INFO:"{}", {}, {}'.format(
-                            client_address, err.errno, err.strerror))
+                        if __debug__:
+                            self._log('CLOSING {}: Connection reset by peer'.format(client_address))
+                        if __debug__:
+                            self._log('EXCEPTION: ACCEPT CLIENT: GETTING CONNECTION INFO:"{}", {}, {}'.format(
+                                client_address, err.errno, err.strerror))
                         self._mark_connection_to_be_closed_immediately(client_info)
                         ok = False
                     else:
                         if 'nt' == os.name:
                             if errno.WSAECONNRESET == err.errno:
                                 # An existing connection was forcibly closed by the remote host
-                                if __debug__: self._log(
-                                    'CLOSING {}: Connection reset by peer'.format(client_address))
-                                if __debug__: self._log(
-                                    'EXCEPTION: ACCEPT CLIENT: GETTING CONNECTION INFO:"{}", {}, {}'.format(
-                                        client_address, err.errno, err.strerror))
+                                if __debug__:
+                                    self._log(
+                                        'CLOSING {}: Connection reset by peer'.format(client_address))
+                                if __debug__:
+                                    self._log(
+                                        'EXCEPTION: ACCEPT CLIENT: GETTING CONNECTION INFO:"{}", {}, {}'.format(
+                                            client_address, err.errno, err.strerror))
                                 self._mark_connection_to_be_closed_immediately(client_info)
                                 ok = False
                             else:
@@ -1082,10 +1121,11 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
                         self._create_unknown_client_from_connection(client_info)
                     else:
                         # Unknown clients are Non allowed - close connection.
-                        if __debug__: self._log(
-                            'UNKNOWN CLIENT {} WILL BE CLOSED: UNKNOWN CLIENTS ARE NOT ALLOWED'.format(
-                                client_info.addr.result
-                            ))
+                        if __debug__:
+                            self._log(
+                                'UNKNOWN CLIENT {} WILL BE CLOSED: UNKNOWN CLIENTS ARE NOT ALLOWED'.format(
+                                    client_info.addr.result
+                                ))
                         self._mark_connection_to_be_closed_immediately(client_info)
 
     # @profile
@@ -1114,8 +1154,9 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
                     connection_info)
         else:
             # Interpret empty result as closed connection
-            if __debug__: self._log(
-                'CLOSING {} after reading no data:'.format(connection_info.addr.result))
+            if __debug__:
+                self._log(
+                    'CLOSING {} after reading no data:'.format(connection_info.addr.result))
             self._mark_connection_to_be_closed_immediately(connection_info)
             ok = False
 
@@ -1155,8 +1196,9 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
             else:
                 # print(current_line())
                 # Interpret empty result as closed connection
-                if __debug__: self._log(
-                    'CLOSING {} after reading no data:'.format(connection_info.addr.result))
+                if __debug__:
+                    self._log(
+                        'CLOSING {} after reading no data:'.format(connection_info.addr.result))
                 self._mark_connection_to_be_closed_immediately(connection_info)
                 ok = False
         else:
@@ -1199,8 +1241,9 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
                     #     # connection_info.current_input_memoryview_nbytes = 0
                     #     # connection_info.current_input_memoryview_diff = 0
             else:
-                if __debug__: self._log(
-                    'CLOSING {} after reading no data:'.format(connection_info.addr.result))
+                if __debug__:
+                    self._log(
+                        'CLOSING {} after reading no data:'.format(connection_info.addr.result))
                 self._mark_connection_to_be_closed_immediately(connection_info)
                 ok = False
         else:
@@ -1248,9 +1291,11 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
             except ConnectionError as err:
                 # print(current_line())
                 # An established connection was aborted by the software in your host machine
-                if __debug__: self._log('CLOSING {}: Connection reset by peer'.format(connection_info.addr.result))
-                if __debug__: self._log('EXCEPTION: READ DATA FROM SOCKET: "{}", {}, {}'.format(
-                    connection_info.addr.result, err.errno, err.strerror))
+                if __debug__:
+                    self._log('CLOSING {}: Connection reset by peer'.format(connection_info.addr.result))
+                if __debug__:
+                    self._log('EXCEPTION: READ DATA FROM SOCKET: "{}", {}, {}'.format(
+                        connection_info.addr.result, err.errno, err.strerror))
                 self._mark_connection_to_be_closed_immediately(connection_info)
                 ok = False
             except (socket.error, OSError) as err:
@@ -1264,9 +1309,11 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
                 elif err.errno in SET_OF_CONNECTION_ERRORS:
                     # print(current_line())
                     # An established connection was aborted by the software in your host machine
-                    if __debug__: self._log('CLOSING {}: Connection reset by peer'.format(connection_info.addr.result))
-                    if __debug__: self._log('EXCEPTION: READ DATA FROM SOCKET: "{}", {}, {}'.format(
-                        connection_info.addr.result, err.errno, err.strerror))
+                    if __debug__:
+                        self._log('CLOSING {}: Connection reset by peer'.format(connection_info.addr.result))
+                    if __debug__:
+                        self._log('EXCEPTION: READ DATA FROM SOCKET: "{}", {}, {}'.format(
+                            connection_info.addr.result, err.errno, err.strerror))
                     self._mark_connection_to_be_closed_immediately(connection_info)
                     ok = False
                 else:
@@ -1276,10 +1323,12 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
                         if errno.WSAECONNRESET == err.errno:
                             # print(current_line())
                             # An existing connection was forcibly closed by the remote host
-                            if __debug__: self._log(
-                                'CLOSING {}: Connection reset by peer'.format(connection_info.addr.result))
-                            if __debug__: self._log('EXCEPTION: READ DATA FROM SOCKET: "{}", {}, {}'.format(
-                                connection_info.addr.result, err.errno, err.strerror))
+                            if __debug__:
+                                self._log(
+                                    'CLOSING {}: Connection reset by peer'.format(connection_info.addr.result))
+                            if __debug__:
+                                self._log('EXCEPTION: READ DATA FROM SOCKET: "{}", {}, {}'.format(
+                                    connection_info.addr.result, err.errno, err.strerror))
                             self._mark_connection_to_be_closed_immediately(connection_info)
                             ok = False
                         else:
@@ -1343,10 +1392,13 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
             connection_type_string = 'INCOMING'
             from_to = 'from'
 
-        if __debug__: self._log('New {} connection {} {}'.format(connection_type_string, from_to, client_address))
+        if __debug__:
+            self._log('New {} connection {} {}'.format(connection_type_string, from_to, client_address))
         if connection.family in {socket.AF_INET, socket.AF_INET6}:
-            if __debug__: self._log('\taddr_info: {}'.format(addr_info))
-            if __debug__: self._log('\thost_names: {}'.format(host_names))
+            if __debug__:
+                self._log('\taddr_info: {}'.format(addr_info))
+            if __debug__:
+                self._log('\thost_names: {}'.format(host_names))
 
     # # @profile
     # def _write_data_to_socket(self, writable_socket: socket.socket):
@@ -1358,7 +1410,7 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
     #         curr_client_info.current_output_memoryview = None
     #         curr_client_info.output_to_client = copy.copy(curr_client_info.output_to_client)
     #         return
-    # 
+    #
     #     ok = True
     #     first_pass = True
     #     can_call__inline_processor__on__output_buffers_are_empty = True
@@ -1383,7 +1435,7 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
     #                         curr_client_info.current_output_memoryview = memoryview(result_data.popleft())
     #                 elif output_fifo_size == 1:
     #                     curr_client_info.current_output_memoryview = memoryview(curr_client_info.output_to_client.get())
-    # 
+    #
     #                 if curr_client_info.current_output_memoryview is None:
     #                     if not curr_client_info.ready_to_be_closed:
     #                         # Если соединение помечено как "Готово к закрытию" - то нам надо дождаться момента когда
@@ -1518,9 +1570,11 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
                 pass
             except ConnectionError as err:
                 # An established connection was aborted by the software in your host machine
-                if __debug__: self._log('CLOSING {}: Connection reset by peer'.format(curr_client_info.addr.result))
-                if __debug__: self._log('EXCEPTION: WRITE DATA TO SOCKET: "{}", {}, {}'.format(
-                    curr_client_info.addr.result, err.errno, err.strerror))
+                if __debug__:
+                    self._log('CLOSING {}: Connection reset by peer'.format(curr_client_info.addr.result))
+                if __debug__:
+                    self._log('EXCEPTION: WRITE DATA TO SOCKET: "{}", {}, {}'.format(
+                        curr_client_info.addr.result, err.errno, err.strerror))
                 self._mark_connection_to_be_closed_immediately(curr_client_info)
                 ok = False
             except (socket.error, OSError) as err:
@@ -1530,21 +1584,25 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
                     pass
                 elif err.errno in SET_OF_CONNECTION_ERRORS:
                     # Connection reset by peer
-                    if __debug__: self._log(
-                        'CLOSING {}: Connection reset by peer ({})'.format(curr_client_info.addr.result,
-                                                                           err.strerror))
-                    if __debug__: self._log('EXCEPTION: WRITE DATA TO SOCKET: "{}", {}, {}'.format(
-                        curr_client_info.addr.result, err.errno, err.strerror))
+                    if __debug__:
+                        self._log(
+                            'CLOSING {}: Connection reset by peer ({})'.format(curr_client_info.addr.result,
+                                                                               err.strerror))
+                    if __debug__:
+                        self._log('EXCEPTION: WRITE DATA TO SOCKET: "{}", {}, {}'.format(
+                            curr_client_info.addr.result, err.errno, err.strerror))
                     self._mark_connection_to_be_closed_immediately(curr_client_info)
                     ok = False
                 else:
                     if 'nt' == os.name:
                         if errno.WSAECONNRESET == err.errno:
                             # An existing connection was forcibly closed by the remote host
-                            if __debug__: self._log(
-                                'CLOSING {}: Connection reset by peer'.format(curr_client_info.addr.result))
-                            if __debug__: self._log('EXCEPTION: WRITE DATA TO SOCKET: "{}", {}, {}'.format(
-                                curr_client_info.addr.result, err.errno, err.strerror))
+                            if __debug__:
+                                self._log(
+                                    'CLOSING {}: Connection reset by peer'.format(curr_client_info.addr.result))
+                            if __debug__:
+                                self._log('EXCEPTION: WRITE DATA TO SOCKET: "{}", {}, {}'.format(
+                                    curr_client_info.addr.result, err.errno, err.strerror))
                             self._mark_connection_to_be_closed_immediately(curr_client_info)
                             ok = False
                         else:
@@ -1576,7 +1634,8 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
         curr_client_info = self._connections[curr_client_id]
         if curr_client_info.should_be_closed:
             return
-        if __debug__: self._log('handling exceptional condition for {}'.format(curr_client_info.addr.result))
+        if __debug__:
+            self._log('handling exceptional condition for {}'.format(curr_client_info.addr.result))
         self._mark_connection_to_be_closed_immediately(curr_client_info)
 
     # # @profile
@@ -1656,7 +1715,7 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
     #     return result
 
     # @profile
-    def _read_messages_from_raw_input_into_fifo(self, connection_info: Connection)->bool:
+    def _read_messages_from_raw_input_into_fifo(self, connection_info: Connection) -> bool:
         result = False
         # if connection_info.this_is_raw_connection:
         #     if connection_info.input_from_client.size():
@@ -1683,15 +1742,15 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
             pass
 
         return result
-    
-    def _read_messages_from_input_memoryview_into_raw_input(self, connection_info: Connection)->bool:
+
+    def _read_messages_from_input_memoryview_into_raw_input(self, connection_info: Connection) -> bool:
         result = False
-        
+
         while True:
             if connection_info.current_message_length is None:
                 if connection_info.current_input_memoryview_diff >= self.message_size_len:
                     current_message_length = memoryview(connection_info.current_input_memoryview.obj)[
-                                             connection_info.current_input_memoryview_offset:self.message_size_len]
+                        connection_info.current_input_memoryview_offset:self.message_size_len]
                     connection_info.current_message_length = int.from_bytes(current_message_length, 'little')
                     connection_info.current_input_memoryview_offset += self.message_size_len
                     connection_info.current_input_memoryview_diff -= self.message_size_len
@@ -1707,7 +1766,7 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
                 #     pass
                 else:
                     break
-            
+
             current_message = connection_info.raw_input_from_client.get_data(
                 connection_info.current_message_length)
             if current_message is None:
@@ -1736,7 +1795,8 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
 
             self._output_check_sockets.add(client_info.conn.result)
         else:
-            if __debug__: self._log('ERROR: SEND MESSAGE TO CLIENT {}: "{}"'.format(client_info.addr.result, data))
+            if __debug__:
+                self._log('ERROR: SEND MESSAGE TO CLIENT {}: "{}"'.format(client_info.addr.result, data))
             raise Exception('EXCEPTION: SEND MESSAGE TO CLIENT: Client is disconnected! You can not send data to him!')
 
     def _generate_list_of_messages_with_their_length(self, messages_list):
@@ -1753,8 +1813,9 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
 
             self._output_check_sockets.add(client_info.conn.result)
         else:
-            if __debug__: self._log(
-                'ERROR: SEND MESSAGES TO CLIENT {}: "{}"'.format(client_info.addr.result, messages_list))
+            if __debug__:
+                self._log(
+                    'ERROR: SEND MESSAGES TO CLIENT {}: "{}"'.format(client_info.addr.result, messages_list))
             raise Exception('EXCEPTION: SEND MESSAGES TO CLIENT: Client is disconnected! You can not send data to him!')
 
     def _send_message_through_connection_raw(self, client_info: Connection, data):
@@ -1762,7 +1823,8 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
             client_info.output_to_client.put(data)
             self._output_check_sockets.add(client_info.conn.result)
         else:
-            if __debug__: self._log('ERROR: SEND MESSAGE TO CLIENT {}: "{}"'.format(client_info.addr.result, data))
+            if __debug__:
+                self._log('ERROR: SEND MESSAGE TO CLIENT {}: "{}"'.format(client_info.addr.result, data))
             raise Exception(
                 'EXCEPTION: SEND MESSAGE TO CLIENT RAW: Client is disconnected! You can not send data to him!')
 
@@ -1771,8 +1833,9 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
             client_info.output_to_client.extend(messages_list)
             self._output_check_sockets.add(client_info.conn.result)
         else:
-            if __debug__: self._log(
-                'ERROR: SEND MESSAGES TO CLIENT {}: "{}"'.format(client_info.addr.result, messages_list))
+            if __debug__:
+                self._log(
+                    'ERROR: SEND MESSAGES TO CLIENT {}: "{}"'.format(client_info.addr.result, messages_list))
             raise Exception(
                 'EXCEPTION: SEND MESSAGES TO CLIENT RAW: Client is disconnected! You can not send data to him!')
 
@@ -1793,7 +1856,6 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
                 client_info.current_output_memoryview = memoryview(result_data.popleft())
         elif output_fifo_size == 1:
             client_info.current_output_memoryview = memoryview(client_info.output_to_client.get())
-
 
             # # try:
             # if client_info.output_to_client.size():
@@ -1896,8 +1958,9 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
                     # Answer was NOT acceptable
                     self._mark_connection_to_be_closed_immediately(connection_info)
                     self._mark_connection_as_ready_for_deletion(connection_info)
-                    if __debug__: self._log('ERROR: SUPER SERVER ANSWER - KEYWORD WAS NOT ACCEPTED: {}'.format(
-                        super_server_answer__keyword_accepted))
+                    if __debug__:
+                        self._log('ERROR: SUPER SERVER ANSWER - KEYWORD WAS NOT ACCEPTED: {}'.format(
+                            super_server_answer__keyword_accepted))
             else:
                 # This is connection to client. So we expect a keyword
                 keyword = connection_info.input_from_client.get()
@@ -2004,7 +2067,8 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
             exception = exception[:2] + (formatted_traceback,)
             trace_str = ''.join(exception[2])
             result_string = '\n\tEXCEPTION:{}\n\tTRACE:{}'.format(error_str, trace_str)
-            if __debug__: self._log('EXCEPTION: INLINE PROCESSOR: ON DATA RECEIVED: {}'.format(result_string))
+            if __debug__:
+                self._log('EXCEPTION: INLINE PROCESSOR: ON DATA RECEIVED: {}'.format(result_string))
 
         return False
 
@@ -2058,8 +2122,9 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
             exception = exception[:2] + (formatted_traceback,)
             trace_str = ''.join(exception[2])
             result_string = '\n\tEXCEPTION:{}\n\tTRACE:{}'.format(error_str, trace_str)
-            if __debug__: self._log(
-                'EXCEPTION: INLINE PROCESSOR: ON OUTPUT BUFFERS ARE EMPTY: {}'.format(result_string))
+            if __debug__:
+                self._log(
+                    'EXCEPTION: INLINE PROCESSOR: ON OUTPUT BUFFERS ARE EMPTY: {}'.format(result_string))
 
         return False
 
@@ -2083,7 +2148,8 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
             exception = exception[:2] + (formatted_traceback,)
             trace_str = ''.join(exception[2])
             result_string = '\n\tEXCEPTION:{}\n\tTRACE:{}'.format(error_str, trace_str)
-            if __debug__: self._log('EXCEPTION: INLINE PROCESSOR: ON CONNECTION LOST: {}'.format(result_string))
+            if __debug__:
+                self._log('EXCEPTION: INLINE PROCESSOR: ON CONNECTION LOST: {}'.format(result_string))
         self.remove_client(expected_client.id)
 
     def _inline_processor__on__connection_lost_by_connection_id(self, connection_id):
@@ -2101,8 +2167,9 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
                     try:
                         os.unlink(gate_connection_settings.socket_address)
                     except:
-                        if __debug__: self._log('EXCEPTION: SERVER END: TRYING TO UNLINK GOOD AF_UNIX GATE: {}'.format(
-                            gate_connection_settings.socket_address))
+                        if __debug__:
+                            self._log('EXCEPTION: SERVER END: TRYING TO UNLINK GOOD AF_UNIX GATE: {}'.format(
+                                gate_connection_settings.socket_address))
                         raise
 
     def _check_for_initial_af_unix_socket_unlink(self, connection_settings: ConnectionSettings):
@@ -2115,12 +2182,13 @@ class ASockIOCore(NetIOCallbacks, ASockIOCoreMemoryManagement):
                     #     if __debug__: self._log('EXCEPTION: INITIATION: GATE: CAN\'T UNLINK EXISTING AF_UNIX SOCKET: {}'.format(
                     #         connection_settings.socket_address))
                     #     raise
-                    if __debug__: self._log('EXCEPTION: INITIATION: GATE: AF_UNIX SOCKET IS ALREADY EXIST: {}'.format(
-                        connection_settings.socket_address))
+                    if __debug__:
+                        self._log('EXCEPTION: INITIATION: GATE: AF_UNIX SOCKET IS ALREADY EXIST: {}'.format(
+                            connection_settings.socket_address))
 
 
 @contextmanager
-def asock_io_core_connect(asock_io_core_obj: ASockIOCore, should_have_gate_connections: bool=False, backlog: int=1):
+def asock_io_core_connect(asock_io_core_obj: ASockIOCore, should_have_gate_connections: bool = False, backlog: int = 1):
     try:
         gate_connections_num = asock_io_core_obj.listen(backlog)
         if should_have_gate_connections and (not gate_connections_num):
@@ -2136,7 +2204,9 @@ def asock_io_core_connect(asock_io_core_obj: ASockIOCore, should_have_gate_conne
         asock_io_core_obj.io_iteration()
         asock_io_core_obj.destroy()
         asock_io_core_obj.io_iteration()
-        if __debug__: print('RECV BUFF SIZES: {}'.format(str(asock_io_core_obj.recv_buff_sizes)[:150]))
-        if __debug__: print('RECV SIZES: {}'.format(str(asock_io_core_obj.recv_sizes)[:150]))
+        if __debug__:
+            print('RECV BUFF SIZES: {}'.format(str(asock_io_core_obj.recv_buff_sizes)[:150]))
+        if __debug__:
+            print('RECV SIZES: {}'.format(str(asock_io_core_obj.recv_sizes)[:150]))
         # print('RECV BUFF SIZES: {}'.format(asock_io_core_obj.recv_buff_sizes))
         # print('RECV SIZES: {}'.format(asock_io_core_obj.recv_sizes))

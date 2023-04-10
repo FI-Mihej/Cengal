@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 # limitations under the License.
 
 
-__all__ = ['get_min_sleep_interval', 'get_usable_min_sleep_interval', 'get_countable_delta_time', 'try_sleep', 'atry_sleep']
+__all__ = ['get_min_sleep_interval', 'get_usable_min_sleep_interval', 'get_countable_delta_time',
+           'ensure_waitable_time_or_smaller', 'ensure_waitable_time_or_bigger', 'try_sleep', 'atry_sleep']
 
 
 """
@@ -25,10 +26,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -38,6 +39,7 @@ __status__ = "Development"
 import os
 from typing import Optional, Union
 
+from cengal.math.numbers import RationalNumber
 
 if 'nt' == os.name:
     _default_min_sleep_interval = 0.0156
@@ -60,26 +62,46 @@ def get_countable_delta_time():
     return _countable_delta_time
 
 
-def try_sleep(secs: Union[int, float], max_secs: Optional[Union[int, float]], sleep_func, *args, **kwargs):
+def ensure_waitable_time_or_smaller(secs: RationalNumber) -> RationalNumber:
+    secs = abs(secs)
+    intervals: int = secs // _default_min_sleep_interval
+    if not intervals:
+        return 0
+
+    return _default_min_sleep_interval * intervals + _countable_delta_time
+
+
+def ensure_waitable_time_or_bigger(secs: RationalNumber) -> RationalNumber:
+    if secs < get_usable_min_sleep_interval():
+        return 0
+
+    intervals: int = secs // _default_min_sleep_interval
+    if secs % _default_min_sleep_interval:
+        intervals += 1
+
+    return _default_min_sleep_interval * intervals + _countable_delta_time
+
+
+def try_sleep(secs: RationalNumber, max_secs: Optional[RationalNumber], sleep_func, *args, **kwargs):
     result = None
     usable_min_sleep_interval = get_usable_min_sleep_interval()
 
     if max_secs is not None:
         if usable_min_sleep_interval > max_secs:
             max_secs = usable_min_sleep_interval
-    
+
         if secs > max_secs:
             secs = max_secs
-    
+
     secs = _default_min_sleep_interval * (secs // _default_min_sleep_interval) + _countable_delta_time
     if secs >= _default_min_sleep_interval:
         still_trying = True
         while still_trying:
             secs = _default_min_sleep_interval * (secs // _default_min_sleep_interval) + _countable_delta_time
-            
+
             if secs < usable_min_sleep_interval:
                 secs = usable_min_sleep_interval
-            
+
             try:
                 # print(f'Sleepting: {secs}...')
                 result = sleep_func(secs, *args, **kwargs)
@@ -89,30 +111,30 @@ def try_sleep(secs: Union[int, float], max_secs: Optional[Union[int, float]], sl
                 secs /= 2
             else:
                 still_trying = False
-    
+
     return result, secs
 
 
-async def atry_sleep(secs: Union[int, float], max_secs: Optional[Union[int, float]], awaitable_sleep_func, *args, **kwargs):
+async def atry_sleep(secs: RationalNumber, max_secs: Optional[RationalNumber], awaitable_sleep_func, *args, **kwargs):
     result = None
     usable_min_sleep_interval = get_usable_min_sleep_interval()
 
     if max_secs is not None:
         if usable_min_sleep_interval > max_secs:
             max_secs = usable_min_sleep_interval
-    
+
         if secs > max_secs:
             secs = max_secs
-    
+
     secs = _default_min_sleep_interval * (secs // _default_min_sleep_interval) + _countable_delta_time
     if secs >= _default_min_sleep_interval:
         still_trying = True
         while still_trying:
             secs = _default_min_sleep_interval * (secs // _default_min_sleep_interval) + _countable_delta_time
-            
+
             if secs < usable_min_sleep_interval:
                 secs = usable_min_sleep_interval
-            
+
             try:
                 result = await awaitable_sleep_func(secs, *args, **kwargs)
             except OverflowError:
@@ -120,5 +142,5 @@ async def atry_sleep(secs: Union[int, float], max_secs: Optional[Union[int, floa
                 secs /= 2
             else:
                 still_trying = False
-    
+
     return result, secs

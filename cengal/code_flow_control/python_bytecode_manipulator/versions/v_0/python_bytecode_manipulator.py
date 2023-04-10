@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,10 +34,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -157,7 +157,7 @@ def set_code(x, code: CodeType):
     return x
 
 
-if (3, 11) > PYTHON_VERSION_INT:
+if (3, 11) > PYTHON_VERSION_INT[:1]:
     def modify_code(original_code: CodeType, co_code, co_consts, co_names, co_varnames):
         co_nlocals = len(co_varnames)
         return CodeType(
@@ -282,7 +282,7 @@ if (3, 11) > PYTHON_VERSION_INT:
     def arg_to_op_index(arg: int) -> int:
         return arg // 2
 
-elif (3, 11) >= PYTHON_VERSION_INT:
+elif (3, 11) >= PYTHON_VERSION_INT[:1]:
     from dis import _is_backward_jump
 
     def find_ops_with_labels(code):
@@ -310,7 +310,9 @@ elif (3, 11) >= PYTHON_VERSION_INT:
 
         return labels, op_by_label
 else:
-    raise RuntimeError('Unsupported Python Version')
+    import warnings
+    warnings.warn(f'Unsupported Python Version: {PYTHON_VERSION_INT}')
+    # raise RuntimeError(f'Unsupported Python Version: {PYTHON_VERSION_INT}')
 
 
 class OpSequenceOffsetMap(CopyableMixin):

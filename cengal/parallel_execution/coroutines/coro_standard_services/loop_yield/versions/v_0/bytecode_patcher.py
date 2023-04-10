@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -141,3 +141,48 @@ def gly_patch(entity: Callable) -> Callable:
     )
     set_code(entity, new_code_type)
     return fn_code
+
+
+def gly_patched(func: Callable) -> Callable:
+    """Example:
+        @gly_patched
+        def func():
+            for i in range(200):
+                print(i)
+                for j in range(100):
+                    print(j)
+            
+            i = 100
+            while i > 0:
+                print(i)
+                i -= 1
+
+    Is equivalent to:
+        from cengal.parallel_execution.coroutines.coro_standard_services.loop_yield import gly
+        def func():
+            ly = gly()
+            for i in range(200):
+                print(i)
+                for j in range(100):
+                    print(j)
+                    ly()
+                
+                ly()
+            
+            i = 100
+            while i > 0:
+                print(i)
+                i -= 1
+                ly()
+
+    Args:
+        func (Callable): _description_
+
+    Returns:
+        Callable: _description_
+    """    
+    gly_patch(func)
+    return func
+
+
+glyp = gly_patched

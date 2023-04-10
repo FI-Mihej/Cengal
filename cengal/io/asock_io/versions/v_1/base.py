@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,13 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import socket
 import errno
+import socket
+
+from cengal.base.classes import BaseClassSettings
 from cengal.code_flow_control.smart_values.versions.v_0 import ResultExistence
-from cengal.base import BaseClassSettings
+from cengal.data_containers.dynamic_list_of_pieces import \
+    DynamicListOfPiecesDequeWithLengthControl
+from cengal.data_containers.fast_fifo import FIFODequeWithLengthControl
 from cengal.hardware_info.cpu.versions.v_0 import l2_cache_per_core
-from cengal.data_containers import DynamicListOfPiecesDequeWithLengthControl, \
-    FIFODequeWithLengthControl
+
 from .abstract import *
 from .recv_buff_size_computer import RecvBuffSizeComputer
 
@@ -31,10 +34,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -105,13 +108,13 @@ class ConnectionSettings(BaseClassSettings):
     def __init__(self,
                  connection_type: ConnectionType,
                  socket_address=None,
-                 keyword: bytes=None,
+                 keyword: bytes = None,
                  socket_family=socket.AF_INET,
                  socket_type=socket.SOCK_STREAM,
                  socket_protocol=0,
                  socket_fileno=None,
                  backlog=0,
-                 non_socket_connection_settings: NonSocketConnectionSettings=None):
+                 non_socket_connection_settings: NonSocketConnectionSettings = None):
         """
         :param connection_type: ConnectionType()
         :param socket_address: './main.server.AF_UNIX.socket', ('localhost', 8080), ('::', 50007, 0, 0), , ect.
@@ -167,7 +170,7 @@ class ASockIOCoreMemoryManagement(IOCoreMemoryManagement):
                                                              int(l2_cache_per_core() / 2) or 1024 ** 2)
         # 1024**2 is the fastest fixed read buffer on my CPU.
         # Also ingeneral, it should be the half of the CPU cache per core (UPD: I don't remember why. Maybe to save other memory to instructions when we are dealing with big amount of connections).
-        # 
+        #
         # My CPU is Intel Core i5 3570:
         # Architecture	x86-64
         # Threads	4 threads
@@ -228,14 +231,14 @@ class Connection:
         self.current_input_memoryview_diff = 0
         self.current_input_memoryview_message_nbytes = 0
         self.raw_input_from_client = DynamicListOfPiecesDequeWithLengthControl(
-                external_data_length=global_memory_management.global_in__data_full_size)
+            external_data_length=global_memory_management.global_in__data_full_size)
         self.current_message_length = None  # length of current input message (or None, if size waw not read yet)
         self.input_from_client = FIFODequeWithLengthControl(
-                external_data_full_size=global_memory_management.global_in__data_full_size)
+            external_data_full_size=global_memory_management.global_in__data_full_size)
 
         self.current_output_memoryview = None
         self.output_to_client = FIFODequeWithLengthControl(
-                external_data_full_size=global_memory_management.global_out__data_full_size)
+            external_data_full_size=global_memory_management.global_out__data_full_size)
 
         self.this_is_raw_connection = False
 
@@ -298,15 +301,15 @@ class InlineProcessor(InlineWorkerBase):
 
     def __getstate__(self):
         return self.client_id, self.keyword, self.socket_family, self.socket_type, self.socket_proto, self.addr_info, \
-               self.host_names, self.is_in_raw_mode, self.__hold__client_id, self.__set__is_in_raw_mode, \
-               self.__set__mark_socket_as_should_be_closed_immediately, self.__set__mark_socket_as_ready_to_be_closed, \
-               self.__external_parameters_set_trigger, self.output_messages
+            self.host_names, self.is_in_raw_mode, self.__hold__client_id, self.__set__is_in_raw_mode, \
+            self.__set__mark_socket_as_should_be_closed_immediately, self.__set__mark_socket_as_ready_to_be_closed, \
+            self.__external_parameters_set_trigger, self.output_messages
 
     def __setstate__(self, state):
         self.client_id, self.keyword, self.socket_family, self.socket_type, self.socket_proto, self.addr_info, \
-        self.host_names, self.is_in_raw_mode, self.__hold__client_id, self.__set__is_in_raw_mode, \
-        self.__set__mark_socket_as_should_be_closed_immediately, self.__set__mark_socket_as_ready_to_be_closed, \
-        self.__external_parameters_set_trigger, self.output_messages = state
+            self.host_names, self.is_in_raw_mode, self.__hold__client_id, self.__set__is_in_raw_mode, \
+            self.__set__mark_socket_as_should_be_closed_immediately, self.__set__mark_socket_as_ready_to_be_closed, \
+            self.__external_parameters_set_trigger, self.output_messages = state
 
 
 class Client:
@@ -345,23 +348,23 @@ class Client:
         # )
         # return data_for_pickling
         return self.id, \
-               self.connection_id, \
-               self.connection_settings, \
-               self.will_use_raw_client_connection, \
-               self.will_use_raw_connection_without_handshake, \
-               self.this_is_unknown_client, \
-               self.obj_for_inline_processing
+            self.connection_id, \
+            self.connection_settings, \
+            self.will_use_raw_client_connection, \
+            self.will_use_raw_connection_without_handshake, \
+            self.this_is_unknown_client, \
+            self.obj_for_inline_processing
 
     def __setstate__(self, data_after_unpickling):
         self.id, self.connection_id, self.connection_settings, self.will_use_raw_client_connection, \
-        self.will_use_raw_connection_without_handshake, self.this_is_unknown_client, \
-        self.obj_for_inline_processing = data_after_unpickling
+            self.will_use_raw_connection_without_handshake, self.this_is_unknown_client, \
+            self.obj_for_inline_processing = data_after_unpickling
 
         self.__connection = None
 
 
 class CheckIsRawConnection:
-    def __call__(self, asock_io_core: 'ASockIOCore', connection_info: Connection)->bool:
+    def __call__(self, asock_io_core: 'ASockIOCore', connection_info: Connection) -> bool:
         """
         :param asock_io_core:
         :param connection_info:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -45,13 +45,13 @@ from typing import Tuple, Callable, Optional, Union, overload
 
 
 class TimerFuncRunnerRequest(ServiceRequest):
-    def add(self, delay: float, handler: Callable, *args, **kwargs) -> ServiceRequest:
+    def add(self, delay: float, handler: Callable, *args, **kwargs) -> TimerRequest:
         return self._save(0, delay, handler, args, kwargs)
-    def discard(self, timer_request: TimerRequest) -> ServiceRequest:
+    def discard(self, timer_request: TimerRequest) -> bool:
         return self._save(1, timer_request)
 
 
-class TimerFuncRunner(DualImmediateProcessingServiceMixin, ServiceWithADirectRequestMixin, Service):
+class TimerFuncRunner(DualImmediateProcessingServiceMixin, ServiceWithADirectRequestMixin, TypedService[TimerRequest]):
     def __init__(self, loop: CoroScheduler):
         super(TimerFuncRunner, self).__init__(loop)
         self.timer = Timer()
@@ -133,6 +133,9 @@ class TimerFuncRunner(DualImmediateProcessingServiceMixin, ServiceWithADirectReq
     
     def time_left_before_next_event(self) -> Tuple[bool, Optional[Union[int, float]]]:
         return True, self.timer.nearest_event()
+
+
+TimerFuncRunnerRequest.default_service_type = TimerFuncRunner
 
 
 def add_timer_func_run_from_other_service(current_service: Service, delay: float, handler: Callable, *args, **kwargs) -> TimerRequest:

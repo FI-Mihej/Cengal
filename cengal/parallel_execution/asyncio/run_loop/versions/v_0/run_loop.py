@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 # limitations under the License.
 
 
-__all__ = ['run_forever']
+__all__ = ['run_forever', 'cancel_all_tasks']
 
 
 """
@@ -25,10 +25,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -39,10 +39,9 @@ from asyncio import events
 from asyncio import tasks
 
 
-# TODO: refactoring required (copied and modified from asyncio.run())
 def run_forever(main, *, debug=False):
     
-    """Execute the coroutine and return the result.
+    """Execute the coroutine and all started tasks and return the result.
 
     This function runs the passed coroutine, taking care of
     managing the asyncio event loop and finalizing asynchronous
@@ -58,19 +57,25 @@ def run_forever(main, *, debug=False):
     ideally only be called once.
 
     Example:
+        async def my_task():
+            await asyncio.sleep(3)
+            print('will be finished before loop end unlike with the asyncio.run() call')
+
 
         async def main():
+            asyncio.create_task(my_task())
             await asyncio.sleep(1)
             print('hello')
 
-        asyncio.run(main())
+
+        run_forever(main())
     """
     if events._get_running_loop() is not None:
         raise RuntimeError(
-            "asyncio.run() cannot be called from a running event loop")
+            'run_forever() cannot be called from a running event loop')
 
     if not coroutines.iscoroutine(main):
-        raise ValueError("a coroutine was expected, got {!r}".format(main))
+        raise ValueError('a coroutine was expected, got {!r}'.format(main))
 
     loop = events.new_event_loop()
     try:
@@ -80,14 +85,14 @@ def run_forever(main, *, debug=False):
         return loop.run_forever()
     finally:
         try:
-            _cancel_all_tasks(loop)
+            cancel_all_tasks(loop)
             loop.run_until_complete(loop.shutdown_asyncgens())
         finally:
             events.set_event_loop(None)
             loop.close()
 
 
-def _cancel_all_tasks(loop):
+def cancel_all_tasks(loop):
     to_cancel = tasks.all_tasks(loop)
     if not to_cancel:
         return
@@ -103,7 +108,7 @@ def _cancel_all_tasks(loop):
             continue
         if task.exception() is not None:
             loop.call_exception_handler({
-                'message': 'unhandled exception during asyncio.run() shutdown',
+                'message': 'unhandled exception during run_forever() shutdown',
                 'exception': task.exception(),
                 'task': task,
             })

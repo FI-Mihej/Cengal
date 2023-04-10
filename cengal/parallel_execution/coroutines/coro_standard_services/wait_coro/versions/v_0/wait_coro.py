@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -42,7 +42,7 @@ from cengal.parallel_execution.coroutines.coro_standard_services.put_coro_list i
 from cengal.parallel_execution.coroutines.coro_standard_services.timer_func_runner import timer_func_run_on
 from cengal.parallel_execution.coroutines.coro_standard_services.kill_coro import kill_coro_on
 from cengal.introspection.inspect import get_exception
-from typing import Any, Optional, Sequence, Tuple, Dict, Set
+from typing import Any, Optional, Sequence, Tuple, Dict, Set, Union, List, overload, Type
 
 
 class CoroutineNotFoundError(Exception):
@@ -53,15 +53,53 @@ class TimeoutError(Exception):
     pass
 
 
+class ServParams:
+    @overload
+    def __init__(self, service_request_type: Type[TypedServiceRequest[ServiceResponseTypeVar]], *args, **kwargs) -> ServiceResponseTypeVar: ...
+
+    @overload
+    def __init__(self, service_request: TypedServiceRequest[ServiceResponseTypeVar]) -> ServiceResponseTypeVar: ...
+
+    @overload
+    def __init__(self, service_type: Type[TypedService[ServiceResponseTypeVar]], *args, **kwargs) -> ServiceResponseTypeVar: ...
+
+    @overload
+    def __init__(self, service_type: ServiceType, service_request: TypedServiceRequest[ServiceResponseTypeVar]) -> ServiceResponseTypeVar: ...
+
+    @overload
+    def __init__(self, service_request_type: Type[ServiceRequest], *args, **kwargs) -> ServiceResponseTypeVar: ...
+
+    @overload
+    def __init__(self, service_request: ServiceRequest) -> ServiceResponseTypeVar: ...
+
+    @overload
+    def __init__(self, service_type: ServiceType, *args, **kwargs) -> ServiceResponseTypeVar: ...
+
+    @overload
+    def __init__(self, service_type: ServiceType, service_request: ServiceRequest) -> ServiceResponseTypeVar: ...
+
+    def __init__(self, service_type, *args, **kwargs) -> None:
+        self.service_type: NormalizableServiceType = service_type
+        self.args: Tuple = args
+        self.kwargs: Dict = kwargs
+    
+    def __call__(self) -> Tuple[NormalizableServiceType, Tuple, Dict]:
+        return self.service_type, self.args, self.kwargs
+
+
+SP = ServParams
+
+
 class WaitCoroRequest(ServiceRequest):
-    def __init__(self, timeout: Optional[float] = None, kill_on_timeout: bool = True, tree: bool = True):
+    def __init__(self, timeout: Optional[float] = None, kill_on_timeout: bool = True, tree: bool = True, result_required: bool = True):
         super().__init__()
         self.provide_to_request_handler = True
         self.timeout: Optional[float] = timeout
         self.kill_on_timeout: bool = kill_on_timeout
         self.tree: bool = tree
+        self.result_required: bool = result_required
 
-    def single(self, coro_id: CoroID) -> ServiceRequest:
+    def single(self, coro_id: CoroID) -> Union[Any, None]:
         return self._save(0, coro_id)
 
     def list(self, coro_list: Sequence[CoroID]) -> ServiceRequest:
@@ -76,7 +114,7 @@ class WaitCoroRequest(ServiceRequest):
     def put_single(self, coro_worker: Worker, *args, **kwargs) -> ServiceRequest:
         return self._save(4, coro_worker, *args, **kwargs)
 
-    def put_list(self, coro_list: Sequence[PutSingleCoroParams]) -> ServiceRequest:
+    def put_list(self, coro_list: Sequence[PutSingleCoroParams]) -> List[Tuple[CoroID, Any, Optional[Exception]]]:
         return self._save(5, coro_list)
 
     def put_atomic(self, coro_list: Sequence[PutSingleCoroParams]) -> ServiceRequest:
@@ -85,6 +123,63 @@ class WaitCoroRequest(ServiceRequest):
     def put_fastest(self, coro_list: Sequence[PutSingleCoroParams], num: int=1, measure_time: bool=False) -> ServiceRequest:
         return self._save(7, coro_list, num, measure_time)
 
+    def serv_list(self, serv_params_list: Sequence[ServParams]) -> List[Tuple[CoroID, Any, Optional[Exception]]]:
+        """Creates a coroutine for each service request and waits for the result of each of them.
+
+        Args:
+            serv_params_list (Sequence[ServParams]): _description_
+
+        Returns:
+            List[Tuple[CoroID, Any, Optional[Exception]]]: _description_
+        """        
+        return self._save(8, serv_params_list)
+
+    def serv_atomic(self, serv_params_list: Sequence[ServParams]) -> ServiceRequest:
+        """Creates a coroutine for each service request and waits for the result of each of them. If one of the coroutines fails, the others are killed which may lead to cancel request processing in some services (see documentation of the service you are trying to use here).
+
+        Args:
+            serv_params_list (Sequence[ServParams]): _description_
+
+        Returns:
+            ServiceRequest: _description_
+        """        
+        return self._save(9, serv_params_list)
+
+    def serv_fastest(self, serv_params_list: Sequence[ServParams], num: int=1, measure_time: bool=False) -> ServiceRequest:
+        """Creates a coroutine for each service request and waits for the result of each of them. When one of coroutines finished, the others are killed which may lead to cancel request processing in some services (see documentation of the service you are trying to use here)
+
+        Args:
+            serv_params_list (Sequence[ServParams]): _description_
+            num (int, optional): _description_. Defaults to 1.
+            measure_time (bool, optional): _description_. Defaults to False.
+
+        Returns:
+            ServiceRequest: _description_
+        """        
+        return self._save(10, serv_params_list, num, measure_time)
+
+    def serv_and_forget_single(self, serv_params: ServParams) -> None:
+        """Creates a coroutine for a service request and returns immediately.
+
+        Args:
+            serv_params (ServParams): _description_
+
+        Returns:
+            _type_: _description_
+        """        
+        return self._save(11, serv_params)
+
+    def serv_and_forget_list(self, serv_params_list: Sequence[ServParams]) -> None:
+        """Creates a coroutine for each service request and returns immediately.
+
+        Args:
+            serv_params_list (Sequence[ServParams]): _description_
+
+        Returns:
+            _type_: _description_
+        """        
+        return self._save(12, serv_params_list)
+
 
 class SingleMethod(ServiceRequestMethodMixin):
 
@@ -92,15 +187,17 @@ class SingleMethod(ServiceRequestMethodMixin):
         super().__init__(service)
         self.single_called_by: Dict[CoroID, CoroID] = dict()  # Dict[CoroID, CoroID] # key - callable; value - requester
         self.new_single_results: Set[Tuple[CoroID, Any, Optional[BaseException]]] = set()  # (id, result, exception)
+        self.result_required_by: Dict[CoroID, bool] = dict()
 
     def __call__(self, request: WaitCoroRequest, coro_id: CoroID) -> ServiceProcessingResponse:
-        requester_id = self.service.current_caller_coro_info.coro_id
+        requester_id: CoroID = self.service.current_caller_coro_info.coro_id
         coro: CoroWrapperBase = self.service._loop.get_coro(coro_id)
         if coro is None:
             return (True, None, CoroutineNotFoundError(coro_id))
 
         coro.add_on_coro_del_handler(self._on_coro_del_handler)
-        self.single_called_by[coro.coro_id] = requester_id
+        self.single_called_by[coro_id] = requester_id
+        self.result_required_by[requester_id] = request.result_required
         timeout: Optional[float] = request.timeout
         if timeout is not None:
             def timeout_handler(coro_id: CoroID, kill_on_timeout: bool, tree: bool):
@@ -117,7 +214,13 @@ class SingleMethod(ServiceRequestMethodMixin):
     def full_processing_iteration(self):
         for coro_id, result, exception in self.new_single_results:
             try:
-                self.service.register_response(self.single_called_by[coro_id], result, exception)
+                requester_id: CoroID = self.single_called_by[coro_id]
+                if self.result_required_by[requester_id]:
+                    self.service.register_response(requester_id, result, exception)
+                else:
+                    self.service.register_response(requester_id, None, None)
+                
+                del self.result_required_by[requester_id]
                 del self.single_called_by[coro_id]
             except KeyError:
                 pass
@@ -257,7 +360,7 @@ class PutListMethod(ServiceRequestMethodMixin):
     def full_processing_iteration(self):
         ready_requesters_buff = self.ready_requesters
         self.ready_requesters = type(ready_requesters_buff)()
-        for requester_id in self.ready_requesters:
+        for requester_id in ready_requesters_buff:
             self.service.register_response(requester_id, self.caller_results[requester_id], None)
             del self.caller_results[requester_id]
 
@@ -321,3 +424,6 @@ class WaitCoro(Service):
 
     def not_implemented(self):
         raise NotImplementedError
+
+
+WaitCoroRequest.default_service_type = WaitCoro

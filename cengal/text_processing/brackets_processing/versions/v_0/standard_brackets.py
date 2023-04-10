@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -34,7 +34,7 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-__all__ = ['out_of_data_bounds', 'out_of_accessible_data_bounds', 'line_end_n', 'line_end_rn', 'line_end', 'first_line', 'first_visible_line', 'line', 'last_line', 'last_visible_line', 'round_l', 'round_r', 'round', 'square_l', 'square_r', 'square', 'triangle_l', 'triangle_r', 'triangle', 'brace_l', 'brace_r', 'brace', 'quote', 'quotes', 'apostrophe', 'apostrophes', 'backtick', 'backticks']
+__all__ = ['out_of_data_bounds', 'out_of_accessible_data_bounds', 'line_delimiter_n', 'line_delimiter_rn', 'line_delimiter', 'first_line', 'first_visible_line', 'line', 'last_line', 'last_visible_line', 'round_l', 'round_r', 'round', 'square_l', 'square_r', 'square', 'triangle_l', 'triangle_r', 'triangle', 'brace_l', 'brace_r', 'brace', 'quote', 'quotes', 'apostrophe', 'apostrophes', 'backtick', 'backticks']
 
 
 #!/usr/bin/env python
@@ -54,15 +54,24 @@ from .brackets import *
 
 out_of_data_bounds: Bracket = Bracket(BracketAbsentType.out_of_data_bounds)
 out_of_accessible_data_bounds: Bracket = Bracket(BracketAbsentType.out_of_accessible_data_bounds)
+out_of_bounds: BracketsList = [out_of_accessible_data_bounds, out_of_data_bounds]
 
-line_end_n: Bracket = Bracket('\n')
-line_end_rn: Bracket = Bracket('\r\n')
-line_end: BracketsList = [line_end_rn, line_end_n]
-first_line: BracketPair = BracketPair([out_of_data_bounds], line_end)
-first_visible_line: BracketPair = BracketPair([out_of_accessible_data_bounds], line_end)
-line: BracketPair = BracketPair(line_end, line_end)
-last_line: BracketPair = BracketPair(line_end, [out_of_data_bounds])
-last_visible_line: BracketPair = BracketPair(line_end, [out_of_accessible_data_bounds])
+line_delimiter_n: Bracket = Bracket('\n')
+line_delimiter_rn: Bracket = Bracket('\r\n')
+line_delimiter: BracketsList = [line_delimiter_rn, line_delimiter_n]
+
+line_brake: BracketsList = [line_delimiter_rn, line_delimiter_n, out_of_accessible_data_bounds, out_of_data_bounds]
+
+first_line: BracketPair = BracketPair([out_of_data_bounds], line_delimiter)
+first_visible_line: BracketPair = BracketPair([out_of_accessible_data_bounds], line_delimiter)
+inner_line: BracketPair = BracketPair(line_delimiter, line_delimiter)
+last_visible_line: BracketPair = BracketPair(line_delimiter, [out_of_accessible_data_bounds])
+last_line: BracketPair = BracketPair(line_delimiter, [out_of_data_bounds])
+line: BracketPair = BracketPair(line_brake, line_brake)
+
+data_body: BracketPair = BracketPair([out_of_data_bounds], [out_of_data_bounds])
+visible_body: BracketPair = BracketPair([out_of_accessible_data_bounds], [out_of_accessible_data_bounds])
+body: BracketPair = BracketPair(out_of_bounds, out_of_bounds)
 
 round_l: Bracket = Bracket('(')
 round_r: Bracket = Bracket(')')

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,15 +25,17 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 
-from cengal.parallel_execution.coroutines.coro_scheduler import *
-from typing import Tuple, List, Dict
+from time import perf_counter
+from typing import Dict, List, Tuple
 
+from cengal.parallel_execution.coroutines.coro_scheduler import *
+from cengal.parallel_execution.coroutines.coro_standard_services.timer_func_runner import TimerFuncRunner, add_timer_func_run_from_other_service, discard_timer_func_run_from_other_service
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -41,18 +43,31 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-class LazyPrint(Service):
+class LazyPrint(TypedService[None]):
 
     def __init__(self, loop):
         super().__init__(loop)
         self.requests = list()
+        self.last_print_time = None
+        self.update_period = 0.5
+        self.update_timer_request = None
 
     def single_task_registration_or_immediate_processing(self, *args, **kwargs) -> Tuple[(bool, None, None)]:
         self.requests.append((args, kwargs))
-        self.make_live()
+        self.try_add_timer()
         return (True, None, None)
 
     def full_processing_iteration(self):
+        if self.last_print_time is None:
+            self.last_print_time = perf_counter()
+        
+        current_time = perf_counter()
+        delta_time = current_time - self.last_print_time
+        if self.update_period > delta_time:
+            return
+        else:
+            self.last_print_time = current_time
+        
         requests_buff = self.requests
         self.requests = type(self.requests)()
         for args, kwargs in requests_buff:
@@ -60,15 +75,36 @@ class LazyPrint(Service):
             print(*args, **kwargs)
 
         print(end='', flush=True)
+        self.add_timer()
         self.make_dead()
+
+    def timer_handler(self):
+        self.update_timer_request = None
+        if self.in_work_impl():
+            self.make_live()
+    
+    def add_timer(self):
+        self.update_timer_request = add_timer_func_run_from_other_service(self, self.update_period, self.timer_handler)
+    
+    def try_add_timer(self):
+        if self.update_timer_request is None: self.add_timer()
 
     def _put_direct_request(self, *args, **kwargs):
         self.requests.append((args, kwargs))
-        self.make_live()
+        self.try_add_timer()
+
+    def in_work_impl(self) -> bool:
+        return bool(self.requests)
 
     def in_work(self) -> bool:
-        result: bool = bool(self.requests)
+        result: bool = self.in_work_impl()
         return self.thrifty_in_work(result)
+    
+    def destroy(self):
+        try:
+            discard_timer_func_run_from_other_service(self, self.update_timer_request)
+        except CoroSchedulerIsCurrentlyDestroingError:
+            pass
 
 
 def lazy_print(*args, **kwargs):
@@ -79,6 +115,14 @@ def lazy_print(*args, **kwargs):
         fallback = True
 
     if fallback:
+        fallback = False
+        try:
+            cs = primary_coro_scheduler()
+        except PrimaryCoroSchedulerWasNotSet:
+            fallback = True
+
+    if fallback:
+        print('**fallback**')
         print(*args, **kwargs)
     else:
         cs.get_service_instance(LazyPrint)._put_direct_request(*args, **kwargs)

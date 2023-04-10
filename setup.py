@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,10 +22,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -96,8 +96,96 @@ setuptools.setup(
     install_requires=pypi_requirements_list,
     classifiers=[
         'Programming Language :: Python :: 3',
-        f'License :: OSI Approved :: {__license__}',
+        'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
+        'Development Status :: 4 - Beta',
+        'Environment :: Console',
+        'Environment :: MacOS X',
+        'Environment :: Web Environment',
+        'Environment :: WebAssembly',
+        'Environment :: Win32 (MS Windows)',
+        'Environment :: X11 Applications',
+        'Framework :: AsyncIO',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Education',
+        'Intended Audience :: Information Technology',
+        'Intended Audience :: Manufacturing',
+        'Intended Audience :: Science/Research',
+        'Intended Audience :: Telecommunications Industry',
+        'Operating System :: Android',
+        'Operating System :: MacOS',
+        'Operating System :: MacOS :: MacOS X',
+        'Operating System :: Microsoft :: Windows',
+        'Operating System :: Microsoft :: Windows :: Windows 7',
+        'Operating System :: Microsoft :: Windows :: Windows 8',
+        'Operating System :: Microsoft :: Windows :: Windows 8.1',
+        'Operating System :: Microsoft :: Windows :: Windows 10',
+        'Operating System :: Microsoft :: Windows :: Windows 11',
+        'Operating System :: Microsoft :: Windows :: Windows Vista',
+        'Operating System :: Microsoft :: Windows :: Windows XP',
+        'Operating System :: Microsoft :: Windows :: Windows Server 2008',
+        'Operating System :: Microsoft :: Windows :: Windows Server 2003',
+        'Operating System :: Microsoft :: Windows :: Windows NT/2000',
+        'Operating System :: POSIX',
+        'Operating System :: POSIX :: BSD',
+        'Operating System :: POSIX :: BSD :: OpenBSD',
+        'Operating System :: POSIX :: BSD :: FreeBSD',
+        'Operating System :: POSIX :: BSD :: NetBSD',
+        'Operating System :: POSIX :: Linux',
+        'Operating System :: Unix',
+        'Operating System :: iOS',
+        'Programming Language :: Cython',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: Implementation',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Programming Language :: Python :: Implementation :: PyPy',
+        'Programming Language :: Python :: Implementation :: MicroPython',
+        'Topic :: Communications',
+        'Topic :: Database',
+        'Topic :: Database :: Database Engines/Servers',
+        'Topic :: Desktop Environment',
+        'Topic :: Games/Entertainment',
+        'Topic :: Internet',
+        'Topic :: Internet :: WWW/HTTP',
+        'Topic :: Internet :: WWW/HTTP :: HTTP Servers',
+        'Topic :: Internet :: WWW/HTTP :: Indexing/Search',
+        'Topic :: Multimedia',
+        'Topic :: Multimedia :: Graphics',
+        'Topic :: Scientific/Engineering',
+        'Topic :: Scientific/Engineering :: Mathematics',
+        'Topic :: Software Development',
+        'Topic :: Software Development :: Code Generators',
+        'Topic :: Software Development :: Compilers',
+        'Topic :: Software Development :: Disassemblers',
+        'Topic :: Software Development :: Internationalization',
+        'Topic :: Software Development :: Libraries',
+        'Topic :: Software Development :: Libraries :: Application Frameworks',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Software Development :: Localization',
+        'Topic :: Software Development :: Testing',
+        'Topic :: Software Development :: Testing :: Mocking',
+        'Topic :: Software Development :: Testing :: Unit',
+        'Topic :: Software Development :: User Interfaces',
+        'Topic :: Software Development :: Version Control :: Git',
+        'Topic :: System',
+        'Topic :: System :: Distributed Computing',
+        'Topic :: System :: Installation/Setup',
+        'Topic :: System :: Logging',
+        'Topic :: System :: Networking',
+        'Topic :: Text Processing',
+        'Topic :: Text Processing :: General',
+        'Topic :: Utilities',
+        'Typing :: Typed',
     ],
     python_requires='>=3.7',
     ext_modules=cythonize(find_and_prepare_cython_modules(), compiler_directives={'language_level': '3'}),

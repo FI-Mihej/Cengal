@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -32,7 +32,7 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-__all__ = ['PortStatus', 'Table', 'Protocol', 'purify_ports', 'get_tables', 'used_ports', 'PortLord', 'PortInfo', 'UsedPorts', 'PortsIterator', 'unify_ports']
+__all__ = ['PortStatus', 'Table', 'Protocol', 'purify_ports', 'get_tables', 'used_ports', 'PortLord', 'PortInfo', 'UsedPorts', 'PortsIterator', 'unify_ports', 'UnaceptablePortsRangeTypeError']
 
 import pickle
 from enum import Enum
@@ -143,11 +143,22 @@ class UsedPorts:
         return self.range(protocol, ports_range, statuses, desired_number_of_ports)
 
 
+class UnaceptablePortsRangeTypeError(Exception):
+    pass
+
+
 class PortsIterator:
-    def __init__(self, used_ports: UsedPorts, protocol: Protocol, ports_range: slice, statuses: Union[PortStatus, Set[PortStatus]], desired_number_of_ports: int) -> None:
+    def __init__(self, used_ports: UsedPorts, protocol: Protocol, ports_range: Union[slice, Tuple[int, int]], statuses: Union[PortStatus, Set[PortStatus]], desired_number_of_ports: int) -> None:
         self.used_ports: UsedPorts = used_ports
         self.protocol: Protocol = protocol
         self.ports_range: slice = ports_range
+        if isinstance(ports_range, slice):
+            pass
+        elif isinstance(ports_range, tuple):
+            self.ports_range = slice(*ports_range)
+        else:
+            raise UnaceptablePortsRangeTypeError
+        
         if isinstance(statuses, PortStatus):
             statuses = {statuses}
         

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 # limitations under the License.
 
 from collections import deque
-from cengal.code_flow_control.smart_values import ValueCache, ValueExistence
-from cengal.code_inspection import set_profiler
 
+from cengal.code_flow_control.smart_values import ValueCache, ValueExistence
+from cengal.code_inspection.line_profiling import set_profiler
 
 """
 Быстрый модуль FIFO. Скорость достигается за счет уменьшенного количества аллокаций и деаллокаций памяти и
@@ -28,10 +28,10 @@ from cengal.code_inspection import set_profiler
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2022 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "0.0.8"
+__version__ = "3.1.9"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -107,8 +107,8 @@ class FIFO:
 
 class FIFOWithLengthControl(FIFO):
     def __init__(self, on_hold_limit=None, on_hold_data_size_limit=None,
-                 external_data_full_size: ValueExistence=None,
-                 external_deletable_data_full_size: ValueExistence=None):
+                 external_data_full_size: ValueExistence = None,
+                 external_deletable_data_full_size: ValueExistence = None):
         super(FIFOWithLengthControl, self).__init__(on_hold_limit)
         self._removed = False
 
@@ -130,7 +130,7 @@ class FIFOWithLengthControl(FIFO):
             self._calculate_data_full_size()
 
         super(FIFOWithLengthControl, self).put(data)
-        
+
         data_size = len(data)
         self._l_length.append(data_size)
         self._data_full_size.value += data_size
@@ -209,14 +209,14 @@ class FIFOWithLengthControl(FIFO):
             # self._l_deletable_length = list()
             self._external_deletable_data_full_size.value -= self._deletable_data_full_size
             self._deletable_data_full_size = 0
-            
+
     def _calculate_data_full_size(self):
         data_full_size = sum(self._l_length)
         last_data_full_size = self._data_full_size.value
         diff_data_full_size = data_full_size - last_data_full_size
         self._data_full_size.set(data_full_size)
         self._external_data_full_size.value += diff_data_full_size
-        
+
     def get_data_full_size(self):
         if not self._data_full_size:
             self._calculate_data_full_size()
@@ -243,7 +243,7 @@ class FIFOWithLengthControl(FIFO):
 
 
 class FIFODequeWithLengthControl:
-    def __init__(self, external_data_full_size: ValueExistence=None):
+    def __init__(self, external_data_full_size: ValueExistence = None):
         self._removed = False
 
         self._l = deque()
