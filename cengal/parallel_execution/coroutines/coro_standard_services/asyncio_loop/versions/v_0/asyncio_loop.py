@@ -51,7 +51,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.10"
+__version__ = "3.1.11"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -416,14 +416,16 @@ async def _internal_loop_holding_coro_run_once_based(i: Interface, service: Asyn
     if priority is not None:
         ly = await agly(priority)
 
-    async def main_wrapper_for_run_once(service: AsyncioLoop, main_awaitable: Optional[Awaitable] = None, priority: Optional[CoroPriority] = None, interrupt_when_no_requests: Optional[bool] = None):
+    async def main_wrapper_for_run_once(service: AsyncioLoop, main_awaitable: Optional[Awaitable] = None):
         loop: AbstractEventLoop = get_event_loop()
         service.inline_set_internal_loop(loop, None)
-        if interrupt_when_no_requests is None:
-            interrupt_when_no_requests = main_awaitable is None
-        
         if main_awaitable is not None:
             create_task_awaitable(main_awaitable)
+    
+    if interrupt_when_no_requests is None:
+        interrupt_when_no_requests = main_awaitable is None
+    
+    main_wrapper_for_run_once_coro = main_wrapper_for_run_once(service, main_awaitable)
     
     exception = None
     try:
@@ -431,14 +433,14 @@ async def _internal_loop_holding_coro_run_once_based(i: Interface, service: Asyn
             raise RuntimeError(
                 'run_forever() cannot be called from a running event loop')
 
-        if not coroutines.iscoroutine(main_wrapper_for_run_once):
+        if not coroutines.iscoroutine(main_wrapper_for_run_once_coro):
             raise ValueError('a coroutine was expected, got {!r}'.format(main_wrapper_for_run_once))
 
         loop = events.new_event_loop()
         try:
             events.set_event_loop(loop)
             loop.set_debug(debug)
-            loop.create_task(main_wrapper_for_run_once)
+            loop.create_task(main_wrapper_for_run_once_coro)
             loop._check_closed()
             loop._check_running()
             loop._set_coroutine_origin_tracking(loop._debug)
@@ -455,9 +457,17 @@ async def _internal_loop_holding_coro_run_once_based(i: Interface, service: Asyn
                     else:
                         await ly()
 
+                    loop.call_soon(lambda: None)
+                    # if (not loop._ready) and (not loop._stopping) and (not loop._scheduled):
+                    #     loop.call_soon(lambda: None)
+                    
                     loop._run_once()
                     if loop._stopping:
                         break
+
+                    if interrupt_when_no_requests and service.is_need_to_yield_internal_loop():
+                        await i(AsyncioLoop, AsyncioLoopRequest()._internal_loop_yield())
+                        continue
             finally:
                 loop._stopping = False
                 loop._thread_id = None

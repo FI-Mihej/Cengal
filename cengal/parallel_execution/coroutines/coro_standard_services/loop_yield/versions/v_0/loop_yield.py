@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.10"
+__version__ = "3.1.11"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -544,7 +544,7 @@ class LoopYieldPriorityScheduler(TypedService[None], EntityStatsMixin):
 LoopYieldPrioritySchedulerRequest.default_service_type = LoopYieldPriorityScheduler
 
 
-def get_loop_yield(default_priority: CoroPriority) -> Union[LoopYieldManaged, FakeLoopYieldManaged]:
+def get_loop_yield(default_priority: CoroPriority = CoroPriority.normal) -> Union[LoopYieldManaged, FakeLoopYieldManaged]:
     loop = CoroScheduler.current_loop()
     if loop is None:
         return FakeLoopYieldManaged()  # running not from inside the loop
@@ -564,7 +564,7 @@ def get_loop_yield(default_priority: CoroPriority) -> Union[LoopYieldManaged, Fa
 gly = get_loop_yield
 
 
-async def aget_loop_yield(default_priority: CoroPriority) -> Union[LoopYieldManagedAsync, FakeLoopYieldManagedAsync]:
+async def aget_loop_yield(default_priority: CoroPriority = CoroPriority.normal) -> Union[LoopYieldManagedAsync, FakeLoopYieldManagedAsync]:
     loop = CoroScheduler.current_loop()
     if loop is None:
         return FakeLoopYieldManagedAsync()  # running not from inside the loop
@@ -586,7 +586,7 @@ agly = aget_loop_yield
 
 @asynccontextmanager
 @async_generator
-async def external_aget_loop_yield(default_priority: CoroPriority, coro_scheduler: Optional[CoroScheduler]=None, asyncio_loop: Optional[asyncio.AbstractEventLoop]=None):
+async def external_aget_loop_yield(default_priority: CoroPriority = CoroPriority.normal, coro_scheduler: Optional[CoroScheduler]=None, asyncio_loop: Optional[asyncio.AbstractEventLoop]=None):
     if coro_scheduler is None:
         coro_scheduler = CoroScheduler.current_loop()
     

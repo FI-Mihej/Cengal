@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.10"
+__version__ = "3.1.11"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -37,7 +37,7 @@ __status__ = "Development"
 from cengal.parallel_execution.coroutines.coro_tools.run_in_loop import run_in_loop
 from cengal.parallel_execution.coroutines.coro_scheduler import *
 from cengal.parallel_execution.coroutines.coro_standard_services.tkinter import TkinterContextManager
-from cengal.parallel_execution.coroutines.integrations.customtkinter import app_mainloop
+from cengal.parallel_execution.coroutines.integrations.customtkinter import prepare_mainloop
 from cengal.parallel_execution.coroutines.coro_standard_services.sleep import Sleep
 from cengal.parallel_execution.coroutines.coro_standard_services.shutdown_on_keyboard_interrupt import ShutdownOnKeyboardInterrupt
 from cengal.parallel_execution.coroutines.coro_tools.wait_coro import sync_coro

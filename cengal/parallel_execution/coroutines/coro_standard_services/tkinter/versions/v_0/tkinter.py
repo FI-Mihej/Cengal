@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.10"
+__version__ = "3.1.11"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -268,7 +268,8 @@ class TkinterService(Service, EntityStatsMixin):
     def start_tk_updater(self):
         if not self.updater_running:
             self.updater_running = True
-            self._loop.put_coro(tk_updater, self)
+            tk_updater_coro = self._loop.put_coro(tk_updater, self)
+            tk_updater_coro.is_background_coro = True
 
     def get_entity_stats(self, stats_level: 'EntityStatsMixin.StatsLevel' = EntityStatsMixin.StatsLevel.debug) -> Tuple[str, Dict[str, Any]]:
         return type(self).__name__, {

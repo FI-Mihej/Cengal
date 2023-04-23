@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.10"
+__version__ = "3.1.11"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -42,7 +42,7 @@ from cengal.code_flow_control.smart_values import ValueExistence
 from cengal.time_management.timer import Timer, TimerRequest
 from functools import partial
 from typing import Tuple, Optional, Union
-from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import put_current_from_other_service, put_root_from_other_service
+from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import put_current_from_other_service, put_root_from_other_service, put_from_other_service
 
 
 class TimerCoroRunnerRequest(ServiceRequest):
@@ -70,11 +70,11 @@ class TimerCoroRunner(DualImmediateProcessingServiceMixin, ServiceWithADirectReq
         return True, timer_request, None
     
     def _add_request_impl(self, delay: float, coro_worker: AnyWorker, *args, **kwargs):
-        def timer_handler_func(coro_worker_: AnyWorker, *args_, **kwargs_):
-            put_current_from_other_service(self, coro_worker_, *args_, **kwargs_)
+        def timer_handler_func(caller_coro_id, coro_worker_: AnyWorker, *args_, **kwargs_):
+            put_from_other_service(self, caller_coro_id, coro_worker_, *args_, **kwargs_)
             self.task_triggered()
 
-        timer_handler = partial(timer_handler_func, coro_worker, *args, **kwargs)
+        timer_handler = partial(timer_handler_func, self.current_caller_coro_info.coro_id, coro_worker, *args, **kwargs)
         self.task_added()
         return self.timer.register(timer_handler, delay)
     
