@@ -13,7 +13,7 @@ It is made for [CPython 2/3 and PyPy 2/3; Linux, Win32 and OS X]
 
 `pip install git+https://github.com/FI-Mihej/Cengal.git`
 
-## Lets combine in single(!) thread: 2 CPU-bound function, Tkinter app, Customtkinter app and asyncio-based file reading task
+## Lets combine in single(!) thread: 2 CPU-bound functions, Tkinter app, Customtkinter app and asyncio-based file reading task
 
 Source code:
 * [rich_example.py](https://github.com/FI-Mihej/Cengal/blob/master/examples/rich_example.py)
