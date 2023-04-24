@@ -1,31 +1,36 @@
-# About Cengal
+# Cengal
+
+## About
 
 **Cengal** is a Python library that consists of various Python helping modules for everyday use. 
 
-It holds modules for multiprocessing, async IO, code flow control, folder traversal, app settings management, 
-console output, etc. 
+Asynchronous loop with almost preemptive multitasking within the single thread. Async Tkinter. Python bytecode manipulation. Introspection. Code parsing. Etc.
 
 It is made for [CPython 2/3 and PyPy 2/3; Linux, Win32 and OS X]
 
-# Installation
-
-`pip install cengal`
+## Installation
 
 `pip install git+https://github.com/FI-Mihej/Cengal.git`
 
-## Lets combine in single(!) thread: 2 CPU-bound functions, Tkinter app, Customtkinter app and asyncio-based file reading task
+or
 
-Source code:
+`pip install cengal`
+
+## Lets combine in single (!) thread: 2 CPU-bound functions, Tkinter app, Customtkinter app and asyncio-based file reading task
+
+### Source code
 * [rich_example.py](https://github.com/FI-Mihej/Cengal/blob/master/examples/rich_example.py)
 * [third_party_cpu_bound.py](https://github.com/FI-Mihej/Cengal/blob/master/examples/third_party_cpu_bound.py)
 
-Video showcase:
+### Video showcase
 
-[![Watch the video](https://img.youtube.com/vi/rc7PBF0cDjw/default.jpg)](https://youtu.be/rc7PBF0cDjw)
+<a href="https://www.youtube.com/watch?feature=player_embedded&v=rc7PBF0cDjw" target="_blank">
+ <img src="https://img.youtube.com/vi/rc7PBF0cDjw/mqdefault.jpg" alt="Watch the video" width="640" height="360" border="5" />
+</a>
 
-# Simpler example step by step
+## Simpler example step by step
 
-1. CPU-bound function and counter (we will use it in other parts of code). Bytecode of this function is asjusted by `gly_patched` decorator
+1. CPU-bound function and counter. Bytecode of this function is adjusted by `gly_patched` decorator. Now it is an unblocking coroutine.
 
 ```python
 from cengal.parallel_execution.coroutines.coro_scheduler import *
@@ -168,10 +173,12 @@ if '__main__' == __name__:
     run_in_loop(main)
 ```
 
-Source code:
+### Source code
+
 * [simple_example.py](https://github.com/FI-Mihej/Cengal/blob/master/examples/simple_example.py)
 
-# Most unique modules
+## Most unique modules
+
 * **"parallel_execution"**
     * **"coroutines"** - asynchronous loop with almost preemptive multitasking within the single thread. Brings an async approach to an unmodified Tkinter, Qt, Kivy, etc. Unlike asyncio/trio/curio, it uses microkernel (services-based) approach which makes it highly- and easily-expandable. Can be executed both independently (asyncio/uvloop loop will be injected within the Cengal-coroutine when needed) and within already executed asyncio/uvloop loop. Can be used from the PyScript for the Web app creation.
         * **"coro_standard_services"** - set of standard services. You can replace standard service by yours for your app or for third-party module without code changes: by registering your own alias.
@@ -286,22 +293,23 @@ Counted with [cloc](https://github.com/AlDanial/cloc) util.
 
 It's at very least is 260 man-days of work or at very least is a 1 man-year of of work (8 hours per day, 5 days per week, without vacations/holidays/seakleaves). I've used widly known industry standard for this measurement: +142 lines of code to the codebase per day by the year of measurements.
 
-# Examples
+## Examples
 
-* Each module has a "development" folder. Examples are usually placed there
+* Can be found in [examples](https://github.com/FI-Mihej/Cengal/blob/master/examples/) dir
+* Each module has a `development` folder. Examples are usually placed there
 * Some of old examples can be fined inside the [tests](https://github.com/FI-Mihej/Cengal/blob/master/tests/) dir.
 
-## Cengal.coroutines examples
+### Cengal.coroutines examples
 
 * [General idea, greenlet main Cengal.coro](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/coro_tools/run_in_loop/versions/v_0/development/main.py)
 * [General idea, async main Cengal.coro](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/coro_tools/run_in_loop/versions/v_0/development/amain.py)
 * [Transparent interconnection between Cengal.coroutines and asyncio](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/coro_tools/run_in_loop/versions/v_0/development/asyncio_interconnection.py)
 
-## Text processing example
+### Text processing example
 
 [Ensures and updates copyright (with dates) in each Cengal's source file](https://github.com/FI-Mihej/Cengal/blob/master/scripts/ensure_copyright/ensure_copyright.py)
 
-# Projects uses Cengal
+## Projects using Cengal
 
 * [flet_async](https://github.com/FI-Mihej/flet_async) - wrapper which makes [Flet](https://github.com/flet-dev/flet) async and brings booth Cengal.coroutines and asyncio to Flet (Flutter based UI)
 * [justpy_containers](https://github.com/FI-Mihej/justpy_containers) - wrapper around [JustPy](https://github.com/justpy-org/justpy) in order to bring more security and more production-needed features to JustPy (VueJS based UI)
@@ -309,7 +317,7 @@ It's at very least is 260 man-days of work or at very least is a 1 man-year of o
 * [Realistic-Damage-Model-mod-for-Long-War](https://github.com/FI-Mihej/Realistic-Damage-Model-mod-for-Long-War) - Mod for both the original XCOM:EW and the mod Long War. Was made with a Bensbach, which was made with Cengal
 * [SmartCATaloguer.com](http://www.smartcataloguer.com/index.html) - TagDB based catalog of images (tags), music albums (genre tags) and apps (categories)
 
-# License
+## License
 
 Copyright © 2012-2023 ButenkoMS. All rights reserved.
 
