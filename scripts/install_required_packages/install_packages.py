@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.11"
+__version__ = "3.1.12"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -208,16 +208,22 @@ class PyPiModules(ModulesLists):
             'lmdb',
         }
 
-        if ((PYTHON_VERSION_INT[0] == 3) and (PYTHON_VERSION_INT[1] < 4)) or (PYTHON_VERSION_INT[0] == 2):
+        if (PYTHON_VERSION_INT[:3] < (3, 4, 0)):
             self.universal.insert(0, 'enum34')  # for pypy3 and Python2 only: it is backport from python34 which is
             #   default in Ubuntu 14.04
+        
+        if ('CPython'.lower() == PLATFORM_NAME.lower()) and (PYTHON_VERSION_INT[:3] < (3, 3, 0)):
+            self.universal.insert(0, 'lzmaffi')  # for pypy3 and Python2 only: it is backport from python34 which is
+            #   default in Ubuntu 14.04
+        
+        if ('PyPy'.lower() == PLATFORM_NAME.lower()) and (PYTHON_VERSION_INT[:3] < (3, 4, 0)):
             self.universal.insert(0, 'lzmaffi')  # for pypy3 and Python2 only: it is backport from python34 which is
             #   default in Ubuntu 14.04
 
-        if ((PYTHON_VERSION_INT[0] == 3) and (PYTHON_VERSION_INT[1] < 5)) or (PYTHON_VERSION_INT[0] == 2):
+        if (PYTHON_VERSION_INT[:3] < (3, 5, 0)):
             self.universal.insert(0, 'typing')  # for pypy3 and Python2 only: it is backport from python35
         
-        if ((PYTHON_VERSION_INT[0] == 3) and (PYTHON_VERSION_INT[1] <= 11) and (PYTHON_VERSION_INT[2] < 1)) or (PYTHON_VERSION_INT[0] == 2):
+        if (PYTHON_VERSION_INT[:3] < (3, 11, 1)):
             self.universal.insert(0, 'charset_normalizer')  # 2023.01.27: 3.11.1 is not supported yet: error: longintrepr.h: No such file or directory
             self.universal.insert(0, 'cchardet')  # 2023.01.27: 3.11.1 is not supported yet: error: longintrepr.h: No such file or directory
             self.universal.insert(0, 'http-parser')  # 2023.01.27: 3.11.1 is not supported yet: error: longintrepr.h: No such file or directory

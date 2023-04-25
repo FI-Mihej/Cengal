@@ -1,12 +1,12 @@
 # Cengal
 
-## About
+* Target platforms: Win32, Linux, OS X, Android, iOS, Emscripten
+* Target architectures: x64, x86, ARM
+* Target interpreters: CPython, PyPy
+* Recommended Python versions: 3.8+
+* Minimal Python versions: 3.1; 2.7
 
-**Cengal** is a Python library that consists of various Python helping modules for everyday use. 
-
-Asynchronous loop with almost preemptive multitasking within the single thread. Async Tkinter. Python bytecode manipulation. Introspection. Code parsing. Etc.
-
-It is made for [CPython 2/3 and PyPy 2/3; Linux, Win32 and OS X]
+Not all features are accessible on every target platform or architecture.
 
 ## Installation
 
@@ -16,19 +16,51 @@ or
 
 `pip install cengal`
 
-## Lets combine in single (!) thread: 2 CPU-bound functions, Tkinter app, Customtkinter app and asyncio-based file reading task
+## Achieving Exclusive Features with the Cengal Library: No Alternatives Online
 
-### Source code
+### (!) Merge the following components into a Single (!) Thread
+
+* own **blocking** CPU-bound function
+* third-party **blocking** CPU-bound function
+* Tkinter application
+* CustomTkinter application
+* asyncio-based file reading task.
+
+#### Source code
 * [rich_example.py](https://github.com/FI-Mihej/Cengal/blob/master/examples/rich_example.py)
 * [third_party_cpu_bound.py](https://github.com/FI-Mihej/Cengal/blob/master/examples/third_party_cpu_bound.py)
 
-### Video showcase
+#### YouTube Showcase
 
 <a href="https://www.youtube.com/watch?feature=player_embedded&v=rc7PBF0cDjw" target="_blank">
- <img src="https://img.youtube.com/vi/rc7PBF0cDjw/mqdefault.jpg" alt="Watch the video" width="640" height="360" border="5" />
+ <img src="https://github.com/FI-Mihej/Cengal/raw/master/docs/assets/2023-04-24 01-37-34-360p-YouTube.png" alt="Watch the video" width="640" height="360" border="5" />
 </a>
 
-## Simpler example step by step
+### Transparent background for your desktop applications
+
+* Target OS: Windows 11, Windows 10, Windows 8, Windows 7, Windows Vista.
+* Target frameworks: PySide, PyQt, Kivy, PyWebView 
+
+![title](https://github.com/FI-Mihej/Cengal/raw/master/docs/assets/Cengal_PyWebView_Transparent_UI_Windows_10.png)
+,
+![title](https://github.com/FI-Mihej/Cengal/raw/master/docs/assets/Cengal_Kivy_Transparent_UI_Windows_10.png)
+
+### Tkinter True Borderless apps for Windows platform
+
+* Target OS: Windows 11, Windows 10, Windows 8, Windows 7, Windows Vista.
+* Target frameworks: CustomTkinter, Tkinter, ttkbootstrap, ...
+
+![title](https://github.com/FI-Mihej/Cengal/raw/master/docs/assets/Cengal_Tkinter_True_Borderless_Draggable_Applications_Windows_10.png)
+
+### Simpler example step by step
+
+We will merge following components into a **single** thread:
+* own **blocking** CPU-bound function
+* Tkinter application
+* CustomTkinter application
+* asyncio-based file reading task.
+
+Steps with imports:
 
 1. CPU-bound function and counter. Bytecode of this function is adjusted by `gly_patched` decorator. Now it is an unblocking coroutine.
 
@@ -173,7 +205,7 @@ if '__main__' == __name__:
     run_in_loop(main)
 ```
 
-### Source code
+#### Source code
 
 * [simple_example.py](https://github.com/FI-Mihej/Cengal/blob/master/examples/simple_example.py)
 

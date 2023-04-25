@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.11"
+__version__ = "3.1.12"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -101,11 +101,11 @@ class RemoteClassInfo:
         self._class_type: Type = getattr(self.module, self.class_name)
     
     @classmethod
-    def from_data(data: Dict[Hashable, Any]) -> 'RemoteClassInfo':
+    def from_data(cls, data: Dict[Hashable, Any]) -> 'RemoteClassInfo':
         local_id: Hashable = data[CommandDataFieldsDeclareServiceClass.local_id.value]
         class_name: str = data[CommandDataFieldsDeclareServiceClass.class_name.value]
         module_importable_str: str = data[CommandDataFieldsDeclareServiceClass.module_importable_str.value]
-        return RemoteClassInfo(local_id, class_name, module_importable_str)
+        return cls(local_id, class_name, module_importable_str)
     
     def __call__(self) -> Type:
         return self._class_type

@@ -33,7 +33,7 @@ __all__ = [
     'ShowWindow',
     'DefWindowProcW',
     'DestroyWindow',
-    'PostQuitMessag',
+    'PostQuitMessage',
     'GetSystemMetrics',
     'GetWindowRect',
     'GetMessageW',
@@ -45,6 +45,8 @@ __all__ = [
     'GetCurrentThreadId',
     'GetDpiForWindow',
     'UpdateWindow',
+    'SHGetKnownFolderPath',
+    'CoTaskMemFree',
 ]
 
 
@@ -71,7 +73,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.11"
+__version__ = "3.1.12"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"

@@ -42,7 +42,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.11"
+__version__ = "3.1.12"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -251,12 +251,10 @@ class GUID(Structure):
     ]
 
     @classmethod
-    def from_uuid(uuid_obj: UUID) -> 'GUID':
-        fields = uuid_obj.fields
-        return GUID(
-            fields[0],
-            fields[1],
-            fields[2],
-            (fields[3][0], fields[3][1], fields[4][0], fields[4][1],
-             fields[4][2], fields[4][3], fields[4][4], fields[4][5])
+    def from_uuid(cls, uuid_obj: UUID) -> 'GUID':
+        return cls(
+            uuid_obj.time_low,
+            uuid_obj.time_mid,
+            uuid_obj.time_hi_version,
+            (BYTE * 8)(*uuid_obj.node.to_bytes(8, byteorder='big'))
         )

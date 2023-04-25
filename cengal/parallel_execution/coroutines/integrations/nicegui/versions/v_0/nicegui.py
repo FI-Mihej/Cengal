@@ -24,7 +24,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.11"
+__version__ = "3.1.12"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -170,11 +170,11 @@ class ClientHandlers:
         if (client is None) or (not isinstance(client, Client)):
             return None
         else:
-            return ClientHandlers.install(client)
+            return cls.install(client)
     
     @classmethod
     def install(cls, client: Client) -> 'ClientHandlers':
-        client_handlers: ClientHandlers = ClientHandlers(client)
+        client_handlers: ClientHandlers = cls(client)
         client.handlers = client_handlers
         client.on_connect(client_handlers._on_connected())
         client.on_disconnect(client_handlers._on_disconnected())
@@ -232,11 +232,11 @@ class PageItems:
         if (client is None) or (not isinstance(client, Client)):
             return None
         else:
-            return PageItems.install(client)
+            return cls.install(client)
     
     @classmethod
     def install(cls, client: Client) -> 'PageItems':
-        page_items: PageItems = PageItems(client)
+        page_items: PageItems = cls(client)
         client.page_items = page_items
         return page_items
     

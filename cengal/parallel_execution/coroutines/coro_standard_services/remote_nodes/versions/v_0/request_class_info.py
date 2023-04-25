@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.11"
+__version__ = "3.1.12"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -102,12 +102,12 @@ class RemoteRequestClassInfo(RemoteClassInfo):
         self._properties: Dict[Hashable, str] = {index: property_name for property_name, index in properties_tuple}  # key: property id; value: property name
     
     @classmethod
-    def from_data(data: Dict[Hashable, Any]) -> 'RemoteRequestClassInfo':
+    def from_data(cls, data: Dict[Hashable, Any]) -> 'RemoteRequestClassInfo':
         local_id: Hashable = data[CommandDataFieldsDeclareServiceRequestClass.local_id.value]
         class_name: str = data[CommandDataFieldsDeclareServiceRequestClass.class_name.value]
         module_importable_str: str = data[CommandDataFieldsDeclareServiceRequestClass.module_importable_str.value]
         properties_tuple: Tuple[Tuple[str, Hashable]] = data[CommandDataFieldsDeclareServiceRequestClass.properties_tuple.value]
-        return RemoteRequestClassInfo(local_id, class_name, module_importable_str, properties_tuple)
+        return cls(local_id, class_name, module_importable_str, properties_tuple)
     
     def __call__(self, data: Dict) -> Request:
         request: Request = self.class_type()

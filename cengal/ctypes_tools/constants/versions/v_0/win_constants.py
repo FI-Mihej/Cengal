@@ -16,7 +16,7 @@
 # limitations under the License.
 
 
-__all__ = ['WH_CALLWNDPROC', 'WH_CALLWNDPROCRET', 'WCA_ACCENT_POLICY', 'WS_BORDER', 'WS_DLGFRAME', 'WS_OVERLAPPED', 'WS_THICKFRAME', 'WS_CAPTION', 'WS_SYSMENU', 'WS_MINIMIZEBOX', 'WS_MAXIMIZEBOX', 'WS_POPUP', 'WS_OVERLAPPEDWINDOW', 'SM_CXPADDEDBORDER', 'KnownfolderidConstants']
+__all__ = ['S_OK', 'WH_CALLWNDPROC', 'WH_CALLWNDPROCRET', 'WCA_ACCENT_POLICY', 'WS_BORDER', 'WS_DLGFRAME', 'WS_OVERLAPPED', 'WS_THICKFRAME', 'WS_CAPTION', 'WS_SYSMENU', 'WS_MINIMIZEBOX', 'WS_MAXIMIZEBOX', 'WS_POPUP', 'WS_OVERLAPPEDWINDOW', 'SM_CXPADDEDBORDER', 'KnownfolderidConstants']
 
 
 """
@@ -28,7 +28,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.11"
+__version__ = "3.1.12"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
