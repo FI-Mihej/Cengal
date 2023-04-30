@@ -36,7 +36,21 @@ or
  <img src="https://github.com/FI-Mihej/Cengal/raw/master/docs/assets/2023-04-24 01-37-34-360p-YouTube.png" alt="Watch the video" width="640" height="360" border="5" />
 </a>
 
-### Transparent background for your desktop applications
+### Async Tkinter and Customtkinter
+
+* [tkinter_0.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/coro_standard_services/tkinter/versions/v_0/development/tkinter_0.py)
+* [customtkinter_0.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/coro_standard_services/tkinter/versions/v_0/development/customtkinter_0.py)
+
+### Async QT (PySide, PySide2, PySide6, PyQt4, PyQt5, PyQt6)
+
+* [pyside6__minimal_asyncio__async_method.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/qt/versions/v_0/development/pyside6__minimal_asyncio__async_method.py)
+
+### Async pytermgui
+
+* [hello_world_app_autoexit.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/pytermgui/versions/v_0/development/hello_world_app_autoexit.py)
+* [hello_world.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/pytermgui/versions/v_0/development/hello_world.py)
+
+### Transparent background for your desktop applications (TBA)
 
 * Target OS: Windows 11, Windows 10, Windows 8, Windows 7, Windows Vista.
 * Target frameworks: PySide, PyQt, Kivy, PyWebView 
@@ -45,14 +59,14 @@ or
 ,
 ![title](https://github.com/FI-Mihej/Cengal/raw/master/docs/assets/Cengal_Kivy_Transparent_UI_Windows_10.png)
 
-### Tkinter True Borderless apps for Windows platform
+### Tkinter True Borderless apps for Windows platform (TBA)
 
 * Target OS: Windows 11, Windows 10, Windows 8, Windows 7, Windows Vista.
 * Target frameworks: CustomTkinter, Tkinter, ttkbootstrap, ...
 
 ![title](https://github.com/FI-Mihej/Cengal/raw/master/docs/assets/Cengal_Tkinter_True_Borderless_Draggable_Applications_Windows_10.png)
 
-### Simpler example step by step
+### Simpler single-thread example step by step
 
 We will merge following components into a **single** thread:
 * own **blocking** CPU-bound function

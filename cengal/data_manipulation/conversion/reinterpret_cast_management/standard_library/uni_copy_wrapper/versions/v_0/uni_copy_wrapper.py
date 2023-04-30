@@ -29,7 +29,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.14"
+__version__ = "3.1.15"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -44,7 +44,7 @@ class UniCopyWrapper(BaseAutoDerivedObjWrapper):
         self._deepcopy_wrapping_required_per_type: Dict[Type, bool] = dict()
         self._methods_per_type: Dict[Type, Dict[str, Callable]] = dict()
     
-    def wrapping_required(self, obj: Any, base_type: Type, fields: Tuple[str]):
+    def wrapping_required(self, obj: Any, base_type: Type, fields: Tuple[str], planned_type_name: str) -> bool:
         copy_required: bool = None
         try:
             copy_required = self._copy_wrapping_required_per_type[base_type]

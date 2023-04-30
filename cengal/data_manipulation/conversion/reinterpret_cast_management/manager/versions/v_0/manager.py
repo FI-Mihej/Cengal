@@ -29,7 +29,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.14"
+__version__ = "3.1.15"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -80,7 +80,7 @@ class BaseAutoDerivedObjWrapper:
         self.derived: Dict[Type, Type] = dict()
         self.t = self.type
     
-    def wrapping_required(self, obj: Any, base_type: Type, fields: Tuple[str]):
+    def wrapping_required(self, obj: Any, base_type: Type, fields: Tuple[str], planned_type_name: str) -> bool:
         return True
     
     def methods(self, obj: Any, base_type: Type, fields: Tuple[str]) -> Dict[str, Callable]:
@@ -104,8 +104,9 @@ class BaseAutoDerivedObjWrapper:
             return self.derived[base_type_name]
         except KeyError:
             fields: Tuple = self.gen_fields_tuple(obj)
-            if self.wrapping_required(obj, base_type, fields):
-                result: Type = type(f'{self.class_name}__{self._instance_id}__from__{base_type_name}', self.base_classes(obj, base_type, fields), self.methods(obj, base_type, fields))
+            planned_type_name: str = f'{self.class_name}__{self._instance_id}__from__{base_type_name}'
+            if self.wrapping_required(obj, base_type, fields, planned_type_name):
+                result: Type = type(planned_type_name, self.base_classes(obj, base_type, fields), self.methods(obj, base_type, fields))
                 self.derived[base_type_name] = result
                 return result
             else:

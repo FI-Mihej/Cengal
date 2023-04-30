@@ -46,7 +46,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.14"
+__version__ = "3.1.15"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -54,11 +54,11 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-class LoopWasEndedBeforeSetupWasMade(Exception):
+class LoopWasEndedBeforeSetupWasPrepared(Exception):
     pass
 
 
-def prepare_loop(setup_coro_worker: Optional[AnyWorker], *args, **kwargs) -> Tuple[CoroScheduler, Any]:
+def prepare_loop(setup_coro_worker: Optional[AnyWorker], *args, **kwargs) -> Tuple[CoroScheduler, ValueExistence[Any]]:
     cs = CoroScheduler()
     set_primary_coro_scheduler(cs)
     cs.turn_on_embedded_mode(True)
@@ -99,7 +99,7 @@ def prepare_loop(setup_coro_worker: Optional[AnyWorker], *args, **kwargs) -> Tup
         in_work = cs.iteration()
     
     if not result:
-        raise LoopWasEndedBeforeSetupWasMade
+        raise LoopWasEndedBeforeSetupWasPrepared
     
     result, exception = result.value
     if exception is not None:
@@ -108,7 +108,7 @@ def prepare_loop(setup_coro_worker: Optional[AnyWorker], *args, **kwargs) -> Tup
     return cs, result
 
 
-def prepare_fast_loop(setup_coro_worker: Optional[AnyWorker], *args, **kwargs) -> Tuple[CoroScheduler, Any]:
+def prepare_fast_loop(setup_coro_worker: Optional[AnyWorker], *args, **kwargs) -> Tuple[CoroScheduler, ValueExistence[Any]]:
     """30% faster than prepare_loop()
 
     Args:
@@ -160,7 +160,7 @@ def prepare_fast_loop(setup_coro_worker: Optional[AnyWorker], *args, **kwargs) -
         in_work = cs.iteration()
     
     if not result:
-        raise LoopWasEndedBeforeSetupWasMade
+        raise LoopWasEndedBeforeSetupWasPrepared
     
     result, exception = result.value
     if exception is not None:
