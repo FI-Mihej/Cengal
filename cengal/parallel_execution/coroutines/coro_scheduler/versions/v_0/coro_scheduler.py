@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -54,19 +54,13 @@ from time import sleep
 from copy import copy
 import logging
 from datetime import datetime
-from cengal.introspection.inspect import get_exception, exception_to_printable_text
+from cengal.introspection.inspect import get_exception, exception_to_printable_text, is_async
 from cengal.code_flow_control.args_manager import args_kwargs
 from threading import local
 from cengal.time_management.sleep_tools import try_sleep, get_usable_min_sleep_interval
 from collections import deque
+from cengal.time_management.cpu_clock_cycles import cpu_clock_cycles
 from cengal.modules_management.alternative_import import alt_import
-with alt_import('rdtsc') as rdtsc:
-    if rdtsc is None:
-        def get_rdtsc():
-            return 0
-    else:
-        def get_rdtsc():
-            return rdtsc.get_cycles()
 
 
 greenlet_awailable: bool = True
@@ -115,13 +109,21 @@ def cs_coro(coro_worker: Worker):
 
     Args:
         coro_worker (Worker): _description_
-    """    
-    def wrapper(i: Interface, *args, **kwargs):
-        return coro_worker(*args, **kwargs)
-        
-    coro_worker_sign: inspect.Signature = inspect.signature(coro_worker)
-    wrapper.__signature__ = coro_worker_sign.replace(parameters=(inspect.Parameter('_interface_param_', inspect.Parameter.POSITIONAL_ONLY),) + tuple(coro_worker_sign.parameters.values()), return_annotation=coro_worker_sign.return_annotation)
-    return wrapper
+    """
+    if is_async(coro_worker):
+        async def wrapper(i: Interface, *args, **kwargs):
+            return await coro_worker(*args, **kwargs)
+            
+        coro_worker_sign: inspect.Signature = inspect.signature(coro_worker)
+        wrapper.__signature__ = coro_worker_sign.replace(parameters=(inspect.Parameter('_interface_param_', inspect.Parameter.POSITIONAL_ONLY),) + tuple(coro_worker_sign.parameters.values()), return_annotation=coro_worker_sign.return_annotation)
+        return wrapper
+    else:
+        def wrapper(i: Interface, *args, **kwargs):
+            return coro_worker(*args, **kwargs)
+            
+        coro_worker_sign: inspect.Signature = inspect.signature(coro_worker)
+        wrapper.__signature__ = coro_worker_sign.replace(parameters=(inspect.Parameter('_interface_param_', inspect.Parameter.POSITIONAL_ONLY),) + tuple(coro_worker_sign.parameters.values()), return_annotation=coro_worker_sign.return_annotation)
+        return wrapper
 
 
 def cs_acoro(coro_aworker: Worker):
@@ -130,12 +132,20 @@ def cs_acoro(coro_aworker: Worker):
     Args:
         coro_aworker (Worker): _description_
     """    
-    async def wrapper(i: Interface, *args, **kwargs):
-        return await coro_aworker(*args, **kwargs)
-        
-    coro_worker_sign: inspect.Signature = inspect.signature(coro_aworker)
-    wrapper.__signature__ = coro_worker_sign.replace(parameters=(inspect.Parameter('_interface_param_', inspect.Parameter.POSITIONAL_ONLY),) + tuple(coro_worker_sign.parameters.values()), return_annotation=coro_worker_sign.return_annotation)
-    return wrapper
+    if is_async(coro_aworker):
+        async def wrapper(i: Interface, *args, **kwargs):
+            return await coro_aworker(*args, **kwargs)
+            
+        coro_worker_sign: inspect.Signature = inspect.signature(coro_aworker)
+        wrapper.__signature__ = coro_worker_sign.replace(parameters=(inspect.Parameter('_interface_param_', inspect.Parameter.POSITIONAL_ONLY),) + tuple(coro_worker_sign.parameters.values()), return_annotation=coro_worker_sign.return_annotation)
+        return wrapper
+    else:
+        def wrapper(i: Interface, *args, **kwargs):
+            return coro_aworker(*args, **kwargs)
+            
+        coro_worker_sign: inspect.Signature = inspect.signature(coro_aworker)
+        wrapper.__signature__ = coro_worker_sign.replace(parameters=(inspect.Parameter('_interface_param_', inspect.Parameter.POSITIONAL_ONLY),) + tuple(coro_worker_sign.parameters.values()), return_annotation=coro_worker_sign.return_annotation)
+        return wrapper
 
 
 class _ThreadLocalCoroScheduler(local):
@@ -1509,7 +1519,7 @@ class CoroSchedulerBase(Iterable, EntityStatsMixin):
         
         self.in_iteration = True
         
-        rdtsc_start_time = get_rdtsc()
+        cpu_clock_cycles_start_time = cpu_clock_cycles()
         # minus_delta_time = 0
         try:
             self.context_switches += len(self.new_born_coroutines) + len(self.responses)
@@ -1528,9 +1538,9 @@ class CoroSchedulerBase(Iterable, EntityStatsMixin):
                 # self.coro_full_history = type(self.coro_full_history)()
                 self.coro_full_history = dict()
 
-            # minus_start_time = get_rdtsc()
+            # minus_start_time = cpu_clock_cycles()
             self.run_low_latency_services()
-            # minus_delta_time += get_rdtsc() - minus_start_time
+            # minus_delta_time += cpu_clock_cycles() - minus_start_time
 
             new_born_coroutines_buff = self.new_born_coroutines
             # self.new_born_coroutines = type(new_born_coroutines_buff)()
@@ -1540,9 +1550,9 @@ class CoroSchedulerBase(Iterable, EntityStatsMixin):
                 if self.execute_global_on_start_handlers(coro):
                     self.current_coro_start_time = self.get_coro_start_time()
                     self.current_coro_wrapper = coro
-                    # minus_start_time = get_rdtsc()
+                    # minus_start_time = cpu_clock_cycles()
                     coro_exit_status: CoroExitStatus = coro.init(self.root_coro)
-                    # minus_delta_time += get_rdtsc() - minus_start_time
+                    # minus_delta_time += cpu_clock_cycles() - minus_start_time
                     self.current_coro_wrapper = None
                     coro_execution_piece_delta_time = self.get_coro_start_time() - self.current_coro_start_time
                     self.current_coro_start_time = None
@@ -1559,23 +1569,23 @@ class CoroSchedulerBase(Iterable, EntityStatsMixin):
                         coro_last_result = coro.last_result
                         if not isinstance(coro_last_result, Request):
                             if self.on_wrong_request is None:
-                                # minus_start_time = get_rdtsc()
+                                # minus_start_time = cpu_clock_cycles()
                                 self.logger.warning(f'{datetime.now()} >> Wrong request {repr(coro_last_result)} of type {type(coro_last_result)} from coroutine {repr(coro)}')
                                 self.kill_coro_by_id(coro_id)
-                                # minus_delta_time += get_rdtsc() - minus_start_time
+                                # minus_delta_time += cpu_clock_cycles() - minus_start_time
                                 continue
                             else:
-                                # minus_start_time = get_rdtsc()
+                                # minus_start_time = cpu_clock_cycles()
                                 coro_last_result = self.on_wrong_request(coro, coro_last_result)
-                                # minus_delta_time += get_rdtsc() - minus_start_time
+                                # minus_delta_time += cpu_clock_cycles() - minus_start_time
                         
                         self.requests.append(coro_last_result)
                         self.coroutines[coro_id] = coro
                         continue
                     else:
-                        # minus_start_time = get_rdtsc()
+                        # minus_start_time = cpu_clock_cycles()
                         self.process_coro_exit_status(coro, coro_exit_status)
-                        # minus_delta_time += get_rdtsc() - minus_start_time
+                        # minus_delta_time += cpu_clock_cycles() - minus_start_time
 
             responses_buff = self.responses
             # self.responses = type(responses_buff)()
@@ -1595,9 +1605,9 @@ class CoroSchedulerBase(Iterable, EntityStatsMixin):
                 if isinstance(response, DirectResponse):
                     response = response.response
                 
-                # minus_start_time = get_rdtsc()
+                # minus_start_time = cpu_clock_cycles()
                 coro_exit_status: CoroExitStatus = coro(response)
-                # minus_delta_time += get_rdtsc() - minus_start_time
+                # minus_delta_time += cpu_clock_cycles() - minus_start_time
                 self.current_coro_wrapper = None
                 coro_execution_piece_delta_time = self.get_coro_start_time() - self.current_coro_start_time
                 self.current_coro_start_time = None
@@ -1614,23 +1624,23 @@ class CoroSchedulerBase(Iterable, EntityStatsMixin):
                     coro_last_result = coro.last_result
                     if not isinstance(coro_last_result, Request):
                         if self.on_wrong_request is None:
-                            # minus_start_time = get_rdtsc()
+                            # minus_start_time = cpu_clock_cycles()
                             self.logger.warning(f'{datetime.now()} >> Wrong request {repr(coro_last_result)} of type {type(coro_last_result)} from coroutine {repr(coro)}')
                             self.kill_coro_by_id(coro_id)
-                            # minus_delta_time += get_rdtsc() - minus_start_time
+                            # minus_delta_time += cpu_clock_cycles() - minus_start_time
                             continue
                         else:
-                            # minus_start_time = get_rdtsc()
+                            # minus_start_time = cpu_clock_cycles()
                             coro_last_result = self.on_wrong_request(coro, coro_last_result)
-                            # minus_delta_time += get_rdtsc() - minus_start_time
+                            # minus_delta_time += cpu_clock_cycles() - minus_start_time
                     
                     self.requests.append(coro_last_result)
                     continue
                 else:
                     del self.coroutines[coro_id]
-                    # minus_start_time = get_rdtsc()
+                    # minus_start_time = cpu_clock_cycles()
                     self.process_coro_exit_status(coro, coro_exit_status)
-                    # minus_delta_time += get_rdtsc() - minus_start_time
+                    # minus_delta_time += cpu_clock_cycles() - minus_start_time
 
             requests_buff = self.requests
             # self.requests = type(requests_buff)()
@@ -1639,9 +1649,9 @@ class CoroSchedulerBase(Iterable, EntityStatsMixin):
                 # if __debug__: dlog(f'λ >>> {repr(request)}')
                 service_type = request.service_type
                 service: 'Service' = self.get_service_by_type(service_type)
-                # minus_start_time = get_rdtsc()
+                # minus_start_time = cpu_clock_cycles()
                 result = service.put_task(request)
-                # minus_delta_time += get_rdtsc() - minus_start_time
+                # minus_delta_time += cpu_clock_cycles() - minus_start_time
                 if result is not None:
                     # if __debug__: dlog(f'λ <<< {repr(result)}')
                     self.responses.append(result)
@@ -1651,22 +1661,22 @@ class CoroSchedulerBase(Iterable, EntityStatsMixin):
             # self.services_in_active_state_list = list()
             self.time_left_before_next_event = None
             for service_type, service in tuple(self.live_services.items()):
-                # minus_start_time = get_rdtsc()
+                # minus_start_time = cpu_clock_cycles()
                 in_work_result = service.in_work()
-                # minus_delta_time += get_rdtsc() - minus_start_time
+                # minus_delta_time += cpu_clock_cycles() - minus_start_time
                 if in_work_result:
                     self.services_in_work += 1
                     self.services_in_active_state += 1
-                    # minus_start_time = get_rdtsc()
+                    # minus_start_time = cpu_clock_cycles()
                     results = service.iteration()
-                    # minus_delta_time += get_rdtsc() - minus_start_time
-                    # minus_start_time = get_rdtsc()
+                    # minus_delta_time += cpu_clock_cycles() - minus_start_time
+                    # minus_start_time = cpu_clock_cycles()
                     in_work_result = service.in_work()
-                    # minus_delta_time += get_rdtsc() - minus_start_time
+                    # minus_delta_time += cpu_clock_cycles() - minus_start_time
                     if in_work_result:
-                        # minus_start_time = get_rdtsc()
+                        # minus_start_time = cpu_clock_cycles()
                         has_planned_events, time_left_before_next_event = service.time_left_before_next_event()
-                        # minus_delta_time += get_rdtsc() - minus_start_time
+                        # minus_delta_time += cpu_clock_cycles() - minus_start_time
                         if has_planned_events and (time_left_before_next_event is not None):
                             self.services_in_active_state -= 1
                             if self.time_left_before_next_event is None:
@@ -1696,8 +1706,8 @@ class CoroSchedulerBase(Iterable, EntityStatsMixin):
             self._update_in_work()
             self._update_is_awake()
             self.loop_iteration_delta_time = self.get_loop_iteration_start_time() - self.loop_iteration_start_time
-            self.loop_rdtsc = get_rdtsc() - rdtsc_start_time
-            # self.sliding_window.append(get_rdtsc() - rdtsc_start_time - minus_delta_time)
+            self.loop_cpu_clock_cycles = cpu_clock_cycles() - cpu_clock_cycles_start_time
+            # self.sliding_window.append(cpu_clock_cycles() - cpu_clock_cycles_start_time - minus_delta_time)
             # self.sliding_window.append(minus_delta_time)
             self.iteration_index += 1
             # print()

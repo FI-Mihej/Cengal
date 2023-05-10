@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -34,8 +34,15 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
+import sys
+
 from typing import Tuple
-from .square_and_rectangle import *
+from square_and_rectangle import *
+
+
+def check_for_exit(input_str: str) -> None:
+    if input_str.lower() in {'q', 'quit', 'exit'}:
+        raise SystemExit
 
 
 def get_new_x_y() -> Tuple[bool, float, float]:
@@ -44,10 +51,11 @@ def get_new_x_y() -> Tuple[bool, float, float]:
     y = 0.0
     try:
         input_str = input('Enter a new x y dimension: ')
+        check_for_exit(input_str)
         input_str_list = input_str.strip().split()
         x = float(input_str_list[0])
         y = float(input_str_list[1])
-    except:
+    except EssenceModelException:
         is_ok = False
     return is_ok, x, y
 
@@ -57,8 +65,9 @@ def get_stretch() -> Tuple[bool, float]:
     multiplier = 0.0
     try:
         input_str = input('SQUARE stretch multiplier: ')
+        check_for_exit(input_str)
         multiplier = float(input_str.strip())
-    except:
+    except EssenceModelException:
         is_ok = False
     return is_ok, multiplier
 
@@ -68,61 +77,50 @@ def get_x_or_y_stretch() -> Tuple[bool, bool, float]:
     is_x = True
     multiplier = 0.0
     try:
-        input_str = input('RECTANGLE stretch in a format "is_x multiplier": ')
+        input_str = input('RECTANGLE stretch in a format "is_x multiplier" ("yes 4"): ')
+        check_for_exit(input_str)
         input_str_list = input_str.strip().split()
         if input_str_list[0].lower() in {'y', 'yes'}:
             is_x = True
         else:
             is_x = False
         multiplier = float(input_str_list[1])
-    except:
+    except EssenceModelException:
         is_ok = False
     return is_ok, is_x, multiplier
 
 
-def request_dimension(frame: RectangleModel):
-    try:
-        rectangle: RectangleInterface = frame.em_interface(RectangleInterface)
-        print('Current dimension: ', rectangle.dimension().x, rectangle.dimension().y)
-        is_ok, new_x, new_y = get_new_x_y()
-        if is_ok:
-            rectangle.set_dimension(Point(new_x, new_y))
-    except EssenceInterfaceIsNotApplicable:
-        pass
+def request_dimension_callback(rectangle: RectangleInterface):
+    print('Current dimension: ', rectangle.dimension().x, rectangle.dimension().y)
+    is_ok, new_x, new_y = get_new_x_y()
+    if is_ok:
+        rectangle.set_dimension(Point(new_x, new_y))
 
 
-def stretch_square(frame: RectangleModel):
-    try:
-        stretching_square: StretchingSquareInterface = frame.em_interface(StretchingSquareInterface)
-        print('Current dimension: ', stretching_square.dimension().x, stretching_square.dimension().y)
-        is_ok, multiplier = get_stretch()
-        if is_ok:
-            stretching_square.stretch(multiplier)
-    except EssenceInterfaceIsNotApplicable:
-        pass
+def stretch_square_callback(stretching_square: StretchingSquareInterface):
+    print('Current dimension: ', stretching_square.dimension().x, stretching_square.dimension().y)
+    is_ok, multiplier = get_stretch()
+    if is_ok:
+        stretching_square.stretch(multiplier)
 
 
-def stretch_rectangle(frame: RectangleModel):
-    try:
-        stretching_rectangle: StretchingRectangleInterface = frame.em_interface(StretchingRectangleInterface)
-        print('Current dimension: ', stretching_rectangle.dimension().x, stretching_rectangle.dimension().y)
-        is_ok, is_x, multiplier = get_x_or_y_stretch()
-        if is_ok:
-            if is_x:
-                stretching_rectangle.stretch_x(multiplier)
-            else:
-                stretching_rectangle.stretch_y(multiplier)
-    except EssenceInterfaceIsNotApplicable:
-        pass
+def stretch_rectangle_callback(stretching_rectangle: StretchingRectangleInterface):
+    print('Current dimension: ', stretching_rectangle.dimension().x, stretching_rectangle.dimension().y)
+    is_ok, is_x, multiplier = get_x_or_y_stretch()
+    if is_ok:
+        if is_x:
+            stretching_rectangle.stretch_x(multiplier)
+        else:
+            stretching_rectangle.stretch_y(multiplier)
 
 
 def main():
     frame: RectangleModel = rectangle_factory(Point(0, 0))
     while True:
-        request_dimension(frame)
-        stretch_square(frame)
-        stretch_rectangle(frame)
-        stretch_square(frame)
+        frame(RectangleInterface, request_dimension_callback)
+        frame(StretchingSquareInterface, stretch_square_callback)  # Will be executed only if frame is a square
+        frame(StretchingRectangleInterface, stretch_rectangle_callback)
+        frame(StretchingSquareInterface, stretch_square_callback)  # Will be executed only if frame is a square
 
 
 if __name__ == '__main__':

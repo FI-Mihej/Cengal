@@ -16,12 +16,12 @@
 # limitations under the License.
 
 
-__all__ = ['cwfunc_def']
+__all__ = ['cfunc_def', 'cwfunc_def']
 
 
 from ctypes import WINFUNCTYPE
 
-from typing import Any
+from typing import Any, Optional, Tuple
 
 
 """
@@ -33,7 +33,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -41,10 +41,16 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-def cwfunc_def(lib, func, params, result) -> Any:
+def cwfunc_def(lib, func, params: Optional[Tuple], result: Optional[Any]) -> Any:
+    if params is None:
+        params = tuple()
+    
     prototype = WINFUNCTYPE(
         result,
         *params,
     )
     func = prototype((func, lib))
     return func
+
+
+cfunc_def = cwfunc_def

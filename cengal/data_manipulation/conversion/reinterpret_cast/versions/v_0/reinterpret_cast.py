@@ -28,7 +28,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -43,18 +43,18 @@ from typing import Type, Any, Generator, TypeVar
 T = TypeVar('T')
 
 
-def reinterpret_cast_attempt(temporary_type: Type[T], value: Any) -> bool:
+def reinterpret_cast_attempt(new_type: Type[T], value: Any) -> bool:
     result: bool = True
     try:
-        value.__class__ = temporary_type
+        value.__class__ = new_type
     except TypeError:
         result = False
     
     return result
 
 
-def reinterpret_cast(temporary_type: Type[T], value: Any) -> T:
-    value.__class__ = temporary_type
+def reinterpret_cast(new_type: Type[T], value: Any) -> T:
+    value.__class__ = new_type
     return value
 
 

@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -42,6 +42,7 @@ from cengal.parallel_execution.coroutines.coro_standard_services.put_coro_list i
 from cengal.parallel_execution.coroutines.coro_standard_services.timer_func_runner import timer_func_run_on
 from cengal.parallel_execution.coroutines.coro_standard_services.kill_coro import kill_coro_on
 from cengal.introspection.inspect import get_exception
+from cengal.data_manipulation.conversion.reinterpret_cast import reinterpret_cast
 from typing import Any, Optional, Sequence, Tuple, Dict, Set, Union, List, overload, Type
 
 
@@ -49,7 +50,15 @@ class CoroutineNotFoundError(Exception):
     pass
 
 
+class SubCoroutineNotFoundError(CoroutineNotFoundError):
+    pass
+
+
 class TimeoutError(Exception):
+    pass
+
+
+class SubTimeoutError(TimeoutError):
     pass
 
 
@@ -216,6 +225,11 @@ class SingleMethod(ServiceRequestMethodMixin):
             try:
                 requester_id: CoroID = self.single_called_by[coro_id]
                 if self.result_required_by[requester_id]:
+                    if CoroutineNotFoundError == type(exception):
+                        reinterpret_cast(SubCoroutineNotFoundError, exception)
+                    elif TimeoutError == type(exception):
+                        reinterpret_cast(SubTimeoutError, exception)
+                    
                     self.service.register_response(requester_id, result, exception)
                 else:
                     self.service.register_response(requester_id, None, None)

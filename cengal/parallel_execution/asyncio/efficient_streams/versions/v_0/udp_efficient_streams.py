@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -61,7 +61,7 @@ from cengal.io.asock_io.versions.v_1.recv_buff_size_computer.recv_buff_size_comp
 # from cengal.io.asock_io.versions.v_1.base import IOCoreMemoryManagement
 from cengal.parallel_execution.asyncio.atasks import create_task
 from cengal.parallel_execution.asyncio.timed_yield import TimedYield
-from cengal.hardware_info.cpu.versions.v_1 import CpuInfo
+from cengal.hardware.info.cpu.versions.v_1 import CpuInfo
 # from cengal.data_containers.dynamic_list_of_pieces import DynamicListOfPiecesDequeWithLengthControl
 # from cengal.data_containers.fast_fifo import FIFODequeWithLengthControl, FIFOIsEmpty
 # from cengal.data_manipulation.front_triggerable_variable import FrontTriggerableVariable, FrontTriggerableVariableType

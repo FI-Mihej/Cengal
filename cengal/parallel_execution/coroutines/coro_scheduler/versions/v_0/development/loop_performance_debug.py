@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -61,7 +61,7 @@ from cengal.parallel_execution.coroutines.coro_scheduler import CoroID, Interfac
 from cengal.parallel_execution.coroutines.coro_standard_services.async_event_bus import (AsyncEventBus,
                                                                                          AsyncEventBusRequest)
 from cengal.parallel_execution.coroutines.coro_standard_services.cpu_tick_count_per_second import (
-    CpuTickCountPerSecond, get_rdtsc)
+    CpuTickCountPerSecond, cpu_clock_cycles)
 from cengal.parallel_execution.coroutines.coro_standard_services.instance import Instance, InstanceRequest
 from cengal.parallel_execution.coroutines.coro_standard_services.lazy_print import lprint
 from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import (PutCoro, PutCoroRequest, aput_coro,
@@ -126,8 +126,8 @@ async def hard_retarding_coro(i: Interface, delta_time: RationalNumber, multipli
 async def print_tickcount(i: Interface, time_period: RationalNumber):
     destroy_cengal_event: ValueExistence = await i(Instance, InstanceRequest().wait(DESTROY_CENGAL_EVENT))
     while not destroy_cengal_event:
-        rdtsc, last_ticks_per_second, val_99, val_95, val_68, max_deviation, min_deviation = await i(CpuTickCountPerSecond)
-        lprint(f'{datetime.now()} >> {rdtsc=}, {last_ticks_per_second=}, {val_99=}, {val_95=}, {val_68=}, {max_deviation=}, {min_deviation=}')
+        cpu_clock_cycles, last_ticks_per_second, val_99, val_95, val_68, max_deviation, min_deviation = await i(CpuTickCountPerSecond)
+        lprint(f'{datetime.now()} >> {cpu_clock_cycles=}, {last_ticks_per_second=}, {val_99=}, {val_95=}, {val_68=}, {max_deviation=}, {min_deviation=}')
         await i(Sleep, time_period)
 
 
@@ -181,20 +181,20 @@ async def sleep_preventor_with_iter_time_print(i: Interface, print_time_period: 
     destroy_cengal_event: ValueExistence = await i(Instance, InstanceRequest().wait(DESTROY_CENGAL_EVENT))
     _, _, val_99, _, _, _, _ = await i(CpuTickCountPerSecond, False)
     sliding_window = deque(maxlen=1000)
-    last_rdtsc: int = get_rdtsc()
+    last_cpu_clock_cycles: int = cpu_clock_cycles()
     last_stat_print_time = None
     while not destroy_cengal_event:
         _, _, val_99, _, _, _, _ = await i(CpuTickCountPerSecond, False)
-        current_rdtsc: int = get_rdtsc()
-        delta_rdtsc: int = current_rdtsc - last_rdtsc
-        seconds = delta_rdtsc / val_99
+        current_cpu_clock_cycles: int = cpu_clock_cycles()
+        delta_cpu_clock_cycles: int = current_cpu_clock_cycles - last_cpu_clock_cycles
+        seconds = delta_cpu_clock_cycles / val_99
         sliding_window.append(seconds)
-        if (last_stat_print_time is None) or (print_time_period <= (current_rdtsc - last_stat_print_time) / val_99):
+        if (last_stat_print_time is None) or (print_time_period <= (current_cpu_clock_cycles - last_stat_print_time) / val_99):
             val_99, val_95, val_68, max_deviation, min_deviation = count_99_95_68(sliding_window)
             lprint(f'{datetime.now()} >> loop iteration time: {val_99=}, {val_95=}, {val_68=}, {max_deviation=}, {min_deviation=}')
-            last_stat_print_time = get_rdtsc()
+            last_stat_print_time = cpu_clock_cycles()
 
-        last_rdtsc = current_rdtsc
+        last_cpu_clock_cycles = current_cpu_clock_cycles
 
 
 async def loop_time_print(i: Interface, print_time_period: RationalNumber):

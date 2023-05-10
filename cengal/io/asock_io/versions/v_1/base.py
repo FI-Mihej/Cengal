@@ -23,7 +23,7 @@ from cengal.code_flow_control.smart_values.versions.v_0 import ResultExistence
 from cengal.data_containers.dynamic_list_of_pieces import \
     DynamicListOfPiecesDequeWithLengthControl
 from cengal.data_containers.fast_fifo import FIFODequeWithLengthControl
-from cengal.hardware_info.cpu.versions.v_0 import l2_cache_per_core
+from cengal.hardware.info.cpu.versions.v_0 import l2_cache_per_core
 
 from .abstract import *
 from .recv_buff_size_computer import RecvBuffSizeComputer
@@ -37,7 +37,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"

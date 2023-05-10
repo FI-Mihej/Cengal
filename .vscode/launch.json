@@ -12,6 +12,22 @@
             "console": "integratedTerminal",
             "pythonArgs" : ["-OO"],
             "justMyCode": false
+        },
+        {
+            "name": "Setup local attach",
+            "type": "python",
+            "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 5678
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}",
+                    "remoteRoot": "${workspaceFolder}"
+                }
+            ],
+            "justMyCode": false
         }
     ]
 }

@@ -17,9 +17,9 @@
 
 from typing import Dict, List, Union, Set
 from .install import *
-from cengal.system import IS_BUILDING_FOR_PYODIDE, IS_RUNNING_IN_EMSCRIPTEN, IS_RUNNING_IN_PYODIDE
-import cpuinfo
-import os
+from cengal.system import IS_INSIDE_OR_FOR_WEB_BROWSER, OS_TYPE
+from cengal.hardware.info.cpu import cpu_info
+
 
 """
 Module Docstring
@@ -30,7 +30,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -39,8 +39,6 @@ __status__ = "Development"
 
 
 class ModulesLists(object):
-    cpu_info_results: Dict[str, Union[int, float, str, List[Union[str, int, float]]]] = cpuinfo.get_cpu_info()
-
     def __init__(self):
         self.list_type = None
 
@@ -61,12 +59,20 @@ class ModulesLists(object):
         self.emscripten_allowed: Set[str] = set()
         self.emscripten_forbidden: Set[str] = set()
 
+        self.arch__x86__allowed: Set[str] = set()
+        self.arch__x86__forbidden: Set[str] = set()
         self.arch__x86_64__allowed: Set[str] = set()
         self.arch__x86_64__forbidden: Set[str] = set()
         self.arch__x86_32__allowed: Set[str] = set()
         self.arch__x86_32__forbidden: Set[str] = set()
+        self.arch__ARM__allowed: Set[str] = set()
+        self.arch__ARM__forbidden: Set[str] = set()
         self.arch__ARM_8__allowed: Set[str] = set()
         self.arch__ARM_8__forbidden: Set[str] = set()
+        self.arch__ARM_8_64__allowed: Set[str] = set()
+        self.arch__ARM_8_64__forbidden: Set[str] = set()
+        self.arch__ARM_8_32__allowed: Set[str] = set()
+        self.arch__ARM_8_32__forbidden: Set[str] = set()
         self.arch__ARM_7__allowed: Set[str] = set()
         self.arch__ARM_7__forbidden: Set[str] = set()
 
@@ -74,30 +80,42 @@ class ModulesLists(object):
         self._forbidden: Set[str] = set()
 
     def chosen_packages(self):
-        if IS_BUILDING_FOR_PYODIDE or IS_RUNNING_IN_EMSCRIPTEN or IS_RUNNING_IN_PYODIDE:
+        if IS_INSIDE_OR_FOR_WEB_BROWSER:
             # Must be before other systems!
             self._allowed.update(self.emscripten_allowed)
             self._forbidden.update(self.emscripten_forbidden)
-        elif 'posix' == os.name:
+        elif 'Linux' == OS_TYPE:
             self._allowed.update(self.linux_allowed)
             self._forbidden.update(self.linux_forbidden)
-        elif 'nt' == os.name:
+        elif 'Windows' == OS_TYPE:
             self._allowed.update(self.windows_allowed)
             self._forbidden.update(self.windows_forbidden)
-        elif 'mac' == os.name:
+        elif 'Darwin' == OS_TYPE:
             self._allowed.update(self.osx_allowed)
             self._forbidden.update(self.osx_forbidden)
         
-        arch = self.cpu_info_results['arch'].casefold()
-        if 'x86_64'.casefold() == arch:
+        arch = cpu_info().arch.casefold()
+        if cpu_info().is_x86:
+            self._allowed.update(self.arch__x86__allowed)
+            self._forbidden.update(self.arch__x86__forbidden)
+        elif 'x86_64'.casefold() == arch:
             self._allowed.update(self.arch__x86_64__allowed)
             self._forbidden.update(self.arch__x86_64__forbidden)
         elif 'x86_32'.casefold() == arch:
             self._allowed.update(self.arch__x86_32__allowed)
             self._forbidden.update(self.arch__x86_32__forbidden)
+        elif cpu_info().is_arm:
+            self._allowed.update(self.arch__ARM__allowed)
+            self._forbidden.update(self.arch__ARM__forbidden)
         elif 'ARM_8'.casefold() == arch:
             self._allowed.update(self.arch__ARM_8__allowed)
             self._forbidden.update(self.arch__ARM_8__forbidden)
+        elif ('ARM_8'.casefold() == arch) and (64 == cpu_info().bits):
+            self._allowed.update(self.arch__ARM_8_64__allowed)
+            self._forbidden.update(self.arch__ARM_8_64__forbidden)
+        elif ('ARM_8'.casefold() == arch) and (32 == cpu_info().bits):
+            self._allowed.update(self.arch__ARM_8_32__allowed)
+            self._forbidden.update(self.arch__ARM_8_32__forbidden)
         elif 'ARM_7'.casefold() == arch:
             self._allowed.update(self.arch__ARM_7__allowed)
             self._forbidden.update(self.arch__ARM_7__forbidden)

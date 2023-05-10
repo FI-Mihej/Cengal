@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = ['EntityWithExtendableArgs', 'ArgsManagerMixin', 'ExtendKwargsManager', 'EKwargs', 'ExtendArgsManager', 'EArgs', 'ArgsManager', 'merge_func_args', 'interested_args_to_kwargs', 'func_args_to_kwargs', 'number_of_provided_args', 'args_kwargs', 'ArgsKwargs', 'prepare_arguments_positions', 'UnknownArgumentError', 'find_arg_position_and_value', 'try_find_arg_position_and_value']
+__all__ = ['EntityWithExtendableArgs', 'ArgsManagerMixin', 'EntityArgsHolder', 'ExtendKwargsManager', 'EKwargs', 'ExtendArgsManager', 'EArgs', 'ArgsManager', 'merge_func_args', 'interested_args_to_kwargs', 'func_args_to_kwargs', 'number_of_provided_args', 'args_kwargs', 'ArgsKwargs', 'prepare_arguments_positions', 'UnknownArgumentError', 'find_arg_position_and_value', 'try_find_arg_position_and_value']
 
 from enum import Enum
 from typing import Any, Dict, Type, Callable, Union, Optional, Sequence, Tuple, List
@@ -31,7 +31,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -45,6 +45,22 @@ EntityWithExtendableArgs = Union[Type, Callable]
 class ArgsManagerMixin:
     def __call__(self, entity: EntityWithExtendableArgs, *args, **kwargs) -> Any:
         raise NotImplementedError
+
+
+class EntityArgsHolder:
+    def __init__(self, entity: EntityWithExtendableArgs, *args, **kwargs):
+        self.entity: EntityWithExtendableArgs = entity
+        self.args: Tuple = args
+        self.kwargs: Dict = kwargs
+    
+    def __call__(self) -> Any:
+        return self.entity(*self.args, **self.kwargs)
+    
+    def args_kwargs(self) -> Tuple:
+        return self.args, self.kwargs
+    
+    def entity_args_kwargs(self) -> Tuple:
+        return self.entity, self.args, self.kwargs
 
 
 class ExtendKwargsManager(ArgsManagerMixin):

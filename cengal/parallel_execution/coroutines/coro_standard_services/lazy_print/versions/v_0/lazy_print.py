@@ -35,7 +35,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -44,12 +44,10 @@ __status__ = "Development"
 
 
 class LazyPrint(TypedService[None]):
-
     def __init__(self, loop):
         super().__init__(loop)
         self.requests = list()
-        self.last_print_time = None
-        self.update_period = 0.5
+        self.update_period = 1 / 60
         self.update_timer_request = None
 
     def single_task_registration_or_immediate_processing(self, *args, **kwargs) -> Tuple[(bool, None, None)]:
@@ -58,16 +56,6 @@ class LazyPrint(TypedService[None]):
         return (True, None, None)
 
     def full_processing_iteration(self):
-        if self.last_print_time is None:
-            self.last_print_time = perf_counter()
-        
-        current_time = perf_counter()
-        delta_time = current_time - self.last_print_time
-        if self.update_period > delta_time:
-            return
-        else:
-            self.last_print_time = current_time
-        
         requests_buff = self.requests
         self.requests = type(self.requests)()
         for args, kwargs in requests_buff:
@@ -111,18 +99,22 @@ def lazy_print(*args, **kwargs):
     fallback = False
     try:
         cs = current_coro_scheduler()
+        if cs._destroyed:
+            fallback = True
     except OutsideCoroSchedulerContext:
         fallback = True
 
     if fallback:
         fallback = False
         try:
-            cs = primary_coro_scheduler()
+            cs: CoroScheduler = primary_coro_scheduler()
+            if cs._destroyed:
+                fallback = True
         except PrimaryCoroSchedulerWasNotSet:
             fallback = True
 
     if fallback:
-        print('**fallback**')
+        fallback = False
         print(*args, **kwargs)
     else:
         cs.get_service_instance(LazyPrint)._put_direct_request(*args, **kwargs)

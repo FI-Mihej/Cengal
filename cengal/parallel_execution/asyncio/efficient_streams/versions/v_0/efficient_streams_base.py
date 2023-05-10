@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -38,7 +38,7 @@ __all__ = ['StreamType', 'GateSecurityPolicy', 'IOCoreMemoryManagement', 'Stream
 
 
 from enum import Enum
-from cengal.hardware_info.cpu.versions.v_1 import CpuInfo
+from cengal.hardware.info.cpu.versions.v_1 import CpuInfo
 from cengal.io.core.memory_management import IOCoreMemoryManagement
 from cengal.code_flow_control.smart_values.versions import ValueExistence
 from typing import Optional

@@ -39,7 +39,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -51,7 +51,15 @@ class GracefulCoroDestroy(Exception):
     pass
 
 
-def graceful_coro_destroyer(i: Interface, phase_time_limit: Optional[float], coro_id: CoroID, ex_type: Type[Exception] = None, ex_value: Exception = None, ex_traceback: Any = None, tree: bool = False, first_phase_is_wait: bool = False):
+def graceful_coro_destroyer(
+        i: Interface, 
+        phase_time_limit: Optional[float], 
+        coro_id: CoroID, 
+        ex_type: Type[Exception] = None, ex_value: Exception = None, ex_traceback: Any = None, 
+        tree: bool = True, 
+        first_phase_is_wait: bool = True, 
+        last_phase_is_kill: bool = True, 
+    ):
     phase_time_limit = phase_time_limit or 0
     try:
         if first_phase_is_wait:
@@ -61,26 +69,37 @@ def graceful_coro_destroyer(i: Interface, phase_time_limit: Optional[float], cor
                 pass
 
         if (ex_type is not None) or (ex_value is not None):
-            i(ThrowCoro, coro_id, ex_type, ex_value, ex_traceback, tree)
+            if not i(ThrowCoro, coro_id, ex_type, ex_value, ex_traceback, tree):
+                raise CoroutineNotFoundError
+            
             try:
                 i(WaitCoro, WaitCoroRequest(phase_time_limit, kill_on_timeout=False, tree=tree, result_required=False).single(coro_id))
             except TimeoutError:
                 pass
 
-        i(ThrowCoro, coro_id, GracefulCoroDestroy, tree=tree)
+        if not i(ThrowCoro, coro_id, GracefulCoroDestroy, tree=tree):
+            raise CoroutineNotFoundError
+        
         try:
-            i(WaitCoro, WaitCoroRequest(phase_time_limit, kill_on_timeout=True, tree=tree, result_required=False).single(coro_id))
+            i(WaitCoro, WaitCoroRequest(phase_time_limit, kill_on_timeout=last_phase_is_kill, tree=tree, result_required=False).single(coro_id))
         except TimeoutError:
             pass
-
-        # i(KillCoro, coro_id, tree)
+        
     except CoroutineNotFoundError:
         pass
     finally:
         i(Yield)
 
 
-async def agraceful_coro_destroyer(i: Interface, phase_time_limit: Optional[float], coro_id: CoroID, ex_type: Type[Exception] = None, ex_value: Exception = None, ex_traceback: Any = None, tree: bool = False, first_phase_is_wait: bool = True):
+async def agraceful_coro_destroyer(
+        i: Interface, 
+        phase_time_limit: Optional[float], 
+        coro_id: CoroID, 
+        ex_type: Type[Exception] = None, ex_value: Exception = None, ex_traceback: Any = None, 
+        tree: bool = True, 
+        first_phase_is_wait: bool = True,
+        last_phase_is_kill: bool = True, 
+    ):
     phase_time_limit = phase_time_limit or 0
     try:
         if first_phase_is_wait:
@@ -90,19 +109,22 @@ async def agraceful_coro_destroyer(i: Interface, phase_time_limit: Optional[floa
                 pass
 
         if (ex_type is not None) or (ex_value is not None):
-            await i(ThrowCoro, coro_id, ex_type, ex_value, ex_traceback, tree)
+            if not await i(ThrowCoro, coro_id, ex_type, ex_value, ex_traceback, tree):
+                raise CoroutineNotFoundError
+            
             try:
                 await i(WaitCoro, WaitCoroRequest(phase_time_limit, kill_on_timeout=False, tree=tree, result_required=False).single(coro_id))
             except TimeoutError:
                 pass
 
-        await i(ThrowCoro, coro_id, GracefulCoroDestroy, tree=tree)
+        if not await i(ThrowCoro, coro_id, GracefulCoroDestroy, tree=tree):
+            raise CoroutineNotFoundError
+        
         try:
-            await i(WaitCoro, WaitCoroRequest(phase_time_limit, kill_on_timeout=True, tree=tree, result_required=False).single(coro_id))
+            await i(WaitCoro, WaitCoroRequest(phase_time_limit, kill_on_timeout=last_phase_is_kill, tree=tree, result_required=False).single(coro_id))
         except TimeoutError:
             pass
-
-        # await i(KillCoro, coro_id, tree)
+        
     except CoroutineNotFoundError:
         pass
     finally:

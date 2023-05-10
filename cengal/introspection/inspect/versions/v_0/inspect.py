@@ -35,7 +35,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -70,7 +70,7 @@ def frame(depth: Optional[int] = 1) -> FrameType:
     return result
 
 
-def get_exception():
+def get_exception() -> Exception:
     ex_type, ex_value, ex_traceback = sys.exc_info()
     return ex_value.with_traceback(ex_traceback)
 

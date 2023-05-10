@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -244,18 +244,12 @@ class ExternalGitModules(ModulesLists):
         ]
 
         self.arch__x86_64__allowed = {
-            'git+https://github.com/YouCannotBurnMyShadow/rdtsc.git',
-            'git+https://github.com/YouCannotBurnMyShadow/hwcounter.git',
         }
 
         self.arch__x86_32__allowed = {
-            'git+https://github.com/YouCannotBurnMyShadow/rdtsc.git',
-            'git+https://github.com/YouCannotBurnMyShadow/hwcounter.git',
         }
 
         self.emscripten_forbidden = {
-            'git+https://github.com/YouCannotBurnMyShadow/rdtsc.git',
-            'git+https://github.com/YouCannotBurnMyShadow/hwcounter.git',
             'git+https://github.com/FI-Mihej/fi-patched--progress.git',
         }
 

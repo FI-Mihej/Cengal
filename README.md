@@ -45,7 +45,7 @@ or
 
 * [pyside6__minimal_asyncio__async_method.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/qt/versions/v_0/development/pyside6__minimal_asyncio__async_method.py)
 
-### Async pytermgui
+### Async PyTermGUI
 
 * [hello_world_app_autoexit.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/pytermgui/versions/v_0/development/hello_world_app_autoexit.py)
 * [hello_world.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/pytermgui/versions/v_0/development/hello_world.py)
@@ -239,16 +239,25 @@ if '__main__' == __name__:
             * **"await_coro"** - await Cengal-coroutine or await for a call to the Cengal-service from your asyncio code
             * **"low_latency"** - use standard json module from your coroutines without hangs on huge Json-data (which usually hung even fast json implementation like orjson)
         * **"integrations"** - 
+            * **"Qt"** - wrapper around an unmodified Qt (supports: PySide, PySide2, PySide6, PyQt4, PyQt5, PyQt6). Adds asynchronous behavior to Slots. Doesn't require total reimplementation of your Qt app unlike other suggestions and competitors.
             * **"customtkinter"** - wrapper around an unmodified [customtkinter](https://github.com/TomSchimansky/CustomTkinter). Implements an additional call, Customtkinter async apps needs to be executed for a proper work
             * **"nicegui"** - wrapper around an unmodified [NiceGUI](https://github.com/zauberzeug/nicegui). Execute nicegui instance from within your code (administrative page for example). Build your pages in an asynchronous way in order to improve your server latency (NiceGUI makes it in a sync way).
             * **"uvicorn"** - wrapper around an unmodified [uvicorn](https://github.com/encode/uvicorn). Run uvicorn as a usual asyncio coroutine.
             * **"uvloop"** - an easy-install for a [uvloop](https://github.com/MagicStack/uvloop) (if awailable).
+            * **"PyTermGUI"** - wrapper around an unmodified PyTermGUI. Adds asynchronous behavior. No competitors currently.
     * **"asyncio"** - tools for an asyncio
         * **"efficient_streams"** - more efficient remake of an [asyncion.streams](https://docs.python.org/3/library/asyncio-stream.html). Better awailable traffic limits utilisation. Less kerner-calls number. Back pressure. Unlike asyncio, UDP version is planned but is not ready yet.
 * **"code_flow_control"** - 
     * **"python_bytecode_manipulator"** - modify your or third-party Python function's code in runtime easily
     * **"chained_flow"** - easy to use monad. Execute your your code if all/none/some of steps were completed withot an exceptions. Use all/none/some resutls of your steps at the final part of monad execution.
     * **"multiinterface_essence"** - Make your model and add different interfaces to it easily. Can be used for example in games: create "chair", "ball", "person" models and add to them your library of general interfaces like "touch", "push", "sit", "shot", "burn", "wet", etc.
+* **"hardware"** - hardware related
+    * **"memory"** - RAM related
+        * **"barriers"** - fast full memory barriers for both x86/x64 and ARM (Windows, Linux, OS X, iOS, Android).
+* **"time_management"** - 
+    * **"high_precision_sync_sleep"** - provides an ability to put your thread into legetimate sleep for at least 10x smaller time period than `time.sleep()` from the Python's Standard Library able to do on same Operating System: uses `nanosleep()` on Linux and periodic `SwitchToThread()` on Windows.
+    * **"cpu_clock_cycles"** - Returnes value of `RDTSCP` on x86/x86_64 or `CNTVCT_EL0` on ARM. Fast implementation: 6-12 times faster than all other competitors on Github. Note: CPU Time Stamp Counter (TSC) is not depends on actual current CPU frequency in modern CPUs (starting from around year 2007) so can be safely used as a high precision clock (see `time_management.cpu_clock` module). Windows, Linux and other Operating Systems are using it internaly.
+    * **"cpu_clock"** - like `perf_counter()` but 25% faster. Supports both x86/x86_64 and ARM. `cpu_clock` is slightly faster than `cpu_clock_cycles` because `double` (`float` in Python terms) transfered from C-code to Python code more efficiently than `64-bit int` (which needs an addition internal logic inside the Python itself for conversion). Highest-precision possible since it is CPU Time Stamp Counter based which is not depends on actual current CPU frequency in modern CPUs (starting from around year 2007) so can be safely used as a high precision clock (and Windows, Linux and other Operating Systems are using it internaly in this way). **Benchmark**: [cpu_clock_test.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/time_management/cpu_clock/versions/v_0/development/cpu_clock_test.py)
 
 # Some of most interesting modules
 * **"parallel_execution"**
@@ -276,8 +285,9 @@ if '__main__' == __name__:
     * **"tools"** - ctypes tools usefull for your code
 * **"file_system"** - normalized relative path, etc.
     * **"app_fs_structure"** - unified list of the default app directories (data, cache, temp, etc.) recommended by OS (Linux, Windows, Mac OS X) in a runtime for a given application name or a service name. Results are cached. Cache size can be modified in runtime.
-* **"hardware_info"** - 
-    * **"cpu"** - normalized results from cpuinfo extended with an info from psutil.
+* **"hardware"** - hardware related
+    * **"info"** - hardware info
+        * **"cpu"** - normalized results from cpuinfo extended with an info from psutil.
 * **"introspection"** - 
     * **"inspect"** - find out function parameters, entity owners list (method -> subclass -> class -> module), entitie's own properties (excluding parent's properties), etc.
     * **"third_party"** - 

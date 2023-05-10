@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -34,11 +34,26 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
+#!/usr/bin/env python
+# coding=utf-8
+
+
+
+
+"""
+Module Docstring
+Docstrings: http://www.python.org/dev/peps/pep-0257/
+"""
+
+
+
+
+
 import asyncio
 # from efficient_streams import *
 from cengal.parallel_execution.asyncio.efficient_streams import *
 from time import perf_counter
-from cengal.hardware_info.cpu.versions.v_1 import CpuInfo
+from cengal.hardware.info.cpu.versions.v_1 import CpuInfo
 from cengal.io.used_ports import *
 
 

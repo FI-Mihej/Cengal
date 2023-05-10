@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -58,11 +58,11 @@ def background_coro(i: Interface, period: float):
 
 
 def wait_for_cpu_tick_count(i: Interface) -> Tuple:
-    rdtsc, last_ticks_per_second, val_99, val_95, val_68, max_deviation, min_deviation = i(CpuTickCountPerSecond)
+    cpu_clock_cycles, last_ticks_per_second, val_99, val_95, val_68, max_deviation, min_deviation = i(CpuTickCountPerSecond)
     while (last_ticks_per_second is None) or (val_99 < 1) or (val_95 < 1) or (val_68 < 1):
-        rdtsc, last_ticks_per_second, val_99, val_95, val_68, max_deviation, min_deviation = i(CpuTickCountPerSecond)
+        cpu_clock_cycles, last_ticks_per_second, val_99, val_95, val_68, max_deviation, min_deviation = i(CpuTickCountPerSecond)
     
-    return rdtsc, last_ticks_per_second, val_99, val_95, val_68, max_deviation, min_deviation
+    return cpu_clock_cycles, last_ticks_per_second, val_99, val_95, val_68, max_deviation, min_deviation
 
 
 def my_coro(i: Interface, a, b) -> int:

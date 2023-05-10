@@ -32,7 +32,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -74,7 +74,7 @@ def _change_current_dir(new_current_dir):
 # Do not import this function from THIS module!
 def _filtered_file_list_traversal(root_dir, filtering_type, extentions_set=None, remove_empty_items=False):
     """
-    :param root_dir: str(); r'C:\XComGame\CookedPCConsole'
+    :param root_dir: str(); r'C:\dir\path'
     :param filtering_type: FilteringType()
     :param extentions_set: set(); {'.upk', '.txt'}
     :return: list() of tuple(); list of (dirpath, dirnames, new_filenames)

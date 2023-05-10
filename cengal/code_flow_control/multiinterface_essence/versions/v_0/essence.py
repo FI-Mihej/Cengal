@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -34,26 +34,37 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-from typing import Any, Callable, NoReturn, Set, Dict, Type, TypeVar, Generic, Optional
+from inspect import isclass
+from cengal.introspection.inspect import get_exception
+from cengal.code_flow_control.args_manager import EntityArgsHolder
+from typing import Any, Callable, NoReturn, Set, Dict, Type, TypeVar, Generic, Optional, Union, Sequence
 # from enum import Enum
 
 
-class IncompatibleEssenceModel(RuntimeError):
+class EssenceModelException(Exception):
+    pass
+
+
+class IncompatibleEssenceModelError(RuntimeError, EssenceModelException):
     # Must be raised by constructor of EssenceInterface class if incompatible essence_model was given
     pass
 
 
-class EssenceInterfaceIsNotApplicable(RuntimeError):
+class UnsuitableEssenceInterfaceError(RuntimeError, EssenceModelException):
+    pass
+
+
+class EssenceInterfaceIsNotApplicableError(UnsuitableEssenceInterfaceError, EssenceModelException):
     # Must be raised by EssenceModel.__call__ when requested EssenceInterface is not active (applicable)
     pass
 
 
-class EssenceInterfaceIsNotRegistered(EssenceInterfaceIsNotApplicable):
+class EssenceInterfaceIsNotRegisteredError(UnsuitableEssenceInterfaceError, EssenceModelException):
     # Must be raised by EssenceModel.__call__ when requested EssenceInterface is not registered
     pass
 
 
-class EssenceModelCanNotInjectSelf(RuntimeError):
+class EssenceModelCanNotInjectSelfError(RuntimeError, EssenceModelException):
     # Must be raised by EssenceModel.emi_inject_model when an object of a class A(EssenceModel) tries
     #   to inject class A - type(self)
     # This behavior is restricted since it may lead to: 
@@ -62,23 +73,23 @@ class EssenceModelCanNotInjectSelf(RuntimeError):
     pass
 
 
-class EssenceModelCanNotBeInjected(RuntimeError):
+class EssenceModelCanNotBeInjectedError(RuntimeError, EssenceModelException):
     # Must be raised by EssenceModel.emi_inject_model if injectable model can not be injected (incompatible)
     pass
 
 
-class EssenceModelIsNotInjected(RuntimeError):
+class EssenceModelIsNotInjectedError(RuntimeError, EssenceModelException):
     # Must be raised by EssenceModel.emi_injected_model if not injected model was requested
     pass
 
 
-class IncompatibleHighOrderEssenceModel(RuntimeError):
+class IncompatibleHighOrderEssenceModelError(RuntimeError, EssenceModelException):
     # Must be raised by EssenceModel.emu_behave_as_unknown_model method if incompatible on attempt to inject it to
     # incompatible high order model
     pass
 
 
-class UnknownEssenceModeBehaviorWasNotImplementedProperly(NotImplementedError):
+class UnknownEssenceModeBehaviorWasNotImplementedProperlyError(NotImplementedError, EssenceModelException):
     pass
 
 
@@ -180,9 +191,9 @@ class EssenceModel(EssenceModelInheritanceAbstract, EssenceModelInjectionAbstrac
     #   - run `self._emi_notify_high_order_model_about_self_update(type(self), essence_model_class, *args, **kwargs)` at
     #       the end of your emi_on_injected_model_updated()
 
-    emi_compatible_injectable_essence_model_classes: TypeVar[Set[Type['EssenceModel']]] = set()
-    # emu_compatible_high_order_essence_model_class: TypeVar[Optional[Type['EssenceModel']]] = None
-    emu_compatible_high_order_essence_model_classes: TypeVar[Set[Type['EssenceModel']]] = set()
+    emi_compatible_injectable_essence_model_classes: Set[Type['EssenceModel']] = set()
+    # emu_compatible_high_order_essence_model_class: Optional[Type['EssenceModel']] = None
+    emu_compatible_high_order_essence_model_classes: Set[Type['EssenceModel']] = set()
 
     def __init__(self):
         self.__em_interfaces: Dict[Type['EssenceInterface'], 'EssenceInterface'] = dict()
@@ -203,28 +214,28 @@ class EssenceModel(EssenceModelInheritanceAbstract, EssenceModelInjectionAbstrac
             for injected_model_class, injected_model in self.__emi_injected_models.items():
                 model: 'EssenceModel' = injected_model
                 if model.em_interface_active(interface_class):
-                    injected_model_interface = model(interface_class)
+                    injected_model_interface = model.em_interface(interface_class)
                     break
             if injected_model_interface:
                 return injected_model_interface
             elif interface_class in self.__em_possible_interfaces:
-                raise EssenceInterfaceIsNotApplicable
+                raise EssenceInterfaceIsNotApplicableError
             else:
-                raise EssenceInterfaceIsNotRegistered
+                raise EssenceInterfaceIsNotRegisteredError
 
     def __call__(self, interface_class: Type['EssenceInterface'], worker: Callable, failed_worker: Optional[Callable] = None, *args, **kwargs) -> Any:
         interface = None
         exception = None
         try:
             interface = self.em_interface(interface_class)
-        except (EssenceInterfaceIsNotApplicable, EssenceInterfaceIsNotRegistered) as exc:
-            exception = exc
+        except (EssenceInterfaceIsNotApplicableError, EssenceInterfaceIsNotRegisteredError) as exc:
+            exception = get_exception()
         
         if interface:
-            return worker(*args, **kwargs)
+            return worker(interface, *args, **kwargs)
         else:
             if failed_worker:
-                return failed_worker(exception, *args, **kwargs)
+                return failed_worker(interface, exception, *args, **kwargs)
             else:
                 return None
     
@@ -270,13 +281,13 @@ class EssenceModel(EssenceModelInheritanceAbstract, EssenceModelInjectionAbstrac
         new_possible_interfaces = dict()
 
         for interface_class, interface in self.__em_interfaces.items():
-            if interface.applicable():
+            if interface._applicable_impl():
                 new_interfaces[interface_class] = interface
             else:
                 new_possible_interfaces[interface_class] = interface
 
         for interface_class, interface in self.__em_possible_interfaces.items():
-            if interface.applicable():
+            if interface._applicable_impl():
                 new_interfaces[interface_class] = interface
             else:
                 new_possible_interfaces[interface_class] = interface
@@ -297,7 +308,7 @@ class EssenceModel(EssenceModelInheritanceAbstract, EssenceModelInjectionAbstrac
             return False
         else:
             interface = interface_class(self, *args, **kwargs)
-            if interface.applicable():
+            if interface._applicable_impl():
                 self.__em_interfaces[interface_class] = interface
             else:
                 self.__em_possible_interfaces[interface_class] = interface
@@ -327,7 +338,7 @@ class EssenceModel(EssenceModelInheritanceAbstract, EssenceModelInjectionAbstrac
         #   essence_model with all needed interfaces - result of an appropriate factory work
         essence_model_class = type(essence_model)
         if isinstance(essence_model, type(self)) or isinstance(self, essence_model_class):
-            raise EssenceModelCanNotInjectSelf
+            raise EssenceModelCanNotInjectSelfError
         
         injectable_model = False
         if essence_model_class in self.emi_compatible_injectable_essence_model_classes:
@@ -337,7 +348,7 @@ class EssenceModel(EssenceModelInheritanceAbstract, EssenceModelInjectionAbstrac
                 injectable_model = True
             else:
                 if self.__emu_raise_on_incompatible_high_order_model:
-                    raise IncompatibleHighOrderEssenceModel
+                    raise IncompatibleHighOrderEssenceModelError
         
         injected = False
         if injectable_model:
@@ -349,7 +360,7 @@ class EssenceModel(EssenceModelInheritanceAbstract, EssenceModelInjectionAbstrac
             injected = True
         else:
             if self.__emi_raise_on_uninjectable_model:
-                raise EssenceModelCanNotBeInjected
+                raise EssenceModelCanNotBeInjectedError
             
         return injected
 
@@ -360,7 +371,7 @@ class EssenceModel(EssenceModelInheritanceAbstract, EssenceModelInjectionAbstrac
         if essence_model_class in self.__emi_injected_models:
             return self.__emi_injected_models[essence_model_class]
         else:
-            raise EssenceModelIsNotInjected
+            raise EssenceModelIsNotInjectedError
 
     def emi_on_injected_model_updated(self, essence_model_class: Type['EssenceModel'], *args, **kwargs):
         # In 'super' in method of inherit class should be run at the end of the method
@@ -397,7 +408,7 @@ class EssenceModel(EssenceModelInheritanceAbstract, EssenceModelInjectionAbstrac
         # Should be called by a high order model for an unknown injected model
         # if type(self.__emi_high_order_model) != self.emu_compatible_high_order_essence_model_class:
         if not self.emu_is_compatible_high_order_model(self.__emi_high_order_model):
-            raise IncompatibleHighOrderEssenceModel
+            raise IncompatibleHighOrderEssenceModelError
         self.__emi_high_order_model._emu_register_on_model_changed_callback(type(self))
         self.__emu_in_unknown_model_behavior = True
         self.emu_on_behave_as_unknown_model()
@@ -419,7 +430,7 @@ class EssenceModel(EssenceModelInheritanceAbstract, EssenceModelInjectionAbstrac
             unknown_model.emu_on_model_changed_callback()
 
     def emu_on_model_changed_callback(self):
-        raise UnknownEssenceModeBehaviorWasNotImplementedProperly
+        raise UnknownEssenceModeBehaviorWasNotImplementedProperlyError
 
     def emu_is_in_unknown_model_behavior(self):
         return self.__emu_in_unknown_model_behavior
@@ -429,18 +440,35 @@ Model = TypeVar('Model', bound=EssenceModel)
 
 
 class EssenceInterface(Generic[Model]):
-    essence_model_class: TypeVar[Type[Model]] = EssenceModel
+    essence_model_class: Type[Model] = EssenceModel
 
     def __init__(self, essence_model: Model, *args, **kwargs):
         self.essence_model: Model = essence_model
+        self._on_applicability_changed_handlers: Set[Callable] = set()
+        self._applicability_state: bool = None
         self.__check_essence_mode_type()
 
     def __check_essence_mode_type(self):
         if not isinstance(self.essence_model, self.essence_model_class):
-            raise IncompatibleEssenceModel
+            raise IncompatibleEssenceModelError
 
     def applicable(self) -> bool:
-        raise NotImplementedError
+        return True
+
+    def _applicable_impl(self) -> bool:
+        result: bool = self.applicable()
+        if result != self._applicability_state:
+            self._applicability_state = result
+            for handler in self._on_applicability_changed_handlers:
+                handler(self)
+        
+        return result
+    
+    def add_on_applicability_changed_handler(self, handler: Callable):
+        self._on_applicability_changed_handlers.add(handler)
+    
+    def discard_on_applicability_changed_handler(self, handler: Callable):
+        self._on_applicability_changed_handlers.discard(handler)
 
     def notify_model_about_change(self, *args, **kwargs):
         # Must be run by EssenceInterface's methods if and after changing model's data. It is enough to run in once per
@@ -448,8 +476,48 @@ class EssenceInterface(Generic[Model]):
         self.essence_model.em_on_model_updated(type(self), *args, **kwargs)
 
 
-class EssenceModelFactory:
+def essence_model_changer(func):
+    def wrapper(self: EssenceInterface, *args, **kwargs):
+        try:
+            func(self, *args, **kwargs)
+        finally:
+            self.notify_model_about_change(*args, **kwargs)
+
+    return wrapper
+
+
+em_changer = essence_model_changer
+
+
+class EssenceModelFactoryExample:
     def __call__(self, *args, **kwargs):
         model: EssenceModel = EssenceModel()
         model.em_add_interface(EssenceInterface)
         return model
+
+
+def simple_essence_model_factory(
+        model: Union[Type[EssenceModel], EntityArgsHolder], 
+        interfaces: Union[
+                Type[EssenceInterface], 
+                EntityArgsHolder, 
+                Sequence[Union[Type[EssenceInterface], EntityArgsHolder]]
+            ]
+    ) -> EssenceModel:
+    model_instance: EssenceModel = model()
+    if isinstance(interfaces, EntityArgsHolder) or (isinstance(interfaces, type) and issubclass(interfaces, EssenceInterface)):
+        interfaces = (interfaces,)
+    
+    for interface in interfaces:
+        if isinstance(interface, type):
+            if issubclass(interface, EssenceInterface):
+                model_instance.em_add_interface(interface)
+        elif isinstance(interface, EntityArgsHolder):
+            model_instance.em_add_interface(*interface.entity_args_kwargs())
+        else:
+            raise TypeError(f'Wrong interface type: {type(interface)}')
+
+    return model_instance
+
+
+simple_em_factory = simple_essence_model_factory

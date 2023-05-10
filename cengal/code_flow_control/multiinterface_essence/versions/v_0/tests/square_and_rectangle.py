@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -55,12 +55,9 @@ class RectangleInterface(EssenceInterface[RectangleModel]):
     def __init__(self, essence_model: EssenceModel):
         super(RectangleInterface, self).__init__(essence_model)
 
-    def applicable(self) -> bool:
-        return True
-
+    @em_changer
     def set_dimension(self, dimension: Point) -> NoReturn:
         self.essence_model.dimension = dimension
-        self.notify_model_about_change()
 
     def dimension(self) -> Point:
         return self.essence_model.dimension
@@ -70,16 +67,13 @@ class StretchingRectangleInterface(RectangleInterface):
     def __init__(self, essence_model: EssenceModel):
         super(StretchingRectangleInterface, self).__init__(essence_model)
 
-    def applicable(self) -> bool:
-        return True
-
+    @em_changer
     def stretch_x(self, multiplier: float) -> NoReturn:
         self.essence_model.dimension.x *= multiplier
-        self.notify_model_about_change()
 
+    @em_changer
     def stretch_y(self, multiplier: float) -> NoReturn:
         self.essence_model.dimension.y *= multiplier
-        self.notify_model_about_change()
 
 
 class StretchingSquareInterface(RectangleInterface):
@@ -89,15 +83,24 @@ class StretchingSquareInterface(RectangleInterface):
     def applicable(self) -> bool:
         return self.essence_model.dimension.x == self.essence_model.dimension.y
 
+    @em_changer
     def stretch(self, multiplier: float) -> NoReturn:
         self.essence_model.dimension.x *= multiplier
         self.essence_model.dimension.y *= multiplier
-        self.notify_model_about_change()
 
 
 def rectangle_factory(dimension: Point) -> RectangleModel:
-    result: RectangleModel = RectangleModel(dimension)
-    result.em_add_interface(RectangleInterface)
-    result.em_add_interface(StretchingRectangleInterface)
-    result.em_add_interface(StretchingSquareInterface)
-    return result
+    return simple_em_factory(
+            EntityArgsHolder(RectangleModel, dimension),
+            [
+                RectangleInterface,
+                StretchingRectangleInterface,
+                StretchingSquareInterface,
+            ]
+        )
+    # result: RectangleModel = RectangleModel(dimension)
+    # result.em_add_interface(RectangleInterface)
+    # result.em_add_interface(StretchingRectangleInterface)
+    # result.em_add_interface(StretchingSquareInterface)
+    # return result
+    

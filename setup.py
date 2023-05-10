@@ -25,12 +25,15 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
 __status__ = "Development"
 # __status__ = "Production"
+
+from os import environ
+environ['CENGAL_IS_IN_BUILD_MODE'] = 'True'
 
 
 import setuptools
@@ -81,6 +84,15 @@ with open(path_relative_to_src('README.md'), 'r') as fh:
 
 pypi_requirements_list = get_pypi_requirements_list()
 remote_requirements_list = get_remote_requirements_list()
+
+
+from cengal.build_tools.current_compiler import compiler_type
+from cengal.build_tools.prepare_cflags import prepare_cflags, concat_cflags, prepare_compile_time_env
+
+
+prepare_cflags()
+
+
 setuptools.setup(
     name='cengal',
     version=__version__,
@@ -191,5 +203,9 @@ setuptools.setup(
         'Typing :: Typed',
     ],
     python_requires='>=3.7',
-    ext_modules=cythonize(find_and_prepare_cython_modules(), compiler_directives={'language_level': '3'}),
+    ext_modules=cythonize(
+        find_and_prepare_cython_modules(),
+        compiler_directives={'language_level': '3'},
+        compile_time_env = prepare_compile_time_env(),
+    ),
 )

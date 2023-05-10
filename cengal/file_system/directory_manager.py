@@ -22,7 +22,7 @@ import os.path
 from enum import Enum
 import hashlib
 from cengal.introspection.inspect import frame
-from typing import Optional
+from typing import Optional, Callable
 
 """
 Module Docstring
@@ -33,7 +33,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.15"
+__version__ = "3.1.16"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -49,7 +49,7 @@ class FilteringType(Enum):
 
 def filtered_file_list(root_dir, filtering_type, extentions_set=None):
     """
-    :param root_dir: str(); r'C:\XComGame\CookedPCConsole'
+    :param root_dir: str(); r'C:\dir\path'
     :param filtering_type: FilteringType()
     :param extentions_set: set(); {'.upk', '.txt'}
     :return: tuple(); (dirpath, dirnames, new_filenames)
@@ -84,7 +84,7 @@ def filtered_file_list(root_dir, filtering_type, extentions_set=None):
 def filtered_file_list_traversal(root_dir, filtering_type, extentions_set=None, remove_empty_items=False,
                                  use_spinner=False):
     """
-    :param root_dir: str(); r'C:\XComGame\CookedPCConsole'
+    :param root_dir: str(); r'C:\dir\path'
     :param filtering_type: FilteringType()
     :param extentions_set: set(); {'.upk', '.txt'}
     :return: list() of tuple(); list of (dirpath, dirnames, new_filenames)
@@ -133,6 +133,59 @@ def filtered_file_list_traversal(root_dir, filtering_type, extentions_set=None, 
         print()
 
     return result_list
+
+
+class FilteringEntity(Enum):
+    dirpath = 0
+    dirname = 1
+    filename = 2
+    aggregated = 3
+
+
+def file_list_traversal(root_dir, filter: Callable = None, remove_empty_dirpaths=False):
+    """
+    :param root_dir: str(); r'C:\dir\path'
+    :param filtering_type: FilteringType()
+    :param extentions_set: set(); {'.upk', '.txt'}
+    :return: list() of tuple(); list of (dirpath, dirnames, new_filenames)
+    """
+
+    if filter is None:
+        def default_filter(filtering_entity: FilteringEntity, data):
+            if FilteringEntity.aggregated == filtering_entity:
+                return data
+            else:
+                return True
+
+        filter = default_filter
+
+    result_list = list()
+    for raw_result in os.walk(root_dir):
+        dirpath = raw_result[0]
+        dirnames = raw_result[1]
+        filenames = raw_result[2]
+
+        if not filter(FilteringEntity.dirpath, (dirpath, dirnames, filenames)):
+            continue
+
+        new_dirnames = list()
+        for dirname in dirnames:
+            if filter(FilteringEntity.dirname, (dirpath, dirname)):
+                new_dirnames.append(dirname)
+
+        new_filenames = list()
+        for filename in filenames:
+            if filter(FilteringEntity.filename, (dirpath, filename)):
+                new_filenames.append(filename)
+        
+        if remove_empty_dirpaths:
+            if not new_filenames and not new_dirnames:
+                continue
+
+        result = (dirpath, new_dirnames, new_filenames)
+        result_list.append(result)
+
+    return filter(FilteringEntity.aggregated, result_list)
 
 
 def clear_dir(full_dir_path):
