@@ -48,15 +48,15 @@ Share your data between your Python processes (2 processes currently) and work w
 
 Supported types (currently):
 
-* `list` - Unlike `shared_memory.ShareableList`: **mutable** and **resizable** between different processes, supports other containers (lists, tuples, dicts) as an items and implements all `list` methods. Faster than `shared_memory.ShareableList`.
+* `list` - Unlike `multiprocessing.shared_memory.ShareableList`: **mutable** and **resizable** between different processes, supports other containers (lists, tuples, dicts) as an items and implements all `list` methods. Faster than `shared_memory.ShareableList`.
 * `dict` - *currently immutable*
 * `tuple`
 * `str`
 * `bytes`
 * `bytearray`
 * `bool`
-* `float`
-* `int` - int64, currently
+* `float` - Unlike values in `multiprocessing.shared_memory.ShareableList`, supports Addition Assignment (`shared_list[20] += 999.3`) and all other native methods and operators
+* `int` - int64, currently. Unlike values in `multiprocessing.shared_memory.ShareableList`, supports Addition Assignment (`shared_list[15] += 999`) and all other native methods and operators
 * `None`
 
 ### Examples
@@ -115,7 +115,7 @@ p.join()
 
 ### Performance Benchmark results
 
-Shared `list` container (which is not fully optimizes currently) is already faster than `shared_memory.ShareableList` and unlike `shared_memory.ShareableList` supports inplace changes (`shared_list[15] += 999`): it gives you ability to make more than 3 000 0000 reads/writes per second of an int64 value (`shared_list[2] = 1234` / `val = shared_list[7]`) or more than 1 450 000 inplace changes per second (`shared_list[15] += 999`).
+Shared `list` container (which is not fully optimizes currently) is already faster than `multiprocessing.shared_memory.ShareableList` and unlike `multiprocessing.shared_memory.ShareableList` supports Addition Assignment (`shared_list[15] += 999`) and all other native methods and operators of items: it gives you ability to make more than 30000000 reads/writes per second of an int64 value (`shared_list[2] = 1234` / `val = shared_list[7]`) or more than 1450000 addition assignments per second (`shared_list[15] += 999`).
 
 [Benchmark Results](https://github.com/FI-Mihej/Cengal/blob/master/cengal/hardware/memory/shared_memory/versions/v_0/development/benchmark_results.md)
 
