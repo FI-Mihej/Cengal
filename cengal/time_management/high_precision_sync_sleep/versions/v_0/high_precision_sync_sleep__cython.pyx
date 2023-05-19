@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.17"
+__version__ = "3.1.18"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -52,7 +52,7 @@ IF UNAME_SYSNAME == "Windows":
             SwitchToThread()
     
 
-    hps_sleep = cython_spinwait
+    hps_sleep = high_precision_sync_sleep = cython_spinwait
 
 ELIF UNAME_SYSNAME in ("Linux", "Darwin"):
     cdef extern from "time.h":
@@ -75,7 +75,7 @@ ELIF UNAME_SYSNAME in ("Linux", "Darwin"):
         while nanosleep(&sleep_req, &sleep_rem) == -1:
             sleep_req = sleep_rem    
     
-    hps_sleep = cython_nanosleep
+    hps_sleep = high_precision_sync_sleep = cython_nanosleep
 
 ELIF UNAME_SYSNAME == "Emscripten":
     from libc.stdint cimport uint32_t
@@ -91,4 +91,4 @@ ELIF UNAME_SYSNAME == "Emscripten":
         emscripten_sleep(sleep_ms)
     
     
-    hps_sleep = cython_emscripten_sleep
+    hps_sleep = high_precision_sync_sleep = cython_emscripten_sleep

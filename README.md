@@ -1,5 +1,3 @@
-# Cengal
-
 * Target platforms: Win32, Linux, OS X, Android, iOS, Emscripten
 * Target architectures: x64, x86, ARM
 * Target interpreters: CPython, PyPy
@@ -8,7 +6,7 @@
 
 Not all features are accessible on every target platform or architecture.
 
-## Installation
+# Installation
 
 `pip install git+https://github.com/FI-Mihej/Cengal.git`
 
@@ -16,9 +14,9 @@ or
 
 `pip install cengal`
 
-## Achieving Exclusive Features with the Cengal Library: No Alternatives Online
+# Exclusive Features: No Alternatives Online
 
-### (!) Merge the following components into a Single (!) Thread
+## Run concurently following components in a Single (!) Thread
 
 * own **blocking** CPU-bound function
 * third-party **blocking** CPU-bound function
@@ -26,9 +24,7 @@ or
 * CustomTkinter application
 * asyncio-based file reading task.
 
-#### Source code
-* [rich_example.py](https://github.com/FI-Mihej/Cengal/blob/master/examples/rich_example.py)
-* [third_party_cpu_bound.py](https://github.com/FI-Mihej/Cengal/blob/master/examples/third_party_cpu_bound.py)
+### Examples
 
 #### YouTube Showcase
 
@@ -36,21 +32,117 @@ or
  <img src="https://github.com/FI-Mihej/Cengal/raw/master/docs/assets/2023-04-24 01-37-34-360p-YouTube.png" alt="Watch the video" width="640" height="360" border="5" />
 </a>
 
-### Async Tkinter and Customtkinter
+#### Source code
+
+* [rich_example.py](https://github.com/FI-Mihej/Cengal/blob/master/examples/rich_example.py)
+* [third_party_cpu_bound.py](https://github.com/FI-Mihej/Cengal/blob/master/examples/third_party_cpu_bound.py)
+
+#### Tutorial
+
+* [Forced Concurrency](https://github.com/FI-Mihej/Cengal/blob/master/docs/forced_concurrency.md)
+
+
+## True Interprocess Shared Memory (Proof of Concepte Stage)
+
+Share your data between your Python processes (2 processes currently) and work with them as usual. Work across different processes is made turn by turn (fast operation: using full memory barrier instead of system calls)
+
+Supported types (currently):
+
+* `list` - Unlike `shared_memory.ShareableList`: **mutable** and **resizable** between different processes, supports other containers (lists, tuples, dicts) as an items and implements all `list` methods. Faster than `shared_memory.ShareableList`.
+* `dict` - *currently immutable*
+* `tuple`
+* `str`
+* `bytes`
+* `bytearray`
+* `bool`
+* `float`
+* `int` - int64, currently
+* `None`
+
+### Examples
+
+[shared_memory_example.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/hardware/memory/shared_memory/versions/v_0/development/shared_memory_example.py)
+
+and smaller:
+
+```python
+from multiprocessing import Process
+from cengal.hardware.memory.shared_memory import *
+
+
+shared_memory_name = 'test_shared_mem'
+shared_memory_size = 200 * 1024 * 1024
+switches = 1000
+changes_per_switch = 2000
+
+
+def work(manager, shared_data)
+    index = 0
+    while index < switches:
+        with wait_my_turn(manager):
+            # emulatin our working process
+            for i in range(changes_per_switch):
+                shared_data[1] += 1
+
+def second_process():
+    consumer: SharedMemory = SharedMemory('test_shmem', False)
+    consumer.wait_for_messages()
+    with wait_my_turn(consumer):
+        shared_data = consumer.take_message()
+    
+    work(consumer, shared_data)
+
+
+creator: SharedMemory = SharedMemory(shared_memory_name, True, shared_memory_size)
+p = Process(target=second_process)
+p.start()
+creator.wait_consumer_ready()
+with wait_my_turn(creator):
+    data = [
+        'hello',
+        0,
+        (8, 2.0, False),
+        {
+            b'world': -6,
+            5: 4
+        }
+    ]
+    shared_data = creator.put_message(data)
+
+work(creator, shared_data)
+p.join()
+```
+
+### Performance Benchmark results
+
+Shared `list` container (which is not fully optimizes currently) is already faster than `shared_memory.ShareableList` and unlike `shared_memory.ShareableList` supports inplace changes (`shared_list[15] += 999`): it gives you ability to make more than 3 000 0000 reads/writes per second of an int64 value (`shared_list[2] = 1234` / `val = shared_list[7]`) or more than 1 450 000 inplace changes per second (`shared_list[15] += 999`).
+
+[Benchmark Results](https://github.com/FI-Mihej/Cengal/blob/master/cengal/hardware/memory/shared_memory/versions/v_0/development/benchmark_results.md)
+
+
+### Roadmap
+
+* Implement mutable `dict` and `set` using an appropricate C hashmap library
+* Implement garbage collector
+* Implement an appropriate Service for `cengal.parallel_execution.coroutines` - for comfortable shared memory usage inside an async code (including `asyncio`) 
+* Improve memory allocation algorithm
+* Move more logic to Cython
+
+## Async Tkinter and Customtkinter
 
 * [tkinter_0.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/coro_standard_services/tkinter/versions/v_0/development/tkinter_0.py)
 * [customtkinter_0.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/coro_standard_services/tkinter/versions/v_0/development/customtkinter_0.py)
 
-### Async QT (PySide, PySide2, PySide6, PyQt4, PyQt5, PyQt6)
+## Async QT (PySide, PySide2, PySide6, PyQt4, PyQt5, PyQt6)
 
 * [pyside6__minimal_asyncio__async_method.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/qt/versions/v_0/development/pyside6__minimal_asyncio__async_method.py)
 
-### Async PyTermGUI
+## Async PyTermGUI
 
 * [hello_world_app_autoexit.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/pytermgui/versions/v_0/development/hello_world_app_autoexit.py)
 * [hello_world.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/pytermgui/versions/v_0/development/hello_world.py)
 
-### Transparent background for your desktop applications (TBA)
+## Transparent background for your desktop applications (TBA)
 
 * Target OS: Windows 11, Windows 10, Windows 8, Windows 7, Windows Vista.
 * Target frameworks: PySide, PyQt, Kivy, PyWebView 
@@ -59,171 +151,14 @@ or
 ,
 ![title](https://github.com/FI-Mihej/Cengal/raw/master/docs/assets/Cengal_Kivy_Transparent_UI_Windows_10.png)
 
-### Tkinter True Borderless apps for Windows platform (TBA)
+## Tkinter True Borderless apps for Windows platform (TBA)
 
 * Target OS: Windows 11, Windows 10, Windows 8, Windows 7, Windows Vista.
 * Target frameworks: CustomTkinter, Tkinter, ttkbootstrap, ...
 
 ![title](https://github.com/FI-Mihej/Cengal/raw/master/docs/assets/Cengal_Tkinter_True_Borderless_Draggable_Applications_Windows_10.png)
 
-### Simpler single-thread example step by step
-
-We will merge following components into a **single** thread:
-* own **blocking** CPU-bound function
-* Tkinter application
-* CustomTkinter application
-* asyncio-based file reading task.
-
-Steps with imports:
-
-1. CPU-bound function and counter. Bytecode of this function is adjusted by `gly_patched` decorator. Now it is an unblocking coroutine.
-
-```python
-from cengal.parallel_execution.coroutines.coro_scheduler import *
-from cengal.parallel_execution.coroutines.coro_standard_services.loop_yield import gly_patched
-
-
-class DataHolder:
-    def __init__(self, counter: int):
-        self.counter: int = counter
-
-
-@cs_coro
-@gly_patched
-def cpu_bound_computations(num: int, counter_holder: DataHolder) -> int:
-    for i in range(num):
-        counter_holder.counter += 1
-        for j in range(num):
-            counter_holder.counter += 1
-            for k in range(num):
-                counter_holder.counter += 1
-    
-    return counter_holder.counter
-```
-
-2. Asyncio-based file reading function
-
-```python
-import aiofiles
-
-from cengal.text_processing.encoding_detection import detect_and_decode
-from cengal.time_management.repeat_for_a_time import Tracer, TracerIterator
-from cengal.math.numbers import RationalNumber
-
-
-async def asyncio_io_bound_coroutine(file_name: str, reading_time: RationalNumber):
-    for i in TracerIterator(Tracer(reading_time)):  # will repeat reading for N seconds
-        async with aiofiles.open(file_name, mode='rb') as f:
-            text, encoding, bom_bytes = detect_and_decode(await f.read())
-    
-    return text, encoding, bom_bytes
-```
-
-3. Tkinter app for displaying counter
-
-```python
-import tkinter
-
-from cengal.parallel_execution.coroutines.coro_scheduler import *
-from cengal.parallel_execution.coroutines.coro_standard_services.sleep import Sleep
-from cengal.parallel_execution.coroutines.coro_standard_services.tkinter import TkinterContextManager
-from cengal.code_flow_control.smart_values import ValueExistence
-
-
-def tkinter_counter_view(i: Interface, counter_holder: DataHolder):
-    with(TkinterContextManager(i, tkinter.Tk())) as wr:
-        app: tkinter.Tk = wr.tk
-        app.geometry('300x100+100+100')
-        label_holder: ValueExistence[tkinter.Label] = ValueExistence()
-        label_holder.value = tkinter.Label(app)
-        label_holder.value.pack()
-        
-        async def state_monitor(i: Interface, counter_holder: DataHolder):
-            while await i(Sleep, 1/60):
-                if counter_holder:
-                    label_holder.value.configure(text=str(counter_holder.counter))
-        
-        wr.put_coro(state_monitor, counter_holder)  # state_monitor will be killed automatically on a window close
-```
-
-4. Customtkinter app for displaying text
-
-```python
-import customtkinter
-
-from cengal.parallel_execution.coroutines.coro_scheduler import *
-from cengal.parallel_execution.coroutines.coro_standard_services.tkinter import TkinterContextManager
-from cengal.parallel_execution.coroutines.coro_standard_services.async_event_bus import AsyncEventBusRequest
-from cengal.parallel_execution.coroutines.integrations.customtkinter import prepare_mainloop
-from cengal.code_flow_control.smart_values import ValueExistence
-
-
-class TextFileViewer(customtkinter.CTkFrame):
-    def __init__(self, parent, content: str):
-        customtkinter.CTkFrame.__init__(self, parent)
-        self.parent = parent
-        self.content = content
-        self.text = customtkinter.CTkTextbox(self, wrap="none")
-        self.text.pack(side="left", fill="both", expand=True)
-        self.text.insert("1.0", content)
-
-
-def customtkinter_file_view(i: Interface, text: str, encoding: str, bom_bytes: bytes):
-    with(TkinterContextManager(i, customtkinter.CTk())) as wr:
-        app = wr.tk
-        app.geometry('400x250+400+100')
-        label_holder: ValueExistence[customtkinter.CTkLabel] = ValueExistence()
-        label_holder.value = customtkinter.CTkLabel(app, text=f'{encoding=}, {bom_bytes=}')
-        label_holder.value.pack()
-        viewer = TextFileViewer(app, text)
-        viewer.pack(side="top", fill="both", expand=True)
-
-        prepare_mainloop(app)  # required by customtkinter in order to prepare things
-    
-    i(AsyncEventBusRequest().send_event('DoneEvent', None))
-```
-
-5. Main function which will combine all above parts
-
-```python
-import asyncio
-import customtkinter
-
-from cengal.parallel_execution.coroutines.coro_scheduler import *
-from cengal.parallel_execution.coroutines.coro_tools.run_in_loop import run_in_loop
-from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import PutCoro
-from cengal.parallel_execution.coroutines.coro_standard_services.asyncio_loop import AsyncioLoopRequest
-from cengal.parallel_execution.coroutines.coro_standard_services.shutdown_on_keyboard_interrupt import ShutdownOnKeyboardInterrupt
-from cengal.parallel_execution.coroutines.coro_standard_services.shutdown_loop import ShutdownLoop
-from cengal.parallel_execution.coroutines.coro_standard_services.async_event_bus import AsyncEventBusRequest
-
-
-async def main(i: Interface):
-    await i(ShutdownOnKeyboardInterrupt)  # force loop shutdown on keyboard interrupt
-    await i(AsyncioLoopRequest().ensure_loop(interrupt_when_no_requests=True))  # ensure that asyncio loop is running
-    await i(AsyncioLoopRequest().turn_on_loops_intercommunication())  # turn on loops intercommunication
-    customtkinter.set_appearance_mode("dark")  # set appearance mode for all Customtkinter apps
-    customtkinter.set_default_color_theme("blue")  # set default color theme for all Customtkinter apps
-
-    counter_holder: DataHolder = DataHolder(-500000)  # counter. Counting will starts from -500000
-    await i(PutCoro, cpu_bound_computations, 999999999, counter_holder)  # starting CPU-heavy cs_coroutine with a patched bytecode in background
-    await i(PutCoro, tkinter_counter_view, counter_holder)  # starting cs_coroutine in background
-    text, encoding, bom_bytes = await asyncio_io_bound_coroutine(__file__, 2.0)  # waiting for an asyncio coroutine which will repeatedly read from file for 2 seconds
-    await asyncio.sleep(2)  # waiting for an asyncio coroutine
-    await i(PutCoro, customtkinter_file_view, text, encoding, bom_bytes)  # starting cs_coroutine in background
-    await i(AsyncEventBusRequest().wait('DoneEvent'))  # waitin for a shutdown event from the CustomtkinterFileView's window
-    await i(ShutdownLoop)  # force loop shutdown in order to not wait for other running background coroutines to be completed
-
-
-if '__main__' == __name__:
-    run_in_loop(main)
-```
-
-#### Source code
-
-* [simple_example.py](https://github.com/FI-Mihej/Cengal/blob/master/examples/simple_example.py)
-
-## Most unique modules
+# Modules with unique functionality
 
 * **"parallel_execution"**
     * **"coroutines"** - asynchronous loop with almost preemptive multitasking within the single thread. Brings an async approach to an unmodified Tkinter, Qt, Kivy, etc. Unlike asyncio/trio/curio, it uses microkernel (services-based) approach which makes it highly- and easily-expandable. Can be executed both independently (asyncio/uvloop loop will be injected within the Cengal-coroutine when needed) and within already executed asyncio/uvloop loop. Can be used from the PyScript for the Web app creation.
@@ -259,7 +194,7 @@ if '__main__' == __name__:
     * **"cpu_clock_cycles"** - Returnes value of `RDTSCP` on x86/x86_64 or `CNTVCT_EL0` on ARM. Fast implementation: 6-12 times faster than all other competitors on Github. Note: CPU Time Stamp Counter (TSC) is not depends on actual current CPU frequency in modern CPUs (starting from around year 2007) so can be safely used as a high precision clock (see `time_management.cpu_clock` module). Windows, Linux and other Operating Systems are using it internaly.
     * **"cpu_clock"** - like `perf_counter()` but 25% faster. Supports both x86/x86_64 and ARM. `cpu_clock` is slightly faster than `cpu_clock_cycles` because `double` (`float` in Python terms) transfered from C-code to Python code more efficiently than `64-bit int` (which needs an addition internal logic inside the Python itself for conversion). Highest-precision possible since it is CPU Time Stamp Counter based which is not depends on actual current CPU frequency in modern CPUs (starting from around year 2007) so can be safely used as a high precision clock (and Windows, Linux and other Operating Systems are using it internaly in this way). **Benchmark**: [cpu_clock_test.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/time_management/cpu_clock/versions/v_0/development/cpu_clock_test.py)
 
-# Some of most interesting modules
+# Some Other modules
 * **"parallel_execution"**
     * **"coroutines"** - 
         * **"coro_tools"** - tools
@@ -326,14 +261,11 @@ if '__main__' == __name__:
 
 ## Size of the Cengal library
 
-How much of your time you can save if you'll use Cengal?
-
-That much (at the moment of 27 Oct 2022):
+At the moment of 27 Oct 2022:
 
 161 modules
 
 ```
-
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -342,12 +274,9 @@ Cython                           5            423            284           1411
 -------------------------------------------------------------------------------
 SUM:                           402          10714          13190          36809
 -------------------------------------------------------------------------------
-
 ```
 
 Counted with [cloc](https://github.com/AlDanial/cloc) util.
-
-It's at very least is 260 man-days of work or at very least is a 1 man-year of of work (8 hours per day, 5 days per week, without vacations/holidays/seakleaves). I've used widly known industry standard for this measurement: +142 lines of code to the codebase per day by the year of measurements.
 
 ## Examples
 
