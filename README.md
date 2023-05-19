@@ -48,7 +48,7 @@ Share your data between your Python processes (2 processes currently) and work w
 
 Supported types (currently):
 
-* `list` - Unlike `multiprocessing.shared_memory.ShareableList`: **mutable** and **resizable** between different processes, supports other containers (lists, tuples, dicts) as an items and implements all `list` methods. Faster than `shared_memory.ShareableList`.
+* `list` - Unlike `multiprocessing.shared_memory.ShareableList`: **mutable** and **resizable** between different processes, supports other containers (lists, tuples, dicts) as an items and implements all `list` methods. Faster than `multiprocessing.shared_memory.ShareableList`.
 * `dict` - *currently immutable*
 * `tuple`
 * `str`
@@ -115,7 +115,9 @@ p.join()
 
 ### Performance Benchmark results
 
-Shared `list` container (which is not fully optimizes currently) is already faster than `multiprocessing.shared_memory.ShareableList` and unlike `multiprocessing.shared_memory.ShareableList` supports Addition Assignment (`shared_list[15] += 999`) and all other native methods and operators of items: it gives you ability to make more than 30000000 reads/writes per second of an int64 value (`shared_list[2] = 1234` / `val = shared_list[7]`) or more than 1450000 addition assignments per second (`shared_list[15] += 999`).
+Shared `list` container (which is not yet fully optimizes currently) is already faster than `multiprocessing.shared_memory.ShareableList`.
+And unlike `multiprocessing.shared_memory.ShareableList` supports Addition Assignment (`shared_list[15] += 999`) and all other native methods and operators of items.
+It provides an ability to make more than 30000000 reads/writes per second of an int64 value (`shared_list[2] = 1234` / `val = shared_list[7]`) or more than 1450000 addition assignments per second (`shared_list[15] += 999`).
 
 [Benchmark Results](https://github.com/FI-Mihej/Cengal/blob/master/cengal/hardware/memory/shared_memory/versions/v_0/development/benchmark_results.md)
 
