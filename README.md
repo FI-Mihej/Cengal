@@ -122,11 +122,12 @@ Shared `list` container (which is not fully optimizes currently) is already fast
 
 ### Roadmap
 
-* Implement mutable `dict` and `set` using an appropricate C hashmap library
-* Implement garbage collector
+* Continuosly moving more logic to Cython
+* Implement mutable `dict` and `set` using an appropricate C hashmap library or C++ code (depending what will be faster in our case)
+* Increase number of interacting processes from 2 to variable value
+* Implement garbage collector for shared data in addition to manual `free()` call
 * Implement an appropriate Service for `cengal.parallel_execution.coroutines` - for comfortable shared memory usage inside an async code (including `asyncio`) 
-* Improve memory allocation algorithm
-* Move more logic to Cython
+* Improve memory allocation algorithm in an attempt of making it faster
 
 ## Async Tkinter and Customtkinter
 
