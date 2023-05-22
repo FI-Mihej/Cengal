@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.18"
+__version__ = "3.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -35,8 +35,7 @@ __status__ = "Development"
 
 
 IF UNAME_SYSNAME == "Windows":
-    from libc.time cimport clock, CLOCKS_PER_SEC
-
+    from libc.time cimport clock, CLOCKS_PER_SEC, clock_t
 
     cdef extern from "Windows.h":
         int SwitchToThread() nogil

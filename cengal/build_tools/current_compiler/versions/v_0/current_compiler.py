@@ -28,7 +28,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.18"
+__version__ = "3.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -40,6 +40,12 @@ from distutils import sysconfig
 
 
 compiler_name_raw: str = sysconfig.get_config_var("CC")
+if compiler_name_raw is None:
+    if sysconfig.get_config_var("VSINSTALLDIR") is None:
+        compiler_name_raw = str()
+    else:
+        compiler_name_raw = 'msvc'
+
 compiler_name: str = compiler_name_raw.replace(' ', '\ ')
 
 if "gcc" in compiler_name_raw.lower():

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-#if defined(C__IS_X86)
+#if defined(IS_X86)
 
 extern unsigned long long c_cpu_clock_cycles()
 {
@@ -30,7 +30,7 @@ extern unsigned long long c_cpu_clock_cycles()
     return result;
 }
 
-#elif defined(C__IS_ARM)
+#elif defined(IS_ARM)
 
 extern u64 c_cpu_clock_cycles()
 {

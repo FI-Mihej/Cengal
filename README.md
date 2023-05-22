@@ -295,7 +295,7 @@ Counted with [cloc](https://github.com/AlDanial/cloc) util.
 
 ### Text processing example
 
-[Ensures and updates copyright (with dates) in each Cengal's source file](https://github.com/FI-Mihej/Cengal/blob/master/scripts/ensure_copyright/ensure_copyright.py)
+[Ensures and updates copyright (with dates) in each Cengal's source file](https://github.com/FI-Mihej/Cengal/blob/master/cengal_setup_scripts/ensure_copyright/ensure_copyright.py)
 
 ## Projects using Cengal
 

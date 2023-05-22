@@ -15,10 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = ['RelativePath', 'path_relative_to_src', 'path_relative_to_cwd', 'WrongBaseDirError', 'get_relative_path_part']
+__all__ = ['RelativePath', 'path_relative_to_src', 'path_relative_to_cwd', 'WrongBaseDirError', 'get_relative_path_part', 'sep']
 
 import os
-from os.path import normpath
+from os.path import normpath, sep
 from typing import Optional
 from cengal.file_system.directory_manager import current_src_dir
 from cengal.text_processing.text_processing import removeprefix
@@ -32,7 +32,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.18"
+__version__ = "3.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -75,7 +75,7 @@ def get_relative_path_part(path: str, base_dir: str) -> str:
         raise WrongBaseDirError
     
     relative_part = removeprefix(path, base_dir)
-    if relative_part.startswith('/'):
-        relative_part = removeprefix(relative_part, '/')
+    if relative_part.startswith(sep):
+        relative_part = removeprefix(relative_part, sep)
     
     return relative_part

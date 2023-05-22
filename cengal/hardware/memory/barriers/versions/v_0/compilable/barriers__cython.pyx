@@ -26,64 +26,12 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.18"
+__version__ = "3.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
 __status__ = "Development"
 # __status__ = "Production"
-
-
-cdef extern from "stdatomic.h":
-    void atomic_thread_fence(int)
-
-
-cdef int _MEMORY_ORDER_RELAXED = 0
-cdef int _MEMORY_ORDER_CONSUME = 1
-cdef int _MEMORY_ORDER_ACQUIRE = 2
-cdef int _MEMORY_ORDER_RELEASE = 3
-cdef int _MEMORY_ORDER_ACQ_REL = 4
-cdef int _MEMORY_ORDER_SEQ_CST = 5
-
-
-MEMORY_ORDER_RELAXED = _MEMORY_ORDER_RELAXED
-MEMORY_ORDER_CONSUME = _MEMORY_ORDER_CONSUME
-MEMORY_ORDER_ACQUIRE = _MEMORY_ORDER_ACQUIRE
-MEMORY_ORDER_RELEASE = _MEMORY_ORDER_RELEASE
-MEMORY_ORDER_ACQ_REL = _MEMORY_ORDER_ACQ_REL
-MEMORY_ORDER_SEQ_CST = _MEMORY_ORDER_SEQ_CST
-
-
-cpdef void py_atomic_thread_fence(int order):
-    cdef int c_order = <int>order
-    atomic_thread_fence(c_order)
-
-
-cpdef void py_atomic_thread_fence__memory_order_relaxed():
-    atomic_thread_fence(_MEMORY_ORDER_RELAXED)
-
-
-cpdef void py_atomic_thread_fence__memory_order_consume():
-    atomic_thread_fence(_MEMORY_ORDER_CONSUME)
-
-
-cpdef void py_atomic_thread_fence__memory_order_acquire():
-    atomic_thread_fence(_MEMORY_ORDER_ACQUIRE)
-
-
-cpdef void py_atomic_thread_fence__memory_order_release():
-    atomic_thread_fence(_MEMORY_ORDER_RELEASE)
-
-
-cpdef void py_atomic_thread_fence__memory_order_acq_rel():
-    atomic_thread_fence(_MEMORY_ORDER_ACQ_REL)
-
-
-cpdef void py_atomic_thread_fence__memory_order_seq_cst():
-    atomic_thread_fence(_MEMORY_ORDER_SEQ_CST)
-
-
-full_memory_barrier = py_atomic_thread_fence__memory_order_seq_cst
 
 
 IF UNAME_SYSNAME == "Windows":
@@ -96,6 +44,58 @@ IF UNAME_SYSNAME == "Windows":
     
     
     full_memory_barrier = memory_barrier
+
+ELSE:
+    cdef extern from "stdatomic.h":
+        void atomic_thread_fence(int)
+
+
+    cdef int _MEMORY_ORDER_RELAXED = 0
+    cdef int _MEMORY_ORDER_CONSUME = 1
+    cdef int _MEMORY_ORDER_ACQUIRE = 2
+    cdef int _MEMORY_ORDER_RELEASE = 3
+    cdef int _MEMORY_ORDER_ACQ_REL = 4
+    cdef int _MEMORY_ORDER_SEQ_CST = 5
+
+
+    MEMORY_ORDER_RELAXED = _MEMORY_ORDER_RELAXED
+    MEMORY_ORDER_CONSUME = _MEMORY_ORDER_CONSUME
+    MEMORY_ORDER_ACQUIRE = _MEMORY_ORDER_ACQUIRE
+    MEMORY_ORDER_RELEASE = _MEMORY_ORDER_RELEASE
+    MEMORY_ORDER_ACQ_REL = _MEMORY_ORDER_ACQ_REL
+    MEMORY_ORDER_SEQ_CST = _MEMORY_ORDER_SEQ_CST
+
+
+    cpdef void py_atomic_thread_fence(int order):
+        cdef int c_order = <int>order
+        atomic_thread_fence(c_order)
+
+
+    cpdef void py_atomic_thread_fence__memory_order_relaxed():
+        atomic_thread_fence(_MEMORY_ORDER_RELAXED)
+
+
+    cpdef void py_atomic_thread_fence__memory_order_consume():
+        atomic_thread_fence(_MEMORY_ORDER_CONSUME)
+
+
+    cpdef void py_atomic_thread_fence__memory_order_acquire():
+        atomic_thread_fence(_MEMORY_ORDER_ACQUIRE)
+
+
+    cpdef void py_atomic_thread_fence__memory_order_release():
+        atomic_thread_fence(_MEMORY_ORDER_RELEASE)
+
+
+    cpdef void py_atomic_thread_fence__memory_order_acq_rel():
+        atomic_thread_fence(_MEMORY_ORDER_ACQ_REL)
+
+
+    cpdef void py_atomic_thread_fence__memory_order_seq_cst():
+        atomic_thread_fence(_MEMORY_ORDER_SEQ_CST)
+
+
+    full_memory_barrier = py_atomic_thread_fence__memory_order_seq_cst
 
 
 IF (UNAME_SYSNAME == "Windows") and (UNAME_MACHINE in ("x86_64", "x86", "i386", "i686", "AMD64")):

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 
-#ifndef RDTSCP_H
-#define RDTSCP_H
+#ifndef MEMORY_ACCESS_H
+#define MEMORY_ACCESS_H
 
 void c_write_uint64(unsigned long long base_address, unsigned long long offset, unsigned long long value);
 unsigned long long c_read_uint64(unsigned long long base_address, unsigned long long offset);

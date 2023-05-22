@@ -1,1 +1,1 @@
-python .\scripts\modules\create.py
+python .\cengal_setup_scripts\modules\create.py

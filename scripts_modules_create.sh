@@ -7,4 +7,4 @@
 
 # https://packaging.python.org/specifications/recording-installed-packages/
 
-python3 ./scripts/modules/create.py
+python3 ./cengal_setup_scripts/modules/create.py

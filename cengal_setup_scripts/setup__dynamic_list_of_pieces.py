@@ -28,17 +28,16 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.18"
+__version__ = "3.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
 __status__ = "Development"
 # __status__ = "Production"
 
-
-path_to_file = os.path.abspath("./cengal/asock_io/recv_buff_size_computer/recv_buff_size_computer__cython.pyx")
+path_to_file = os.path.abspath("./cengal/data_containers/dynamic_list_of_pieces/dynamic_list_of_pieces__cython.pyx")
 
 setup(
-    name='recv_buff_size_computer module',
+    name='dynamic_list_of_pieces module',
     ext_modules=cythonize(path_to_file),
 )

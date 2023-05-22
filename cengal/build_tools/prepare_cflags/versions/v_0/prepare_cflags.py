@@ -28,7 +28,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.18"
+__version__ = "3.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -36,7 +36,16 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-from os import environ, uname
+from os import environ
+try:
+    from os import uname
+    uname_sysname: str = uname().sysname
+    uname_machine: str = uname().machine
+except ImportError:
+    from platform import uname
+    uname_sysname: str = uname().system
+    uname_machine: str = uname().machine
+
 from cengal.hardware.info.cpu import cpu_info
 from cengal.build_tools.current_compiler import compiler_type, compiler_name
 from cengal.system import (
@@ -85,13 +94,13 @@ def prepare_cflags():
     
     macro_flags_list = [
         # Cython
-        macros_string_template.format(macro_name='UNAME_SYSNAME', macro_value=uname().sysname),  # see: https://en.wikipedia.org/wiki/Uname
-        macros_string_template.format(macro_name='UNAME_MACHINE', macro_value=uname().machine),  # see: https://en.wikipedia.org/wiki/Uname
+        macros_string_template.format(macro_name='UNAME_SYSNAME', macro_value=uname_sysname),  # see: https://en.wikipedia.org/wiki/Uname
+        macros_string_template.format(macro_name='UNAME_MACHINE', macro_value=uname_machine),  # see: https://en.wikipedia.org/wiki/Uname
         macros_string_template.format(macro_name='CPU_ARCH', macro_value=cpu_info().arch),  # 'X86_32', 'X86_64', 'ARM_8', 'ARM_7', 'PPC_32', 'PPC_64', 'SPARC_32', 'SPARC_64', 'S390X', 'MIPS_32', 'MIPS_64', 'RISCV_32', 'RISCV_64'
         macros_string_template.format(macro_name='CPU_ARCH_RAW_STRING', macro_value=cpu_info().arch_string_raw),
         macros_string_template.format(macro_name='CPU_BITS', macro_value=cpu_info().bits),  # '32', '64'
-        macros_string_template.format(macro_name='IS_X86', macro_value=cpu_info().is_x86),  # 'True', 'False'
-        macros_string_template.format(macro_name='IS_ARM', macro_value=cpu_info().is_arm),  # 'True', 'False'
+        macros_string_template.format(macro_name='IS_X86', macro_value=int(cpu_info().is_x86)),  # 'True', 'False'
+        macros_string_template.format(macro_name='IS_ARM', macro_value=int(cpu_info().is_arm)),  # 'True', 'False'
         macros_string_template.format(macro_name='COMPILER_TYPE', macro_value=compiler_type),  # 'gcc', 'msvc', 'clang', 'icc', 'llvm', 'intel', 'arm', 'mingw', 'unknown'
         macros_string_template.format(macro_name='COMPILER_NAME', macro_value=compiler_name),  # 'x86_64-linux-gnu-gcc_-pthread'
         macros_string_template.format(macro_name='PYTHON_IMPLEMENTATION', macro_value=PYTHON_IMPLEMENTATION),  # 'CPython', 'PyPy', 'IronPython', 'Jython'
@@ -221,13 +230,13 @@ def prepare_cflags():
 
 def prepare_compile_time_env():
     return {
-        'UNAME_SYSNAME': uname().sysname,  # see: https://en.wikipedia.org/wiki/Uname
-        'UNAME_MACHINE': uname().machine,  # see: https://en.wikipedia.org/wiki/Uname
+        'UNAME_SYSNAME': uname_sysname,  # see: https://en.wikipedia.org/wiki/Uname
+        'UNAME_MACHINE': uname_machine,  # see: https://en.wikipedia.org/wiki/Uname
         'CPU_ARCH': cpu_info().arch,  # 'X86_32', 'X86_64', 'ARM_8', 'ARM_7', 'PPC_32', 'PPC_64', 'SPARC_32', 'SPARC_64', 'S390X', 'MIPS_32', 'MIPS_64', 'RISCV_32', 'RISCV_64'
         'CPU_ARCH_RAW_STRING': cpu_info().arch_string_raw,
         'CPU_BITS': cpu_info().bits,  # '32', '64'
-        'IS_X86': cpu_info().is_x86,  # 'True', 'False'
-        'IS_ARM': cpu_info().is_arm,  # 'True', 'False'
+        'IS_X86': int(cpu_info().is_x86),  # 'True', 'False'
+        'IS_ARM': int(cpu_info().is_arm),  # 'True', 'False'
         'COMPILER_TYPE': compiler_type,  # 'gcc', 'msvc', 'clang', 'icc', 'llvm', 'intel', 'arm', 'mingw', 'unknown'
         'COMPILER_NAME': compiler_name,  # 'x86_64-linux-gnu-gcc_-pthread'
         'PYTHON_IMPLEMENTATION': PYTHON_IMPLEMENTATION,  # 'CPython', 'PyPy', 'IronPython', 'Jython'

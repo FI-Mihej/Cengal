@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.1.18"
+__version__ = "3.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -42,7 +42,7 @@ class DirTemplatesManager:
         template_content = self._templates[template_name]
         absolute_template_content = dict()
         for key, data in template_content.items():
-            data = data.split('/')
+            data = data.split(os.path.sep)
             data = os.path.join(root, *data)
             absolute_template_content[key] = data
         return absolute_template_content
@@ -56,6 +56,6 @@ class DirTemplatesManager:
 
 def get_property_as_relative_dir(config_manager, file, property_name, root):
     property_data = config_manager.get_property(file, property_name)
-    property_data = property_data.split('/')
+    property_data = property_data.split(os.path.sep)
     result = os.path.join(root, *property_data)
     return result

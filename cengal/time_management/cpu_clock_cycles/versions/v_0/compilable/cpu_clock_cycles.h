@@ -16,11 +16,11 @@
 #ifndef RDTSCP_H
 #define RDTSCP_H
 
-#if defined(C__IS_X86)
+#if defined(IS_X86)
 
 unsigned long long c_cpu_clock_cycles();
 
-#elif defined(C__IS_ARM)
+#elif defined(IS_ARM)
 
 unsigned u64 c_cpu_clock_cycles();
 
