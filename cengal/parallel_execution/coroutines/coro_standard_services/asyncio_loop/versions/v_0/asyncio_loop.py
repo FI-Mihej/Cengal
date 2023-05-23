@@ -19,8 +19,8 @@
 __all__ = ['AsyncioLoop', 'AsyncioLoopRequest', 'AsyncioLoopWasNotSetError', 'run_in_thread_pool']
 
 from cengal.parallel_execution.coroutines.coro_scheduler import *
-from cengal.parallel_execution.coroutines.coro_tools import create_task
-from cengal.parallel_execution.coroutines.coro_tools import task_in_thread_pool
+from cengal.parallel_execution.coroutines.coro_tools.await_coro import create_task
+from cengal.parallel_execution.coroutines.coro_tools.await_coro import task_in_thread_pool
 from cengal.parallel_execution.coroutines.coro_standard_services.loop_yield import gly, agly, CoroPriority
 from cengal.parallel_execution.coroutines.coro_standard_services.simple_yield import Yield
 from cengal.parallel_execution.asyncio.run_loop import run_forever, cancel_all_tasks
@@ -51,7 +51,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.1"
+__version__ = "3.2.2"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"

@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.1"
+__version__ = "3.2.2"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -39,7 +39,16 @@ from justpy_components import *
 from pprint import pprint
 from typing import NoReturn, Union, Optional, Dict, List, Type, Callable, Sequence
 from time import perf_counter
-from cengal.parallel_execution.coroutines import *
+# from cengal.parallel_execution.coroutines import *
+from cengal.parallel_execution.coroutines.coro_scheduler import *
+from cengal.parallel_execution.coroutines.coro_standard_services.sleep import Sleep
+from cengal.parallel_execution.coroutines.coro_standard_services.run_coro import RunCoro
+from cengal.parallel_execution.coroutines.coro_standard_services.loop_yield import LoopYieldPriorityScheduler, CoroPriority, gly, agly
+from cengal.parallel_execution.coroutines.coro_standard_services.timer_coro_runner import TimerCoroRunner
+from cengal.parallel_execution.coroutines.coro_standard_services.
+from cengal.parallel_execution.coroutines.coro_standard_services.
+from cengal.parallel_execution.coroutines.coro_tools.await_coro import RunSchedulerInAsyncioLoop
+from cengal.code_flow_control.args_manager import ArgsManager, EArgs
 from random import randint
 from time import perf_counter
 from justpy_coro_helpers import coro_interfaces
