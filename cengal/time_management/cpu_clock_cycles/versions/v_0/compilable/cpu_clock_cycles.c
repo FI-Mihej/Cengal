@@ -15,9 +15,21 @@
 
 #if defined(IS_X86)
 
+#ifdef _MSC_VER
+
+#include <intrin.h>
+
+extern unsigned long long c_cpu_clock_cycles() {
+    unsigned int ui;
+    unsigned long long cycles = __rdtscp(&ui);
+    return cycles;
+}
+
+#else
+
 extern unsigned long long c_cpu_clock_cycles()
 {
-    long long result;
+    unsigned long long result;
     asm volatile(
         "RDTSCP;"
         "SHLQ $32,%%rdx;"
@@ -29,6 +41,8 @@ extern unsigned long long c_cpu_clock_cycles()
     );
     return result;
 }
+
+#endif
 
 #elif defined(IS_ARM)
 

@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.0"
+__version__ = "3.2.1"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -47,8 +47,9 @@ from cengal.introspection.inspect import get_exception
 from cengal.system import OS_TYPE, TEMPLATE_MODULE_NAME
 from shutil import rmtree
 from os import remove
-from os.path import splitext, normpath, join as path_join, basename, splitext
-from setuptools import Extension
+from os.path import splitext, normpath, join as path_join, basename, split
+# from setuptools import Extension
+from Cython.Distutils import Extension
 from distutils.command.build import build as build_orig
 from distutils.command.build_ext import build_ext as build_ext_orig
 from setuptools.command.sdist import sdist as sdist_orig
@@ -85,6 +86,59 @@ def remove_header_files(ext_modules: Sequence[Extension]) -> Sequence[Extension]
             
             ext_module.sources = new_sources
     
+    return ext_modules
+
+
+def extend_file_names_to_root_relative_paths(root_path: str, dir_path_obj: RelativePath, file_names_or_path: Sequence[str]) -> Sequence[str]:
+    result = list()
+    for file_name_or_path in file_names_or_path:
+        if not file_name_or_path:
+            continue
+        
+        owner_path, file_name = split(file_name_or_path)
+        file_name = file_name.strip()
+        if owner_path:
+            result.append(file_name_or_path)
+        else:
+            result.append(path_join('.', get_relative_path_part(dir_path_obj(file_name), root_path)))
+    
+    return result
+
+
+def process_macros(ext_modules: Sequence[Extension]) -> Sequence[Extension]:
+    for ext_module in ext_modules:
+        if isinstance(ext_module, Extension):
+            if hasattr(ext_module, 'compile_time_env'):
+                compile_time_env = ext_module.compile_time_env
+            else:
+                compile_time_env = dict()
+            
+            if hasattr(ext_module, 'cython_compile_time_env'):
+                cython_compile_time_env = ext_module.cython_compile_time_env or dict()
+                compile_time_env.update(cython_compile_time_env)
+                ext_module.cython_compile_time_env = dict()
+            
+            ext_module.compile_time_env = compile_time_env
+
+            if hasattr(ext_module, 'define_macros'):
+                define_macros = ext_module.define_macros
+            else:
+                define_macros = list()
+            
+            if isinstance(define_macros, dict):
+                define_macros = list(define_macros.items())
+            
+            new_define_macros = list()
+            for macros_name, macros_value in define_macros:
+                macros_value = str(macros_value)
+                macros_value = macros_value.strip()
+                if not macros_value:
+                    macros_value = None
+                
+                new_define_macros.append((macros_name, macros_value))
+            
+            ext_module.define_macros = define_macros
+
     return ext_modules
 
 
@@ -167,6 +221,7 @@ def find_and_prepare_cython_modules(depth = 1):
             module_full_name = '.'.join([name_part for name_part in name_parts if name_part])
             build_config_module = importlib.import_module(module_full_name)
             build_config = build_config_module.build_config()
+            is_exctension = True
 
         sub_result = list()
         if (cython_file_ext in extensions) or (build_config is not None):
@@ -178,7 +233,7 @@ def find_and_prepare_cython_modules(depth = 1):
                     
                     if '.c' == file_extension.lower():
                         filename, _ = splitext(file)
-                        if filename.endswith('__cython'):
+                        if filename.endswith('__cython') or filename.endswith('__python'):
                             try:
                                 remove(dir_path_obj(file))
                             except OSError as e:
@@ -207,7 +262,8 @@ def find_and_prepare_cython_modules(depth = 1):
                     name, 
                     sources=sub_result,
                     language="c",
-                    cython_compile_time_env=prepare_compile_time_env(),
+                    # cython_compile_time_env=prepare_compile_time_env(),
+                    define_macros=prepare_compile_time_env(),
                 )
             else:
                 if 'Windows' == OS_TYPE:
@@ -222,11 +278,20 @@ def find_and_prepare_cython_modules(depth = 1):
                 if 'cython_compile_time_env' in build_config:
                     cython_compile_time_env.update(build_config['cython_compile_time_env'])
                     build_config.pop('cython_compile_time_env', None)
+
+                define_macros=prepare_compile_time_env()
+                if 'define_macros' in build_config:
+                    define_macros.update(build_config['define_macros'])
+                    build_config.pop('define_macros', None)
+                
+                sources = extend_file_names_to_root_relative_paths(root_path, dir_path_obj, build_config.pop('sources', list()))
+                sources.extend(sub_result)
                 
                 extension: Extension = Extension(
                     name, 
-                    sources=sub_result,
-                    cython_compile_time_env=cython_compile_time_env,
+                    sources=sources,
+                    # cython_compile_time_env=cython_compile_time_env,
+                    define_macros=define_macros,
                     **build_config
                 )
             
@@ -255,10 +320,11 @@ class build(build_orig):
         super().finalize_options()
         if 'CENGAL_BUILD_IS_IN_SDIST_MODE' not in environ:
             from Cython.Build import cythonize
-            self.distribution.ext_modules = remove_header_files(cythonize(self.distribution.ext_modules,
-                                                compiler_directives={'language_level': '3'},
-                                                compile_time_env = prepare_compile_time_env(),
-                                                ))
+            self.distribution.ext_modules = remove_header_files(
+                cythonize(process_macros(self.distribution.ext_modules),
+                compiler_directives={'language_level': '3'},
+                compile_time_env = prepare_compile_time_env(),
+                ))
             if 'CENGAL_BUILD_IS_IN_DEBUG_MODE' in environ:
                 debugpy.breakpoint()
                 print()
@@ -272,10 +338,11 @@ class build_ext(build_ext_orig):
         super().finalize_options()
         if 'CENGAL_BUILD_IS_IN_SDIST_MODE' not in environ:
             from Cython.Build import cythonize
-            self.distribution.ext_modules = remove_header_files(cythonize(self.distribution.ext_modules,
-                                                compiler_directives={'language_level': '3'},
-                                                compile_time_env = prepare_compile_time_env(),
-                                                ))
+            self.distribution.ext_modules = remove_header_files(
+                cythonize(process_macros(self.distribution.ext_modules),
+                compiler_directives={'language_level': '3'},
+                compile_time_env = prepare_compile_time_env(),
+                ))
             if 'CENGAL_BUILD_IS_IN_DEBUG_MODE' in environ:
                 debugpy.breakpoint()
                 print()

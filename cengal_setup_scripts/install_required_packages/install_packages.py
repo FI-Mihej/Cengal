@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.0"
+__version__ = "3.2.1"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -106,7 +106,7 @@ class PyPiModules(ModulesLists):
             # 'wheel',
             # 'virtualenv',
 
-            'Cython',
+            'Cython>=0.29.34',
             'python-dateutil',
             # 'holidays',
             # 'bdateutil',  # Used by Cengal. However requires outdated version of python-dateutil==2.2. Leads to conflicts with 'pendulum' and 'pandas'. Must not be installed. Latest dev version will be installed from github in ExternalGitModules.
