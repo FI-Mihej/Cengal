@@ -49,7 +49,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.2"
+__version__ = "3.2.5"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -1180,7 +1180,7 @@ class Db(Service, EntityStatsMixin):
                 await task_in_thread_pool(asyncio_loop, sync_worker)
 
             env: lmdb.Environment = self.db_environments[env_id].env
-            await i(AsyncioLoop, AsyncioLoopRequest.wait(sync_db, self, asyncio_loop, env))
+            await i(AsyncioLoop, AsyncioLoopRequest.wait(sync_db(self, asyncio_loop, env)))
             self.write_locked_coro_id.discard(i.coro_id)
             def make_service_live_for_a_next_sync(self: 'Db'):
                 self.make_live()

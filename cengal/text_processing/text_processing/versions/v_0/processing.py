@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.2"
+__version__ = "3.2.5"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -91,7 +91,7 @@ def normalize_text(text: Text, desired_type: Type, encoding: Optional[str] = DEF
     elif issubclass(desired_type, bytearray):
         if isinstance(text, bytearray):
             pass
-        if isinstance(text, bytes):
+        elif isinstance(text, bytes):
             text = bytearray(text)
         elif isinstance(text, str):
             if encoding:
@@ -103,7 +103,7 @@ def normalize_text(text: Text, desired_type: Type, encoding: Optional[str] = DEF
     elif issubclass(desired_type, str):
         if isinstance(text, str):
             pass
-        if isinstance(text, bytes) or isinstance(text, bytearray):
+        elif isinstance(text, bytes) or isinstance(text, bytearray):
             if encoding:
                 text = text.decode(encoding)
             else:
@@ -151,13 +151,14 @@ def replace_text(data: Text, old_text: Text, new_text: Text, count: int = -1, en
     return data.replace(old_text, new_text, count)
 
 
-def normalize_line_separators(text: Text) -> Text:
+def normalize_line_separators(text: Text, encoding: Optional[str] = DEFAULT_ENCODING, normalizer: Optional[Callable] = None) -> Text:
     lines = text.splitlines()
-    return normalize_text('\n', type(text)).join(lines)
+    line_separator = '\n'
+    return normalize_text(line_separator, type(text), encoding, normalizer).join(lines)
 
 
-def normalize_line_separators_and_tabs(text: Text, tabsize=4) -> Text:
-    text = normalize_line_separators(text)
+def normalize_line_separators_and_tabs(text: Text, tabsize=4, encoding: Optional[str] = DEFAULT_ENCODING, normalizer: Optional[Callable] = None) -> Text:
+    text = normalize_line_separators(text, encoding, normalizer)
     return text.expandtabs(tabsize)
 
 

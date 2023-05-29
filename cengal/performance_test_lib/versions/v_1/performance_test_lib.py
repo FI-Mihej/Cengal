@@ -20,10 +20,12 @@ import gc
 from contextlib import contextmanager
 from cengal.code_flow_control.smart_values.versions.v_2 import ValueExistence
 from cengal.parallel_execution.coroutines.coro_standard_services.lazy_print.versions.v_0.lazy_print import lprint
-from cengal.time_management.load_best_timer import perf_counter
+from cengal.time_management.load_best_timer import perf_counter, process_time
 from cengal.time_management.repeat_for_a_time import Tracer, ClockType
 from cengal.math.numbers import RationalNumber
 from cengal.introspection.inspect import is_async
+from cengal.introspection.inspect import func_name, entity_properties
+from typing import Union, Callable, Awaitable
 
 """
 Module Docstring
@@ -34,7 +36,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.2"
+__version__ = "3.2.5"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -228,3 +230,163 @@ class PrecisePerformanceTestTracer(Tracer):
             gc.enable()
         if self.suppress_exceptions:
             return True
+
+
+class MeasureTime:
+    def __init__(self, name: str=None, do_print: Union[bool, Callable] = True, raise_exceptions: bool = True):
+        self.name = name
+        self.do_print: Union[bool, Callable] = do_print
+        self.raise_exceptions: bool = raise_exceptions
+        self.start_time = None
+        self.stop_time = None
+        self.time_spent = None
+        self.exc_type = None
+        self.exc_value = None
+        self.exc_tb = None
+
+    def __enter__(self):
+        self.start_time = perf_counter()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.exc_type = exc_type
+        self.exc_value = exc_val
+        self.exc_tb = exc_tb
+
+        self.stop_time = perf_counter()
+        self.time_spent = self.stop_time - self.start_time
+        if self.do_print:
+            if isinstance(self.do_print, bool):
+                if self.name is not None:
+                    print(f'>>> "{self.name}"')
+                else:
+                    print('>>>')
+
+                if self.exc_type is not None:
+                    print(f'\t Exception: {self.exc_type}')
+                    print(f'\t Exception value: {self.exc_value}')
+                    print(f'\t Exception traceback: {self.exc_tb}')
+                
+                print(f'\t It was used {self.time_spent} seconds')
+                if self.time_spent:
+                    print(f'\t It is {1 / self.time_spent} iterations/seconds')
+                    print()
+            else:
+                self.do_print(self)
+        
+        return not self.raise_exceptions
+
+
+class MeasureProcessTime:
+    def __init__(self, name: str=None, do_print: Union[bool, Callable] = False, raise_exceptions: bool = True):
+        self.name = name
+        self.do_print: Union[bool, Callable] = do_print
+        self.raise_exceptions: bool = raise_exceptions
+        self.start_time = None
+        self.stop_time = None
+        self.time_spent = None
+        self.exc_type = None
+        self.exc_value = None
+        self.exc_tb = None
+
+    def __enter__(self):
+        self.start_time = process_time()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.exc_type = exc_type
+        self.exc_value = exc_val
+        self.exc_tb = exc_tb
+
+        self.stop_time = process_time()
+        self.time_spent = self.stop_time - self.start_time
+        if self.do_print:
+            if isinstance(self.do_print, bool):
+                if self.name is not None:
+                    print(f'>>> "{self.name}"')
+                else:
+                    print('>>>')
+
+                if self.exc_type is not None:
+                    print(f'\t Exception: {self.exc_type}')
+                    print(f'\t Exception value: {self.exc_value}')
+                    print(f'\t Exception traceback: {self.exc_tb}')
+                
+                print(f'\t It was used {self.time_spent} seconds')
+                if self.time_spent:
+                    print(f'\t It is {1 / self.time_spent} iterations/seconds')
+                    print()
+            else:
+                self.do_print(self)
+        
+        return not self.raise_exceptions
+
+
+def measure_func_performance(func: Callable, 
+                    run_time: float,
+                    name: str=None, 
+                    do_print: Union[bool, Callable] = False, 
+                    clock_type: ClockType=ClockType.perf_counter,
+                    suppress_exceptions: bool=False,
+                    turn_off_gc: bool=False
+                   ):
+    tr = PrecisePerformanceTestTracer(run_time, clock_type, suppress_exceptions, turn_off_gc)
+    try:
+        if turn_off_gc:
+            gc.disable()
+        
+        while tr.iter():
+            func()
+
+        with tr as fast_iter:
+            for i in fast_iter:
+                func()
+    finally:
+        if turn_off_gc:
+            gc.enable()
+
+    if do_print:
+        if isinstance(do_print, bool):
+            if name is not None:
+                print(f'>>> "{name}": {func_name(func)}()')
+            else:
+                print(f'>>> {func_name(func)}()')
+
+            print(f'\t It was used {tr.time_spent} seconds to make {tr.iterations_made} iterations. Performance: {tr.iter_per_time_unit} iterations/seconds')
+        else:
+            do_print(func, run_time, name, clock_type, tr)
+
+
+async def measure_afunc_performance(afunc: Awaitable, 
+                    run_time: float,
+                    name: str=None, 
+                    do_print: Union[bool, Callable] = False, 
+                    clock_type: ClockType=ClockType.perf_counter,
+                    suppress_exceptions: bool=False,
+                    turn_off_gc: bool=False
+                   ):
+    tr = PrecisePerformanceTestTracer(run_time, clock_type, suppress_exceptions, turn_off_gc)
+    try:
+        if turn_off_gc:
+            gc.disable()
+        
+        while tr.iter():
+            await afunc
+
+        with tr as fast_iter:
+            for i in fast_iter:
+                await afunc
+    finally:
+        if turn_off_gc:
+            gc.enable()
+
+    if do_print:
+        if isinstance(do_print, bool):
+            if name is not None:
+                print(f'>>> "{name}": {func_name(afunc)}()')
+            else:
+                print(f'>>> {func_name(afunc)}()')
+
+            print(f'\t It was used {tr.time_spent} seconds to make {tr.iterations_made} iterations. Performance: {tr.iter_per_time_unit} iterations/seconds')
+        else:
+            do_print(afunc, run_time, name, clock_type, tr)

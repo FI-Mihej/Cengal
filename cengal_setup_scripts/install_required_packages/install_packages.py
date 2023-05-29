@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.2"
+__version__ = "3.2.5"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -181,7 +181,9 @@ class PyPiModules(ModulesLists):
             'orjson',
             'python3-dtls',
             'cloudpickle',
-            'psutil'
+            'psutil',
+            'ttkbootstrap',
+            'pprintpp'
         ]
 
         self.windows_allowed = {
@@ -206,6 +208,7 @@ class PyPiModules(ModulesLists):
             'requests',  # already preinstalled in Ubuntu 14.04 x64
             'greenlet',
             'lmdb',
+            'ttkbootstrap'
         }
 
         if (PYTHON_VERSION_INT[:3] < (3, 4, 0)):

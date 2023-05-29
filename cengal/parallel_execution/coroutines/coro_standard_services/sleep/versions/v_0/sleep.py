@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.2"
+__version__ = "3.2.5"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -77,8 +77,7 @@ class Sleep(TypedService[float]):
         self.pending_tasks_number -= 1
 
     def in_work(self) -> bool:
-        result: bool = self.pending_tasks_number != 0
-        return self.thrifty_in_work(result)
+        return self.thrifty_in_work(self.pending_tasks_number != 0)
     
     def time_left_before_next_event(self) -> Tuple[bool, Optional[Union[int, float]]]:
-        return True, self.timer.nearest_event()
+        return self.pending_tasks_number != 0, self.timer.nearest_event()

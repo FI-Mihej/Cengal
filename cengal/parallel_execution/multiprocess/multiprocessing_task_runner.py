@@ -39,7 +39,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.2"
+__version__ = "3.2.5"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -93,6 +93,7 @@ class SubprocessWorkerSettings(BaseClassSettings):
         self.queue_from_subprocess = None  # only needed if you want to directly connect this worker with another.
         #   For example to connect output from this worker to input of another worker.
         self.input_queue_average_size_trigger_limit = 30
+        self.subprocess_reading_timeout = 0.1
 
     def check(self):
         if self.working_function is None:
@@ -254,7 +255,7 @@ class SubprocessWorker:
                             break
                     elif Transport.queue == self.settings.transport:
                         if not input_from_parent_process_queue.empty():
-                            another_chunk_of_data = input_from_parent_process_queue.get()
+                            another_chunk_of_data = input_from_parent_process_queue.get(block=False, timeout=self.settings.subprocess_reading_timeout)
                         else:
                             break
                     self.list_of_subprocess_input_data.append(another_chunk_of_data)
@@ -276,7 +277,7 @@ class SubprocessWorker:
                         if self.settings.on_input_queue_is_too_big is not None:
                             self.settings.on_input_queue_is_too_big(self.data_shelf, average_input_size_trigger_result)
 
-                # data = input_from_parent_process_queue.get()
+                # data = input_from_parent_process_queue.get(block=False, timeout=self.settings.subprocess_reading_timeout)
                 if len(self.list_of_subprocess_input_data) > 0:
                     data = self.list_of_subprocess_input_data[0]
                     # print('===>>', self.settings.process_name, 'input_data:', data)
@@ -307,7 +308,10 @@ class SubprocessWorker:
                                 self.settings.on_input_queue_is_too_big(self.data_shelf,
                                                                         average_input_size_trigger_result)
 
-                    data = input_from_parent_process_queue.get()
+                    try:
+                        data = input_from_parent_process_queue.get(block=True, timeout=self.settings.subprocess_reading_timeout)
+                    except Empty:
+                        pass
 
             # print('===>>', self.settings.process_name, '_subprocess_wrapper', '2')
 

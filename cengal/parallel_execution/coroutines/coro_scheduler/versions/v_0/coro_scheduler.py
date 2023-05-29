@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.2"
+__version__ = "3.2.5"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -42,7 +42,6 @@ __all__ = [
 import sys
 import os
 import inspect
-from cengal.time_management.timer import Timer
 from contextlib import contextmanager
 from typing import Coroutine, Dict, Tuple, List, Callable, Awaitable, Any, Optional, Type, Set, Union, Generator, AsyncGenerator, overload, Generic, TypeVar
 from enum import Enum
@@ -51,7 +50,6 @@ from cengal.time_management.load_best_timer import perf_counter
 import traceback
 from contextlib import contextmanager
 from time import sleep
-from copy import copy
 import logging
 from datetime import datetime
 from cengal.introspection.inspect import get_exception, exception_to_printable_text, is_async
@@ -60,7 +58,6 @@ from threading import local
 from cengal.time_management.sleep_tools import try_sleep, get_usable_min_sleep_interval
 from collections import deque
 from cengal.time_management.cpu_clock_cycles import cpu_clock_cycles
-from cengal.modules_management.alternative_import import alt_import
 
 
 greenlet_awailable: bool = True
@@ -881,7 +878,7 @@ class CoroSchedulerBase(Iterable, EntityStatsMixin):
                                 for key, value in wrapper.init_kwargs.items()
                             },
                         }
-                        for coro_id, wrapper in self.coroutines
+                        for coro_id, wrapper in self.coroutines.items()
                     },
                 },
                 'coro counter': self.coro_counter._index,
@@ -1199,7 +1196,7 @@ class CoroSchedulerBase(Iterable, EntityStatsMixin):
     def forget_coro_by_id(self, coro: 'CoroWrapperBase') -> Optional['CoroWrapperBase']:
         return self.forget_coro_by_id(coro.coro_id)
     
-    def find_coro_by_id(self, coro_id: CoroID) -> Tuple[Optional['CoroWrapperBase'], bool]:
+    def find_coro_by_id(self, coro_id: CoroID) -> Tuple[Optional['CoroWrapperBase'], bool, Optional[int]]:
         coro = None
         if coro_id in self.coroutines:
             was_new_born: bool = False

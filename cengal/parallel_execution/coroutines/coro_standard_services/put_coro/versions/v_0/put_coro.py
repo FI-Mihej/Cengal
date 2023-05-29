@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.2"
+__version__ = "3.2.5"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -187,7 +187,7 @@ class PutCoro(ServiceWithADirectRequestMixin, DualImmediateProcessingServiceMixi
         t = KeyMultiValueTreeTraversal(self._tree_children_by_parent, None, handler, on_switched_to_stack_based_implementation)
         t(coro_id)
     
-    def get_set_of_all_children(self, coro_id):
+    def get_set_of_all_children(self, coro_id) -> Set[CoroID]:
         result = set()
         def handler(deep, parent, child: ValueExistence[CoroID], index):
             if child:
@@ -348,22 +348,22 @@ def try_travers_through_all_coro_children(coro_id, handler: Callable[[int, CoroI
 # ==================================================
 
 
-def get_set_of_all_coro_children_on(prioritized_coro_scheduler: Optional[CoroScheduler], coro_id) -> ValueExistence[CoroID]:
+def get_set_of_all_coro_children_on(prioritized_coro_scheduler: Optional[CoroScheduler], coro_id) -> Set[CoroID]:
     put_coro: PutCoro = service_with_explicit_loop(PutCoro, prioritized_coro_scheduler)
     return put_coro.get_set_of_all_children(coro_id)
 
 
-def try_get_set_of_all_coro_children_on(prioritized_coro_scheduler: Optional[CoroScheduler], coro_id) -> ValueExistence[Optional[CoroID]]:
+def try_get_set_of_all_coro_children_on(prioritized_coro_scheduler: Optional[CoroScheduler], coro_id) -> Optional[Set[CoroID]]:
     put_coro: PutCoro = get_service_with_explicit_loop(PutCoro, prioritized_coro_scheduler)
     if put_coro is not None:
         return put_coro.get_set_of_all_children(coro_id)
 
 
-def get_set_of_all_coro_children(coro_id) -> ValueExistence[CoroID]:
+def get_set_of_all_coro_children(coro_id) -> Set[CoroID]:
     return get_set_of_all_coro_children_on(get_available_coro_scheduler(), coro_id)
 
 
-def try_get_set_of_all_coro_children(coro_id) -> ValueExistence[Optional[CoroID]]:
+def try_get_set_of_all_coro_children(coro_id) -> Optional[Set[CoroID]]:
     return try_get_set_of_all_coro_children_on(get_available_coro_scheduler(), coro_id)
 
 

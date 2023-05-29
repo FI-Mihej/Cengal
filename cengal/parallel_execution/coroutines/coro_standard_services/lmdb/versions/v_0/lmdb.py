@@ -32,7 +32,7 @@ from typing import Hashable, Tuple, List, Any, Dict, Callable
 import sys
 import os
 import asyncio
-import lmdb
+import lmdb as lmdb_lib
 
 
 """
@@ -44,7 +44,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.2"
+__version__ = "3.2.5"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -207,7 +207,7 @@ class Lmdb(Service, EntityStatsMixin):
                         txn.put(key, value, db=databases[db_id], dupdata=False, append=False)
 
                 self.writes_num += len(data_cache_buff)
-            except lmdb.MapFullError:
+            except lmdb_lib.MapFullError:
                 raise DBError.from_exception(db_id)
         
         lmdb_reapplier(self.db_environment, self.databases, put_handler)
@@ -237,7 +237,7 @@ class Lmdb(Service, EntityStatsMixin):
                             txn.drop(db=databases[db_id], delete=delete_db)
                         
                         self.db_drops_num += 1
-                    except lmdb.MapFullError:
+                    except lmdb_lib.MapFullError:
                         raise DBError.from_exception(db_id)
                     
                     dropped_databases.add(db_id)
@@ -315,7 +315,7 @@ class Lmdb(Service, EntityStatsMixin):
 
     def _init_db(self):
         print(f'self.path_to_db_environment: {self.path_to_db_environment}')
-        self.db_environment = lmdb.open(self.path_to_db_environment, map_size=20 * 1024**2, writemap=True, max_dbs=10,
+        self.db_environment = lmdb_lib.open(self.path_to_db_environment, map_size=20 * 1024**2, writemap=True, max_dbs=10,
                                         map_async=True, lock=False, metasync=False, sync=False, meminit=False)
         self.databases[None] = self.db_environment.open_db(self.default_db_name)
         self.db_environment.sync(True)
@@ -464,7 +464,7 @@ class Lmdb(Service, EntityStatsMixin):
                 asyncio_loop = await i(AsyncioLoop, AsyncioLoopRequest().ensure_loop(None,CoroPriority.low, True))
             else:
                 if asyncio_loop is None:
-                    asyncio_loop = await i(AsyncioLoop, AsyncioLoopRequest.get())
+                    asyncio_loop = await i(AsyncioLoop, AsyncioLoopRequest().get())
             
             async def sync_db(self, asyncio_loop):
                 def sync_worker():
@@ -472,7 +472,7 @@ class Lmdb(Service, EntityStatsMixin):
                 
                 await task_in_thread_pool(asyncio_loop, sync_worker)
 
-            await i(AsyncioLoop, AsyncioLoopRequest.wait(sync_db, self, asyncio_loop))
+            await i(AsyncioLoop, AsyncioLoopRequest().wait(sync_db(self, asyncio_loop)))
             self.write_locked_coro_id = None
             self.write_locked = False
             def make_service_live_for_a_next_sync(self):
@@ -512,7 +512,7 @@ class DBError(Exception):
         return DBError(db_id, get_exception())
 
 
-def lmdb_reapplier(environment: lmdb.Environment, databases: Dict[Hashable, Any], handler: Callable):
+def lmdb_reapplier(environment: lmdb_lib.Environment, databases: Dict[Hashable, Any], handler: Callable):
     failed = True
     while failed:
         need_to_resize: bool = False
@@ -520,7 +520,7 @@ def lmdb_reapplier(environment: lmdb.Environment, databases: Dict[Hashable, Any]
             handler(environment, databases)
             failed = False
         except DBError as err:
-            if isinstance(err.original_exception, lmdb.MapFullError):
+            if isinstance(err.original_exception, lmdb_lib.MapFullError):
                 need_to_resize = True
         
         if need_to_resize:

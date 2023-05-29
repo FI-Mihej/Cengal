@@ -16,15 +16,16 @@
 # limitations under the License.
 
 
-__all__ = ['GracefulCoroDestroy', 'graceful_coro_destroyer', 'agraceful_coro_destroyer']
+__all__ = ['GracefulCoroDestroy', 'graceful_coro_destroyer', 'agraceful_coro_destroyer', 'set_my_exit_handler', 'set_exit_handler', 'kill_coro_children', 'kill_my_children_on_exit', 'kill_children_on_exit']
 
 
-from typing import Optional, Type, Any, Hashable
-from cengal.parallel_execution.coroutines.coro_scheduler import CoroScheduler, Interface, CoroID, ExplicitWorker, Worker, CoroWrapperBase, get_interface_for_an_explicit_loop
-from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import PutCoro, put_coro_to, put_coro
+from typing import Optional, Type, Any, Hashable, cast, Set, Callable
+from cengal.parallel_execution.coroutines.coro_scheduler import CoroScheduler, Interface, CoroID, ExplicitWorker, Worker, CoroWrapperBase, get_interface_for_an_explicit_loop, current_interface, current_coro_scheduler
+from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import PutCoro, put_coro_to, put_coro, get_set_of_all_coro_children
 from cengal.parallel_execution.coroutines.coro_standard_services.sleep import Sleep
 from cengal.parallel_execution.coroutines.coro_standard_services.simple_yield import Yield
-from cengal.parallel_execution.coroutines.coro_standard_services.kill_coro import KillCoro
+from cengal.parallel_execution.coroutines.coro_standard_services.kill_coro import KillCoro, kill_coro
+from cengal.parallel_execution.coroutines.coro_standard_services.kill_coro_list import KillCoroList, kill_coro_list
 from cengal.parallel_execution.coroutines.coro_standard_services.throw_coro import ThrowCoro
 from cengal.parallel_execution.coroutines.coro_standard_services.wait_coro import WaitCoro, WaitCoroRequest, CoroutineNotFoundError
 from cengal.code_flow_control.smart_values import ValueExistence
@@ -39,7 +40,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.2"
+__version__ = "3.2.5"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -129,3 +130,56 @@ async def agraceful_coro_destroyer(
         pass
     finally:
         await i(Yield)
+
+
+def set_my_exit_handler(handler: Callable[[CoroWrapperBase], Optional[bool]]) -> bool:
+    i: Interface = current_interface()
+    coro = cast(CoroWrapperBase, i._coro)
+    coro.add_on_coro_del_handler(handler)
+
+
+def set_exit_handler(handler: Callable[[CoroWrapperBase], Optional[bool]], coro_id: Optional[CoroID] = None) -> bool:
+    current_loop: CoroScheduler = current_coro_scheduler()
+    if coro_id is None:
+        i: Interface = current_loop.current_interface()
+        if i is None:
+            return False
+        
+        coro_id = i.coro_id
+    
+    if coro_id is None:
+        return False
+    
+    coro, was_new_born, new_born_index = current_loop.find_coro_by_id(coro_id)
+    coro = cast(CoroWrapperBase, coro)
+    coro.add_on_coro_del_handler(handler)
+
+
+def kill_coro_children(coro: CoroWrapperBase):
+    coro_id = coro.coro_id
+    children: Set[CoroID] = get_set_of_all_coro_children(coro_id)
+    for child_id in children:
+        kill_coro(child_id, tree=True)
+
+
+def kill_my_children_on_exit() -> bool:
+    i: Interface = current_interface()
+    coro = cast(CoroWrapperBase, i._coro)
+    coro.add_on_coro_del_handler(kill_coro_children)
+
+
+def kill_children_on_exit(coro_id: Optional[CoroID] = None) -> bool:
+    current_loop: CoroScheduler = current_coro_scheduler()
+    if coro_id is None:
+        i: Interface = current_loop.current_interface()
+        if i is None:
+            return False
+        
+        coro_id = i.coro_id
+    
+    if coro_id is None:
+        return False
+    
+    coro, was_new_born, new_born_index = current_loop.find_coro_by_id(coro_id)
+    coro = cast(CoroWrapperBase, coro)
+    coro.add_on_coro_del_handler(kill_coro_children)

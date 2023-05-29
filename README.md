@@ -161,6 +161,21 @@ It provides an ability to make more than 30000000 reads/writes per second of an 
 
 ![title](https://github.com/FI-Mihej/Cengal/raw/master/docs/assets/Cengal_Tkinter_True_Borderless_Draggable_Applications_Windows_10.png)
 
+## Cengal Coroutines and Asyncio Administration and Monitoring Page
+
+Observe loop performance, services state and coroutines list with details. Use an async interactive console in order to interact with your application from inside.
+
+### YouTube Showcase
+
+<a href="https://www.youtube.com/watch?feature=player_embedded&v=qiuOH9B6uCY" target="_blank">
+ <img src="https://github.com/FI-Mihej/Cengal/raw/master/docs/assets/CoroSchedulerAdminYoutube.png" alt="Watch the video" width="640" height="360" border="5" />
+</a>
+
+### Examples
+
+[admin_test.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/coro_tools/loop_administration/admin_tk/versions/v_0/development/admin_test.py)
+
+
 # Modules with unique functionality
 
 * **"parallel_execution"**

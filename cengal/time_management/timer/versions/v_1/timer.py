@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.2"
+__version__ = "3.2.5"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -37,7 +37,7 @@ __status__ = "Development"
 __all__ = ['TimerHandler', 'TimeInSeconds', 'TimerRequest', 'Timer']
 
 
-from time import perf_counter
+from cengal.time_management.cpu_clock import cpu_clock
 from cengal.math.numbers import RationalNumber
 from cengal.data_generation.id_generator import IDGenerator, GeneratorType
 from collections import deque
@@ -54,26 +54,27 @@ class TimerRequest:
         self.request_id: RequestId = id
         self.timer_handler = timer_handler
         self.requested_time = desired_time
-        self.start_time = perf_counter()
+        self.start_time = cpu_clock()
         self.real_end_time = None
         self.processed = False
 
     def __call__(self, current_time = None) -> bool:
         if not self.processed:
-            if current_time is None: current_time = perf_counter()
+            if current_time is None: current_time = cpu_clock()
             if self.start_time > current_time:
                 self.start_time = current_time
             time_delta = current_time - self.start_time
             if time_delta >= self.requested_time:
                 self.timer_handler()
                 self.processed = True
+        
         return self.processed
 
     def time_left(self, current_time = None) -> Optional[TimeInSeconds]:
         if self.processed:
             return None
 
-        if current_time is None: current_time = perf_counter()
+        if current_time is None: current_time = cpu_clock()
         if self.start_time > current_time:
             self.start_time = current_time
         time_delta = current_time - self.start_time
@@ -104,13 +105,13 @@ class Timer:
         return request
     
     def _init_requests_order(self, request_id, desired_time):
-        current_time = perf_counter()
+        current_time = cpu_clock()
         self.last_time = current_time
         self.requests_order.append((request_id, desired_time))
         self.times_left_order.append(desired_time)
     
     def _fast_update_requests_order(self, request_id: RequestId, desired_time: TimeInSeconds):
-        current_time: TimeInSeconds = perf_counter()
+        current_time: TimeInSeconds = cpu_clock()
         time_left: TimeInSeconds = desired_time + (current_time - self.last_time)
         if self.requests_order[0][1] >= time_left:
             self.requests_order.appendleft((request_id, time_left))
@@ -125,7 +126,7 @@ class Timer:
     
     # Not needed anymore since much slower
     def _update_requests_order(self):
-        current_time = perf_counter()
+        current_time = cpu_clock()
         self.last_time = current_time
         requests_times_left = ((request.request_id, request.time_left(current_time)) for request in self.requests_dict.values())
         self.requests_order = deque((request_and_time_left for request_and_time_left in sorted(requests_times_left, key=lambda request_and_time_left: request_and_time_left[1])))
@@ -139,7 +140,7 @@ class Timer:
             return False
 
     def __call__(self, current_time = None):
-        if current_time is None: current_time = perf_counter()
+        if current_time is None: current_time = cpu_clock()
         time_spend = current_time - self.last_time
         need_to_process_num: int = 0
         for _, time_left in self.requests_order:
@@ -157,7 +158,7 @@ class Timer:
                 request()
 
     def nearest_event(self, current_time = None) -> Optional[TimeInSeconds]:
-        if current_time is None: current_time = perf_counter()
+        if current_time is None: current_time = cpu_clock()
         if not self.requests_order:
             return None
         

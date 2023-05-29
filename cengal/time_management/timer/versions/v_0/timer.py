@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.2"
+__version__ = "3.2.5"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -114,17 +114,22 @@ class Timer:
         requests_buff = self.requests
         self.requests = set()
         processed_requests = set()
-        for request in requests_buff:
-            if request():
-                processed_requests.add(request)
+        try:
+            for request in requests_buff:
+                request_result: bool = True
+                try:
+                    request_result = request()
+                finally:
+                    if request_result:
+                        processed_requests.add(request)
+        finally:
+            if processed_requests:
+                requests_buff -= processed_requests
 
-        if processed_requests:
-            requests_buff -= processed_requests
+            if self.requests:
+                requests_buff.update(self.requests)
 
-        if self.requests:
-            requests_buff.update(self.requests)
-
-        self.requests = requests_buff
+            self.requests = requests_buff
 
     def nearest_event(self) -> Optional[TimeInSeconds]:
         nearest_event_time = None
