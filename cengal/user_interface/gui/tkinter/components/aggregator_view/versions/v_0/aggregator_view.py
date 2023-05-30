@@ -28,7 +28,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.5"
+__version__ = "3.2.6"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -69,7 +69,7 @@ class AggregatorAppendFormatter:
 
 
 class AggregatorView(ttkb.Frame):
-    def __init__(self, append_data: bool, aggregator_key: Hashable, updating_interval: float, data_formatter_func: Optional[Callable], width, height, *args, **kwargs):
+    def __init__(self, append_data: bool, default_auto_scroll: bool, aggregator_key: Hashable, updating_interval: float, data_formatter_func: Optional[Callable], width, height, *args, **kwargs):
         self.append_data: bool = append_data
         self.updating_interval: float = updating_interval
         self.aggregator_key: Hashable = aggregator_key
@@ -101,7 +101,7 @@ class AggregatorView(ttkb.Frame):
 
         self.text_area._text['yscrollcommand'] = self.yscroll
         self.text_area._vbar.config(command=self.yview)
-        self.auto_scroll: bool = True
+        self.auto_scroll: bool = default_auto_scroll
         self.last_yscroll: Tuple[str, str] = None
         self.last_lines_num: int = None
         self.last_yview: Tuple[str] = None
@@ -235,7 +235,7 @@ class AggregatorView(ttkb.Frame):
         return
 
     def put(self, text: str):
-        lines_num_before = int(float(self.text_area._text.index('end')))
+        lines_num_before = self.index_to_line_number(self.text_area._text.index('end'))
         view_fractions_before = self.text_area._text.yview()
         line_before = int(ceil(lines_num_before * float(view_fractions_before[0])))
         tag_insert_before = self.text_area._text.index(ttkb__INSERT)
@@ -243,13 +243,13 @@ class AggregatorView(ttkb.Frame):
         
         if not self.append_data:
             self.clear_context()
-            
+        
         self.text_area._text.insert('end', text)
         
-        if self.append_data:
-            if self.auto_scroll:
-                self.text_area._text.yview(ttkb__END)
-        else:
+        if self.auto_scroll:
+            self.text_area._text.yview(ttkb__END)
+
+        if not self.append_data:
             self.text_area._text.tag_remove(ttkb__INSERT, '1.0', 'end')
             self.text_area._text.tag_add(ttkb__INSERT, tag_insert_before)
             self.text_area._text.tag_remove(ttkb__CURRENT, '1.0', 'end')
@@ -258,7 +258,7 @@ class AggregatorView(ttkb.Frame):
             self.text_area._text.mark_set(ttkb__INSERT, tag_insert_before)
             self.apply_selection()
             
-            lines_num_after = int(float(self.text_area._text.index('end')))
+            lines_num_after = self.index_to_line_number(self.text_area._text.index('end'))
             view_fractions_after = self.text_area._text.yview()
             line_after = int(ceil(lines_num_after * float(view_fractions_after[0])))
             
@@ -268,16 +268,25 @@ class AggregatorView(ttkb.Frame):
                 movement = line_before - line_after
                 self.text_area._text.yview_scroll(movement, 'units')
     
+    def index_to_line_number(self, index: str):
+        return int(index.split('.')[0])
+
     def clear_context(self):
         self.text_area._text.delete('1.0', 'end')
 
     def yscroll(self, *args):
-        lines_num = int(float(self.text_area._text.index('end')))
-        index = (lines_num - 1) / lines_num
-        if index <= float(args[1]):
-            self.auto_scroll = True
+        first, last = args
+        lines_num = self.index_to_line_number(self.text_area._text.index('end')) - 1
+        last_line_index = lines_num - 1
+        first_visible_line_index = int(ceil(lines_num * float(first)))
+        last_visible_line_index = int(ceil(lines_num * float(last))) - 1
+
+        if self.auto_scroll:
+            if (0 < first_visible_line_index) and (last_visible_line_index < last_line_index):
+                self.auto_scroll = False
         else:
-            self.auto_scroll = False
+            if (0 <= last_line_index) and (0 <= last_visible_line_index) and (0 < first_visible_line_index) and (last_visible_line_index >= first_visible_line_index) and (last_visible_line_index == last_line_index):
+                self.auto_scroll = True
         
         self.text_area._vbar.set(*args)
 
@@ -298,7 +307,9 @@ class AggregatorView(ttkb.Frame):
                     if isinstance(self.data_formatter_func, AggregatorAppendFormatter):
                         self.updates_num = 1
                         self.data_formatter_func.reset()
+                        auto_scroll_buff = self.auto_scroll
                         self.clear_context()
+                        self.auto_scroll = auto_scroll_buff
                     
                 data = i(FastAggregator, self.aggregator_key)
                 if self.append_data:

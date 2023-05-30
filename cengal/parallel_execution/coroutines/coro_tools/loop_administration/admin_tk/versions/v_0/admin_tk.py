@@ -28,7 +28,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.5"
+__version__ = "3.2.6"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -36,7 +36,7 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-from time import perf_counter
+from cengal.time_management.load_best_timer import perf_counter
 import ttkbootstrap as ttkb
 from ttkbootstrap.scrolled import ScrolledText as TtkbScrolledText
 from tkinter import simpledialog
@@ -50,7 +50,7 @@ from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import
 from cengal.parallel_execution.coroutines.coro_standard_services.run_coro import RunCoro
 from cengal.parallel_execution.coroutines.coro_standard_services.sleep import Sleep
 from cengal.parallel_execution.coroutines.coro_standard_services.simple_yield import Yield
-from cengal.parallel_execution.coroutines.coro_standard_services.asyncio_loop import AsyncioLoopRequest
+from cengal.parallel_execution.coroutines.coro_standard_services.asyncio_loop import AsyncioLoopRequest, run_in_thread_pool, run_in_thread_pool_fast
 from cengal.parallel_execution.coroutines.coro_standard_services.fast_aggregator import *
 from cengal.parallel_execution.coroutines.coro_tools.coro_flow_control import graceful_coro_destroyer, GracefulCoroDestroy
 from cengal.statistics.normal_distribution import average
@@ -280,35 +280,41 @@ class CSStatsFormatterMultiprocess:
             'filtered_paths': self.filtered_paths
         }
         
-        self.worker = SubprocessWorker(settings)
+        self.worker: SubprocessWorker = SubprocessWorker(settings)
+        self.worker.start(wait_for_process_readyness=False)
+        self.worker_is_ready: bool = False
+    
+    async def _worker_readyness_waiting_coro(self, i: Interface):
+        need_to_wait = True
+        while need_to_wait:
+            try:
+                self.worker.wait_for_subprocess_readines(block=False)
+                need_to_wait = False
+            except SubprocessIsNotReadyError:
+                await i(Sleep, 0.1)
+        
+        self.worker_is_ready = True
+    
+    async def wait_for_worker_readyness(self, i: Interface):
+        while not self.worker_is_ready:
+            await i(Sleep, 0.1)
     
     def start(self, wr: TkObjWrapper):
-        self.worker.start()
-        wr.put_coro(self.start_and_wait_for_subprocess)
+        wr.put_coro(self._worker_readyness_waiting_coro)
     
     def stop(self):
         self._stop = True
-        self.worker.stop()
-    
-    async def start_and_wait_for_subprocess(self, i: Interface):
-        self.worker.send_data_to_subprocess({
-            'type': 'init',
-            'data': None,
-        })
-        got_result = False
-        while (not got_result) and (not self._stop):
-            try:
-                result = self.worker.get_answer_from_subprocess(block_queue=False, time_out=0.1)
-            except Empty:
-                pass
-            else:
-                got_result = True
-            
-            if not got_result:
-                await i(Sleep, 0.01)
+        need_to_block = False
+        try:
+            i: Interface = current_interface()
+        except:
+            need_to_block = True
         
-        self._subprocess_started = True
-    
+        if need_to_block:
+            self.worker.stop()
+        else:
+            run_in_thread_pool_fast(i, self.worker.stop)
+        
     def update_filtered_paths(self, filtered_paths: List[Sequence[str]]):
         i: Interface = current_interface()
         self.filtered_paths = filtered_paths
@@ -318,7 +324,7 @@ class CSStatsFormatterMultiprocess:
         })
     
     def __call__(self, data):
-        if not self._subprocess_started:
+        if not self.worker_is_ready:
             # return data
             return '<<Waiting for subprocess to start...>>'
         
@@ -331,7 +337,7 @@ class CSStatsFormatterMultiprocess:
         got_result = False
         while (not got_result) and (not self._stop):
             try:
-                result = self.worker.get_answer_from_subprocess(block_queue=False, time_out=0.1)
+                result = self.worker.get_answer_from_subprocess(block=False)
             except Empty:
                 pass
             else:
@@ -356,22 +362,20 @@ class CSStatsFormatterMultiprocess:
     @staticmethod
     def process_worker(global_data, data_msg):
         data = data_msg['data']
-        if 'init' == data_msg['type']:
-            pass
-        elif 'filter' == data_msg['type']:
+        if 'filter' == data_msg['type']:
             if global_data is None:
                 global_data = dict()
             
             global_data['filtered_paths'] = data
+            return None  # no answer to parent process
         elif 'data' == data_msg['type']:
             filtered_paths = global_data['filtered_paths']
             for path in filtered_paths:
                 try_del_dict_item(data, path)
             
             data = pf(data, indent=4, width=120)
-
-        data_msg['data'] = data
-        return data_msg
+            data_msg['data'] = data
+            return data_msg
 
 
 class CorosMaxExecutionTimesProvider:
@@ -442,32 +446,65 @@ class SchedulerPerformanceFormatter:
         settings.working_function = self.process_worker
         settings.transport = Transport.queue
         settings.sendable_data_type = SendableDataType.marshalable
-        self.worker = SubprocessWorker(settings)
-        self.worker.start()
+        self.worker: SubprocessWorker = SubprocessWorker(settings)
+        self.worker.start(wait_for_process_readyness=False)
+        self.worker_is_ready: bool = False
+    
+    async def _worker_readyness_waiting_coro(self, i: Interface):
+        need_to_wait = True
+        while need_to_wait:
+            try:
+                self.worker.wait_for_subprocess_readines(block=False)
+                need_to_wait = False
+            except SubprocessIsNotReadyError:
+                await i(Sleep, 0.1)
+        
+        self.worker_is_ready = True
+    
+    async def wait_for_worker_readyness(self, i: Interface):
+        while not self.worker_is_ready:
+            await i(Sleep, 0.1)
     
     def start(self, wr: Optional[TkObjWrapper] = None):
         if self.i is None:
             self.i = current_interface()
         
         if wr:
+            wr.put_coro(self._worker_readyness_waiting_coro)
             wr.put_coro(self._update)
             wr.put_coro(self._update_stats)
         else:
+            self.i(PutCoro, self._worker_readyness_waiting_coro)
             self.i(PutCoro, self._update)
             self.i(PutCoro, self._update_stats)
     
     def stop(self):
         self._stop = True
+        need_to_block = False
+        try:
+            i: Interface = current_interface()
+        except:
+            need_to_block = True
+        
+        if need_to_block:
+            self.worker.stop()
+        else:
+            run_in_thread_pool_fast(i, self.worker.stop)
     
     def _update(self, i: Interface):
+        i(RunCoro, self.wait_for_worker_readyness)
         while not self._stop:
-            start = perf_counter()
+            # start = perf_counter()
             i(Yield)
-            stop = perf_counter()
-            self.fac(self.external_items_key, stop - start)
-            self.fac(self.internal_items_key, stop - start)
+            # stop = perf_counter()
+            # delta_time = stop - start
+            loop: CoroScheduler = i._loop
+            delta_time = loop.loop_iteration_delta_time
+            self.fac(self.external_items_key, delta_time)
+            self.fac(self.internal_items_key, delta_time)
 
     def _update_stats(self, i: Interface):
+        i(RunCoro, self.wait_for_worker_readyness)
         while not self._stop:
             try:
                 data = i(FastAggregator, self.internal_items_key)
@@ -516,7 +553,7 @@ class SchedulerPerformanceFormatter:
         got_result = False
         while not got_result:
             try:
-                result = self.worker.get_answer_from_subprocess(block_queue=False, time_out=0.1)
+                result = self.worker.get_answer_from_subprocess(block=False)
             except Empty:
                 pass
             else:
@@ -640,7 +677,7 @@ class FilterSetupDialog(ttkb.Toplevel):
 # class Application(Tk):
 class Application(ttkb.Window):
     def __init__(self, style: str = 'superhero', filtered_paths: List[List[str]] = None):
-        super().__init__()
+        super().__init__(size=(1900, 900), resizable=(True, True))
         self.style_name = style
         Style(style)
         self.filtered_paths: List[Sequence[str]] = filtered_paths
@@ -663,7 +700,7 @@ class Application(ttkb.Window):
         self.scheduler_stats_format_button.pack(fill=None, expand='no', side='top', pady=1)
         self.scheduler_stats_help_button.pack(fill=None, expand='no', side='top', pady=1)
         self.scheduler_stats_control_frame.pack(fill='y', expand='no', side='left')
-        self.coro_scheduler_view = AggregatorView(False, 'coro scheduler stats', 1, self.sfmp, 120, 23, self.scheduler_stats_frame)
+        self.coro_scheduler_view = AggregatorView(False, False, 'coro scheduler stats', 1, self.sfmp, 120, 23, self.scheduler_stats_frame)
         self.coro_scheduler_view.pack(fill='both', expand='yes', side='left')
         self.scheduler_stats_frame.pack(fill='both', expand='yes', side='bottom')
 
@@ -672,40 +709,47 @@ class Application(ttkb.Window):
         
         self.cmet = CorosMaxExecutionTimesProvider('coros lifetime max execution times', 'coros max execution times', 0.5)
         
-        self.coros_lifetime_max_execution_times = AggregatorView(False, 'coros lifetime max execution times', 0.75, self.cmet.lifetime_stats_formatter, 25, 13, self)
+        self.coros_lifetime_max_execution_times = AggregatorView(False, False, 'coros lifetime max execution times', 0.75, self.cmet.lifetime_stats_formatter, 25, 13, self)
         self.coros_lifetime_max_execution_times.pack(fill='x', expand='no', side='left')
         
-        self.coros_max_execution_times = AggregatorView(False, 'coros max execution times', 0.75, self.cmet.stats_formatter, 25, 13, self)
+        self.coros_max_execution_times = AggregatorView(False, False, 'coros max execution times', 0.75, self.cmet.stats_formatter, 25, 13, self)
         self.coros_max_execution_times.pack(fill='x', expand='no', side='left')
         
         self.spf = SchedulerPerformanceFormatter('scheduler tdelta', 'internal scheduler tdelta', 'scheduler lifetime stats', 'scheduler stats', 5000)
         
         self.scheduler_tdelta_formatter = AggregatorAppendFormatter('Scheduler TDelta')
-        self.scheduler_tdelta = AggregatorView(True, 'scheduler tdelta', 0.1, self.scheduler_tdelta_formatter, 22, 13, self)
+        self.scheduler_tdelta = AggregatorView(True, False, 'scheduler tdelta', 0.1, self.scheduler_tdelta_formatter, 22, 13, self)
+        self.scheduler_tdelta.default_auto_scroll = False
         self.scheduler_tdelta.max_len = 1000
         self.scheduler_tdelta.pack(fill='x', expand='no', side='left')
         
         def aggregator_view_formatter(data: Any) -> str:
             return f'{current_interface().coro_id}. Aggregator:\n{data}'
         
-        self.command_executor_aggregator_view = AggregatorView(False, command_executor_aggregator_view_key, 1, aggregator_view_formatter, 25, 13, self)
+        self.command_executor_aggregator_view = AggregatorView(False, False, command_executor_aggregator_view_key, 1, aggregator_view_formatter, 25, 13, self)
         self.command_executor_aggregator_view.pack(fill='x', expand='yes', side='right')
         FastAggregatorClient()(command_executor_aggregator_view_key, str())
         
         self.command_executor_aggregator_append_formatter = AggregatorAppendFormatter('Aggregator Append')
-        self.command_executor_aggregator_append_view = AggregatorView(True, command_executor_aggregator_append_view_key, 1, self.command_executor_aggregator_append_formatter, 25, 13, self)
+        self.command_executor_aggregator_append_view = AggregatorView(True, True, command_executor_aggregator_append_view_key, 1, self.command_executor_aggregator_append_formatter, 25, 13, self)
         self.command_executor_aggregator_append_view.max_len = 5000
         self.command_executor_aggregator_append_view.pack(fill='x', expand='yes', side='right')
         FastAggregatorClient()(command_executor_aggregator_append_view_key, str())
 
-        self.scheduler_lifetime_stats = AggregatorView(False, 'scheduler lifetime stats', 0.3, self.spf.lifetime_stats_formatter, 36, 5, self)
+        self.scheduler_lifetime_stats = AggregatorView(False, False, 'scheduler lifetime stats', 0.3, self.spf.lifetime_stats_formatter, 36, 5, self)
         self.scheduler_lifetime_stats.pack(fill=None, expand='no', side='top')
         
-        self.scheduler_stats = AggregatorView(False, 'scheduler stats', 0.3, self.spf.stats_formatter, 36, 7, self)
+        self.scheduler_stats = AggregatorView(False, False, 'scheduler stats', 0.3, self.spf.stats_formatter, 36, 7, self)
         self.scheduler_stats.pack(fill=None, expand='no', side='bottom')
 
-        # hide window
-        self.withdraw()
+        # set window size taking into account the size of the widgets
+        self.update()
+        width = self.winfo_width()
+        height = self.winfo_height()
+        x = (self.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.winfo_screenheight() // 2) - (height // 2)
+        self.geometry('{}x{}+{}+{}'.format(width, height, x, y))
+        self.update()
     
     def scheduler_stats_format_button_on_click(self):
         d = FilterSetupDialog(self, self.sfmp.filtered_paths)
@@ -743,18 +787,8 @@ class Application(ttkb.Window):
     
     def prepare(self, i: Interface, wr: TkObjWrapper):
         i(Yield)
-        width = self.winfo_width()
-        height = self.winfo_height()
-        x = (self.winfo_screenwidth() // 2) - (width // 2)
-        y = (self.winfo_screenheight() // 2) - (height // 2)
-        self.geometry('{}x{}+{}+{}'.format(width, height, x, y))
-
         self.start(wr)
-
         i(Yield)
-
-        # show window again
-        self.deiconify()
 
 
 def coro_scheduler_admin__view(i: Interface, on_close: Optional[AnyWorker] = None):
