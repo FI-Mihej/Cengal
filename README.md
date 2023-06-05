@@ -8,11 +8,22 @@ Not all features are accessible on every target platform or architecture.
 
 # Installation
 
-`pip install git+https://github.com/FI-Mihej/Cengal.git`
+Installation process requires compilation (brebuild Wheels are not prepared yet). So ensure that:
+* GCC/LLVM is installed in your Linux/WSL (`sudo apt-get --yes install build-essential` for Ubuntu. And `./before_install_on_wsl.sh` for Ubuntu under WSL for UI like Tkinter or Qt if you are using some kind of XServer on your host Windows)
+* At least `Visual Studio Community - Build Tools` are installed on your Windows and you are installing Cengal from within its `Developer Command Prompt` for an appropriate target CPU architecture (`x64 Native Tools Command Prompt for VS 2022` for example). Make sure that you have compatible version of Visual Studio for your target CPython interpreter (see `python -VV` command output. For example `Python 3.9.11 (tags/v3.9.11:2de452f, Mar 16 2022, 14:33:45) [MSC v.1929 64 bit (AMD64)]`: this python interpreter requires Visual Studio 2019 version 16.11.2+ according to `1929` word search in [Wikipedia page](https://en.wikipedia.org/wiki/Microsoft_Visual_C%2B%2B))
+
+`pip install cengal`
 
 or
 
-`pip install cengal`
+`pip install git+https://github.com/FI-Mihej/Cengal.git`
+
+# Documentation
+
+* https://github.com/FI-Mihej/Cengal/tree/master/docs
+* https://github.com/FI-Mihej/Cengal/wiki
+
+For example [Cengal Coroutines Concepts & Usage](https://github.com/FI-Mihej/Cengal/wiki/Cengal-Coroutines)
 
 # Exclusive Features: No Alternatives Online
 
