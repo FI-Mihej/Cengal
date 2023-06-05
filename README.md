@@ -242,7 +242,7 @@ Observe loop performance, services state and coroutines list with details. Use a
 * **"data_manipulation"** - 
     * **"conversion"** - 
         * **"bit_cast_like"** - similar to std::bit_cast from C++
-        * **"reinterpret_cast"** - similar to reinterpret_cast from C++. You have a third-party object and you want to change it's type (and behavior) in runtime.
+        * **"reinterpret_cast"** - similar to reinterpret_cast from C++. You have a third-party object and you want to change its type (and behavior) in runtime.
     * **"serialization"** - automatically choose a fastest appropriate serializer for your type and structure of data (json, simplejson, ujson, ojson, msgpack, cbor, cbor2, marshal, pickle, cloudpickle, ...)
     * **"tree_traversal"** - both recrsive and nonrecursive tree traversal algorithms
 * **"ctypes_tools"** - ctypes code and structures used by Cengal.

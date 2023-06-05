@@ -91,6 +91,31 @@ from cengal.parallel_execution.coroutines.coro_standard_services.tkinter import 
 from cengal.parallel_execution.coroutines.coro_standard_services.wait_coro import *
 ```
 
+## Tools
+
+```python
+from cengal.parallel_execution.coroutines.coro_tools.await_coro import *
+from cengal.parallel_execution.coroutines.coro_tools.coro_flow_control import *
+from cengal.parallel_execution.coroutines.coro_tools.loop_administration import *
+from cengal.parallel_execution.coroutines.coro_tools.low_latency import *
+from cengal.parallel_execution.coroutines.coro_tools.prepare_loop import *
+from cengal.parallel_execution.coroutines.coro_tools.run_in_loop import *
+from cengal.parallel_execution.coroutines.coro_tools.wait_coro import *
+```
+
+## Integrations
+
+In some cases it is enough to create a set of functions or coroutines to integrate with some third-party package instead of new stand-alone service creation. For example: `customtkinter` requires one single small function to be used in addition to Tkinter Service; and it is can be handfull to register `uvloop` as a default asyncio-compatible loop automatically, if it is awailable. 
+
+```python
+from cengal.parallel_execution.coroutines.integrations.customtkinter import *
+from cengal.parallel_execution.coroutines.integrations.nicegui import *
+from cengal.parallel_execution.coroutines.integrations.pytermgui import *
+from cengal.parallel_execution.coroutines.integrations.qt import *
+from cengal.parallel_execution.coroutines.integrations.uvicorn import *
+from cengal.parallel_execution.coroutines.integrations.uvloop import *
+```
+
 # Explicit Syntax
 
 ## Async-Await
@@ -211,7 +236,7 @@ class Class:
 
 Calls to services are made through the Interface instances which are provided by loop to an each coroutine. Each such a call to the service returns execution back to the loop until coroutine receives a response from the service.
 
-If service has only one type of a request, it's API is a simplest:
+If service has only one type of a request, its API is a simplest:
 
 ```python
 def coro(i: Interface) -> str:
@@ -236,17 +261,24 @@ def coro(i: Interface) -> str:
     i(FastAggregatorRequest().wait(DataStreamID))
     i(FastAggregatorWaitFor(DataStreamID))
 
+    coro_id: CoroID = i(PutCoro, my_concat_str_coro, 'hello', 'coro')  ## Creates coroutine and returns its ID
+    i(WaitCoro, WaitCoroRequest(result_required=False).single(coro_id))  ## Will wait until coro with coro_id will be finished. (Coro can be already finished before this call - it's totaly OK)
+    result: str = i(WaitCoro, WaitCoroRequest().single(coro_id))  ## Will wait until coro with coro_id will be finished. (Will raise `SubCoroutineNotFoundError` if coro was already finished before this call)
+    assert 'hello coro' == result
+
+    result: str = i(RunCoro, my_concat_str_coro, 'hello', 'coro')  ## will create a new coro and waits until it will be finished
+
     i(WaitCoroRequest(timeout=0.01, kill_on_timeout=True, tree=True).list([
         CoroID_0,
         CoroID_1,
         CoroID_2,
-    ]))  # Will wait untill at least one of coroutines completes. Will kill all coroutines with all their children coroutines if timeout is reached before at leas one of coroutines completes.
+    ]))  # Will wait until at least one of coroutines completes. Will kill all coroutines with all their children coroutines if timeout is reached before at leas one of coroutines completes.
 
     i(WaitCoroRequest(timeout=0.01, kill_on_timeout=True, tree=True).put_fastest([
         PutSingleCoroParams(my_coro_0, 'hello', 'world'),
         PSCP(my_coro_1, 'hello', 'world'),
         PSCP(my_coro_2, 'hello', 'world'),
-    ]))  # Will start three new corotine. Will wait untill at least one of coroutines completes. Will kill all coroutines with all their children coroutines if timeout is reached before at leas one of coroutines completes.
+    ]))  # Will start three new corotines. Will wait until at least one of coroutines completes. Will kill all coroutines with all their children coroutines if timeout is reached before at leas one of coroutines completes.
 
     return 'Hello World'
 ```
@@ -258,24 +290,58 @@ async def coro(i: Interface) -> str:
     await i(FastAggregatorRequest().wait(DataStreamID))
     await i(FastAggregatorWaitFor(DataStreamID))
 
+    coro_id: CoroID = await i(PutCoro, my_concat_str_coro, 'hello', 'coro')  ## Creates coroutine and returns its ID
+    await i(WaitCoro, WaitCoroRequest(result_required=False).single(coro_id))  ## Will wait until coro with coro_id will be finished. (Coro can be already finished before this call - it's totaly OK)
+    result: str = await i(WaitCoro, WaitCoroRequest().single(coro_id))  ## Will wait until coro with coro_id will be finished. (Will raise `SubCoroutineNotFoundError` if coro was already finished before this call)
+    assert 'hello coro' == result
+
+    result: str = await i(RunCoro, my_concat_str_coro, 'hello', 'coro')  ## will create a new coro and waits until it will be finished
+
     await i(WaitCoroRequest(timeout=0.01, kill_on_timeout=True, tree=True).list([
-        CoroID_0,
-        CoroID_1,
-        CoroID_2,
-    ]))  # Will wait untill at least one of coroutines completes. Will kill all coroutines with all their children coroutines if timeout is reached before at leas one of coroutines completes.
+        coro_id_0,
+        coro_id_1,
+        coro_id_2,
+    ]))  # Will wait until at least one of coroutines completes. Will kill all coroutines with all their children coroutines if timeout is reached before at leas one of coroutines completes.
 
     await i(WaitCoroRequest(timeout=0.01, kill_on_timeout=True, tree=True).put_fastest([
         PutSingleCoroParams(my_coro_0, 'hello', 'world'),
         PSCP(my_coro_1, 'hello', 'world'),
         PSCP(my_coro_2, 'hello', 'world'),
-    ]))  # Will start three new corotine. Will wait untill at least one of coroutines completes. Will kill all coroutines with all their children coroutines if timeout is reached before at leas one of coroutines completes.
+    ]))  # Will start three new corotine. Will wait until at least one of coroutines completes. Will kill all coroutines with all their children coroutines if timeout is reached before at leas one of coroutines completes.
 
     return 'Hello World'
 ```
 
 # Work with different coroutines types
 
-We can general call (for green let coro) or await (for an async coro) when we are working with same coroutine type. On the other hand, general way to work with different or unknown type of coroutines is through an appropriate services (RunCoro, PutCoro, WaitCoro, ThrowCoro, KillCoro, etc.)
+We can make general call (for a greenlet coro) or await (for an async coro) when we are working with the same coroutine type.
+
+```python
+@cs_coro
+def coro_green(a: int, b: int) -> int:
+    return a - b
+
+
+@cs_acoro
+async def coro_async(a: int, b: int) -> int:
+    return a - b
+
+
+def main_green(i: Interface):
+    res = coro_green(i, 1, 2)
+    res = execute_coro(coro_green, 1, 2)
+    res = exec_coro(coro_green, 1, 2)
+    res = ecoro(coro_green, 1, 2)
+
+
+async def main_async(i: Interface):
+    res = await coro_async(i, 1, 2)
+    res = await aexecute_coro(coro_async, 1, 2)
+    res = await aexec_coro(coro_async, 1, 2)
+    res = await aecoro(coro_async, 1, 2)
+```
+
+On the other hand, a general way to work with a different or unknown type of coroutines is through an appropriate services (RunCoro, PutCoro, WaitCoro, ThrowCoro, KillCoro, etc.)
 
 ```python
 @cs_coro
