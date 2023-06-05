@@ -20,8 +20,7 @@ or
 
 # Documentation
 
-* https://github.com/FI-Mihej/Cengal/tree/master/docs
-* https://github.com/FI-Mihej/Cengal/wiki
+[Cengal Wiki](https://github.com/FI-Mihej/Cengal/wiki)
 
 For example [Cengal Coroutines Concepts & Usage](https://github.com/FI-Mihej/Cengal/wiki/Cengal-Coroutines)
 
@@ -50,7 +49,7 @@ For example [Cengal Coroutines Concepts & Usage](https://github.com/FI-Mihej/Cen
 
 #### Tutorial
 
-* [Forced Concurrency](https://github.com/FI-Mihej/Cengal/blob/master/docs/forced_concurrency.md)
+* [Decorator which converts blocking code to concurrent code](https://github.com/FI-Mihej/Cengal/wiki/Decorator-which-converts-blocking-code-to-concurrent-code)
 
 
 ## True Interprocess Shared Memory (Proof of Concepte Stage)
