@@ -32,7 +32,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -63,6 +63,7 @@ class Tags(enum.Enum):
     compat = 18
     compat_with_python_below_3_8 = 19
     compat_with_python_abowe_3_8 = 20
+    decode_set_as_set = 21  # does not convert sets to tuple/list
 
 
 class DataFormats(enum.Enum):
@@ -70,6 +71,9 @@ class DataFormats(enum.Enum):
     json = 1  # serialized data is json
     binary = 2  # serialized data is binary (not really human-readable)
     text = 3  # serialized data is human-readable
+    yaml = 4
+    toml = 5
+    messagepack = 6
 
 
 SerializerFeatures = Set[Union[Tags, DataFormats]]
@@ -113,6 +117,10 @@ class Serializers(enum.Enum):
     cloudpickle_compat_3 = 33
     cloudpickle_compat_2 = 34
     cloudpickle_compat_1 = 35
+    msgspec_json = 36
+    msgspec_messagepack = 37
+    msgspec_yaml = 38
+    msgspec_toml = 39
 
 
 SERIALIZERS_DESCRIPTION = {
@@ -201,6 +209,7 @@ SERIALIZERS_DESCRIPTION = {
         Tags.explicit_format_version,
         DataFormats.any,
         DataFormats.binary,
+        DataFormats.messagepack,
     }),
     Serializers.msgpack_fast: ('msgpack_fast', {
         Tags.tested,
@@ -217,6 +226,7 @@ SERIALIZERS_DESCRIPTION = {
         Tags.explicit_format_version,
         DataFormats.any,
         DataFormats.binary,
+        DataFormats.messagepack,
     }),
     Serializers.cbor: ('cbor', {
         Tags.tested,
@@ -305,6 +315,64 @@ SERIALIZERS_DESCRIPTION = {
         DataFormats.any,
         DataFormats.binary,
     }),
+    Serializers.msgspec_messagepack: ('msgspec_messagepack', {
+        Tags.tested,
+        Tags.deep,
+        Tags.superficial,
+        Tags.multi_platform,
+        Tags.current_platform,
+        Tags.can_use_set,
+        Tags.can_use_bytes,
+        Tags.decode_str_as_str,
+        Tags.decode_bytes_as_bytes,
+        Tags.decode_list_as_list,
+        Tags.explicit_format_version,
+        DataFormats.any,
+        DataFormats.binary,
+        DataFormats.messagepack,
+    }),
+    Serializers.msgspec_json: ('msgspec_json', {
+        Tags.tested,
+        Tags.deep,
+        Tags.superficial,
+        Tags.multi_platform,
+        Tags.current_platform,
+        Tags.can_use_set,
+        Tags.decode_str_as_str,
+        Tags.decode_list_as_list,
+        Tags.explicit_format_version,
+        DataFormats.any,
+        DataFormats.json,
+        DataFormats.text,
+    }),
+    Serializers.msgspec_yaml: ('msgspec_yaml', {
+        Tags.tested,
+        Tags.deep,
+        Tags.superficial,
+        Tags.multi_platform,
+        Tags.current_platform,
+        Tags.can_use_set,
+        Tags.decode_str_as_str,
+        Tags.decode_list_as_list,
+        Tags.explicit_format_version,
+        DataFormats.any,
+        DataFormats.yaml,
+        DataFormats.text,
+    }),
+    Serializers.msgspec_toml: ('msgspec_toml', {
+        Tags.tested,
+        Tags.deep,
+        Tags.superficial,
+        Tags.multi_platform,
+        Tags.current_platform,
+        Tags.can_use_set,
+        Tags.decode_str_as_str,
+        Tags.decode_list_as_list,
+        Tags.explicit_format_version,
+        DataFormats.any,
+        DataFormats.toml,
+        DataFormats.text,
+    }),
 }
 
 
@@ -343,6 +411,12 @@ with alt_import('msgpack') as msgpack:
     if msgpack is not None:
         EXISTING_SERIALIZERS.add(Serializers.msgpack_fast)
         EXISTING_SERIALIZERS.add(Serializers.msgpack)
+with alt_import('msgspec') as msgspec:
+    if msgspec is not None:
+        EXISTING_SERIALIZERS.add(Serializers.msgspec_messagepack)
+        EXISTING_SERIALIZERS.add(Serializers.msgspec_json)
+        EXISTING_SERIALIZERS.add(Serializers.msgspec_yaml)
+        EXISTING_SERIALIZERS.add(Serializers.msgspec_toml)
 with alt_import('cbor') as cbor:
     if cbor is not None:
         EXISTING_SERIALIZERS.add(Serializers.cbor)
@@ -498,7 +572,7 @@ class Serializer:
     @staticmethod
     def _msgpack__dump(*args, **kwargs):
         result_kwargs = {
-            'encoding': 'utf-8',
+            # 'encoding': 'utf-8',  # PendingDeprecationWarning: encoding is deprecated.
             'use_bin_type': True
         }
         result_kwargs.update(kwargs)
@@ -507,7 +581,7 @@ class Serializer:
     @staticmethod
     def _msgpack__dumps(*args, **kwargs):
         result_kwargs = {
-            'encoding': 'utf-8',
+            # 'encoding': 'utf-8',  # PendingDeprecationWarning: encoding is deprecated.
             'use_bin_type': True
         }
         result_kwargs.update(kwargs)
@@ -516,7 +590,7 @@ class Serializer:
     @staticmethod
     def _msgpack__load(*args, **kwargs):
         result_kwargs = {
-            'encoding': 'utf-8',
+            # 'encoding': 'utf-8',  # PendingDeprecationWarning: encoding is deprecated, Use raw=False instead.
             'raw': False,
             'use_list': True
         }
@@ -529,7 +603,7 @@ class Serializer:
     @staticmethod
     def _msgpack__loads(*args, **kwargs):
         result_kwargs = {
-            'encoding': 'utf-8',
+            # 'encoding': 'utf-8',  # PendingDeprecationWarning: encoding is deprecated, Use raw=False instead.
             'raw': False,
             'use_list': True
         }
@@ -581,6 +655,98 @@ class Serializer:
         result_kwargs.update(kwargs)
         gc.disable()
         result = msgpack.loads(*args, **result_kwargs)
+        gc.enable()
+        return result
+
+    # msgspec_messagepack
+    @staticmethod
+    def _msgspec_messagepack__dump(obj, fp, *args, **kwargs):
+        fp.write(msgspec.msgpack.encode(obj, *args, **kwargs))
+
+    @staticmethod
+    def _msgspec_messagepack__dumps(*args, **kwargs):
+        return msgspec.msgpack.encode(*args, **kwargs)
+
+    @staticmethod
+    def _msgspec_messagepack__load(fp, *args, **kwargs):
+        gc.disable()
+        result = msgspec.msgpack.decode(fp.read(), *args, **kwargs)
+        gc.enable()
+        return result
+
+    @staticmethod
+    def _msgspec_messagepack__loads(*args, **kwargs):
+        gc.disable()
+        result = msgspec.msgpack.decode(*args, **kwargs)
+        gc.enable()
+        return result
+
+    # msgspec_json
+    @staticmethod
+    def _msgspec_json__dump(obj, fp, *args, **kwargs):
+        fp.write(msgspec.json.encode(obj, *args, **kwargs))
+
+    @staticmethod
+    def _msgspec_json__dumps(*args, **kwargs):
+        return msgspec.json.encode(*args, **kwargs)
+
+    @staticmethod
+    def _msgspec_json__load(fp, *args, **kwargs):
+        gc.disable()
+        result = msgspec.json.decode(fp.read(), *args, **kwargs)
+        gc.enable()
+        return result
+
+    @staticmethod
+    def _msgspec_json__loads(*args, **kwargs):
+        gc.disable()
+        result = msgspec.json.decode(*args, **kwargs)
+        gc.enable()
+        return result
+
+    # msgspec_yaml
+    @staticmethod
+    def _msgspec_yaml__dump(obj, fp, *args, **kwargs):
+        fp.write(msgspec.yaml.encode(obj, *args, **kwargs))
+
+    @staticmethod
+    def _msgspec_yaml__dumps(*args, **kwargs):
+        return msgspec.yaml.encode(*args, **kwargs)
+
+    @staticmethod
+    def _msgspec_yaml__load(fp, *args, **kwargs):
+        gc.disable()
+        result = msgspec.yaml.decode(fp.read(), *args, **kwargs)
+        gc.enable()
+        return result
+
+    @staticmethod
+    def _msgspec_yaml__loads(*args, **kwargs):
+        gc.disable()
+        result = msgspec.yaml.decode(*args, **kwargs)
+        gc.enable()
+        return result
+
+    # msgspec_toml
+    @staticmethod
+    def _msgspec_toml__dump(obj, fp, *args, **kwargs):
+        fp.write(msgspec.toml.encode(obj, *args, **kwargs))
+
+    @staticmethod
+    def _msgspec_toml__dumps(*args, **kwargs):
+        return msgspec.toml.encode(*args, **kwargs)
+
+    @staticmethod
+    def _msgspec_toml__load(fp, *args, **kwargs):
+        gc.disable()
+        result = msgspec.toml.decode(fp.read(), *args, **kwargs)
+        gc.enable()
+        return result
+
+    @staticmethod
+    def _msgspec_toml__loads(*args, **kwargs):
+        gc.disable()
+        result = msgspec.toml.decode(*args, **kwargs)
         gc.enable()
         return result
 

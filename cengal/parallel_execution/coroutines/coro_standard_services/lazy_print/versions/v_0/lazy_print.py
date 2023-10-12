@@ -35,7 +35,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -72,7 +72,7 @@ class LazyPrint(TypedService[None]):
             self.make_live()
     
     def add_timer(self):
-        self.update_timer_request = add_timer_func_run_from_other_service(self, self.update_period, self.timer_handler)
+        self.update_timer_request = add_timer_func_run_from_other_service(self, True, self.update_period, self.timer_handler)
     
     def try_add_timer(self):
         if self.update_timer_request is None: self.add_timer()

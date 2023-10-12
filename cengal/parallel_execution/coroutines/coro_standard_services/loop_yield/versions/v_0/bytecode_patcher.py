@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -37,9 +37,10 @@ __status__ = "Development"
 from typing import Callable, List
 from types import CodeType
 from cengal.code_flow_control.python_bytecode_manipulator import *
+from cengal.introspection.inspect import is_async, is_callable
 
 
-def gly_patch(entity: Callable) -> Callable:
+def gly_patch(entity: Callable) -> CodeType:
     # TODO: try to complise strings using _get_code_object() instead of get_code()
     entity_code_type: CodeTypeEnum = code_type(entity)
     if entity_code_type is None:
@@ -143,6 +144,16 @@ def gly_patch(entity: Callable) -> Callable:
     return fn_code
 
 
+def agly_patch(entity: Callable) -> Callable:
+    # TODO: try to complise strings using _get_code_object() instead of get_code()
+    entity_code_type: CodeTypeEnum = code_type(entity)
+    if entity_code_type is None:
+        raise RuntimeError( 'Entity {entity} cann not be patched')
+    
+    fn_code = get_code(entity)
+    return fn_code
+
+
 def gly_patched(func: Callable) -> Callable:
     """Example:
         @gly_patched
@@ -186,3 +197,63 @@ def gly_patched(func: Callable) -> Callable:
 
 
 glyp = gly_patched
+gp = gly_patched
+
+
+def agly_patched(func: Callable) -> Callable:
+    agly_patch(func)
+    return func
+
+
+aglyp = agly_patched
+agp = agly_patched
+
+
+class GlyPatchManagerError(Exception):
+    pass
+
+
+class GlyPatchManager:
+    patched_functions = dict()
+    call_tree = dict()
+
+    def __call__(self, func: Callable, tree: bool = True) -> Callable:
+        if func not in self.patched_functions:
+            if tree:
+                if is_async(func):
+                    agly_patched_tree(func, self)
+                elif is_callable(func):
+                    gly_patched_tree(func, self)
+                else:
+                    raise GlyPatchManagerError(f'Entity {func} can not be patched: it must be a callable (either async or not)')
+            else:
+                if is_async(func):
+                    fn_code = agly_patch(func)
+                elif is_callable(func):
+                    fn_code = gly_patch(func)
+                else:
+                    raise GlyPatchManagerError(f'Entity {func} can not be patched: it must be a callable (either async or not)')
+            
+                self.patched_functions[func] = fn_code
+        
+        return func
+
+    def restore(self, func: Callable, tree: bool = True) -> Callable:
+        if func in self.patched_functions:
+            if tree:
+                self._unpatch_tree(func)
+            else:
+                set_code(func, self.patched_functions[func])
+
+        return func
+    
+    def _unpatch_tree(self, func: Callable) -> Callable:
+        raise NotImplementedError
+
+
+def gly_patched_tree(entity: Callable, gly_patch_manager: Optional[GlyPatchManager] = None) -> Callable:
+    raise NotImplementedError
+
+
+def agly_patched_tree(entity: Callable, gly_patch_manager: Optional[GlyPatchManager] = None) -> Callable:
+    raise NotImplementedError

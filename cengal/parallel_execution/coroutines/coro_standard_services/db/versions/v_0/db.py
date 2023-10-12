@@ -49,7 +49,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -795,8 +795,7 @@ class Db(Service, EntityStatsMixin):
         env_info: EnvInfo = EnvInfo(env_init_info, lmdb.open(*env_init_info.args, **env_init_info.kwargs))
         db_environment = env_info.env
         self.db_environments[env_info.env_id] = env_info
-        default_db_name = 
-        env_info.databases[None] = env_info.databases[None] = db_environment.open_db(self.default_db_id)
+        env_info.databases[self.default_db_id] = env_info.databases[None] = db_environment.open_db(self.default_db_id)
         db_environment.sync(True)
 
     def _init_default_db(self):

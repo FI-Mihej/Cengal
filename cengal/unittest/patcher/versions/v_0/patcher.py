@@ -27,17 +27,17 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
 __status__ = "Development"
 # __status__ = "Production"
 
-EntityExdctHolder = Any
+EntityExactHolder = Any
 EntityHolder = Optional[Any]
 EntityName = str
-OriginalExactEntity = Tuple[EntityExdctHolder, EntityName]
+OriginalExactEntity = Tuple[EntityExactHolder, EntityName]
 OriginalEntity = Tuple[EntityHolder, EntityName]
 EntityMock = Any
 
@@ -47,7 +47,7 @@ def patch_entity(original: OriginalExactEntity, mock: EntityMock):
     buff_original_value = getattr(holder, name)
     setattr(holder, name, mock)
     try:
-        yield
+        yield buff_original_value
     finally:
         setattr(holder, name, buff_original_value)
 
@@ -56,7 +56,7 @@ def patch_builtins(name: EntityName, mock: EntityMock):
     buff_original_value = __builtins__[name]
     __builtins__[name] = mock
     try:
-        yield
+        yield buff_original_value
     finally:
         __builtins__[name] = buff_original_value
 
@@ -84,7 +84,7 @@ def patch_set(patch_set: Dict[OriginalEntity, EntityMock]):
             buff[original] = getattr(holder, name)
             setattr(holder, name, mock)
     try:
-        yield
+        yield buff
     finally:
         for original, mock in patch_set.items():
             holder, name = original

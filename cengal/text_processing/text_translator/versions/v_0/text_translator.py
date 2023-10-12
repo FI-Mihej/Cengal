@@ -40,7 +40,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -164,7 +164,7 @@ class TranslationLanguageMapper:
         self.default_lang: TranslationLanguageId = default_lang
     
     def __call__(self, lang: TranslationLanguageId):
-        return self.lang_2_lang.get(lang) or self.default_lang
+        return self.lang_2_lang.get(lang, None) or self.default_lang
 
 
 class TranslationLanguageChooser:
@@ -173,9 +173,9 @@ class TranslationLanguageChooser:
                  coro_scheduler: Optional[CoroScheduler]=None):
         self._end_lang: Optional[TranslationLanguageId] = None
         self._lang: Optional[TranslationLanguageId] = None
-        self.text_translator = text_translator
-        self.translation_language_mapper = translation_language_mapper
-        self.coro_scheduler = coro_scheduler or CoroScheduler.current_loop()
+        self.text_translator: TextTranslator = text_translator
+        self.translation_language_mapper: TranslationLanguageMapper = translation_language_mapper
+        self.coro_scheduler: CoroScheduler = coro_scheduler or CoroScheduler.current_loop()
         self.translation_language_changed_event: str = str(uuid4())
     
     @property

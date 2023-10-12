@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -56,6 +56,7 @@ class TimerFuncRunner(DualImmediateProcessingServiceMixin, ServiceWithADirectReq
         super(TimerFuncRunner, self).__init__(loop)
         self.timer = Timer()
         self.pending_tasks_number = 0
+        self.pending_foreground_tasks_number = 0
         self.direct_requests = list()
         self._request_workers = {
             0: self._on_add,
@@ -64,44 +65,47 @@ class TimerFuncRunner(DualImmediateProcessingServiceMixin, ServiceWithADirectReq
 
     def single_task_registration_or_immediate_processing_single(
             self, delay: float, handler: Callable, *args, **kwargs) -> Tuple[bool, TimerRequest, None]:
-        timer_request: TimerRequest = self._add_request_impl(delay, handler, *args, **kwargs)
+        timer_request: TimerRequest = self._add_request_impl(not self.current_caller_coro_info.coro.is_background_coro, delay, handler, *args, **kwargs)
         self.make_live()
         return True, timer_request, None
     
-    def _add_request_impl(self, delay: float, handler: Callable, *args, **kwargs) -> TimerRequest:
-        def timer_handler_func(handler_: Callable, *args_, **kwargs_):
+    def _add_request_impl(self, foreground: bool, delay: float, handler: Callable, *args, **kwargs) -> TimerRequest:
+        def timer_handler_func(foreground: bool, handler_: Callable, *args_, **kwargs_):
             try:
                 handler_(*args_, **kwargs_)
             except:
                 self._loop.logger.exception('TimerFuncRunner. Event handler error')
             finally:
-                self.task_triggered()
+                self.task_triggered(foreground)
 
-        timer_handler = partial(timer_handler_func, handler, *args, **kwargs)
-        self.task_added()
-        return self.timer.register(timer_handler, delay)
+        timer_handler = partial(timer_handler_func, foreground, handler, *args, **kwargs)
+        self.task_added(foreground)
+        timer_request: TimerRequest = self.timer.register(timer_handler, delay)
+        timer_request.foreground = foreground
+        return timer_request
     
     def _on_add(self, delay: float, handler: Callable, *args, **kwargs) -> Tuple[bool, TimerRequest, None]:
-        timer_request: TimerRequest = self._add_request_impl(delay, handler, *args, **kwargs)
+        timer_request: TimerRequest = self._add_request_impl(
+            not self.current_caller_coro_info.coro.is_background_coro, delay, handler, *args, **kwargs)
         self.make_live()
         return True, timer_request, None
     
     def _on_discard(self, timer_request: TimerRequest) -> Tuple[bool, TimerRequest, None]:
         result: bool = self.timer.discard(timer_request)
         if result:
-            self.task_triggered()
+            self.task_triggered(timer_request.foreground)
         
         return True, result, None
     
-    def add_timer_func_run_from_other_service(self, delay: float, handler: Callable, *args, **kwargs) -> TimerRequest:
-        timer_request: TimerRequest = self._add_request_impl(delay, handler, *args, **kwargs)
+    def add_timer_func_run_from_other_service(self, foreground: bool, delay: float, handler: Callable, *args, **kwargs) -> TimerRequest:
+        timer_request: TimerRequest = self._add_request_impl(foreground, delay, handler, *args, **kwargs)
         self.make_live()
         return timer_request
     
     def discard_timer_func_run_from_other_service(self, timer_request: TimerRequest) -> bool:
         result: bool = self.timer.discard(timer_request)
         if result:
-            self.task_triggered()
+            self.task_triggered(timer_request.foreground)
         
         return result
 
@@ -110,7 +114,7 @@ class TimerFuncRunner(DualImmediateProcessingServiceMixin, ServiceWithADirectReq
             direct_requests_buff = self.direct_requests
             self.direct_requests = type(direct_requests_buff)()
             for delay, handler, args, kwargs in direct_requests_buff:
-                self._add_request_impl(delay, handler, *args, **kwargs)
+                self._add_request_impl(True, delay, handler, *args, **kwargs)
         
         self.timer()
         if 0 == self.pending_tasks_number:
@@ -121,15 +125,20 @@ class TimerFuncRunner(DualImmediateProcessingServiceMixin, ServiceWithADirectReq
         self.make_live()
         return ValueExistence()
 
-    def task_added(self):
+    def task_added(self, foreground: bool):
         self.pending_tasks_number += 1
+        self.pending_foreground_tasks_number += 1 if foreground else 0
 
-    def task_triggered(self):
+    def task_triggered(self, foreground: bool):
         self.pending_tasks_number -= 1
+        self.pending_foreground_tasks_number -= 1 if foreground else 0
 
     def in_work(self) -> bool:
         result: bool = (self.pending_tasks_number != 0) or bool(self.direct_requests)
         return self.thrifty_in_work(result)
+    
+    def in_forground_work(self) -> bool:
+        return self.pending_foreground_tasks_number or bool(self.direct_requests)
     
     def time_left_before_next_event(self) -> Tuple[bool, Optional[Union[int, float]]]:
         return True, self.timer.nearest_event()
@@ -138,9 +147,9 @@ class TimerFuncRunner(DualImmediateProcessingServiceMixin, ServiceWithADirectReq
 TimerFuncRunnerRequest.default_service_type = TimerFuncRunner
 
 
-def add_timer_func_run_from_other_service(current_service: Service, delay: float, handler: Callable, *args, **kwargs) -> TimerRequest:
+def add_timer_func_run_from_other_service(current_service: Service, foreground: bool, delay: float, handler: Callable, *args, **kwargs) -> TimerRequest:
     timer_func_runner: TimerFuncRunner = current_service._loop.get_service_instance(TimerFuncRunner)
-    return timer_func_runner.add_timer_func_run_from_other_service(delay, handler, *args, **kwargs)
+    return timer_func_runner.add_timer_func_run_from_other_service(foreground, delay, handler, *args, **kwargs)
 
 
 def discard_timer_func_run_from_other_service(current_service: Service, timer_request: TimerRequest) -> bool:

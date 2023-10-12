@@ -15,7 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = ['EntityWithExtendableArgs', 'ArgsManagerMixin', 'EntityArgsHolder', 'ExtendKwargsManager', 'EKwargs', 'ExtendArgsManager', 'EArgs', 'ArgsManager', 'merge_func_args', 'interested_args_to_kwargs', 'func_args_to_kwargs', 'number_of_provided_args', 'args_kwargs', 'ArgsKwargs', 'prepare_arguments_positions', 'UnknownArgumentError', 'find_arg_position_and_value', 'try_find_arg_position_and_value']
+__all__ = ['EntityWithExtendableArgs', 'ArgsManagerMixin', 'EntityArgsHolder', 'EAH', 'EntityArgsHolderExplicit', 'EAHE', 'ExtendKwargsManager', 
+           'EKwargs', 'ExtendArgsManager', 'EArgs', 'ArgsManager', 'merge_func_args', 'interested_args_to_kwargs', 'func_args_to_kwargs', 
+           'number_of_provided_args', 'args_kwargs', 'args_kwargs_to_str', 'ArgsKwargs', 'AK', 'prepare_arguments_positions', 'UnknownArgumentError', 
+           'find_arg_position_and_value', 'try_find_arg_position_and_value']
 
 from enum import Enum
 from typing import Any, Dict, Type, Callable, Union, Optional, Sequence, Tuple, List
@@ -31,7 +34,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -56,11 +59,24 @@ class EntityArgsHolder:
     def __call__(self) -> Any:
         return self.entity(*self.args, **self.kwargs)
     
-    def args_kwargs(self) -> Tuple:
+    def args_kwargs(self) -> Tuple[Tuple, Dict]:
         return self.args, self.kwargs
     
-    def entity_args_kwargs(self) -> Tuple:
+    def entity_args_kwargs(self) -> Tuple[EntityWithExtendableArgs, Tuple, Dict]:
         return self.entity, self.args, self.kwargs
+
+
+EAH = EntityArgsHolder
+
+
+class EntityArgsHolderExplicit(EntityArgsHolder):
+    def __init__(self, entity: EntityWithExtendableArgs, args, kwargs):
+        super().__init__(entity)
+        self.args: Tuple = args
+        self.kwargs: Dict = kwargs
+
+
+EAHE = EntityArgsHolderExplicit
 
 
 class ExtendKwargsManager(ArgsManagerMixin):
@@ -318,8 +334,25 @@ def number_of_provided_args(args, kwargs):
     return len(args) + len(kwargs)
 
 
-def args_kwargs(*args, **kwargs):
+def args_kwargs(*args, **kwargs) -> Tuple[Tuple, Dict]:
     return args, kwargs
+
+
+def args_kwargs_to_str(args, kwargs) -> str:
+    if args:
+        args_str = ', '.join([f'{arg}' for arg in args])
+    else:
+        args_str = str()
+    
+    if kwargs:
+        kwargs_str = ', '.join([f'{key}={value}' for key, value in kwargs.items()])
+    else:
+        kwargs_str = str()
+    
+    if kwargs_str:
+        return f'{args_str}, {kwargs_str}'
+    else:
+        return args_str
 
 
 class ArgsKwargs:
@@ -329,6 +362,9 @@ class ArgsKwargs:
     
     def __call__(self) -> Any:
         return self.args, self.kwargs
+
+
+AK = ArgsKwargs
 
 
 def prepare_arguments_positions(positional: Sequence[str], keyword_only: Sequence[str]) -> Dict[str, Optional[int]]:

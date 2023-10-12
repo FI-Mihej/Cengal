@@ -16,13 +16,17 @@
 # limitations under the License.
 
 
-__all__ = ['PLATFORM_NAME', 'PYTHON_IMPLEMENTATION', 'PYTHON_VERSION', 'PYTHON_VERSION_STR', 'PYTHON_VERSION_INT', 'IS_RUNNING_IN_PYCHARM', 'RAW_OS_PLATFORM', 'OS_API_TYPE', 'OS_TYPE', '', 'IS_RUNNING_IN_EMSCRIPTEN', 'IS_RUNNING_IN_PYODIDE', 'IS_BUILDING_FOR_PYODIDE', 'CENGAL_IS_IN_BUILD_MODE', 'TEMPLATE_MODULE_NAME']
+__all__ = ['PLATFORM_NAME', 'PYTHON_IMPLEMENTATION', 'PYTHON_VERSION', 'PYTHON_VERSION_STR', 
+           'PYTHON_VERSION_INT', 'IS_RUNNING_IN_PYCHARM', 'RAW_OS_PLATFORM', 'OS_API_TYPE', 
+           'OS_TYPE', '', 'IS_RUNNING_IN_EMSCRIPTEN', 'IS_RUNNING_IN_PYODIDE', 'IS_BUILDING_FOR_PYODIDE', 
+           'CENGAL_IS_IN_BUILD_MODE', 'TEMPLATE_MODULE_NAME', 'cengal_module_rel_path', 
+           'cengal_module_import_str', 'current_cengal_module_rel_path', 'current_cengal_module_import_str']
 
 
 import platform
 import sys
 import os
-from typing import Tuple
+from typing import Tuple, Optional
 
 
 """
@@ -34,7 +38,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -64,6 +68,32 @@ IS_RUNNING_IN_PYODIDE: bool = "pyodide" in sys.modules
 IS_BUILDING_FOR_PYODIDE: bool = "PYODIDE" in os.environ  # for setup.py execution time
 IS_INSIDE_OR_FOR_WEB_BROWSER: bool = IS_RUNNING_IN_EMSCRIPTEN or IS_RUNNING_IN_WASI or IS_BUILDING_FOR_PYODIDE or IS_RUNNING_IN_PYODIDE
 
-CENGAL_IS_IN_BUILD_MODE: bool = 'CENGAL_IS_IN_BUILD_MODE' in os.environ
+CENGAL_IS_IN_BUILD_MODE: bool = ('CENGAL_IS_IN_BUILD_MODE' in os.environ) and ('true' == os.environ['CENGAL_IS_IN_BUILD_MODE'].casefold())
 
 TEMPLATE_MODULE_NAME: str = '_template_module'
+
+CENGAL_UNITTESTS_DISCOVER_IS_RUNNING: bool = ('CENGAL_UNITTESTS_DISCOVER_IS_RUNNING' in os.environ) and ('true' == os.environ['CENGAL_UNITTESTS_DISCOVER_IS_RUNNING'].casefold())
+
+
+def cengal_module_rel_path(cengal_module) -> str:
+    from cengal.modules_management.module_rel_path import module_rel_path
+    import cengal
+    return module_rel_path(cengal, cengal_module)
+
+
+def cengal_module_import_str(cengal_module) -> str:
+    from cengal.modules_management.module_rel_path import module_import_str
+    import cengal
+    return module_import_str(cengal, cengal_module)
+
+
+def current_cengal_module_rel_path(depth: Optional[int] = 1) -> str:
+    from cengal.modules_management.module_rel_path import current_module_rel_path
+    import cengal
+    return current_module_rel_path(cengal, depth + 1)
+
+
+def current_cengal_module_import_str(depth: Optional[int] = 1) -> str:
+    from cengal.modules_management.module_rel_path import current_module_import_str
+    import cengal
+    return current_module_import_str(cengal, depth + 1)

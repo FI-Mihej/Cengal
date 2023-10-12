@@ -261,12 +261,12 @@ def coro(i: Interface) -> str:
     i(FastAggregatorRequest().wait(DataStreamID))
     i(FastAggregatorWaitFor(DataStreamID))
 
+    result: str = i(RunCoro, my_concat_str_coro, 'hello', 'coro')  ## will create a new coro and waits until it will be finished
+
     coro_id: CoroID = i(PutCoro, my_concat_str_coro, 'hello', 'coro')  ## Creates coroutine and returns its ID
     i(WaitCoro, WaitCoroRequest(result_required=False).single(coro_id))  ## Will wait until coro with coro_id will be finished. (Coro can be already finished before this call - it's totaly OK)
     result: str = i(WaitCoro, WaitCoroRequest().single(coro_id))  ## Will wait until coro with coro_id will be finished. (Will raise `SubCoroutineNotFoundError` if coro was already finished before this call)
     assert 'hello coro' == result
-
-    result: str = i(RunCoro, my_concat_str_coro, 'hello', 'coro')  ## will create a new coro and waits until it will be finished
 
     i(WaitCoroRequest(timeout=0.01, kill_on_timeout=True, tree=True).list([
         CoroID_0,
@@ -290,12 +290,12 @@ async def coro(i: Interface) -> str:
     await i(FastAggregatorRequest().wait(DataStreamID))
     await i(FastAggregatorWaitFor(DataStreamID))
 
+    result: str = await i(RunCoro, my_concat_str_coro, 'hello', 'coro')  ## will create a new coro and waits until it will be finished
+
     coro_id: CoroID = await i(PutCoro, my_concat_str_coro, 'hello', 'coro')  ## Creates coroutine and returns its ID
     await i(WaitCoro, WaitCoroRequest(result_required=False).single(coro_id))  ## Will wait until coro with coro_id will be finished. (Coro can be already finished before this call - it's totaly OK)
     result: str = await i(WaitCoro, WaitCoroRequest().single(coro_id))  ## Will wait until coro with coro_id will be finished. (Will raise `SubCoroutineNotFoundError` if coro was already finished before this call)
     assert 'hello coro' == result
-
-    result: str = await i(RunCoro, my_concat_str_coro, 'hello', 'coro')  ## will create a new coro and waits until it will be finished
 
     await i(WaitCoroRequest(timeout=0.01, kill_on_timeout=True, tree=True).list([
         coro_id_0,

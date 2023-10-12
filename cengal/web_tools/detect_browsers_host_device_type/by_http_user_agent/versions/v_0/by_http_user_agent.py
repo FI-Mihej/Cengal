@@ -32,7 +32,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -47,13 +47,13 @@ reg_v = re.compile('1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|
 def is_mobile_browser(user_agent: str) -> bool:
     b = reg_b.search(user_agent)
     v = reg_v.search(user_agent[0:4])
-    print(f"is_mobile_browser. b: {b}; v: {v}.")
+    # print(f"is_mobile_browser. b: {b}; v: {v}.")
     return bool(b or v)
 
 
 def is_tablet_browser(user_agent: str) -> bool:
     if not is_mobile_browser(user_agent):
-        additional_words = ('android', 'touch')
+        additional_words = ('android', 'touch', 'ipad')
         uac = user_agent.casefold()
         for additional_word in additional_words:
             if additional_word in uac:
@@ -65,7 +65,7 @@ def is_tablet_browser(user_agent: str) -> bool:
 def is_mobile_or_tablet_browser(user_agent: str) -> bool:
     mobile = is_mobile_browser(user_agent)
     if not mobile:
-        additional_words = ('android', 'touch')
+        additional_words = ('android', 'touch', 'ipad')
         uac = user_agent.casefold()
         for additional_word in additional_words:
             if additional_word in uac:

@@ -24,7 +24,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -32,7 +32,10 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-__all__ = ['ClientHandlers', 'PageItems', 'nicegui_page_sync_coro', 'nicegui_page_async_coro', 'run']
+__all__ = ['ClientHandlers', 'PageItems', 'nicegui_page_sync_coro', 'sync_like_page', 
+           'sl_page', 'nicegui_page_async_coro', 'async_page', 'apage',
+           'nicegui_page_class_async_coro', 'async_page_class', 'apage_class', 
+           'PageContextBase', 'run']
 
 
 import asyncio
@@ -72,11 +75,12 @@ if True:
     Payload.max_decode_packets = 500
 
 
+import inspect
 from time import perf_counter
-from typing import Set, Tuple, Optional, Union, Dict, Callable, Any
+from typing import Set, Tuple, Optional, Union, Dict, Callable, Any, Hashable, cast
 import warnings
 from cengal.parallel_execution.asyncio.atasks import create_task
-from cengal.parallel_execution.coroutines.coro_scheduler import Interface, AnyWorker
+from cengal.parallel_execution.coroutines.coro_scheduler import Interface, AnyWorker, cs_acoro
 from cengal.parallel_execution.coroutines.coro_standard_services.async_event_bus import (AsyncEventBus,
                                                                                          AsyncEventBusRequest)
 from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import PutCoro, put_coro_to
@@ -87,13 +91,14 @@ from cengal.parallel_execution.coroutines.coro_standard_services.shutdown_loop i
 from cengal.parallel_execution.coroutines.coro_standard_services.shutdown_on_keyboard_interrupt import ShutdownOnKeyboardInterrupt
 from cengal.parallel_execution.coroutines.coro_standard_services.simple_yield import \
     Yield
-from cengal.parallel_execution.coroutines.coro_standard_services.instance import Instance, InstanceRequest
+from cengal.parallel_execution.coroutines.coro_standard_services.instance import Instance, InstanceRequest, afast_wait
+from cengal.parallel_execution.coroutines.coro_standard_services.loop_yield import agly_patched
 from cengal.parallel_execution.coroutines.coro_tools.await_coro import await_coro_prim
-from cengal.parallel_execution.coroutines.coro_tools.run_in_loop import (arun_in_fast_loop, arun_in_loop)
-from cengal.code_flow_control.args_manager import args_kwargs
+from cengal.parallel_execution.coroutines.coro_tools.run_in_loop import (arun_in_fast_loop, arun_in_loop, run_in_loop)
+from cengal.code_flow_control.args_manager import args_kwargs, EntityArgsHolder, EntityArgsHolderExplicit
 from cengal.io.serve_free_ports import simple_port_search
 from uuid import uuid4
-from inspect import signature, Signature
+from inspect import signature, Signature, isclass
 from cengal.parallel_execution.coroutines.coro_scheduler import *
 from cengal.data_manipulation.conversion.reinterpret_cast import \
     reinterpret_cast
@@ -106,10 +111,42 @@ from cengal.parallel_execution.asyncio.atasks import create_task
 
 
 from nicegui import app, ui, Client
+from nicegui.binding import loop
+# agly_patched(loop)
+from cengal.parallel_execution.asyncio.timed_yield import TimedYield
+import nicegui.binding
+original__propagate = nicegui.binding.propagate
+class PropageteMock:
+    def __init__(self) -> None:
+        self.ty: TimedYield = TimedYield(0.01)
+    
+    def __call__(self, source_obj: Any, source_name: str, visited: Optional[Set[Tuple[int, str]]] = None) -> None:
+        return original__propagate(source_obj, source_name, visited)
+
+
+nicegui.binding.propagate = PropageteMock()
+from fastapi import Request as FastAPIRequest
+from .text_translation import setup_translation, create_translatable_text_element, TextTranslator, \
+    TranslationLanguageMapper, TranslationLanguageChooser, TranslatableTextElement, TTE, NiceguiTranslatableTextElement, NTTE
+from cengal.parallel_execution.coroutines.coro_tools.await_coro import asyncio_coro
+from cengal.file_system.app_fs_structure.app_dir_path import AppDirPath, AppDirectoryType
+from cengal.file_system.path_manager import RelativePath
+from cengal.web_tools.detect_browsers_host_device_type.by_http_headers import ClientViewType, client_view_type
+from cengal.web_tools.detect_browsers_language.by_http_headers import parse_accept_language, optimize_accept_language, match_langs, normalize_lang
+from cengal.math.numbers import RationalNumber
+from functools import partial
+from collections import OrderedDict
 
 
 DESTROY_CS_EVENT = f'DESTROY_CENGAL_EVENT__{uuid4()}'
 CS_DESTROY_TIMEOUT = 3.0
+
+
+text_translator: TextTranslator = None
+translation_language_mapper: TranslationLanguageMapper = None
+session_clients: Dict[Hashable, Set[Hashable]] = dict()
+translatable_text_element_per_session: Dict[Hashable, NiceguiTranslatableTextElement] = dict()
+translatable_text_element_per_client: Dict[Hashable, NiceguiTranslatableTextElement] = dict()
 
 
 class CoroWrapperNiceGuiPage(CoroWrapperAsyncAwait):
@@ -250,8 +287,40 @@ class PageItems:
         return self.add(item)
 
 
+class PageContextBase:
+    def __init__(self, client: Client, request: FastAPIRequest, _t: NTTE) -> None:
+        self.client: Client = client
+        self.request: FastAPIRequest = request
+        self.client_id: Hashable = client.id
+        self.session_id: Hashable = client.session_id
+        self.user_id: Hashable = None
+        self._t: NTTE = _t
+        self.client_view_type: ClientViewType = self._determine_client_view_type()
+        self.better_lang: str = None
+        self.featured_langs: OrderedDict[str, RationalNumber] = None
+        self.langs: OrderedDict[str, RationalNumber] = None
+        self.better_lang, self.featured_langs, self.langs = self._determine_client_languages()
+        self._t.text_translation_language_chooser.lang = self.better_lang
+    
+    def _determine_client_view_type(self) -> ClientViewType:
+        return client_view_type(self.request.headers)
+    
+    def _determine_client_languages(self):
+        parsed_accept_language: Optional[OrderedDict[str, RationalNumber]] = optimize_accept_language(parse_accept_language(self.request.headers))
+        translation_data: Dict = self._t.text_translator.decoded_data
+        return match_langs(
+                translation_data['default_language'], 
+                set(translation_data['featured_languages']),
+                set(translation_data['supported_languages']),
+                translation_data['translation_language_map'],
+                parsed_accept_language,
+            )
+
+
 def nicegui_page_sync_coro(*dargs, **dkwargs):
-    """Decorator. With an arguments. Gives ability to execute any decorated Cengal coroutine based page as as a sync function. Can postpone execution to the actual loop when possible if None as an immediate result (no result) is acceptible. Can start own loop if needed. See sync_coro_param() decorator from cengal/parallel_execution/coroutines/coro_tools/wait_coro for more details
+    """Decorator. With an arguments. Gives ability to execute any decorated Cengal coroutine based page as a sync function.
+    Can postpone execution to the actual loop when possible if None as an immediate result (no result) is acceptible.
+    Can start own loop if needed. See sync_coro_param() decorator from cengal/parallel_execution/coroutines/coro_tools/wait_coro for more details
 
     Returns:
         _type_: _description_
@@ -280,7 +349,11 @@ def nicegui_page_sync_coro(*dargs, **dkwargs):
     return nicegui_page_sync_coro_impl
 
 
-def nicegui_page_async_coro(coro_worker: Worker):
+sync_like_page = nicegui_page_sync_coro
+sl_page = nicegui_page_sync_coro
+
+
+def nicegui_page_async_coro_impl(page_class: Optional[Union[PageContextBase, EntityArgsHolder]], coro_worker: Worker):
     """Decorator. Without arguments. Makes a proper, fully functional async Page from any decorated Cengal coroutine
 
     Args:
@@ -293,11 +366,40 @@ def nicegui_page_async_coro(coro_worker: Worker):
         _type_: _description_
     """    
     coro_worker_0 = coro_worker
-    async def wrapper(*args, **kwargs):
+    page_class_0 = page_class
+    # async def wrapper(*args, **kwargs):
+    async def wrapper(request: FastAPIRequest, client: Client):
+        client_id = client.id
+        session_id = request.session.get('id', None)
+        client.session_id = session_id
+        if session_id not in session_clients:
+            session_clients[session_id] = set()
+        
+        session_clients[session_id].add(client_id)
+
+        if session_id is None:
+            translatable_text_element: NiceguiTranslatableTextElement = create_translatable_text_element(text_translator, translation_language_mapper)
+            # translatable_text_element: NiceguiTranslatableTextElement = create_translatable_text_element(
+            #         await asyncio_coro(cs_acoro(afast_wait))('text_translator'), await asyncio_coro(cs_acoro(afast_wait))('translation_language_mapper')
+            #     )
+            translatable_text_element_per_client[client_id] = translatable_text_element
+        else:
+            if session_id in translatable_text_element_per_session:
+                translatable_text_element = translatable_text_element_per_session[session_id]
+            else:
+                translatable_text_element: NiceguiTranslatableTextElement = create_translatable_text_element(text_translator, translation_language_mapper)
+                # translatable_text_element: NiceguiTranslatableTextElement = create_translatable_text_element(
+                #         await asyncio_coro(cs_acoro(afast_wait))('text_translator'), await asyncio_coro(cs_acoro(afast_wait))('translation_language_mapper')
+                #     )
+                translatable_text_element_per_session[session_id] = translatable_text_element
+        
+        client.translatable_text_element = translatable_text_element
+        await asyncio_coro(cs_acoro(translatable_text_element.aregister_on_lang_changed_handler))()
         coro_worker = coro_worker_0
         coro_worker_type: CoroType = find_coro_type(coro_worker)
         if CoroType.awaitable == coro_worker_type:
-            async def awaitable_coro_wrapper(i: Interface, current_asyncio_task, wrapper_signature, coro_worker: Worker, *args, **kwargs):
+            async def awaitable_coro_wrapper(i: Interface, current_asyncio_task, wrapper_signature, coro_worker_with_args: EntityArgsHolderExplicit):
+                coro_worker, args, kwargs = coro_worker_with_args.entity_args_kwargs()
                 reinterpret_cast(CoroWrapperNiceGuiPage, i._coro)
                 i._coro.current_asyncio_task = current_asyncio_task
                 i._coro.reinit_for_nicegui()
@@ -308,7 +410,8 @@ def nicegui_page_async_coro(coro_worker: Worker):
             
             coro_wrapper = awaitable_coro_wrapper
         elif CoroType.greenlet == coro_worker_type:
-            def greenlet_coro_wrapper(i: Interface, current_asyncio_task, wrapper_signature, coro_worker: Worker, *args, **kwargs):
+            def greenlet_coro_wrapper(i: Interface, current_asyncio_task, wrapper_signature, coro_worker_with_args: EntityArgsHolderExplicit):
+                coro_worker, args, kwargs = coro_worker_with_args.entity_args_kwargs()
                 reinterpret_cast(CoroWrapperNiceGuiPage, i._coro)
                 i._coro.current_asyncio_task = current_asyncio_task
                 i._coro.reinit_for_nicegui()
@@ -326,13 +429,67 @@ def nicegui_page_async_coro(coro_worker: Worker):
         if args_kwargs is None:
             args_kwargs = (tuple(), dict())
         
-        return await await_coro_prim(coro_wrapper, current_asyncio_task, wrapper_signature, coro_worker, *args, **kwargs)
+        args = tuple()
+        kwargs = dict()
+        coro_worker_param_names_set: Set[str] = set(inspect.signature(coro_worker).parameters.keys())
+        if 'client' in coro_worker_param_names_set:
+            kwargs['client'] = client
+
+        if 'request' in coro_worker_param_names_set:
+            kwargs['request'] = request
         
+        translation_params: Set[str] = {'_t', '_T', '__'} & coro_worker_param_names_set
+        if translation_params:
+            for translation_param in translation_params:
+                kwargs[translation_param] = translatable_text_element
+        
+        page_context_params: Set[str] = {'page_context', 'pc', 'self'} & coro_worker_param_names_set
+        if page_context_params:
+            page_class = page_class_0
+            if isclass(page_class):
+                if issubclass(page_class, PageContextBase):
+                    page_context: PageContextBase = page_class(client, request, translatable_text_element)
+                else:
+                    raise TypeError(f'{page_class} is not a subclass of PageContextBase')
+            elif isinstance(page_class, EntityArgsHolder):
+                page_class = cast(EntityArgsHolder, page_class)
+                page_class, page_class_own_args, page_class_own_kwargs = page_class.entity_args_kwargs()
+                page_class_own_kwargs.update({
+                    'client': client,
+                    'request': request,
+                    '_t': translatable_text_element,
+                })
+                page_context = page_class(*page_class_own_args, **page_class_own_kwargs)
+            else:
+                raise TypeError(f'{page_class} is not a subclass of PageContextBase nor an EntityArgsHolder')
+
+            for page_context_param in page_context_params:
+                kwargs[page_context_param] = page_context
+
+        return await await_coro_prim(coro_wrapper, current_asyncio_task, wrapper_signature, EntityArgsHolderExplicit(coro_worker, args, kwargs))
+        
+    wrapper_sign: Signature = signature(wrapper)
     coro_worker_sign: Signature = signature(coro_worker)
-    wrapper_signature = coro_worker_sign.replace(parameters=tuple(coro_worker_sign.parameters.values())[1:], return_annotation=coro_worker_sign.return_annotation)
+    # wrapper_signature = coro_worker_sign.replace(parameters=tuple(coro_worker_sign.parameters.values())[1:], return_annotation=coro_worker_sign.return_annotation)
+    wrapper_signature = coro_worker_sign.replace(parameters=wrapper_sign.parameters.values(), return_annotation=coro_worker_sign.return_annotation)
     wrapper.__signature__ = wrapper_signature
     
     return wrapper
+
+
+nicegui_page_async_coro = partial(nicegui_page_async_coro_impl, None)
+
+
+async_page = nicegui_page_async_coro
+apage = nicegui_page_async_coro
+
+
+def nicegui_page_class_async_coro(page_class: Optional[Union[PageContextBase, EntityArgsHolder]] = PageContextBase):
+    return partial(nicegui_page_async_coro_impl, page_class)
+
+
+async_page_class = nicegui_page_class_async_coro
+apage_class = nicegui_page_class_async_coro
 
 
 async def init_cs(is_fast_loop: bool = True, main_coro: AnyWorker = None, app_args_kwargs = None):
@@ -340,7 +497,18 @@ async def init_cs(is_fast_loop: bool = True, main_coro: AnyWorker = None, app_ar
         await i(AsyncioLoop, AsyncioLoopRequest().inherit_surrounding_loop())
         await i(AsyncioLoop, AsyncioLoopRequest().turn_on_loops_intercommunication(True))
         await i(ShutdownOnKeyboardInterrupt)
-        await i(Instance, InstanceRequest().set('nicegui_app_args_kwargs', app_args_kwargs))
+        await i(Instance, InstanceRequest().set('nicegui__app_args_kwargs', app_args_kwargs))
+
+        app_name: str = app_args_kwargs[1]['app_name']
+        app_name_for_fs: str = app_args_kwargs[1]['app_name_for_fs']
+        app_version: str = app_args_kwargs[1]['app_version']
+        app_version_str: str = app_args_kwargs[1]['app_version_str']
+        await i(Instance, InstanceRequest().set('app_name', app_name))
+        await i(Instance, InstanceRequest().set('app_name_for_fs', app_name_for_fs))
+        await i(Instance, InstanceRequest().set('app_version', app_version))
+        await i(Instance, InstanceRequest().set('app_version_str', app_version_str))
+
+        # await init_translation(i, app_args_kwargs)
         if main_coro is not None:
             await i(PutCoro, main_coro, app_args_kwargs)
 
@@ -383,26 +551,60 @@ def destroy_cs():
         warnings.warn(f'destroy_cs - not finished within timeout of {CS_DESTROY_TIMEOUT} sec.')
 
 
+@asyncio_coro
+async def on_disconnect_handler(i: Interface, client: Client):
+    client_id = client.id
+    if hasattr(client, 'session_id'):
+        session_id = client.session_id
+    else:
+        session_id = None
+    
+    if session_id is None:
+        translatable_text_element: NiceguiTranslatableTextElement = translatable_text_element_per_client.pop(client_id, None)
+    else:
+        translatable_text_element = translatable_text_element_per_session.pop(session_id, None)
+    
+    if hasattr(client, 'translatable_text_element'):
+        if translatable_text_element is None:
+            translatable_text_element = client.translatable_text_element
+        
+        delattr(client, 'translatable_text_element')
+
+    if translatable_text_element is not None:
+        await translatable_text_element.aremove_on_lang_changed_handler()
+    
+    if session_id is not None:
+        session_clients[session_id].discard(client_id)
+        if not session_clients[session_id]:
+            session_clients.pop(session_id, None)
+
+
+async def init_translation(i: Interface, app_args_kwargs: Tuple[Tuple, Dict]):
+    await i(ShutdownOnKeyboardInterrupt)
+    app_dir_path: AppDirPath = await i(Instance, InstanceRequest().get(AppDirPath))
+    app_data_dir_path_type: str = await i(Instance, InstanceRequest().get('app_data_dir_path_type'))
+    app_name_for_fs: str = await i(Instance, InstanceRequest().get('app_name_for_fs'))
+    app_name_for_fs = app_name_for_fs if app_name_for_fs else app_args_kwargs[1]['app_name_for_fs']
+    app_data_dir_path_rel: RelativePath = RelativePath(app_dir_path(app_data_dir_path_type, app_name_for_fs))
+    global text_translator
+    global translation_language_mapper
+    text_translator, translation_language_mapper = setup_translation(app_data_dir_path_rel('text_dictionary.json'))
+    await i(Instance, InstanceRequest().set('nicegui__text_translator', text_translator))
+    await i(Instance, InstanceRequest().set('nicegui__translation_language_mapper', translation_language_mapper))
+
+
 def run(*,
         host: str = '0.0.0.0',
         port_or_range: Union[int, slice, Tuple[int, int]] = 8080,
-        title: str = 'NiceGUI',
-        viewport: str = 'width=device-width, initial-scale=1',
-        favicon: Optional[str] = None,
-        dark: Optional[bool] = False,
-        binding_refresh_interval: float = 0.1,
-        show: bool = True,
-        reload: bool = True,
-        uvicorn_logging_level: str = 'warning',
-        uvicorn_reload_dirs: str = '.',
-        uvicorn_reload_includes: str = '*.py',
-        uvicorn_reload_excludes: str = '.*, .py[cod], .sw.*, ~*',
-        exclude: str = '',
-        tailwind: bool = True,
-        is_fast_loop: bool = True,
         main_coro: AnyWorker = None,
+        is_fast_loop: bool = True,
+        app_name: str = str(),
+        app_name_for_fs: str = str(),
+        app_version: Tuple[int, int, int, Union[int, str]] = tuple(),
+        app_version_str: str = str(),
+        **kwargs
     ) -> None:
-    """Prepares and starts NiceGUI. Saves initial args and kwargs parameters (as well as determined free port) into a tuple (Tuple[Tuple, Dict]) within an Instance service awailable by a 'nicegui_app_args_kwargs' string key 
+    """Prepares and starts NiceGUI. Saves initial args and kwargs parameters (as well as determined free port) into a tuple (Tuple[Tuple, Dict]) within an Instance service awailable by a 'nicegui__app_args_kwargs' string key 
 
     Args:
         host (str, optional): _description_. Defaults to '0.0.0.0'.
@@ -418,48 +620,30 @@ def run(*,
         uvicorn_reload_dirs (str, optional): _description_. Defaults to '.'.
         uvicorn_reload_includes (str, optional): _description_. Defaults to '*.py'.
         uvicorn_reload_excludes (str, optional): _description_. Defaults to '.*, .py[cod], .sw.*, ~*'.
-        exclude (str, optional): _description_. Defaults to ''.
         tailwind (bool, optional): _description_. Defaults to True.
         is_fast_loop (bool, optional): _description_. Defaults to True.
         main_coro (AnyWorker, optional): _description_. Defaults to None.
-    """    
+    """
     port = simple_port_search(host, port_or_range)
-    app_args_kwargs = args_kwargs(
+    app_args_kwargs: Tuple[Tuple, Dict] = args_kwargs(
         host=host, 
         port_or_range=port_or_range, 
         port=port, 
-        title=title, 
-        viewport=viewport, 
-        favicon=favicon, 
-        dark=dark, 
-        binding_refresh_interval=binding_refresh_interval,
-        show=show,
-        reload=reload,
-        uvicorn_logging_level=uvicorn_logging_level,
-        uvicorn_reload_dirs=uvicorn_reload_dirs,
-        uvicorn_reload_includes=uvicorn_reload_includes,
-        uvicorn_reload_excludes=uvicorn_reload_excludes,
-        exclude=exclude,
-        tailwind=tailwind,
+        main_coro=main_coro,
         is_fast_loop=is_fast_loop,
-        main_coro=main_coro
+        app_name=app_name,
+        app_name_for_fs=app_name_for_fs,
+        app_version=app_version,
+        app_version_str=app_version_str,
+        **kwargs,
     )
+    run_in_loop(init_translation, app_args_kwargs)
     app.on_startup(init_cs(is_fast_loop, main_coro, app_args_kwargs))
     app.on_shutdown(destroy_cs)
+    # app.on_connect(on_connect_handler)
+    app.on_disconnect(on_disconnect_handler)
     ui.run(
-        host=host, 
-        port=port, 
-        title=title, 
-        viewport=viewport, 
-        favicon=favicon, 
-        dark=dark, 
-        binding_refresh_interval=binding_refresh_interval,
-        show=show,
-        reload=reload,
-        uvicorn_logging_level=uvicorn_logging_level,
-        uvicorn_reload_dirs=uvicorn_reload_dirs,
-        uvicorn_reload_includes=uvicorn_reload_includes,
-        uvicorn_reload_excludes=uvicorn_reload_excludes,
-        exclude=exclude,
-        tailwind=tailwind,
+        host=host,
+        port=port,
+        **kwargs,
         )

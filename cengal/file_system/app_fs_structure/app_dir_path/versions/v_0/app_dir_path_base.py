@@ -28,7 +28,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -92,7 +92,7 @@ class AppDirPathBase:
         base_dir_path = self.base_dir_id_to_path(mapping[0])
         result_list = [base_dir_path]
         result_list.extend(norm_dir_name_or_path(mapping[1]))
-        result_list.append(norm_dir_name_or_path(app_name_or_path))
+        result_list.extend(norm_dir_name_or_path(app_name_or_path))
         if with_structure:
             result_list.extend(norm_dir_name_or_path(mapping[2]))
         

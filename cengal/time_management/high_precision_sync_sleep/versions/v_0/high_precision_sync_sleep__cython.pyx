@@ -26,12 +26,35 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
 __status__ = "Development"
 # __status__ = "Production"
+
+
+IF (UNAME_SYSNAME == "Windows") and (UNAME_MACHINE in ("x86_64", "x86", "i386", "i686", "AMD64")):
+    cdef extern from "<immintrin.h>" nogil:
+        void _mm_pause()
+
+
+    cpdef void mm_pause():
+        _mm_pause()
+
+
+ELIF (UNAME_SYSNAME in ("Linux", "Darwin")) and (UNAME_MACHINE in ("x86_64", "x86", "i386", "i686", "AMD64")):
+    cdef extern from "<immintrin.h>" nogil:
+        void _mm_pause()
+
+
+    cpdef void mm_pause():
+        _mm_pause()
+
+
+ELSE:
+    cpdef void mm_pause():
+        pass
 
 
 IF UNAME_SYSNAME == "Windows":
@@ -48,7 +71,9 @@ IF UNAME_SYSNAME == "Windows":
         end = start + <clock_t>(sleep_time * CLOCKS_PER_SEC)
 
         while clock() < end:
+            mm_pause()
             SwitchToThread()
+            mm_pause()
     
 
     hps_sleep = high_precision_sync_sleep = cython_spinwait
@@ -72,7 +97,9 @@ ELIF UNAME_SYSNAME in ("Linux", "Darwin"):
         sleep_req.tv_nsec = <long>((sleep_time - sleep_req.tv_sec) * 1e9)
 
         while nanosleep(&sleep_req, &sleep_rem) == -1:
-            sleep_req = sleep_rem    
+            mm_pause()
+            sleep_req = sleep_rem
+            mm_pause()
     
     hps_sleep = high_precision_sync_sleep = cython_nanosleep
 

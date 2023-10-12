@@ -28,7 +28,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -40,6 +40,7 @@ from cengal.time_management.load_best_timer import perf_counter
 import ttkbootstrap as ttkb
 from ttkbootstrap.scrolled import ScrolledText as TtkbScrolledText
 from tkinter import simpledialog
+import tkinter as tk
 from ttkbootstrap import Style
 from pprintpp import pformat as pf
 from typing import Callable, Hashable, Optional, Set, Dict, Tuple, Union, List, Sequence, Any, cast
@@ -52,7 +53,9 @@ from cengal.parallel_execution.coroutines.coro_standard_services.sleep import Sl
 from cengal.parallel_execution.coroutines.coro_standard_services.simple_yield import Yield
 from cengal.parallel_execution.coroutines.coro_standard_services.asyncio_loop import AsyncioLoopRequest, run_in_thread_pool, run_in_thread_pool_fast
 from cengal.parallel_execution.coroutines.coro_standard_services.fast_aggregator import *
-from cengal.parallel_execution.coroutines.coro_tools.coro_flow_control import graceful_coro_destroyer, GracefulCoroDestroy
+from cengal.parallel_execution.coroutines.coro_standard_services.log import *
+from cengal.parallel_execution.coroutines.coro_standard_services.instance import InstanceRequest
+from cengal.parallel_execution.coroutines.coro_tools.coro_flow_control import graceful_coro_destroyer, agraceful_coro_destroyer, GracefulCoroDestroy
 from cengal.statistics.normal_distribution import average
 from cengal.parallel_execution.multiprocess.multiprocessing_task_runner import *
 from cengal.text_processing.text_processing import normalize_line_separators_and_tabs
@@ -62,6 +65,8 @@ from cengal.data_manipulation.dict_path import *
 from cengal.user_interface.gui.tkinter.components.read_only_text import *
 from cengal.user_interface.gui.tkinter.components.tool_tip import *
 from cengal.user_interface.gui.tkinter.components.aggregator_view import *
+from cengal.math.numbers import RationalNumber
+from cengal.code_flow_control.args_manager import args_kwargs_to_str, ArgsKwargs
 from greenlet import GreenletExit
 
 
@@ -81,6 +86,7 @@ from cengal.parallel_execution.coroutines.coro_standard_services.throw_coro_list
 from cengal.parallel_execution.coroutines.coro_standard_services.wait_coro import *
 from cengal.parallel_execution.coroutines.coro_standard_services.shutdown_loop import *
 from cengal.parallel_execution.coroutines.coro_standard_services.fast_aggregator import *
+from cengal.parallel_execution.coroutines.coro_standard_services.log import *
 from cengal.parallel_execution.coroutines.coro_tools.coro_flow_control import graceful_coro_destroyer, GracefulCoroDestroy
 import asyncio
 
@@ -425,6 +431,131 @@ class CorosMaxExecutionTimesProvider:
         return self._formatter('Coros Lifetime Max Execution Times', data)
 
 
+class CoroLogsAppendFormatter(AggregatorAppendFormatter):
+    def __init__(self, initial_text: str) -> None:
+        super().__init__(initial_text)
+        self._prompt_string: str = f'>>> {"-"*80}'
+
+    def __call__(self, data: List[Tuple[Tuple, Dict, Dict[str, Any]]]) -> Any:
+        if data:
+            data_part = '\n\n'.join([self._format(*log_info) for log_info in data])
+            return super().__call__(f'\n{data_part}\n')
+        else:
+            return super().__call__(str())
+
+    def _format(self, args, kwargs, info=None) -> str:
+        if info is None:
+            return f'{self._prompt_string}\n{args_kwargs_to_str(args, kwargs)}'
+        else:
+            output_strings: List[str] = list()
+            output_strings.append(self._prompt_string)
+            output_strings.append(f'> Time: {info[InfoFields.current_time]}; Perf Counter: {info[InfoFields.perf_counter_time]:17.6f}')
+            output_strings.append(f'> λ: {info[InfoFields.caller_info]}')
+            if InfoFields.logging_level in info:
+                output_strings.append(f'> Logging level: {info[InfoFields.logging_level]}')
+            
+            output_strings.append(args_kwargs_to_str(args, kwargs))
+            coro_parents_strings: List[str] = info[InfoFields.coro_parents_strings]
+            if coro_parents_strings:
+                coro_parents_text: str = '\n'.join(coro_parents_strings)
+                output_strings.append(f'> Coros traceback:\n{coro_parents_text}')
+            
+            output_strings.append(f'> @ {info[InfoFields.file_name]}:{info[InfoFields.line_number]}')
+            traceback_strings: List[str] = info[InfoFields.traceback_strings]
+            if traceback_strings:
+                traceback_text: str = '\n'.join(traceback_strings)
+                traceback_text = traceback_text.strip('\n')
+                output_strings.append(f'> Traceback:\n{traceback_text}')
+            
+            return '\n'.join(output_strings)
+
+
+class CorosLogsProvider:
+    def __init__(self, coros_logs_key: Hashable, logs_limit: Union[None, int], period: float, force_stop_timeout: RationalNumber = 0.1):
+        self.coros_logs_key: Hashable = coros_logs_key
+        self.logs_limit: Union[None, int] = logs_limit
+        self.period: float = period
+        self.i: Interface = None
+        self._update_coro_id: CoroID = None
+        self.force_stop_timeout: RationalNumber = force_stop_timeout
+        self.fac = FastAggregatorClient()
+        self._stop = False
+        self.lifetime_stats: Dict[CoroID, float] = dict()
+        self._current_logs_taken: bool = False
+        self._unsend_data: List[List[Tuple[Tuple, Dict]]] = list()
+        self._log_service_handler_was_added: bool = False
+    
+    def start(self):
+        if self.i is None:
+            self.i = current_interface()
+        
+        self._update_coro_id = self.i(PutCoro, self._update)
+    
+    def stop(self):
+        self._stop = True
+        self.i(PutCoro, self._force_stop)
+    
+    async def _force_stop(self, i: Interface):
+        if self._update_coro_id is not None:
+            update_coro_id = self._update_coro_id
+            self._update_coro_id = None
+            await agraceful_coro_destroyer(i, self.force_stop_timeout, update_coro_id)
+        
+        if self._log_service_handler_was_added:
+            self._log_service_handler_was_added = False
+            await i(LogRequest().remove_iteration_handler(self))
+        
+        self._unsend_data = type(self._unsend_data)()
+    
+    async def _update(self, i: Interface):
+        while not self._stop:
+            if not self._log_service_handler_was_added:
+                if i._loop.is_service_registered(Log):
+                    self._log_service_handler_was_added = True
+                    await i(LogRequest().add_iteration_handler(self))
+                    
+            logs_parts = self._unsend_data
+            self._unsend_data = type(self._unsend_data)()
+            for logs_part in logs_parts:
+                self.fac(self.coros_logs_key, logs_part)
+            
+            await i(Sleep, self.period)
+    
+    def __call__(self, log_service: Log, data: List[Tuple[Tuple, Dict, Dict[str, Any]]], current_time: float, current_time_str: str):
+        if self._current_logs_taken:
+            if self.logs_limit is None:
+                if data:
+                    self._unsend_data.append(data)
+            else:
+                num_of_an_initial_logs_needed: int = self.logs_limit - len(data)
+                if 0 <= num_of_an_initial_logs_needed:
+                    if data:
+                        self._unsend_data.append(data)
+                else:
+                    part_of_data = data[-self.logs_limit:]
+                    if part_of_data:
+                        self._unsend_data.append(part_of_data)
+        else:
+            self._current_logs_taken = True
+            if self.logs_limit is None:
+                combined_data = log_service.get_last_n_logs(None) + data
+                if combined_data:
+                    self._unsend_data.append(combined_data)
+            else:
+                num_of_an_initial_logs_needed: int = self.logs_limit - len(data)
+                if 0 < num_of_an_initial_logs_needed:
+                    combined_data = log_service.get_last_n_logs(num_of_an_initial_logs_needed) + data
+                    if combined_data:
+                        self._unsend_data.append(combined_data)
+                if 0 == num_of_an_initial_logs_needed:
+                    if data:
+                        self._unsend_data.append(data)
+                else:
+                    part_of_data = data[-self.logs_limit:]
+                    if part_of_data:
+                        self._unsend_data.append(part_of_data)
+
+
 class SchedulerPerformanceFormatter:
     def __init__(self, external_items_key: Hashable, internal_items_key: Hashable, lifetime_stats_key: Hashable, stats_key: Hashable, window_size: int):
         self.external_items_key: Hashable = external_items_key
@@ -676,10 +807,13 @@ class FilterSetupDialog(ttkb.Toplevel):
 
 # class Application(Tk):
 class Application(ttkb.Window):
-    def __init__(self, style: str = 'superhero', filtered_paths: List[List[str]] = None):
+    def __init__(self, style: str = 'superhero', filtered_paths: List[List[str]] = None, current_children_pack_type: int = 1):
         super().__init__(size=(1900, 900), resizable=(True, True))
         self.style_name = style
         Style(style)
+        self.current_children_pack_type: int = current_children_pack_type
+        self.max_children_pack_type: int = 2
+        self.packed_widgets: List[tk.Widget] = list()
         self.filtered_paths: List[Sequence[str]] = filtered_paths
 
         self.title('CoroScheduler Admin')
@@ -689,31 +823,35 @@ class Application(ttkb.Window):
         
         self.scheduler_stats_frame = ttkb.Frame(self)
         self.scheduler_stats_control_frame = ttkb.Frame(self.scheduler_stats_frame)
+        
+        self.scheduler_stats_layout_button_text = self.scheduler_stats_layout_button_name()
+        self.scheduler_stats_layout_button_text_len = len('L') + 1
+        self.scheduler_stats_layout_button = ttkb.Button(self.scheduler_stats_control_frame, text=self.scheduler_stats_layout_button_text, width=self.scheduler_stats_layout_button_text_len, command=self.scheduler_stats_layout_button_on_click)
+        self.scheduler_stats_layout_button_tooltip = ToolTipHovered(self.scheduler_stats_layout_button, 'Layout circle switch')
+
         self.scheduler_stats_format_button_text = 'F'
-        self.scheduler_stats_format_button_text_len = len('F') + 1
+        self.scheduler_stats_format_button_text_len = len(self.scheduler_stats_format_button_text) + 1
         self.scheduler_stats_format_button = ttkb.Button(self.scheduler_stats_control_frame, text=self.scheduler_stats_format_button_text, width=self.scheduler_stats_format_button_text_len, command=self.scheduler_stats_format_button_on_click)
         self.scheduler_stats_format_button_tooltip = ToolTipHovered(self.scheduler_stats_format_button, 'Filter our unnecessary or flickering paths')
+        
         self.scheduler_stats_help_button_text = '?'
-        self.scheduler_stats_help_button_text_len = len('?') + 1
+        self.scheduler_stats_help_button_text_len = len(self.scheduler_stats_help_button_text) + 1
         self.scheduler_stats_help_button = ttkb.Button(self.scheduler_stats_control_frame, text=self.scheduler_stats_help_button_text, width=self.scheduler_stats_help_button_text_len, bootstyle="info", command=self.scheduler_stats_help_button_on_click)
         self.scheduler_stats_help_button_tooltip = ToolTipHovered(self.scheduler_stats_help_button, 'Console description and help')
-        self.scheduler_stats_format_button.pack(fill=None, expand='no', side='top', pady=1)
-        self.scheduler_stats_help_button.pack(fill=None, expand='no', side='top', pady=1)
-        self.scheduler_stats_control_frame.pack(fill='y', expand='no', side='left')
-        self.coro_scheduler_view = AggregatorView(False, False, 'coro scheduler stats', 1, self.sfmp, 120, 23, self.scheduler_stats_frame)
-        self.coro_scheduler_view.pack(fill='both', expand='yes', side='left')
-        self.scheduler_stats_frame.pack(fill='both', expand='yes', side='bottom')
+
+        self.coro_scheduler_view = AggregatorView(False, False, 'coro scheduler stats', 1, self.sfmp, 25, 23, self.scheduler_stats_frame)
+
+        self.coro_logs_formatter: CoroLogsAppendFormatter = CoroLogsAppendFormatter('Coro Logs')
+        self.coro_logs_provider: CorosLogsProvider = CorosLogsProvider('coro scheduler logs', None, 0.25)
+        self.coro_scheduler_logs_view = AggregatorView(True, True, 'coro scheduler logs', 1, self.coro_logs_formatter, 25, 23, self.scheduler_stats_frame)
 
         self.command_executor_view = CommandExecutor(160, 6)
-        self.command_executor_view.pack(fill='x', expand='no', side='bottom')
         
         self.cmet = CorosMaxExecutionTimesProvider('coros lifetime max execution times', 'coros max execution times', 0.5)
         
         self.coros_lifetime_max_execution_times = AggregatorView(False, False, 'coros lifetime max execution times', 0.75, self.cmet.lifetime_stats_formatter, 25, 13, self)
-        self.coros_lifetime_max_execution_times.pack(fill='x', expand='no', side='left')
         
         self.coros_max_execution_times = AggregatorView(False, False, 'coros max execution times', 0.75, self.cmet.stats_formatter, 25, 13, self)
-        self.coros_max_execution_times.pack(fill='x', expand='no', side='left')
         
         self.spf = SchedulerPerformanceFormatter('scheduler tdelta', 'internal scheduler tdelta', 'scheduler lifetime stats', 'scheduler stats', 5000)
         
@@ -721,26 +859,23 @@ class Application(ttkb.Window):
         self.scheduler_tdelta = AggregatorView(True, False, 'scheduler tdelta', 0.1, self.scheduler_tdelta_formatter, 22, 13, self)
         self.scheduler_tdelta.default_auto_scroll = False
         self.scheduler_tdelta.max_len = 1000
-        self.scheduler_tdelta.pack(fill='x', expand='no', side='left')
         
         def aggregator_view_formatter(data: Any) -> str:
             return f'{current_interface().coro_id}. Aggregator:\n{data}'
         
         self.command_executor_aggregator_view = AggregatorView(False, False, command_executor_aggregator_view_key, 1, aggregator_view_formatter, 25, 13, self)
-        self.command_executor_aggregator_view.pack(fill='x', expand='yes', side='right')
         FastAggregatorClient()(command_executor_aggregator_view_key, str())
         
         self.command_executor_aggregator_append_formatter = AggregatorAppendFormatter('Aggregator Append')
         self.command_executor_aggregator_append_view = AggregatorView(True, True, command_executor_aggregator_append_view_key, 1, self.command_executor_aggregator_append_formatter, 25, 13, self)
         self.command_executor_aggregator_append_view.max_len = 5000
-        self.command_executor_aggregator_append_view.pack(fill='x', expand='yes', side='right')
         FastAggregatorClient()(command_executor_aggregator_append_view_key, str())
 
         self.scheduler_lifetime_stats = AggregatorView(False, False, 'scheduler lifetime stats', 0.3, self.spf.lifetime_stats_formatter, 36, 5, self)
-        self.scheduler_lifetime_stats.pack(fill=None, expand='no', side='top')
         
         self.scheduler_stats = AggregatorView(False, False, 'scheduler stats', 0.3, self.spf.stats_formatter, 36, 7, self)
-        self.scheduler_stats.pack(fill=None, expand='no', side='bottom')
+
+        self.pack_children(self.current_children_pack_type)
 
         # set window size taking into account the size of the widgets
         self.update()
@@ -750,6 +885,125 @@ class Application(ttkb.Window):
         y = (self.winfo_screenheight() // 2) - (height // 2)
         self.geometry('{}x{}+{}+{}'.format(width, height, x, y))
         self.update()
+    
+    def pack_forget_children(self):
+        self.packed_widgets.reverse()
+        for widget in self.packed_widgets:
+            widget.pack_forget()
+    
+    def pack_children(self, pack_type: int):
+        self.pack_forget_children()
+        self.packed_widgets.clear()
+        if 0 == pack_type:
+            self.scheduler_stats_layout_button.pack(fill=None, expand='no', side='top', pady=1)
+            self.packed_widgets.append(self.scheduler_stats_layout_button)
+            self.scheduler_stats_format_button.pack(fill=None, expand='no', side='top', pady=1)
+            self.packed_widgets.append(self.scheduler_stats_format_button)
+            self.scheduler_stats_help_button.pack(fill=None, expand='no', side='top', pady=1)
+            self.packed_widgets.append(self.scheduler_stats_help_button)
+            self.scheduler_stats_control_frame.pack(fill='y', expand='no', side='left')
+            self.packed_widgets.append(self.scheduler_stats_control_frame)
+            self.coro_scheduler_view.pack(fill='both', expand='yes', side='left')
+            self.packed_widgets.append(self.coro_scheduler_view)
+            self.coro_scheduler_logs_view.pack(fill='both', expand='no', side='left')
+            self.packed_widgets.append(self.coro_scheduler_logs_view)
+
+            self.scheduler_stats_frame.pack(fill='both', expand='yes', side='bottom')
+            self.packed_widgets.append(self.scheduler_stats_frame)
+            self.command_executor_view.pack(fill='x', expand='no', side='bottom')
+            self.packed_widgets.append(self.command_executor_view)
+            self.coros_lifetime_max_execution_times.pack(fill='x', expand='no', side='left')
+            self.packed_widgets.append(self.coros_lifetime_max_execution_times)
+            self.coros_max_execution_times.pack(fill='x', expand='no', side='left')
+            self.packed_widgets.append(self.coros_max_execution_times)
+            self.scheduler_tdelta.pack(fill='x', expand='no', side='left')
+            self.packed_widgets.append(self.scheduler_tdelta)
+            self.command_executor_aggregator_view.pack(fill='x', expand='yes', side='right')
+            self.packed_widgets.append(self.command_executor_aggregator_view)
+            self.command_executor_aggregator_append_view.pack(fill='x', expand='yes', side='right')
+            self.packed_widgets.append(self.command_executor_aggregator_append_view)
+            self.scheduler_lifetime_stats.pack(fill=None, expand='no', side='top')
+            self.packed_widgets.append(self.scheduler_lifetime_stats)
+            self.scheduler_stats.pack(fill=None, expand='no', side='bottom')
+            self.packed_widgets.append(self.scheduler_stats)
+        elif 1 == pack_type:
+            self.scheduler_stats_layout_button.pack(fill=None, expand='no', side='top', pady=1)
+            self.packed_widgets.append(self.scheduler_stats_layout_button)
+            self.scheduler_stats_format_button.pack(fill=None, expand='no', side='top', pady=1)
+            self.packed_widgets.append(self.scheduler_stats_format_button)
+            self.scheduler_stats_help_button.pack(fill=None, expand='no', side='top', pady=1)
+            self.packed_widgets.append(self.scheduler_stats_help_button)
+            self.scheduler_stats_control_frame.pack(fill='y', expand='no', side='left')
+            self.packed_widgets.append(self.scheduler_stats_control_frame)
+            self.coro_scheduler_view.pack(fill='both', expand='yes', side='left')
+            self.packed_widgets.append(self.coro_scheduler_view)
+            self.coro_scheduler_logs_view.pack(fill='both', expand='yes', side='left')
+            self.packed_widgets.append(self.coro_scheduler_logs_view)
+
+            self.scheduler_stats_frame.pack(fill='both', expand='yes', side='bottom')
+            self.packed_widgets.append(self.scheduler_stats_frame)
+            self.command_executor_view.pack(fill='x', expand='no', side='bottom')
+            self.packed_widgets.append(self.command_executor_view)
+            self.coros_lifetime_max_execution_times.pack(fill='x', expand='no', side='left')
+            self.packed_widgets.append(self.coros_lifetime_max_execution_times)
+            self.coros_max_execution_times.pack(fill='x', expand='no', side='left')
+            self.packed_widgets.append(self.coros_max_execution_times)
+            self.scheduler_tdelta.pack(fill='x', expand='no', side='left')
+            self.packed_widgets.append(self.scheduler_tdelta)
+            self.command_executor_aggregator_view.pack(fill='x', expand='yes', side='right')
+            self.packed_widgets.append(self.command_executor_aggregator_view)
+            self.command_executor_aggregator_append_view.pack(fill='x', expand='yes', side='right')
+            self.packed_widgets.append(self.command_executor_aggregator_append_view)
+            self.scheduler_lifetime_stats.pack(fill=None, expand='no', side='top')
+            self.packed_widgets.append(self.scheduler_lifetime_stats)
+            self.scheduler_stats.pack(fill=None, expand='no', side='bottom')
+            self.packed_widgets.append(self.scheduler_stats)
+        elif 2 == pack_type:
+            self.scheduler_stats_layout_button.pack(fill=None, expand='no', side='top', pady=1)
+            self.packed_widgets.append(self.scheduler_stats_layout_button)
+            self.scheduler_stats_format_button.pack(fill=None, expand='no', side='top', pady=1)
+            self.packed_widgets.append(self.scheduler_stats_format_button)
+            self.scheduler_stats_help_button.pack(fill=None, expand='no', side='top', pady=1)
+            self.packed_widgets.append(self.scheduler_stats_help_button)
+            self.scheduler_stats_control_frame.pack(fill='y', expand='no', side='left')
+            self.packed_widgets.append(self.scheduler_stats_control_frame)
+            self.coro_scheduler_view.pack(fill='both', expand='no', side='left')
+            self.packed_widgets.append(self.coro_scheduler_view)
+            self.coro_scheduler_logs_view.pack(fill='both', expand='yes', side='left')
+            self.packed_widgets.append(self.coro_scheduler_logs_view)
+
+            self.scheduler_stats_frame.pack(fill='both', expand='yes', side='bottom')
+            self.packed_widgets.append(self.scheduler_stats_frame)
+            self.command_executor_view.pack(fill='x', expand='no', side='bottom')
+            self.packed_widgets.append(self.command_executor_view)
+            self.coros_lifetime_max_execution_times.pack(fill='x', expand='no', side='left')
+            self.packed_widgets.append(self.coros_lifetime_max_execution_times)
+            self.coros_max_execution_times.pack(fill='x', expand='no', side='left')
+            self.packed_widgets.append(self.coros_max_execution_times)
+            self.scheduler_tdelta.pack(fill='x', expand='no', side='left')
+            self.packed_widgets.append(self.scheduler_tdelta)
+            self.command_executor_aggregator_view.pack(fill='x', expand='yes', side='right')
+            self.packed_widgets.append(self.command_executor_aggregator_view)
+            self.command_executor_aggregator_append_view.pack(fill='x', expand='yes', side='right')
+            self.packed_widgets.append(self.command_executor_aggregator_append_view)
+            self.scheduler_lifetime_stats.pack(fill=None, expand='no', side='top')
+            self.packed_widgets.append(self.scheduler_lifetime_stats)
+            self.scheduler_stats.pack(fill=None, expand='no', side='bottom')
+            self.packed_widgets.append(self.scheduler_stats)
+        else:
+            raise NotImplementedError
+    
+    def scheduler_stats_layout_button_name(self) -> str:
+        return 'L' if 0 == self.current_children_pack_type else 'L' + str(self.current_children_pack_type)
+
+    def scheduler_stats_layout_button_on_click(self):
+        self.current_children_pack_type += 1
+        if self.current_children_pack_type > self.max_children_pack_type:
+            self.current_children_pack_type = 0
+        
+        self.scheduler_stats_layout_button_text = self.scheduler_stats_layout_button_name()
+        self.scheduler_stats_layout_button.config(text=self.scheduler_stats_layout_button_text)
+        self.pack_children(self.current_children_pack_type)
     
     def scheduler_stats_format_button_on_click(self):
         d = FilterSetupDialog(self, self.sfmp.filtered_paths)
@@ -762,12 +1016,14 @@ class Application(ttkb.Window):
     def start(self, wr: TkObjWrapper):
         self.spf.start()
         self.sfmp.start(wr)
+        self.coro_logs_provider.start()
         self.scheduler_tdelta.start(wr)
         self.command_executor_aggregator_view.start(wr)
         self.command_executor_aggregator_append_view.start(wr)
         self.scheduler_lifetime_stats.start(wr)
         self.scheduler_stats.start(wr)
         self.coro_scheduler_view.start(wr)
+        self.coro_scheduler_logs_view.start(wr)
         self.cmet.start()
         self.coros_lifetime_max_execution_times.start(wr)
         self.coros_max_execution_times.start(wr)
@@ -775,12 +1031,14 @@ class Application(ttkb.Window):
     def stop(self):
         self.spf.stop()
         self.sfmp.stop()
+        self.coro_logs_provider.stop()
         self.scheduler_tdelta.stop()
         self.command_executor_aggregator_view.stop()
         self.command_executor_aggregator_append_view.stop()
         self.scheduler_lifetime_stats.stop()
         self.scheduler_stats.stop()
         self.coro_scheduler_view.stop()
+        self.coro_scheduler_logs_view.stop()
         self.cmet.stop()
         self.coros_lifetime_max_execution_times.stop()
         self.coros_max_execution_times.stop()
@@ -791,10 +1049,12 @@ class Application(ttkb.Window):
         i(Yield)
 
 
-def coro_scheduler_admin__view(i: Interface, on_close: Optional[AnyWorker] = None):
-    with(TkinterContextManager(i, Application())) as wr:
+def coro_scheduler_admin__view(i: Interface, on_close: Optional[AnyWorker] = None, app_args_kwargs: Optional[ArgsKwargs] = None):
+    app_args, app_kwargs = app_args_kwargs() if app_args_kwargs is not None else ArgsKwargs()()
+    with TkinterContextManager(i, Application(*app_args, **app_kwargs)) as wr:
         app: Application = cast(Application, wr.tk)
         app.prepare(i, wr)
+        i(InstanceRequest().set('admin_tk_app', app))
     
     if on_close is not None:
         app.stop()
@@ -819,8 +1079,8 @@ def cs_init(cs: CoroScheduler):
     cs.set_loop_iteration_time_measurement(True)
 
 
-async def start_admin(i: Interface, on_close: Optional[AnyWorker] = None):
+async def start_admin(i: Interface, on_close: Optional[AnyWorker] = None, app_args_kwargs: Optional[ArgsKwargs] = None):
     cs_init(i._loop)
     await i(PutCoroRequest().turn_on_tree_monitoring(True))
     await i(PutCoro, scheduler_stats_aggregator_provider)
-    await i(PutCoro, coro_scheduler_admin__view, on_close)
+    await i(PutCoro, coro_scheduler_admin__view, on_close, app_args_kwargs)

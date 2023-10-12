@@ -25,7 +25,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -48,41 +48,12 @@ import setuptools
 from setuptools import Extension, setup
 import platform
 
-_PYTHON_VERSION = platform.python_version_tuple()
-MODULES_TO_IGNORE = {'cengal._template_module'}
-PYTHON_2_MODULES = {'cengal.cross_version.console_print.python2'}
-
-
-def find_good_packages():
-    all_packages = setuptools.find_packages(exclude=[
-            'tests', 'tests.*', 'multiproject', 'multiproject.*', 'examples', 'examples.*', 'docs', 'docs.*', 'benchmarks', 'benchmarks.*', 'cengal.egg-info', 'cengal.egg-info.*', 'dist', '.eggs', '.idea', '.vscode',
-        ])
-    good_packages = list()
-    for package in all_packages:
-        is_good = True
-        for item in MODULES_TO_IGNORE:
-            if package.startswith(item):
-                is_good = False
-                break
-
-        if '3' == _PYTHON_VERSION[0]:
-            for item in PYTHON_2_MODULES:
-                if package.startswith(item):
-                    is_good = False
-                    break
-
-        if is_good:
-            good_packages.append(package)
-
-    return good_packages
-
-
 setuptools._install_setup_requires({'setup_requires': ['py-cpuinfo', 'Cython']})
 
 
 from cengal_setup_scripts.install_required_packages.install_packages import install_bundled, get_pypi_requirements_list, get_remote_requirements_list
 install_bundled()
-from cengal_setup_scripts.find_and_prepare_cython_modules import find_and_prepare_cython_modules, build, build_ext, sdist
+from cengal_setup_scripts.find_and_prepare_cython_modules import find_and_prepare_cython_modules, build, build_ext, sdist, find_good_packages, find_package_data
 from cengal.file_system.path_manager import path_relative_to_src
 from Cython.Build import cythonize
 
@@ -94,17 +65,22 @@ pypi_requirements_list = get_pypi_requirements_list()
 remote_requirements_list = get_remote_requirements_list()
 
 
+from cengal.system import CENGAL_IS_IN_BUILD_MODE
 from cengal.build_tools.current_compiler import compiler_type
 from cengal.build_tools.prepare_cflags import prepare_cflags, concat_cflags, prepare_compile_time_env
 
 
-prepare_cflags()
+prepare_cflags({
+    'CENGAL_IS_IN_BUILD_MODE': (False, CENGAL_IS_IN_BUILD_MODE),
+    'CENGAL_BUILD_IS_IN_DEBUG_MODE': (False, 'CENGAL_BUILD_IS_IN_DEBUG_MODE' in environ),
+})
 
 
 if 'CENGAL_BUILD_IS_IN_DEBUG_MODE' in environ:
     debugpy.breakpoint()
 
 
+packages_data_dict, manifest_included_files = find_package_data()
 setuptools.setup(
     name='cengal',
     version=__version__,
@@ -115,10 +91,11 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     url='https://github.com/FI-Mihej/Cengal',
     license=__license__,
-    keywords='async loop, coroutine, async Qt, async Tkinter, bytecode manipulation, introspection, text parsing',
+    keywords='async loop, coroutine, async wxPython, async Qt, async Tkinter, bytecode manipulation, introspection, text parsing',
     py_modules=['cengal'],
     # package_dir={'': path_relative_to_src('')},
     packages=find_good_packages(),
+    package_data=packages_data_dict,
     setup_requires=pypi_requirements_list,
     install_requires=pypi_requirements_list,
     classifiers=[

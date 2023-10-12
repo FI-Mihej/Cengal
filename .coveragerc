@@ -1,0 +1,15 @@
+[paths]
+source = 
+    ./cengal
+
+[run]
+source = ./cengal
+omit = 
+    ./cengal/_template_module/*
+    ./cengal/cross_version/console_print/python2/*
+    */versions/v_*/tests/*
+    */versions/v_*/compilable
+    */versions/v_*/data
+    */versions/v_*/development
+    __init__.py
+    __x__build_config.py

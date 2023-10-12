@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -34,21 +34,19 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-__all__ = ['Text', 'BinText', 'DEFAULT_ENCODING', 'EncodingRequired', 'NotSupportedDataType', 'NotSupportedDesiredTextType', 'normalize_text', 'normalize_text_to_data', 'find_text', 'replace_slice', 'replace_text', 'normalize_line_separators', 'normalize_line_separators_and_tabs', 'removeprefix', 'removesuffix']
+__all__ = ['Text', 'BinText', 'DEFAULT_ENCODING', 'EncodingRequired', 'NotSupportedDataType', 'NotSupportedDesiredTextType', 
+           'normalize_text', 'normalize_text_to_data', 'find_text', 'replace_slice', 'replace_text', 'normalize_line_separators', 
+           'normalize_line_separators_and_tabs', 'removeprefix', 'removesuffix', 'to_identifier', 'remove_repetitive']
 
 
 #!/usr/bin/env python
 # coding=utf-8
 
 
-
-from cengal.system import PYTHON_VERSION
-from typing import Optional, Tuple, Union, Type, Callable
-
-
-
-
-
+from cengal.system import PYTHON_VERSION_INT
+from typing import Optional, Tuple, Union, Type, Callable, Set, List
+import string
+import keyword
 
 
 Text = Union[bytes, bytearray, str]
@@ -164,7 +162,7 @@ def normalize_line_separators_and_tabs(text: Text, tabsize=4, encoding: Optional
 
 def removeprefix(data: Text, prefix: Text, encoding: Optional[str] = DEFAULT_ENCODING, normalizer: Optional[Callable] = None) -> Text:
     prefix = normalize_text_to_data(data, prefix, encoding, normalizer)
-    if (3 == PYTHON_VERSION[0]) and (9 == PYTHON_VERSION[1]):
+    if (3, 9) <= PYTHON_VERSION_INT:
         return data.removeprefix(prefix)
     else:
         if data.startswith(prefix):
@@ -175,10 +173,42 @@ def removeprefix(data: Text, prefix: Text, encoding: Optional[str] = DEFAULT_ENC
 
 def removesuffix(data: Text, suffix: Text, encoding: Optional[str] = DEFAULT_ENCODING, normalizer: Optional[Callable] = None) -> Text:
     suffix = normalize_text_to_data(data, suffix, encoding, normalizer)
-    if (3 == PYTHON_VERSION[0]) and (9 == PYTHON_VERSION[1]):
-        return data.removeprefix(suffix)
+    if (3, 9) <= PYTHON_VERSION_INT:
+        return data.removesuffix(suffix)
     else:
-        if data.startswith(suffix):
+        if data.endswith(suffix):
             return data[:-len(suffix):]
         else:
             return data
+        
+
+def to_identifier(text: Text, need_to_remove_repetitive: bool = True, encoding: Optional[str] = DEFAULT_ENCODING, normalizer: Optional[Callable] = None) -> Text:
+    original_text = text
+    text = normalize_text_to_data(str(), text, encoding, normalizer)
+    valid_initial_chars = string.ascii_letters + '_'
+    valid_chars = valid_initial_chars + string.digits
+    text_chars: Set[str] = set(text)
+
+    trans = str.maketrans({
+        char: '_' for char in text_chars if char not in valid_chars
+    })
+    identifier = text.translate(trans)
+    if need_to_remove_repetitive:
+        identifier = remove_repetitive(identifier, '_')
+    
+    if not identifier or identifier[0] not in valid_initial_chars:
+        identifier = '_' + identifier
+
+    while keyword.iskeyword(identifier):
+        identifier += '_'
+
+    return normalize_text_to_data(original_text, text, encoding, normalizer)
+        
+
+def remove_repetitive(data: Text, sub_str: Text, encoding: Optional[str] = DEFAULT_ENCODING, normalizer: Optional[Callable] = None) -> Text:
+    normalized_data: str = normalize_text_to_data(str(), data, encoding, normalizer)
+    normalized_sub_str: str = normalize_text_to_data(str(), sub_str, encoding, normalizer)
+    normalized_data.strip(normalized_sub_str)
+    split_normalized_data: List[str] = normalized_data.split(normalized_sub_str)
+    result: str = normalized_sub_str.join((piece for piece in split_normalized_data if piece))
+    return normalize_text_to_data(data, result, encoding, normalizer)

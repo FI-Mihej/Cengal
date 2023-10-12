@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = ['Number', 'RationalNumber']
+__all__ = ['Number', 'RationalNumber', 'approximately_equal', 'ae']
 
 
 from typing import Union
@@ -30,7 +30,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -40,3 +40,10 @@ __status__ = "Development"
 
 Number = Union[int, float, complex]
 RationalNumber = Union[int, float]
+
+
+def approximately_equal(first: Number, second: Number, epsilon: Number) -> bool:
+    return abs(first - second) <= epsilon
+
+
+ae = approximately_equal

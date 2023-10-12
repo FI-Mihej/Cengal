@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cengal.RequestCache import RequestCache
+from cengal.web_tools.request_cache import RequestCache
 from cengal.text_processing import get_text_in_brackets
 from cengal.data_manipulation import hex_dword_to_int, get_slice_from_array, bytes__to__hex_string
 from cengal.code_flow_control.chained_flow.versions.v_1.chained_flow import Chain, link, chain_reader, \
@@ -31,7 +31,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"

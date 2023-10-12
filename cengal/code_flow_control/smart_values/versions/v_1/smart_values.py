@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -54,7 +54,21 @@ class ValueExistence:
         return self.existence, self.result
 
     def __setstate__(self, state):
-        self.existence, self.result = state
+        existence, value = state
+        self.value = value
+        self.existence = existence
+    
+    def __eq__(self, __value: object) -> bool:
+        if isinstance(__value, ValueExistence):
+            return (self.existence == __value.existence) and (self.value == __value.value)
+        else:
+            if self.existence:
+                return self.value == __value
+            else:
+                return False
+    
+    def __ne__(self, __value: object) -> bool:
+        return not self.__eq__(__value)
 
 
 class ValueCache(ValueExistence):
@@ -77,7 +91,21 @@ class ValueCache(ValueExistence):
         return self.existence, self.result
 
     def __setstate__(self, state):
-        self.existence, self.result = state
+        existence, value = state
+        self.value = value
+        self.existence = existence
+    
+    def __eq__(self, __value: object) -> bool:
+        if isinstance(__value, ValueExistence):
+            return (self.existence == __value.existence) and (self.value == __value.value)
+        else:
+            if self.existence:
+                return self.value == __value
+            else:
+                return False
+    
+    def __ne__(self, __value: object) -> bool:
+        return not self.__eq__(__value)
 
 
 class ValueType:

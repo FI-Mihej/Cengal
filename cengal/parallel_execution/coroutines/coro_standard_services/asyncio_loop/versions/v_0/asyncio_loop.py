@@ -21,15 +21,22 @@ __all__ = ['AsyncioLoop', 'AsyncioLoopRequest', 'AsyncioLoopWasNotSetError', 'ru
 from cengal.parallel_execution.coroutines.coro_scheduler import *
 from cengal.parallel_execution.coroutines.coro_tools.await_coro import create_task
 from cengal.parallel_execution.coroutines.coro_tools.await_coro import task_in_thread_pool
-from cengal.parallel_execution.coroutines.coro_standard_services.loop_yield import gly, agly, CoroPriority
+from cengal.parallel_execution.coroutines.coro_standard_services.loop_yield import gly, agly, CoroPriority, LoopYieldPriorityScheduler
 from cengal.parallel_execution.coroutines.coro_standard_services.simple_yield import Yield
+from cengal.parallel_execution.coroutines.coro_standard_services.sleep import Sleep
+from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import PutCoro
+from cengal.parallel_execution.coroutines.coro_standard_services.throw_coro import ThrowCoro
+from cengal.parallel_execution.coroutines.coro_standard_services.kill_coro import KillCoro
+from cengal.parallel_execution.coroutines.coro_standard_services.wait_coro import WaitCoro, WaitCoroRequest, CoroutineNotFoundError
 from cengal.parallel_execution.asyncio.run_loop import run_forever, cancel_all_tasks
 from cengal.parallel_execution.asyncio.atasks import create_task_awaitable
 from cengal.file_system.file_manager import path_relative_to_current_dir
 from cengal.time_management.load_best_timer import perf_counter
+from cengal.time_management.sleep_tools import get_usable_min_sleep_interval, get_min_sleep_interval
 from cengal.data_manipulation.serialization import *
 from cengal.introspection.inspect import get_exception
-from typing import Callable, Tuple, List, Any, Dict, Awaitable
+from cengal.math.numbers import RationalNumber
+from typing import Callable, Tuple, List, Any, Dict, Awaitable, Type
 import sys
 import os
 from asyncio import AbstractEventLoop, get_event_loop, get_running_loop, Task as asyncio_Task, sleep as asyncio_sleep
@@ -51,7 +58,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -65,6 +72,13 @@ class AsyncioLoopWasNotSetError(Exception):
 
 class ExternalAsyncioLoopAlreadyExistsError(Exception):
     pass
+
+
+class WaitingCancelled(Exception):
+    pass
+
+
+WAITING_FOR_NEW_REQUESTS_EVENT = 'AsyncioLoopRequest - WaitingForNewRequestsEvent'
 
 
 class AsyncioLoopRequest(ServiceRequest):
@@ -101,6 +115,12 @@ class AsyncioLoopRequest(ServiceRequest):
     def wait_idle(self, awaitable: Awaitable) -> Any:
         return self._save(10, awaitable, False, False)
 
+    def use_higher_level_sleep_manager(self, use_higher_level_sleep_manager: bool = True) -> Any:
+        return self._save(12, use_higher_level_sleep_manager)
+
+    def turn_on_low_latency_io_mode(self, low_latency_io_mode: bool = True) -> Any:
+        return self._save(13, low_latency_io_mode)
+
 
 async def asyncio_coro_sleep_0():
     return await asyncio_sleep(0)
@@ -126,6 +146,7 @@ class AsyncioLoop(Service, EntityStatsMixin):
         self.need_to_stop_internal_loop: bool = False
         self.internal_loop_creation_error: Optional[Exception] = None
         self.internal_loop_in_yield: bool = False
+        self.waiting_for_new_requests: bool = False
         self.loops_intercommunication: bool = False
         self._previous_on_wrong_request = None
         self.intercommunication_requests_coro_ids: Set[CoroID] = set()
@@ -142,11 +163,31 @@ class AsyncioLoop(Service, EntityStatsMixin):
             8: self._on_turn_on_loops_intercommunication,
             9: self._on_await,
             10: self._on_await,
+            11: self._on__internal_wait_for_new_requests, 
+            12: self._on__use_higher_level_sleep_manager, 
+            13: self._on__low_latency_io_mode, 
         }
         
         self.pending_requests_num: int = 0
+        self.new_requests_num: int = 0
         self.no_idle_calls: Set[CoroID] = set()
         self.results: Dict[CoroID, Tuple[Any, Exception]] = dict()
+        self._waiting_coro_id: Optional[CoroID] = None
+        self._original_loop_class: Type = None
+        self._idle_for: Optional[RationalNumber] = None  # in seconds
+        self.use_higher_level_sleep_manager: bool = False
+        self.current_on_idle_handler: Optional[Callable] = None
+        self.low_latency_io_mode: int = 0
+    
+    def destroy(self):
+        if self.internal_async_loop is not None:
+            events._set_running_loop(None)
+
+    def _on_system_loop_idle(self, next_event_after: Optional[RationalNumber]):
+        if next_event_after is None:
+            self._idle_for = max(0.001, get_usable_min_sleep_interval())
+        else:
+            self._idle_for = max(0.001, next_event_after)
 
     def get_entity_stats(self, stats_level: 'EntityStatsMixin.StatsLevel' = EntityStatsMixin.StatsLevel.debug) -> Tuple[str, Dict[str, Any]]:
         return type(self).__name__, {
@@ -160,6 +201,15 @@ class AsyncioLoop(Service, EntityStatsMixin):
         return True, None, None
 
     def full_processing_iteration(self):
+        from cengal.parallel_execution.coroutines.coro_standard_services.async_event_bus import AsyncEventBusRequest, try_send_async_event
+        if (self._waiting_coro_id is not None) and self.new_requests_num:
+            # throw_coro_service: ThrowCoro = self._loop.get_service_instance(ThrowCoro)
+            # throw_coro_service._add_direct_request(self._waiting_coro_id, WaitingCancelled)
+            kill_coro_service: KillCoro = self._loop.get_service_instance(KillCoro)
+            kill_coro_service._add_direct_request(self._waiting_coro_id)
+            self._waiting_coro_id = None
+            try_send_async_event(self._loop, WAITING_FOR_NEW_REQUESTS_EVENT, None)
+
         if self.internal_loop_in_yield:
             if self.pending_requests_num:
                 self.register_response(self._internal_loop_holding_coro.coro_id, None, None)
@@ -322,6 +372,45 @@ class AsyncioLoop(Service, EntityStatsMixin):
             self.internal_loop_in_yield = True
             return False, None, None
     
+    def _on__internal_wait_for_new_requests(self) -> Tuple[bool, None, None]:
+        if self.new_requests_num:
+            return True, None, None
+        else:
+            self.waiting_for_new_requests = True
+            return False, None, None
+    
+    def register_new_asyncio_request(self) -> None:
+        self.new_requests_num += 1
+        self.make_live()
+    
+    def add_on_idle_handler(self) -> None:
+        if not self.use_higher_level_sleep_manager:
+            self.current_on_idle_handler = self._on_system_loop_idle
+            self._loop.on_idle_handlers.add(self._on_system_loop_idle)
+    
+    def discard_on_idle_handler(self) -> None:
+        self._loop.on_idle_handlers.discard(self._on_system_loop_idle)
+        self.current_on_idle_handler = None
+    
+    def _on__use_higher_level_sleep_manager(self, use_higher_level_sleep_manager: bool) -> Tuple[bool, Optional[None], None]:
+        self.use_higher_level_sleep_manager = use_higher_level_sleep_manager
+        if use_higher_level_sleep_manager:
+            if self.current_on_idle_handler is not None:
+                self._loop.on_idle_handlers.add(self.current_on_idle_handler)
+        else:
+            self.discard_on_idle_handler()
+        
+        return True, None, None
+
+    def _on__low_latency_io_mode(self, low_latency_io_mode: bool) -> Tuple[bool, Optional[bool], None]:
+        buff_low_latency_io_mode = self.low_latency_io_mode > 0
+        if low_latency_io_mode:
+            self.low_latency_io_mode += 1
+        else:
+            self.low_latency_io_mode -= 1
+        
+        return True, buff_low_latency_io_mode, None
+    
     def _on_turn_on_loops_intercommunication(self, turn_on: bool) -> Tuple[bool, Optional[Callable], None]:
         result = self._loop.on_wrong_request
         if turn_on:
@@ -383,7 +472,12 @@ def _internal_loop_holding_coro(i: Interface, service: AsyncioLoop, main_awaitab
                 i(Yield)
             
             if not service.need_to_stop_internal_loop:
-                loop.call_soon(on_loop_simple_yield)
+                if service._idle_for is None:
+                    loop.call_soon(on_loop_simple_yield)
+                else:
+                    idle_for = service._idle_for
+                    service._idle_for = None
+                    loop.call_later(idle_for, on_loop_simple_yield)
         
         def on_loop_loop_yield():
             if interrupt_when_no_requests and service.is_need_to_yield_internal_loop():
@@ -392,7 +486,12 @@ def _internal_loop_holding_coro(i: Interface, service: AsyncioLoop, main_awaitab
                 ly()
             
             if not service.need_to_stop_internal_loop:
-                loop.call_soon(on_loop_loop_yield)
+                if service._idle_for is None:
+                    loop.call_soon(on_loop_loop_yield)
+                else:
+                    idle_for = service._idle_for
+                    service._idle_for = None
+                    loop.call_later(idle_for, on_loop_loop_yield)
         
         if ly is None:
             loop.call_soon(on_loop_simple_yield)
@@ -404,14 +503,29 @@ def _internal_loop_holding_coro(i: Interface, service: AsyncioLoop, main_awaitab
     
     exception = None
     try:
+        service.add_on_idle_handler()
         run_forever(main_wrapper(service, main_awaitable, priority, interrupt_when_no_requests), debug=debug)
     except:
         exception = get_exception()
+        # TODO: do something with exception
     finally:
+        try:
+            service._loop.on_idle_handlers.discard(service._on_system_loop_idle)
+            service.current_on_idle_handler = None
+        except ValueError:
+            pass
+
         service.inline_set_internal_loop(None, exception)
 
 
 async def _internal_loop_holding_coro_run_once_based(i: Interface, service: AsyncioLoop, main_awaitable: Optional[Awaitable] = None, priority: Optional[CoroPriority] = None, interrupt_when_no_requests: Optional[bool] = None, debug: bool = False):
+    from cengal.parallel_execution.coroutines.coro_standard_services.async_event_bus import AsyncEventBusRequest, try_send_async_event
+    from .known_asyncio_compatible_loops import prepare_loop, restore_loop
+
+    cs: CoroScheduler = current_coro_scheduler()
+    lyps: LoopYieldPriorityScheduler = cs.get_service_instance(LoopYieldPriorityScheduler)
+    umsi: RationalNumber = get_usable_min_sleep_interval()
+
     ly = None
     if priority is not None:
         ly = await agly(priority)
@@ -437,6 +551,7 @@ async def _internal_loop_holding_coro_run_once_based(i: Interface, service: Asyn
             raise ValueError('a coroutine was expected, got {!r}'.format(main_wrapper_for_run_once))
 
         loop = events.new_event_loop()
+        service._original_loop_class = prepare_loop(loop)
         try:
             events.set_event_loop(loop)
             loop.set_debug(debug)
@@ -465,6 +580,48 @@ async def _internal_loop_holding_coro_run_once_based(i: Interface, service: Asyn
                     if loop._stopping:
                         break
 
+                    if (not loop._ready) and (not loop._stopping):
+                        if not loop._scheduled:
+                            await i(AsyncioLoop, AsyncioLoopRequest()._internal_loop_yield())
+                            continue
+                        else:
+                            when = loop._scheduled[0]._when
+                            from asyncio.base_events import MAXIMUM_SELECT_TIMEOUT
+                            timeout = min(max(0, when - loop.time()), MAXIMUM_SELECT_TIMEOUT)
+                            # if get_min_sleep_interval() <= timeout:
+                            #     usable_min_sleep_interval = get_usable_min_sleep_interval()
+                            #     if usable_min_sleep_interval > timeout:
+                            #         timeout = usable_min_sleep_interval
+
+                            if (not service.low_latency_io_mode) and (0.001 <= timeout) and (not service.results):
+                                service.new_requests_num = 0
+                                service.make_dead()
+                                async def waiting_coro(i: Interface, timeout: float):
+                                    from cengal.parallel_execution.coroutines.coro_standard_services.async_event_bus import AsyncEventBusRequest, try_send_async_event
+                                    try:
+                                        await i(Sleep, timeout)
+                                        await i(AsyncEventBusRequest().send_event(WAITING_FOR_NEW_REQUESTS_EVENT, None))
+                                    except WaitingCancelled:
+                                        print(f'AsyncIoLoop {datetime.now().strftime("%H:%M:%S.%f")} >> WaitingCancelled')
+                                
+                                from datetime import datetime
+                                try:
+                                    # TODO: reimplement it in more efficient and elegant way. Btw: Sleep currently will not cancel an event upon coro destroyed
+                                    lyps_max_delay = lyps.max_delay
+                                    new_max_timeout = umsi if lyps_max_delay < umsi else lyps_max_delay
+                                    new_timeout = timeout if new_max_timeout > timeout else new_max_timeout
+                                    waiting_coro_id = await i(PutCoro, waiting_coro, new_timeout)
+                                    service._waiting_coro_id = waiting_coro_id
+                                    # await i(WaitCoro, WaitCoroRequest().single(waiting_coro_id))
+                                    await i(AsyncEventBusRequest().wait(WAITING_FOR_NEW_REQUESTS_EVENT))
+                                    # print(f'AsyncIoLoop {datetime.now().strftime("%H:%M:%S.%f")} >> WAITING_FOR_NEW_REQUESTS_EVENT')
+                                except (WaitingCancelled, CoroutineNotFoundError):
+                                    print(f'AsyncIoLoop {datetime.now().strftime("%H:%M:%S.%f")} >> WaitingCancelled or CoroutineNotFoundError')
+                                    pass
+                                except:
+                                    print(f'AsyncIoLoop {datetime.now().strftime("%H:%M:%S.%f")} >> {get_exception()}')
+                                    raise
+
                     if interrupt_when_no_requests and service.is_need_to_yield_internal_loop():
                         await i(AsyncioLoop, AsyncioLoopRequest()._internal_loop_yield())
                         continue
@@ -475,6 +632,7 @@ async def _internal_loop_holding_coro_run_once_based(i: Interface, service: Asyn
                 loop._set_coroutine_origin_tracking(False)
                 sys.set_asyncgen_hooks(*old_agen_hooks)
         finally:
+            restore_loop(loop, service._original_loop_class)
             try:
                 cancel_all_tasks(loop)
                 loop.run_until_complete(loop.shutdown_asyncgens())

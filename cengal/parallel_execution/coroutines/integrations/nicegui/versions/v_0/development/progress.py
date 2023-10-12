@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -46,7 +46,7 @@ from cengal.parallel_execution.coroutines.coro_standard_services.loop_yield impo
 from cengal.parallel_execution.coroutines.coro_standard_services.sleep import Sleep
 from cengal.parallel_execution.coroutines.coro_standard_services.instance import InstanceRequest
 from nicegui import app, ui, Client
-from cengal.parallel_execution.coroutines.integrations.nicegui import run, nicegui_page_async_coro, nicegui_page_sync_coro
+from cengal.parallel_execution.coroutines.integrations.nicegui import run, apage, sl_page
 
 
 pool = ProcessPoolExecutor()
@@ -65,7 +65,7 @@ def heavy_computation(q: Queue) -> str:
 
 
 # @ui.page('/')
-@nicegui_page_sync_coro(True, 200.0)
+@sl_page(True, 200.0)
 @cs_coro
 def main_page_impl():
 # def main_page_impl(i: Interface):
@@ -98,7 +98,7 @@ def main_page_impl():
         
 
 @ui.page('/', response_timeout=30)
-@nicegui_page_async_coro
+@apage
 @cs_acoro
 async def main_page_impl_2(client: Client):
 # async def main_page_impl_2(i: Interface, client: Client):
@@ -156,7 +156,7 @@ async def main_page_impl_2(client: Client):
 
 
 @ui.page('/wait_for_connection', response_timeout=30)
-@nicegui_page_async_coro
+@apage
 # @cs_acoro
 async def wait_for_connection(i: Interface, client: Client):
     ui.label('This text is displayed immediately.')
@@ -185,7 +185,7 @@ async def wait_for_connection(i: Interface, client: Client):
 
 
 @ui.page('/show_server_startup_parameters', response_timeout=30)
-@nicegui_page_async_coro
+@apage
 # @cs_acoro
 async def show_server_startup_parameters(i: Interface):
     app_args_kwargs: Tuple[Tuple, Dict] = await i(InstanceRequest().wait('nicegui_app_args_kwargs'))

@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = ['RelativePath', 'path_relative_to_src', 'path_relative_to_cwd', 'WrongBaseDirError', 'get_relative_path_part', 'sep']
+__all__ = ['RelativePath', 'relative_to_src', 'path_relative_to_src', 'relative_to_cwd', 'path_relative_to_cwd', 'WrongBaseDirError', 'get_relative_path_part', 'sep']
 
 import os
 from os.path import normpath, sep
@@ -32,7 +32,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -48,6 +48,17 @@ class RelativePath:
         return normpath(os.path.join(self.base_path, relative_path))
 
 
+def relative_to_src(depth: Optional[int] = 1) -> RelativePath:
+    """
+
+    :param depth: 0 - path of this file, 1 - path of the caller's file, etc.
+    :return:
+    """
+    depth = depth or 0
+    depth += 1
+    return RelativePath(current_src_dir(depth))
+
+
 def path_relative_to_src(relative_path: str, depth: Optional[int] = 1):
     """
 
@@ -58,6 +69,10 @@ def path_relative_to_src(relative_path: str, depth: Optional[int] = 1):
     depth = depth or 0
     depth += 1
     return RelativePath(current_src_dir(depth))(relative_path)
+
+
+def relative_to_cwd() -> RelativePath:
+    return RelativePath(os.getcwd())
 
 
 def path_relative_to_cwd(relative_path: str):

@@ -26,6 +26,7 @@ from types import CodeType
 from copy import copy
 from cengal.entities.copyable import CopyableMixin
 from cengal.data_manipulation.front_triggerable_variable import FrontTriggerableVariableType, FrontTriggerableVariable
+import sys
 
 
 """
@@ -37,7 +38,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -83,13 +84,21 @@ def code_param_names(code) -> CodeParamNames:
     return CodeParamNames(positional, positional_only, keyword_only)
 
 
-def code_name(code) -> str:
+def code_name(code: CodeType) -> str:
     return code.co_name
+
+
+if sys.version_info >= (3, 11):
+    def code_qualname(code: CodeType) -> str:
+        return code.co_qualname
 
 
 def get_code(x=None) -> CodeType:
     if x is None:
         return
+    
+    if isinstance(x, CodeType):
+        return x
     
     # Extract functions from methods.
     if hasattr(x, '__func__'):
@@ -101,8 +110,12 @@ def get_code(x=None) -> CodeType:
         x = x.gi_code
     elif hasattr(x, 'ag_code'):  #...an asynchronous generator object, or
         x = x.ag_code
-    elif hasattr(x, 'cr_code'):  #...a coroutine.
+    elif hasattr(x, 'cr_code'):  #...a coroutine, or
         x = x.cr_code
+    elif hasattr(x, 'f_code'):  #...a frame.
+        x = x.f_code
+    # else:
+    #     raise TypeError(f'Expected a code object or an entity with code, but got {type(x)}')
     
     return x
 

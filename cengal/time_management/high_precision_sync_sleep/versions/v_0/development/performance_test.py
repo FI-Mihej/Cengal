@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -34,6 +34,8 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
+from time import sleep
+from cengal.hardware.memory.barriers import mm_pause
 from cengal.time_management.high_precision_sync_sleep import hps_sleep
 from cengal.performance_test_lib import PrecisePerformanceTestTracer
 from cengal.introspection.inspect import func_name
@@ -54,6 +56,9 @@ def func_perf_test(func: Callable, *args, **kwargs):
 
 def main():
     func_perf_test(hps_sleep, 0.00001)
+    # func_perf_test(hps_sleep, 0)
+    # func_perf_test(sleep, 0.00001)
+    # func_perf_test(sleep, 0)
 
 
 if '__main__' == __name__:

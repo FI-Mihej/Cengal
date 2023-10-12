@@ -22,7 +22,7 @@ import os.path
 from enum import Enum
 import hashlib
 from cengal.introspection.inspect import frame
-from typing import Optional, Callable
+from typing import Optional, Callable, Set, Tuple
 
 """
 Module Docstring
@@ -33,7 +33,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -47,12 +47,19 @@ class FilteringType(Enum):
     off = 2  # any file will fit criteria
 
 
-def filtered_file_list(root_dir, filtering_type, extentions_set=None):
-    """
-    :param root_dir: str(); r'C:\dir\path'
-    :param filtering_type: FilteringType()
-    :param extentions_set: set(); {'.upk', '.txt'}
-    :return: tuple(); (dirpath, dirnames, new_filenames)
+def filtered_file_list(root_dir: str, filtering_type: FilteringType, extentions_set: Optional[Set] = None) -> Tuple:
+    """_summary_
+
+    Args:
+        root_dir (str): r'C:\dir\path'
+        filtering_type (FilteringType): _description_
+        extentions_set (Optional[Set], optional): {'.upk', '.txt'}. Defaults to None.
+
+    Raises:
+        Exception: _description_
+
+    Returns:
+        Tuple: (dirpath, dirnames, new_filenames)
     """
 
     if (FilteringType.off != filtering_type) and (extentions_set is None):
@@ -81,8 +88,8 @@ def filtered_file_list(root_dir, filtering_type, extentions_set=None):
     return result
 
 
-def filtered_file_list_traversal(root_dir, filtering_type, extentions_set=None, remove_empty_items=False,
-                                 use_spinner=False):
+def filtered_file_list_traversal(root_dir: str, filtering_type: FilteringType, extentions_set: Optional[Set] = None, 
+                                 remove_empty_items: bool =False, use_spinner: bool = False):
     """
     :param root_dir: str(); r'C:\dir\path'
     :param filtering_type: FilteringType()

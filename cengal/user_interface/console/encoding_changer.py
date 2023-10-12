@@ -18,7 +18,7 @@
 import sys
 import os
 from contextlib import contextmanager, redirect_stdout, redirect_stderr
-from cengal.check_is_in_pycharm import IS_RUNNING_IN_PYCHARM
+from cengal.system import IS_RUNNING_IN_PYCHARM
 if 'nt' == os.name:
     import win32console
     import codecs
@@ -33,7 +33,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"

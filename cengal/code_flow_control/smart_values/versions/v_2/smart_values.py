@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = ['ValueExistence', 'ValueHolder', 'ValueCache', 'ValueType']
+__all__ = ['ValueExistence', 'ValueHolder', 'ValueCache', 'ValueType', 'ValueWithType']
 
 from typing import Any, TypeVar, Generic
 
@@ -28,7 +28,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -74,11 +74,25 @@ class ValueExistence(Generic[T]):
         return self.existence, self.value
 
     def __setstate__(self, state):
-        self.existence, self.value = state
+        existence, value = state
+        self.value = value
+        self.existence = existence
+    
+    def __eq__(self, __value: object) -> bool:
+        if isinstance(__value, ValueExistence):
+            return (self.existence == __value.existence) and (self.value == __value.value)
+        else:
+            if self.existence:
+                return self.value == __value
+            else:
+                return False
+    
+    def __ne__(self, __value: object) -> bool:
+        return not self.__eq__(__value)
 
 
-ValueHolder = ValueExistence
-
+class ValueHolder(ValueExistence):
+    pass
 
 class ValueCache(ValueExistence):
     __slots__ = tuple()
@@ -100,7 +114,21 @@ class ValueCache(ValueExistence):
         return self.existence, self.value
 
     def __setstate__(self, state):
-        self.existence, self.value = state
+        existence, value = state
+        self.value = value
+        self.existence = existence
+    
+    def __eq__(self, __value: object) -> bool:
+        if isinstance(__value, ValueExistence):
+            return (self.existence == __value.existence) and (self.value == __value.value)
+        else:
+            if self.existence:
+                return self.value == __value
+            else:
+                return False
+    
+    def __ne__(self, __value: object) -> bool:
+        return not self.__eq__(__value)
 
 
 class ValueType:
@@ -112,10 +140,39 @@ class ValueType:
 
     def __eq__(self, other):
         # "__ne__() delegates to __eq__() and inverts the value"
-        if isinstance(other, ValueType):
+        if isinstance(other, (ValueType, ValueWithType)):
             return self.type_id == other.type_id
         else:
             return self.type_id == other
+
+    def __getstate__(self):
+        return self.type_id, self.value
+
+    def __setstate__(self, state):
+        self.type_id, self.value = state
+
+    def __str__(self):
+        return f'{type(self).__name__}({repr(self.type_id)}, {repr(self.value)})'
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class ValueWithType:
+    __slots__ = ('type_id', 'value')
+
+    def __init__(self, type_id, value):
+        self.type_id = type_id
+        self.value = value
+
+    def __eq__(self, other):
+        # "__ne__() delegates to __eq__() and inverts the value"
+        if isinstance(other, ValueType):
+            return self.type_id == other.type_id
+        elif isinstance(other, ValueWithType):
+            return (self.type_id == other.type_id) and (self.value == other.value)
+        else:
+            return self.value == other
 
     def __getstate__(self):
         return self.type_id, self.value

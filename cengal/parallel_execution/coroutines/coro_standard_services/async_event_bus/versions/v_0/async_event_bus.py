@@ -23,7 +23,7 @@ __all__ = [
 
 import sys
 from enum import Enum
-from typing import Dict, Set, List, Tuple, Union, Type, Optional, Any
+from typing import Dict, Set, List, Tuple, Union, Type, Optional, Any, Deque
 from cengal.parallel_execution.coroutines.coro_scheduler import *
 from cengal.parallel_execution.coroutines.coro_standard_services.loop_yield import *
 from cengal.parallel_execution.coroutines.coro_standard_services.event_bus import EventID, Handler
@@ -31,6 +31,7 @@ from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import
 from cengal.code_flow_control.smart_values.versions.v_1 import ValueExistence
 from cengal.introspection.inspect import get_exception
 from cengal.time_management.repeat_for_a_time import Tracer
+from collections import deque
 
 
 """
@@ -42,7 +43,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -82,9 +83,9 @@ class AsyncEventBus(Service, EntityStatsMixin):
         }
 
         self.waiters: Dict[EventID, Set[CoroID]] = dict()
-        self.events_by_waiter = dict()
+        self.events_by_waiter: Dict[CoroID, Set[Any]] = dict()
         self.handlers: Dict[EventID, Set[Handler]] = dict()
-        self.events: Dict[CoroPriority, Dict[EventID, List[Any]]] = {
+        self.events: Dict[CoroPriority, Dict[EventID, Deque[Any]]] = {
             CoroPriority.low: dict(),
             CoroPriority.normal: dict(),
             CoroPriority.high: dict()
@@ -149,30 +150,34 @@ class AsyncEventBus(Service, EntityStatsMixin):
             if not priority_events:
                 continue
             else:
-                processed_priority_events = set()
                 interested_events = waiters.keys() & priority_events.keys()
                 for event in interested_events:
-                    event_data_list = priority_events[event]
-                    processed_priority_events.add(event)
-                    for data in event_data_list:
+                    event_data_list: Deque = priority_events[event]
+                    for i in range(len(event_data_list)):
                         event_waiters = waiters.pop(event, None)
-                        if event_waiters:
+                        if event_waiters is None:
+                            break
+                        else:
                             for waiter in event_waiters:
                                 waiter_events = self.events_by_waiter.get(waiter, None)
                                 if waiter_events:
                                     if event in waiter_events:
                                         waiter_events.remove(event)
-                                self.register_response(waiter, data)
+                                        self.register_response(waiter, event_data_list.popleft())
+                
+                    if not event_data_list:
+                        del priority_events[event]
 
                 interested_events = handlers.keys() & priority_events.keys()
             
             if interested_events:
+                processed_priority_events = set()
                 handlers_info_list = list()
                 for event in interested_events:
                     event_data_list = priority_events[event]
                     processed_priority_events.add(event)
                     for data in event_data_list:
-                        event_handlers = handlers.pop(event, None)
+                        event_handlers = handlers.get(event, None)
                         if event_handlers:
                             for handler in event_handlers:
                                 handlers_info_list.append((handler, event, data))
@@ -222,14 +227,16 @@ class AsyncEventBus(Service, EntityStatsMixin):
 
     def _on_remove_handler(self, event: EventID, handler: Handler):
         if event in self.handlers:
-            self.handlers[event].remove(handler)
+            self.handlers[event].discard(handler)
+            if not self.handlers[event]:
+                del self.handlers[event]
 
         return True, None, None
 
     def _on_send_event(self, event: EventID, data: Any, priority: Optional[CoroPriority]=CoroPriority.low):
         events_of_priority = self.events[priority]
         if event not in events_of_priority:
-            events_of_priority[event] = list()
+            events_of_priority[event] = deque()
 
         events_of_priority[event].append(data)
         self.make_live()

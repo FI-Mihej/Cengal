@@ -28,7 +28,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -36,6 +36,7 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
+from typing import Dict, Any, Tuple, Union
 from os import environ
 try:
     from os import uname
@@ -62,7 +63,6 @@ from cengal.system import (
     IS_RUNNING_IN_PYODIDE,
     IS_BUILDING_FOR_PYODIDE,
     IS_INSIDE_OR_FOR_WEB_BROWSER,
-    CENGAL_IS_IN_BUILD_MODE,
 )
 
 
@@ -84,7 +84,7 @@ def concat_cflags(cflags: str):
     environ[compiler_flags_env_var_name] = f'{environ.get(compiler_flags_env_var_name, str())} {cflags}'
 
 
-def prepare_cflags():
+def prepare_cflags(additional_cflags: Dict[str, Tuple[bool, Union[str, int]]]):
     if 'msvc' == compiler_type:
         macros_string_template: str = '/D{macro_name}="{macro_value}"'
         macros_flag_template: str = '/D{macro_name}={macro_value}'
@@ -117,13 +117,19 @@ def prepare_cflags():
         macros_string_template.format(macro_name='IS_RUNNING_IN_PYODIDE', macro_value=IS_RUNNING_IN_PYODIDE),  # 'True', 'False'
         macros_string_template.format(macro_name='IS_BUILDING_FOR_PYODIDE', macro_value=IS_BUILDING_FOR_PYODIDE),  # 'True', 'False'
         macros_string_template.format(macro_name='IS_INSIDE_OR_FOR_WEB_BROWSER', macro_value=IS_INSIDE_OR_FOR_WEB_BROWSER),  # 'True', 'False'
-        macros_string_template.format(macro_name='CENGAL_IS_IN_BUILD_MODE', macro_value=CENGAL_IS_IN_BUILD_MODE),  # 'True', 'False'
 
         # C preprocessor
         macros_flag_template.format(macro_name='C__PYTHON_VERSION_MAJOR', macro_value=PYTHON_VERSION_INT.major),  # '3', ...
         macros_flag_template.format(macro_name='C__PYTHON_VERSION_MINOR', macro_value=PYTHON_VERSION_INT.minor),  # '5', ...
         macros_flag_template.format(macro_name='C__PYTHON_VERSION_MICRO', macro_value=PYTHON_VERSION_INT.micro),  # '1', ...
     ]
+    for key, data in additional_cflags.items():
+        is_flag, value = data
+        if is_flag:
+            macro_flags_list.append(macros_flag_template.format(macro_name=key, macro_value=value))
+        else:
+            macro_flags_list.append(macros_string_template.format(macro_name=key, macro_value=value))
+
     
     # C preprocessor
     if 32 == cpu_info().bits:
@@ -228,8 +234,8 @@ def prepare_cflags():
     append_cflags(macro_flags_list)
 
 
-def prepare_compile_time_env():
-    return {
+def prepare_compile_time_env(additional_cflags: Dict[str, Tuple[bool, Union[str, int]]]):
+    result = {
         'UNAME_SYSNAME': uname_sysname,  # see: https://en.wikipedia.org/wiki/Uname
         'UNAME_MACHINE': uname_machine,  # see: https://en.wikipedia.org/wiki/Uname
         'CPU_ARCH': cpu_info().arch,  # 'X86_32', 'X86_64', 'ARM_8', 'ARM_7', 'PPC_32', 'PPC_64', 'SPARC_32', 'SPARC_64', 'S390X', 'MIPS_32', 'MIPS_64', 'RISCV_32', 'RISCV_64'
@@ -253,5 +259,6 @@ def prepare_compile_time_env():
         'IS_RUNNING_IN_PYODIDE': IS_RUNNING_IN_PYODIDE,  # 'True', 'False'
         'IS_BUILDING_FOR_PYODIDE': IS_BUILDING_FOR_PYODIDE,  # 'True', 'False'
         'IS_INSIDE_OR_FOR_WEB_BROWSER': IS_INSIDE_OR_FOR_WEB_BROWSER,  # 'True', 'False'
-        'CENGAL_IS_IN_BUILD_MODE': CENGAL_IS_IN_BUILD_MODE,  # 'True', 'False'
     }
+    result.update(additional_cflags)
+    return result

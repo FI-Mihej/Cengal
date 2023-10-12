@@ -24,7 +24,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -84,7 +84,7 @@ class Sitting(EssenceModel):
 
 
 class EssenceOnCasters(EssenceModel):
-    emi_compatible_injectable_essence_model_classes: TypeVar[Set[Type['EssenceModel']]] = {Riding}
+    emi_compatible_injectable_essence_model_classes: Set[Type['EssenceModel']] = {Riding}
     def __init__(self, dimension: Point):
         super(EssenceOnCasters, self).__init__()
         self.dimension: Point = dimension

@@ -39,7 +39,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -93,9 +93,12 @@ class CpuTickCountPerSecond(TypedService[Tuple[int, float, RationalNumber, Ratio
             self.measurement_required = True
             self.make_live()
 
-        add_timer_func_run_from_other_service(self, self.measurement_period, timer_handler)
+        add_timer_func_run_from_other_service(self, False, self.measurement_period, timer_handler)
         self.make_dead()
 
     def in_work(self) -> bool:
         result: bool = self.measurement_required
         return self.thrifty_in_work(result)
+    
+    def in_forground_work(self) -> bool:
+        return False

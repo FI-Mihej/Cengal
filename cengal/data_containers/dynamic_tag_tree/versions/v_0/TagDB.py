@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -38,7 +38,7 @@ __author__ = 'Mikhail Butenko <gtalk@mikhail-butenko.in.ua>'
 
 from cengal.data_generation.id_generator import IDGenerator
 # from help_tools import AddToCompoundDict, ResultExistence
-from cengal.code_flow_control.result_types import ResultExistence
+from cengal.code_flow_control.smart_values.versions.v_0 import ResultExistence
 from cengal.data_containers.compound_dict_management import AddToCompoundDict
 
 

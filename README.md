@@ -10,7 +10,7 @@ Not all features are accessible on every target platform or architecture.
 
 # Installation
 
-Installation process requires compilation (brebuild Wheels are not prepared yet). So ensure that:
+Installation process requires compilation (prebuild Wheels are not prepared yet). So ensure that:
 * GCC/Clang is installed in your Linux/WSL (`sudo apt-get --yes install build-essential` for Ubuntu. And `./before_install_on_wsl.sh` for Ubuntu under WSL for UI like Tkinter or Qt if you are using some kind of XServer on your host Windows)
 * At least `Visual Studio Community - Build Tools` are installed on your Windows and you are installing Cengal from within its `Developer Command Prompt` for an appropriate target CPU architecture (`x64 Native Tools Command Prompt for VS 2022` for example). Make sure that you have compatible version of Visual Studio for your target CPython interpreter (see `python -VV` command output. For example `Python 3.9.11 (tags/v3.9.11:2de452f, Mar 16 2022, 14:33:45) [MSC v.1929 64 bit (AMD64)]`: this python interpreter requires Visual Studio 2019 version 16.11.2+ according to `1929` word search in [Wikipedia page](https://en.wikipedia.org/wiki/Microsoft_Visual_C%2B%2B))
 
@@ -54,7 +54,7 @@ For example [Cengal Coroutines Concepts & Usage](https://github.com/FI-Mihej/Cen
 * [Decorator which converts blocking code to concurrent code](https://github.com/FI-Mihej/Cengal/wiki/Decorator-which-converts-blocking-code-to-concurrent-code)
 
 
-## True Interprocess Shared Memory (Proof of Concepte Stage)
+## True Interprocess Shared Memory (Proof of Concept Stage)
 
 Share your data between your Python processes (2 processes currently) and work with them as usual. Work across different processes is made turn by turn (fast operation: using full memory barrier instead of system calls)
 
@@ -143,14 +143,34 @@ It provides an ability to make more than 30000000 reads/writes per second of an 
 * Implement an appropriate Service for `cengal.parallel_execution.coroutines` - for comfortable shared memory usage inside an async code (including `asyncio`) 
 * Improve memory allocation algorithm in an attempt of making it faster
 
+## Async LMDB database API
+
+An example of usage (unit test of the module):
+* [test__db.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/coro_standard_services/db/versions/v_1/tests/test__db.py)
+
+## Async logging into LMDB database
+
+Developer can observe their logs in runtime using `cengal.parallel_execution.coroutines.coro_tools.loop_administration.admin_tk` module (made with Async Tkinter GUI):
+* [admin_tk.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/coro_tools/loop_administration/admin_tk/versions/v_0/admin_tk.py)
+
+An example of usage of the admin_tk:
+* [admin_test.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/coro_tools/loop_administration/admin_tk/versions/v_0/development/admin_test.py)
+
+Alternatively, developer can load logs in off-line mode using Log Viewer application (made with async Tkinter GUI):
+* [log_viewer.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/coro_tools/log_viewer/versions/v_0/log_viewer.py)
+
 ## Async Tkinter and Customtkinter
 
 * [tkinter_0.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/coro_standard_services/tkinter/versions/v_0/development/tkinter_0.py)
 * [customtkinter_0.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/coro_standard_services/tkinter/versions/v_0/development/customtkinter_0.py)
 
+## Async wxPython
+
+* [async_wxpython_example.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/wxpython/versions/v_0/development/async_wxpython_example.py)
+
 ## Async QT (PySide, PySide2, PySide6, PyQt4, PyQt5, PyQt6)
 
-* [pyside6__minimal_asyncio__async_method.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/qt/versions/v_0/development/pyside6__minimal_asyncio__async_method.py)
+* [pyside6__coro_slot_example_0.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/qt/pyside6/versions/v_0/development/pyside6__coro_slot_example_0.py)
 
 ## Async PyTermGUI
 
@@ -291,20 +311,20 @@ Observe loop performance, services state and coroutines list with details. Use a
 
 ## Size of the Cengal library
 
-At the moment of 5 Jun 2023:
+At the moment of 11 Oct 2023:
 
-191 modules
+More than 190 modules
 
 ```
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Python                         568          15810          19470          50394
-Cython                           9            676            415           1800
+Python                         636          18572          21458          59787
+Cython                           9            686            415           1817
 C                                2             39             26            163
 C/C++ Header                     2             14             26             37
 -------------------------------------------------------------------------------
-SUM:                           581          16539          19937          52394
+SUM:                           649          19311          21925          61804
 -------------------------------------------------------------------------------
 ```
 

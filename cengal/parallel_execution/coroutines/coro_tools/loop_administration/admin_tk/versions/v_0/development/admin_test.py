@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -39,6 +39,8 @@ from cengal.parallel_execution.coroutines.coro_tools.run_in_loop import run_in_l
 from cengal.parallel_execution.coroutines.coro_tools.loop_administration.admin_tk import start_admin
 from cengal.parallel_execution.coroutines.coro_standard_services.shutdown_on_keyboard_interrupt import ShutdownOnKeyboardInterrupt
 from cengal.parallel_execution.coroutines.coro_standard_services.shutdown_loop import ShutdownLoop
+from cengal.parallel_execution.coroutines.coro_standard_services.instance import InstanceRequest
+from cengal.system import current_cengal_module_import_str
 
 
 async def on_close(i: Interface):
@@ -47,7 +49,8 @@ async def on_close(i: Interface):
 
 async def main(i: Interface):
     await i(ShutdownOnKeyboardInterrupt)
-    await start_admin(i, on_close=on_close)
+    await i(InstanceRequest().set('app_name_for_fs', current_cengal_module_import_str()))
+    await start_admin(i, on_close)
 
 
 if '__main__' == __name__:

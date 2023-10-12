@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -45,7 +45,7 @@ __author__ = 'Mikhail Butenko <gtalk@mikhail-butenko.in.ua>'
 # from TagDB import PLAIN_PSEUDO_TREE_TYPE as PLAIN_PSEUDO_TREE_TYPE
 from .TagDB import *
 import copy
-from cengal.RequestCache import RequestCache
+from cengal.web_tools.request_cache import RequestCache
 import time
 from cengal.parallel_execution.coroutines.coro_standard_services.loop_yield import gly, CoroPriority
 from cengal.parallel_execution.coroutines.coro_standard_services.read_write_locker import grwl, RWOperation

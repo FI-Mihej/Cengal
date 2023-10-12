@@ -15,7 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .uvicorn import *
+try:
+    from .uvicorn import *
+except ImportError:
+    from cengal.system import CENGAL_UNITTESTS_DISCOVER_IS_RUNNING
+    if CENGAL_UNITTESTS_DISCOVER_IS_RUNNING:
+        from unittest import SkipTest
+        raise SkipTest('Uvicorn is not installed')
 
 """
 Module Docstring
@@ -26,7 +32,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"

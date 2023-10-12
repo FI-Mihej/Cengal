@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -59,6 +59,9 @@ class PutCoroRequest(ServiceRequest):
     def set_on_children_del_handler(self, parent_coro_id: CoroID, handler: Callable) -> ServiceRequest:
         return self._save(3, parent_coro_id, handler)
 
+    def put_background_coro(self, coro_worker: AnyWorker, *args, **kwargs) -> ServiceRequest:
+        return self._save(4, coro_worker, args, kwargs)
+
 
 class PutCoro(ServiceWithADirectRequestMixin, DualImmediateProcessingServiceMixin, TypedService[CoroID]):
     def __init__(self, loop: CoroScheduler):
@@ -74,6 +77,7 @@ class PutCoro(ServiceWithADirectRequestMixin, DualImmediateProcessingServiceMixi
         self._request_workers = {
             0: self._turn_on_tree_monitoring,
             1: self._tree_monitoring_state,
+            4: self._put_background_coro,
         }
 
         self.direct_requests: List[Tuple] = list()
@@ -140,6 +144,15 @@ class PutCoro(ServiceWithADirectRequestMixin, DualImmediateProcessingServiceMixi
     
     def _tree_monitoring_state(self):
         return True, self._tree_monitoring_turned_on, None
+    
+    def _put_background_coro(self, coro_worker: AnyWorker, args, kwargs):
+        try:
+            coro: CoroWrapperBase = self._single_task_registration_or_immediate_processing_single_impl(coro_worker, *args, **kwargs)
+            coro.is_background_coro = True
+        except:
+            return True, None, get_exception()
+
+        return True, coro.coro_id, None
 
     def full_processing_iteration(self):
         if self._dead_coroutines:
@@ -194,6 +207,7 @@ class PutCoro(ServiceWithADirectRequestMixin, DualImmediateProcessingServiceMixi
                 result.add(child.value)
         
         self.travers_through_all_children(coro_id, handler)
+        result.discard(coro_id)
         return result
     
     def travers_through_all_parents(self, coro_id, handler: Callable[[CoroID, CoroID], None], on_switched_to_stack_based_implementation: Optional[Callable]=None):
@@ -207,6 +221,7 @@ class PutCoro(ServiceWithADirectRequestMixin, DualImmediateProcessingServiceMixi
                 result.add(parent)
         
         self.travers_through_all_parents(coro_id, handler)
+        result.discard(coro_id)
         return result
 
     def in_work(self) -> bool:

@@ -17,7 +17,7 @@
 
 # __all__ = ['frame', 'get_exception', 'get_exception_tripple', 'exception_to_printable_text', 'is_async', 'is_callable', 'func_param_names', 'frame_param_names', 'intro_func_param_names', 'CodeParamsWithValues', 'intro_func_params_with_values', 'intro_func_all_params_with_values', 'intro_func_all_params_with_values_as_ordered_dict', 'code_params_with_values_to_signature_items_gen', 'code_params_with_values_to_signature']
 
-from typing import Any, Callable, Dict, Generator, List, Optional, Tuple, NamedTuple, OrderedDict as OrderedDictType, Type, Union, Set, Sequence
+from typing import Any, Callable, Awaitable, Dict, Generator, List, Optional, Tuple, NamedTuple, OrderedDict as OrderedDictType, Type, Union, Set, Sequence, cast
 from types import ModuleType, CodeType, FrameType
 import traceback
 import inspect
@@ -35,7 +35,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -125,12 +125,28 @@ def func_qualname(func):
         return str()
 
 
-def entity_try_qualname(entity):
+def entity_name(entity):
+    if isinstance(entity, FrameType):
+        entity = entity.f_code
+    
     if isinstance(entity, CodeType):
-        code = entity
-        return code_name(code)
+        return code_name(entity)
     else:
-        code = get_code(entity)
+        return func_name(entity)
+
+
+def entity_qualname(entity):
+    if isinstance(entity, FrameType):
+        entity = entity.f_code
+    
+    if isinstance(entity, CodeType):
+        if sys.version_info >= (3, 11):
+            return code_qualname(entity)
+        else:
+            # raise RuntimeError('CodeType.__qualname__ is available only since Python 3.11')
+            entity_instance = find_entity(entity)
+            return f'{entity_owner_name(entity_instance)}.{entity_name(entity_instance)}'
+    else:
         return func_qualname(entity)
 
 
@@ -149,14 +165,14 @@ def entity_class(func) -> Optional[Type]:
     
     if inspect.isfunction(func):
         try:
-            func_class = getattr(inspect.getmodule(func), func.__qualname__.split('.<locals>', 1)[0].rsplit('.', 1)[0])
+            func_class = getattr_ex(inspect.getmodule(func), func.__qualname__.split('.<locals>', 1)[0].rsplit('.', 1)[0])
         except AttributeError:
             return None
         
         if isinstance(func_class, type):
             return func_class
     
-    return getattr(func, '__objclass__', None)
+    return getattr_ex(func, '__objclass__', None)
 
 
 def entity_owner(func) -> Optional[Union[Type, ModuleType]]:
@@ -176,7 +192,7 @@ def entity_owner(func) -> Optional[Union[Type, ModuleType]]:
     if inspect.isfunction(func):
         func_module = inspect.getmodule(func)
         try:
-            func_class = getattr(func_module, func.__qualname__.split('.<locals>', 1)[0].rsplit('.', 1)[0])
+            func_class = getattr_ex(func_module, func.__qualname__.split('.<locals>', 1)[0].rsplit('.', 1)[0])
         except AttributeError:
             return func_module
         
@@ -186,7 +202,7 @@ def entity_owner(func) -> Optional[Union[Type, ModuleType]]:
             return func_module
     
     try:
-        return getattr(func, '__objclass__')
+        return getattr_ex(func, '__objclass__')
     except AttributeError:
         if func_module is None:
             func_module = inspect.getmodule(func)
@@ -249,6 +265,9 @@ def normalized_code_owner_repr(code: CodeType, owner: Optional[Union[Type, Modul
 
 
 def entity_owner_repr(entity):
+    if isinstance(entity, FrameType):
+        entity = entity.f_code
+    
     if isinstance(entity, CodeType):
         return normalized_code_owner_repr(entity, entity_owner(entity))
     else:
@@ -266,7 +285,7 @@ def entity_owner_name(entity):
     return owner_name(entity_owner(entity))
 
 
-def frame_param_names(frame_instance) -> CodeParamNames:
+def frame_param_names(frame_instance: FrameType) -> CodeParamNames:
     return code_param_names(frame_instance.f_code)
 
 
@@ -276,6 +295,36 @@ def intro_func_param_names(depth: Optional[int] = 1) -> CodeParamNames:
 
 CodeParamsWithValues = CodeParamNames
 ParamWithValue = Tuple[str, Any]
+
+
+def fill_code_params_with_values(code_params: CodeParamNames, args, kwargs) -> Tuple[CodeParamsWithValues, Tuple, Dict]:
+    positional, positional_only, keyword_only = code_params
+    positional_len = len(positional)
+    positional_only_len = len(positional_only)
+    keyword_only_len = len(keyword_only)
+    positional_only_delimiter_place: Optional[int] = None
+    if positional_only_len:
+        positional_only_delimiter_place = positional_only_len
+    
+    positional_values = tuple(((arg, args[index]) for index, arg in enumerate(positional)))
+    if positional_only_len:
+        positional_only_values = tuple(((arg, args[index]) for index, arg in enumerate(positional_only)))
+    else:
+        positional_only_values = tuple()
+    
+    if keyword_only_len:
+        keyword_only_values = tuple(((arg, kwargs[arg]) for arg in keyword_only))
+    else:
+        keyword_only_values = tuple()
+
+    result_args: Tuple = args[positional_len:]
+    result_kwargs: Dict = {key: value for key, value in kwargs.items() if key not in keyword_only}
+    
+    return CodeParamsWithValues(positional_values, positional_only_values, keyword_only_values), result_args, result_kwargs
+
+
+def func_params_with_values(func: Union[Callable, Awaitable], args, kwargs) -> Tuple[CodeParamsWithValues, Tuple, Dict]:
+    return fill_code_params_with_values(func_param_names(func), args, kwargs)
 
 
 def intro_frame_params_with_values(frame_instance) -> CodeParamsWithValues:
@@ -319,22 +368,24 @@ def code_params_with_values_to_signature_items_gen(code_params_with_values: Code
         positional_only_delimiter_place = positional_only_len
     
     for index, arg in enumerate(positional):
+        arg_name, arg_value = arg
         if (positional_only_delimiter_place is not None) and (index == positional_only_delimiter_place):
             yield '/'
         
         if verbose:
-            yield f'{arg[0]}={arg[1]}'
+            yield f'{arg_name}={arg_value}'
         else:
-            yield str(arg[1])
+            yield str(arg_value)
     
     if keyword_only_len:
         yield '*'
         for arg in keyword_only:
-            yield f'{arg[0]}={arg[1]}'
+            arg_name, arg_value = arg
+            yield f'{arg_name}={arg_value}'
 
 
-def code_params_to_signature_items_gen(code_params_with_values: CodeParamNames) -> Generator[str, None, None]:
-    positional, positional_only, keyword_only = code_params_with_values
+def code_params_to_signature_items_gen(code_params: CodeParamNames) -> Generator[str, None, None]:
+    positional, positional_only, keyword_only = code_params
     positional_len = len(positional)
     positional_only_len = len(positional_only)
     keyword_only_len = len(keyword_only)
@@ -346,12 +397,14 @@ def code_params_to_signature_items_gen(code_params_with_values: CodeParamNames) 
         if (positional_only_delimiter_place is not None) and (index == positional_only_delimiter_place):
             yield '/'
         
-        yield arg[0]
+        # yield arg[0]
+        yield arg
     
     if keyword_only_len:
         yield '*'
         for arg in keyword_only:
-            yield arg[0]
+            # yield arg[0]
+            yield arg
 
 
 def code_params_with_values_to_signature(params_with_values: CodeParamsWithValues, verbose: bool = False) -> str:
@@ -363,6 +416,9 @@ def code_params_to_signature(param_names: CodeParamNames) -> str:
 
 
 def entity_repr_limited(entity):
+    if isinstance(entity, FrameType):
+        entity = entity.f_code
+    
     if isinstance(entity, CodeType):
         code = entity
     else:
@@ -375,6 +431,9 @@ def entity_repr_limited(entity):
 
 
 def entity_repr_limited_try_qualname(entity):
+    if isinstance(entity, FrameType):
+        entity = entity.f_code
+    
     if isinstance(entity, CodeType):
         code = entity
         func_name = code_name(code)
@@ -388,6 +447,9 @@ def entity_repr_limited_try_qualname(entity):
 
 
 def entity_repr_owner_based(entity):
+    if isinstance(entity, FrameType):
+        entity = entity.f_code
+    
     owner = entity_owner(entity)
     if isinstance(entity, CodeType):
         owner_repr = normalized_code_owner_repr(entity, owner)
@@ -406,6 +468,9 @@ def entity_repr_owner_based(entity):
 
 
 def entity_repr(entity):
+    if isinstance(entity, FrameType):
+        entity = entity.f_code
+    
     module = inspect.getmodule(entity)
     if isinstance(entity, CodeType):
         owner_repr = normalized_code_owner_repr(entity, module)
@@ -452,6 +517,44 @@ def entity_properties(entity) -> Set[str]:
     return entity_items - entity_type_items
 
 
+def class_properties(entity: Type) -> Set[str]:
+    """
+    Example:
+
+    Args:
+        entity (_type_): _description_
+
+    Returns:
+        Set[str]: _description_
+    """    
+    entity_type_items = set(dir(type(entity)))
+    entity_items = set(dir(entity))
+    mro = inspect.getmro(entity)
+    base_members: Set = set()
+    for base in mro:
+        if base is entity:
+            continue
+        
+        base_members |= set(dir(base))
+    
+    return (entity_items - entity_type_items) - base_members
+
+
+def class_properties_including_overrided(entity: Type) -> Set[str]:
+    """
+    Example:
+
+    Args:
+        entity (_type_): _description_
+
+    Returns:
+        Set[str]: _description_
+    """    
+    entity_type_items = set(dir(type(entity)))
+    entity_items = set(entity.__dict__.keys())
+    return entity_items - entity_type_items
+
+
 def intro_frame_repr_limited(frame_instance, verbose: bool = False):
     func_name = code_name(frame_instance.f_code)
     params_with_values = intro_frame_params_with_values(frame_instance)
@@ -471,6 +574,13 @@ def intro_frame_repr(frame_instance, verbose: bool = False):
 
 def intro_func_repr_limited(verbose: bool = False, depth: Optional[int] = 1):
     return intro_frame_repr_limited(frame(depth + 1), verbose)
+
+
+def print_intro_func_repr_limited(verbose: bool = False, depth: Optional[int] = 1):
+    print(intro_func_repr_limited(verbose, depth + 1))
+
+
+pifrl = print_intro_func_repr_limited
 
 
 def intro_func_repr(verbose: bool = False, depth: Optional[int] = 1):
@@ -605,15 +715,21 @@ def filled_slots_with_names(owning_object):
 
 def current_entity_name(depth: Optional[int] = 1):
     fr = frame(depth + 1)
-    entity_name = code_name(fr.f_code)
-    # print(dir(fr.f_code))
-    # print(fr.f_code.__class__)
-    # print(dir(fr))
-    # print(fr.__class__)
-    return entity_name
+    return entity_name(fr)
+    # entity_name = code_name(fr.f_code)
+    # # print(dir(fr.f_code))
+    # # print(fr.f_code.__class__)
+    # # print(dir(fr))
+    # # print(fr.__class__)
+    # return entity_name
 
 
 cen = current_entity_name
+
+
+def current_entity_owner_name(depth: Optional[int] = 1):
+    fr = frame(depth + 1)
+    return owner_name(entity_owner(fr.f_code))
 
 
 # def current_entity_full_name(depth: Optional[int] = 1):
@@ -624,3 +740,323 @@ cen = current_entity_name
 
 # cefn = current_entity_full_name
 
+
+def getattr_ex(entity, attr_name: str) -> Any:
+    try:
+        return getattr(entity, attr_name)
+    except AttributeError:  # See code of the `inspect.getmembers()`
+        if attr_name in entity.__dict__:
+            return entity.__dict__[attr_name]
+        else:
+            raise AttributeError(f'Attribute "{attr_name}" was not found in the entity "{entity}"')
+
+
+def entity_is_function(entity) -> bool:
+    owner: Optional[Union[Type, ModuleType]] = entity_owner(entity)
+    if owner is None:
+        return False
+    
+    if inspect.ismodule(owner):
+        entity_name_str: str = entity_name(entity)
+        if hasattr(owner, entity_name_str):
+            possible_entity = getattr_ex(owner, entity_name_str)
+            possible_entity_code = get_code(possible_entity)
+            entity_code = get_code(entity)
+            if possible_entity_code is entity_code:
+                return True
+            else:
+                return False
+        else:
+            return False
+    else:
+        return False
+
+
+def get_function_by_entity(entity) -> Optional[Callable]:
+    owner: Optional[Union[Type, ModuleType]] = entity_owner(entity)
+    if owner is None:
+        return None
+    
+    if inspect.ismodule(owner):
+        entity_name_str: str = entity_name(entity)
+        if hasattr(owner, entity_name_str):
+            possible_entity = getattr_ex(owner, entity_name_str)
+            possible_entity_code = get_code(possible_entity)
+            entity_code = get_code(entity)
+            if possible_entity_code is entity_code:
+                return possible_entity
+            else:
+                return None
+        else:
+            return None
+    else:
+        return None
+
+
+def entity_is_method(entity) -> bool:
+    owner: Optional[Union[Type, ModuleType]] = entity_owner(entity)
+    if owner is None:
+        return False
+    
+    if inspect.isclass(owner):
+        entity_name_str: str = entity_name(entity)
+        if hasattr(owner, entity_name_str):
+            possible_entity = getattr_ex(owner, entity_name_str)
+            possible_entity_code = get_code(possible_entity)
+            entity_code = get_code(entity)
+            if possible_entity_code is entity_code:
+                return True
+            else:
+                return False
+        else:
+            return False
+    else:
+        return False
+
+
+def get_method_by_entity(entity) -> Optional[Callable]:
+    owner: Optional[Union[Type, ModuleType]] = entity_owner(entity)
+    if owner is None:
+        return None
+    
+    if inspect.isclass(owner):
+        entity_name_str: str = entity_name(entity)
+        if hasattr(owner, entity_name_str):
+            possible_entity = getattr_ex(owner, entity_name_str)
+            possible_entity_code = get_code(possible_entity)
+            entity_code = get_code(entity)
+            if possible_entity_code is entity_code:
+                return possible_entity
+            else:
+                return None
+        else:
+            return None
+    else:
+        return None
+
+
+def entity_is_unbound_method(entity):
+    owner: Optional[Union[Type, ModuleType]] = entity_owner(entity)
+    if owner is None:
+        return False
+    
+    if inspect.ismodule(owner):
+        entity_name_str: str = entity_name(entity)
+        if hasattr(owner, entity_name_str):
+            possible_entity = getattr_ex(owner, entity_name_str)
+            possible_entity_code = get_code(possible_entity)
+            entity_code = get_code(entity)
+            if possible_entity_code is entity_code:
+                return False
+            else:
+                return True
+        else:
+            return True
+    else:
+        return False
+
+
+def get_unbound_method_by_entity(entity) -> Optional[Callable]:
+    raise NotImplementedError()
+
+
+class AnAppropriateOwnerParameterWasNotFoundError(Exception):
+    pass
+
+
+class PossibleOwnerParameterDoesNotMatchError(AnAppropriateOwnerParameterWasNotFoundError):
+    pass
+
+
+class EntityHasNoPositionalParametersError(AnAppropriateOwnerParameterWasNotFoundError):
+    pass
+
+
+def get_owner_parameter(entity, owner_parameter_name: str, return_even_if_not_match: bool = False):
+    if entity_is_function(entity):
+        raise TypeError(f'Function has no {owner_parameter_name} parameter')
+    
+    if entity_is_method(entity):
+        return entity.__self__
+    elif entity_is_unbound_method(entity):
+        if isinstance(entity, FrameType):
+            entity_name_str: str = entity_name(entity)
+            params_with_values: CodeParamsWithValues = intro_frame_params_with_values(entity)
+            positional, positional_only, keyword_only = params_with_values
+            if positional:
+                possible_positional_self = positional[0][1]
+            elif positional_only:
+                possible_positional_self = positional_only[0][1]
+            else:
+                raise EntityHasNoPositionalParametersError
+            
+            if hasattr(possible_positional_self, entity_name_str):
+                possible_entity = getattr_ex(possible_positional_self, entity_name_str)
+                possible_entity_code = get_code(possible_entity)
+                entity_code = get_code(entity)
+                if possible_entity_code is entity_code:
+                    return possible_positional_self
+                else:
+                    if return_even_if_not_match:
+                        return possible_positional_self
+                    else:
+                        raise PossibleOwnerParameterDoesNotMatchError
+            
+            raise AnAppropriateOwnerParameterWasNotFoundError(f'Can not find an appropriate {owner_parameter_name} parameter in {entity}')
+    else:
+        raise TypeError(f'{entity} of type {type(entity)} is not supported')
+
+
+def get_self_parameter(entity):
+    return get_owner_parameter(entity, 'self')
+
+
+def get_cls_parameter(entity):
+    return get_owner_parameter(entity, 'cls')
+
+
+def get_any_owner_parameter(entity, owner_parameter_name: str, any_positional: bool = True, any_keyword: bool = True):
+    if entity_is_function(entity):
+        raise TypeError(f'Function has no {owner_parameter_name} parameter')
+    
+    if entity_is_method(entity):
+        return entity.__self__
+    elif entity_is_unbound_method(entity):
+        if isinstance(entity, FrameType):
+            entity_name_str: str = entity_name(entity)
+            params_with_values: CodeParamsWithValues = intro_frame_params_with_values(entity)
+            positional, positional_only, keyword_only = params_with_values
+            
+            if any_positional:
+                all_positional = positional + positional_only
+                for param in all_positional:
+                    possible_positional_self_name, possible_positional_self = param
+                    if hasattr(possible_positional_self, entity_name_str):
+                        possible_entity = getattr_ex(possible_positional_self, entity_name_str)
+                        possible_entity_code = get_code(possible_entity)
+                        entity_code = get_code(entity)
+                        if possible_entity_code is entity_code:
+                            return possible_positional_self
+            else:
+                if positional:
+                    possible_positional_self = positional[0][1]
+                elif positional_only:
+                    possible_positional_self = positional_only[0][1]
+                
+                if hasattr(possible_positional_self, entity_name_str):
+                    possible_entity = getattr_ex(possible_positional_self, entity_name_str)
+                    possible_entity_code = get_code(possible_entity)
+                    entity_code = get_code(entity)
+                    if possible_entity_code is entity_code:
+                        return possible_positional_self
+            
+            if any_keyword:
+                for possible_keyword_self_name, possible_keyword_self in keyword_only:
+                    if hasattr(possible_keyword_self, entity_name_str):
+                        possible_entity = getattr_ex(possible_keyword_self, entity_name_str)
+                        possible_entity_code = get_code(possible_entity)
+                        entity_code = get_code(entity)
+                        if possible_entity_code is entity_code:
+                            return possible_keyword_self
+            else:
+                keyword_only_dict: Dict[str, Any] = dict(keyword_only)
+                if owner_parameter_name in keyword_only_dict:
+                    possible_keyword_self = keyword_only_dict[owner_parameter_name]
+                    if hasattr(possible_keyword_self, entity_name_str):
+                        possible_entity = getattr_ex(possible_keyword_self, entity_name_str)
+                        possible_entity_code = get_code(possible_entity)
+                        entity_code = get_code(entity)
+                        if possible_entity_code is entity_code:
+                            return possible_keyword_self
+            
+            raise AnAppropriateOwnerParameterWasNotFoundError(f'Can not find {owner_parameter_name} parameter in {entity}')
+
+
+def get_any_self_parameter(entity, any_positional: bool = True, any_keyword: bool = True):
+    return get_owner_parameter(entity, 'self', any_positional, any_keyword)
+
+
+def get_any_cls_parameter(entity, any_positional: bool = True, any_keyword: bool = True):
+    return get_owner_parameter(entity, 'cls' , any_positional, any_keyword)
+
+
+def find_method_in_module_by_code(module, code_to_find: CodeType) -> Optional[CodeType]:
+    for entity_name_str in dir(module):
+        entity = getattr_ex(module, entity_name_str)
+        if inspect.isclass(entity):
+            possible_method = find_method_in_class_by_code(entity, code_to_find)
+            if possible_method is not None:
+                return possible_method
+    
+    return None
+
+
+def find_method_in_class_by_code(class_to_search_in, code_to_find: CodeType) -> Optional[CodeType]:
+    subclassess = list()
+    for entity_name_str in class_properties_including_overrided(class_to_search_in):
+        entity = getattr_ex(class_to_search_in, entity_name_str)
+        if inspect.isclass(entity):
+            subclassess.append(entity)
+        elif inspect.isfunction(entity) or inspect.ismethod(entity):
+            if get_code(entity) is code_to_find:
+                return entity
+        
+    for subclass in subclassess:
+        possible_method = find_method_in_class_by_code(subclass, code_to_find)
+        if possible_method is not None:
+            return possible_method
+    
+    return None
+
+
+class EntityWasNotFoundError(Exception):
+    pass
+
+
+def find_entity(entity: Union[Callable, FrameType, CodeType]) -> Callable:
+    if not (inspect.isfunction(entity) or inspect.ismethod(entity) or isinstance(entity, FrameType) or isinstance(entity, CodeType)):
+        raise TypeError(f'Only functions, methods, frames and codes are supported. {type(entity)} was provided instead')
+    
+    result = get_function_by_entity(entity)
+    if result is not None:
+        return result
+    
+    result = get_method_by_entity(entity)
+    if result is not None:
+        return result
+    
+    entity_name_str: str = entity_name(entity)
+    entity_instance: Callable = None
+    if isinstance(entity, FrameType):
+        owner = None
+        need_to_try_clr: bool = False
+        try:
+            owner = get_self_parameter(entity)
+        except AnAppropriateOwnerParameterWasNotFoundError:
+            need_to_try_clr = True
+        
+        if need_to_try_clr:
+            try:
+                owner = get_cls_parameter(entity)
+            except AnAppropriateOwnerParameterWasNotFoundError:
+                pass
+        
+        entity_code = entity.f_code
+        if owner is not None:
+            entity_instance = getattr_ex(owner, entity_name_str)
+            if get_code(entity_instance) is entity_code:
+                return entity_instance
+        
+        entity = entity_code
+    
+    if isinstance(entity, CodeType):
+        entity_owner_instance = entity_owner(entity)
+        entity_instance = find_method_in_module_by_code(entity_owner_instance, entity)
+        if entity_instance is not None:
+            return entity_instance
+    
+    raise EntityWasNotFoundError
+
+
+def find_current_entity(depth: Optional[int] = 1) -> Callable:
+    return find_entity(frame(depth + 1))

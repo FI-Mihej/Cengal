@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -50,9 +50,9 @@ from .base import *
 from cengal.data_containers.dynamic_list_of_pieces import DynamicListOfPiecesDequeWithLengthControl
 from cengal.data_containers.fast_fifo import FIFODequeWithLengthControl, FIFOIsEmpty
 from cengal.data_manipulation.front_triggerable_variable import FrontTriggerableVariable, FrontTriggerableVariableType
-from code_flow_control import ResultExistence
+from cengal.code_flow_control.smart_values.versions.v_0 import ResultExistence
 from contextlib import contextmanager
-from code_inspection import set_profiler
+from cengal.code_inspection.line_profiling import set_profiler
 from .recv_buff_size_computer import RecvBuffSizeComputer
 from math import ceil
 

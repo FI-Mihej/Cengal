@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -241,9 +241,9 @@ class ExternalGitModules(ModulesLists):
         self.universal = [
             # 'git+https://github.com/Epikem/pypreprocessor.git',  # temporary workaround for pypreprocessor: https://github.com/interpreters/pypreprocessor/pull/15 . https://github.com/YouCannotBurnMyShadow/pypreprocessor.git must be used instead:
             # 'git+https://github.com/YouCannotBurnMyShadow/pypreprocessor.git',
-            'git+https://github.com/YouCannotBurnMyShadow/python-bdateutil.git',
-            'git+https://github.com/YouCannotBurnMyShadow/version.git',
-            'git+https://github.com/FI-Mihej/fi-patched--progress.git',
+            'git+https://github.com/YouCannotBurnMyShadow/python-bdateutil.git',  # TODO: check is it really will be installed
+            'git+https://github.com/YouCannotBurnMyShadow/version.git',  # TODO: check is it really will be installed
+            'git+https://github.com/FI-Mihej/fi-patched--progress.git',  # TODO: check is it really will be installed
         ]
 
         self.arch__x86_64__allowed = {

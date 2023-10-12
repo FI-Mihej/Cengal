@@ -279,3 +279,4 @@ dmypy.json
 
 # Other
 .vscode/settings.json
+MANIFEST.in

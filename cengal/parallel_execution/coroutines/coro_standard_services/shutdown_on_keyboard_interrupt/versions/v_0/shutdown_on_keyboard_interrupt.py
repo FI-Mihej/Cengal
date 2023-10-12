@@ -24,7 +24,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -73,7 +73,7 @@ class ShutdownOnKeyboardInterrupt(TypedService[None]):
         result: bool = self.keyboard_interrupt_emited
         return self.thrifty_in_work(result)
     
-    def keyboard_interrupt_handler(self, signal, frame):
+    def keyboard_interrupt_handler(self, sig, frame):
         self.keyboard_interrupt_emited = True
         self.make_live()
     

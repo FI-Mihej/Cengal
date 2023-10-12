@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -48,19 +48,21 @@ class Sleep(TypedService[float]):
         super(Sleep, self).__init__(loop)
         self.timer = Timer()
         self.pending_tasks_number = 0
+        self.pending_foreground_tasks_number = 0
 
     def single_task_registration_or_immediate_processing(
             self, delay: float) -> Tuple[bool, None, None]:
-        def timer_handler_func(coro_id: CoroID, start_time: float):
+        def timer_handler_func(coro_id: CoroID, foreground: bool, start_time: float):
             current_time = perf_counter()
             if start_time > current_time:
                 start_time = current_time
             real_delay = current_time - start_time
-            self.task_triggered()
+            self.task_triggered(foreground)
             self.register_response(coro_id, real_delay, None)
 
-        handler = partial(timer_handler_func, self.current_caller_coro_info.coro_id, perf_counter())
-        self.task_added()
+        foreground: bool = not self.current_caller_coro_info.coro.is_background_coro
+        handler = partial(timer_handler_func, self.current_caller_coro_info.coro_id, foreground, perf_counter())
+        self.task_added(foreground)
         self.timer.register(handler, delay)
         self.make_live()
         return False, None, None
@@ -70,14 +72,19 @@ class Sleep(TypedService[float]):
         if 0 == self.pending_tasks_number:
             self.make_dead()
 
-    def task_added(self):
+    def task_added(self, foreground: bool):
         self.pending_tasks_number += 1
+        self.pending_foreground_tasks_number += 1 if foreground else 0
 
-    def task_triggered(self):
+    def task_triggered(self, foreground: bool):
         self.pending_tasks_number -= 1
+        self.pending_foreground_tasks_number -= 1 if foreground else 0
 
     def in_work(self) -> bool:
         return self.thrifty_in_work(self.pending_tasks_number != 0)
+    
+    def in_forground_work(self) -> bool:
+        return self.pending_foreground_tasks_number
     
     def time_left_before_next_event(self) -> Tuple[bool, Optional[Union[int, float]]]:
         return self.pending_tasks_number != 0, self.timer.nearest_event()

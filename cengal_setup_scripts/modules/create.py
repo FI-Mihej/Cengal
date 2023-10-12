@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -34,52 +34,14 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-from os import rename, remove
-from os.path import sep as os_sep, dirname, exists, isfile
-from distutils.dir_util import copy_tree
-from cengal.file_system.win_fs.global_install_uninstall import win_fs
-from cengal.file_system.path_manager import path_relative_to_src, RelativePath
-from cengal.text_processing.text_processing import removeprefix
-from cengal.file_system.file_patch.simple import patch_text_file
+from cengal.file_system.path_manager import path_relative_to_src
+from cengal.build_tools.modules.create import create
 
 
 def main(sep: str = '/'):
-    with win_fs():
-        cengal_dir = path_relative_to_src('../../cengal')
-        cengal_dir_path = RelativePath(cengal_dir)
-        template_module_dir = cengal_dir_path('_template_module')
-        template_submodule_dir = cengal_dir_path('_template_module/_template_submodule')
-        required_path_input = input(f'Enter `module/submodule` path: ')
-        required_path_input = required_path_input.replace(os_sep, sep)
-        required_path_input = required_path_input.strip()
-        required_path_input = required_path_input.strip(sep)
-        if sep not in required_path_input:
-            print('Wrong path: both module and submodule are mandatory')
-            return
-        
-        required_path_input_parts = required_path_input.split(sep)
-        submodule_name = required_path_input_parts[-1]
-        submodule_path = cengal_dir_path(required_path_input)
-        module_path = RelativePath(submodule_path)('..')
-        copy_tree(template_submodule_dir, submodule_path, update=True)
-
-        template_submodule_py_path = RelativePath(submodule_path)('versions/v_0/_template_submodule.py')
-        template_submodule_py_new_path = RelativePath(submodule_path)(f'versions/v_0/{submodule_name}.py')
-        if exists(template_submodule_py_new_path) and isfile(template_submodule_py_new_path):
-            remove(template_submodule_py_path)
-        else:
-            rename(template_submodule_py_path, template_submodule_py_new_path)
-
-        init_py_path = RelativePath(submodule_path)('versions/v_0/__init__.py')
-        patch_text_file(init_py_path, [('_template_submodule', submodule_name)])
-
-        create_env_sh_path = RelativePath(submodule_path)('versions/v_0/development/create_env.sh')
-        development_dir_path = dirname(create_env_sh_path)
-        remaining_path = removeprefix(development_dir_path, cengal_dir)
-        sep_num = remaining_path.count(sep)
-        cd_2_parent_num = 1 + sep_num  # since we need dir parent to the `cengal_dir`
-        new_relativeness = '/..' * cd_2_parent_num
-        patch_text_file(create_env_sh_path, [('$WORKDIR/../../../../../..`', f'$WORKDIR{new_relativeness}`')])
+    cengal_dir = path_relative_to_src('../../cengal')
+    required_path_input = input(f'Enter `module/submodule` path: ')
+    return create(cengal_dir, required_path_input, sep)
 
 
 if __name__ == '__main__':

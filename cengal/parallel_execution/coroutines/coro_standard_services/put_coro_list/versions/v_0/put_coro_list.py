@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -42,6 +42,7 @@ from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import
 from cengal.parallel_execution.coroutines.coro_standard_services_internal_lib.service_with_a_direct_request import *
 from cengal.code_flow_control.smart_values import ValueExistence
 from cengal.introspection.inspect import get_exception, get_exception_tripple
+from cengal.code_flow_control.args_manager import EntityArgsHolder
 from typing import Sequence, Tuple, List, Optional, Any, cast, Dict, Union
 
 

@@ -15,12 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = ['await_coro_fast', 'await_coro', 'await_coro_prim', 'asyncio_coro', 'await_task_fast', 'await_task', 'await_task_prim', 'RunSchedulerInAsyncioLoop',
+__all__ = ['await_coro_fast', 'await_coro', 'await_coro_prim', 'asyncio_coro', 'await_task_fast', 'await_task', 'await_task_prim', 
+           'cs_awaitable', 
+           'RunSchedulerInAsyncioLoop',
            'coro_interfaces_arg_manager', 'create_task', 'create_task_in_thread_pool', 'task_in_thread_pool']
 
 import sys
 import asyncio
-from inspect import signature, Signature, Parameter
+from inspect import signature, Signature, Parameter, isawaitable
 from cengal.parallel_execution.coroutines.coro_scheduler import *
 # from cengal.parallel_execution.coroutines.coro_standard_services import *
 from cengal.code_flow_control.args_manager import ArgsManager, EArgs
@@ -28,9 +30,11 @@ from enum import Enum
 from functools import partial
 from typing import Union, Optional, Callable, Awaitable, Any, Coroutine
 from cengal.time_management.sleep_tools import get_min_sleep_interval, try_sleep, get_usable_min_sleep_interval, get_countable_delta_time
-from cengal.introspection.inspect import get_exception, get_exception_tripple
+from cengal.introspection.inspect import get_exception, get_exception_tripple, is_async
 from cengal.parallel_execution.coroutines.coro_standard_services_internal_lib.service_with_a_direct_request import *
 from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import PutCoro
+
+from functools import wraps, update_wrapper
 
 
 """
@@ -42,7 +46,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -99,9 +103,9 @@ def await_coro_fast(loop: asyncio.AbstractEventLoop,
     
     future = loop.create_future()
     if CoroType.awaitable == coro_type:
-        make_request_to_service_with_context(get_interface_and_loop_with_explicit_loop(scheduler), PutCoro, ExplicitWorker(coro_type, _awaitable_async_coro_wrapper), future, coro_worker, *args, **kwargs)
+        put_request_to_service_with_context(get_interface_and_loop_with_explicit_loop(scheduler), PutCoro, ExplicitWorker(coro_type, _awaitable_async_coro_wrapper), future, coro_worker, *args, **kwargs)
     elif CoroType.greenlet == coro_type:
-        make_request_to_service_with_context(get_interface_and_loop_with_explicit_loop(scheduler), PutCoro, ExplicitWorker(coro_type, _async_coro_wrapper), future, coro_worker, *args, **kwargs)
+        put_request_to_service_with_context(get_interface_and_loop_with_explicit_loop(scheduler), PutCoro, ExplicitWorker(coro_type, _async_coro_wrapper), future, coro_worker, *args, **kwargs)
     else:
         raise NotImplementedError
     
@@ -152,7 +156,7 @@ def await_task_fast(loop: asyncio.AbstractEventLoop,
                     scheduler: CoroScheduler, service_type: ServiceType, *args, **kwargs
                     ) -> asyncio.Future:
     future = loop.create_future()
-    make_request_to_service_with_context(get_interface_and_loop_with_explicit_loop(scheduler), PutCoro, ExplicitWorker(CoroType.greenlet, _async_coro_wrapper), future, _async_task_runner_coro_worker, service_type, *args, **kwargs)
+    put_request_to_service_with_context(get_interface_and_loop_with_explicit_loop(scheduler), PutCoro, ExplicitWorker(CoroType.greenlet, _async_coro_wrapper), future, _async_task_runner_coro_worker, service_type, *args, **kwargs)
     return future
 
 
@@ -170,6 +174,157 @@ def await_task_prim(service_type: ServiceType, *args, **kwargs) -> asyncio.Futur
         asyncio.Future: _description_
     """
     return await_task_fast(asyncio.get_event_loop(), available_coro_scheduler(), service_type, *args, **kwargs)
+
+
+def cs_awaitable(coro_worker: Worker) -> Coroutine:
+    """Decorator. Without arguments. Makes any Cengal coro awaitable from the async code (like coroutines in asyncio)
+    Example:
+        from cengal.parallel_execution.coroutines.coro_sheduler import cs_acoro
+        from cengal.parallel_execution.coroutines.coro_standard_services.run_coro import RunCoro
+        from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import PutCoro
+        from cengal.parallel_execution.coroutines.coro_standard_services.sleep import Sleep
+        import asyncio
+
+        @cs_awaitable
+        def my_coro_g(a: str, b: str) -> str:
+            i: Interface = current_interface()
+            i(Sleep, 0.1)
+
+            return a + b
+
+        @cs_awaitable
+        async def my_coro_a(a: str, b: str) -> str:
+            i: Interface = current_interface()
+            await i(Sleep, 0.05)
+
+            await asyncio.sleep(0.05)
+
+            return a + b
+
+        @cs_acoro
+        async def my_coro_a_implicit(a: str, b: str) -> str:
+            i: Interface = current_interface()
+            await i(Sleep, 0.05)
+
+            await asyncio.sleep(0.05)
+
+            return a + b
+
+        async def my_coro_a_explicit(i: Interface, a: str, b: str) -> str:
+            await i(Sleep, 0.05)
+
+            await asyncio.sleep(0.05)
+
+            return a + b
+        
+        async def my_coro_asyncio(a: str, b: str) -> str:
+            await asyncio.sleep(0.1)
+
+            return a + b
+        
+        @cs_awaitable
+        async def amain():
+            i: Interface = current_interface()
+
+            # await
+
+            print(await my_coro_g('a', 'b'))
+            print(await my_coro_a('a', 'b'))
+            print(await my_coro_a_implicit('a', 'b'))
+            print(await my_coro_a_explicit(i, 'a', 'b'))
+            print(await my_coro_asyncio('a', 'b'))
+
+            # RunCoro
+
+            print(await i(RunCoro, my_coro_g('a', 'b')))
+            print(await i(RunCoro, my_coro_g, 'a', 'b'))
+
+            print(await i(RunCoro, my_coro_a('a', 'b')))
+            print(await i(RunCoro, my_coro_a, 'a', 'b'))
+            
+            print(await i(RunCoro, my_coro_a_implicit('a', 'b')))
+            print(await i(RunCoro, my_coro_a_implicit, 'a', 'b'))
+            
+            print(await i(RunCoro, my_coro_a_explicit, 'a', 'b'))
+            
+            print(await i(RunCoro, my_coro_asyncio('a', 'b')))
+            print(await i(RunCoro, cs_acoro(my_coro_asyncio), 'a', 'b'))
+
+            # PutCoro
+
+            await i(PutCoro, my_coro_g('a', 'b'))
+            await i(PutCoro, my_coro_g, 'a', 'b')
+
+            await i(PutCoro, my_coro_a('a', 'b'))
+            await i(PutCoro, my_coro_a, 'a', 'b')
+            
+            await i(PutCoro, my_coro_a_implicit('a', 'b'))
+            await i(PutCoro, my_coro_a_implicit, 'a', 'b')
+            
+            await i(PutCoro, my_coro_a_explicit, 'a', 'b')
+            
+            await i(PutCoro, my_coro_asyncio('a', 'b'))
+            await i(PutCoro, cs_acoro(my_coro_asyncio), 'a', 'b')
+        
+        @cs_awaitable
+        def main():
+            i: Interface = current_interface()
+
+            # RunCoro
+
+            print(i(RunCoro, my_coro_g('a', 'b')))
+            print(i(RunCoro, my_coro_g, 'a', 'b'))
+
+            print(i(RunCoro, my_coro_a('a', 'b')))
+            print(i(RunCoro, my_coro_a, 'a', 'b'))
+            
+            print(i(RunCoro, my_coro_a_implicit('a', 'b')))
+            print(i(RunCoro, my_coro_a_implicit, 'a', 'b'))
+            
+            print(i(RunCoro, my_coro_a_explicit, 'a', 'b'))
+            
+            print(i(RunCoro, my_coro_asyncio('a', 'b')))
+            print(i(RunCoro, cs_acoro(my_coro_asyncio), 'a', 'b'))
+
+            # PutCoro
+
+            i(PutCoro, my_coro_g('a', 'b'))
+            i(PutCoro, my_coro_g, 'a', 'b')
+
+            i(PutCoro, my_coro_a('a', 'b'))
+            i(PutCoro, my_coro_a, 'a', 'b')
+            
+            i(PutCoro, my_coro_a_implicit('a', 'b'))
+            i(PutCoro, my_coro_a_implicit, 'a', 'b')
+            
+            i(PutCoro, my_coro_a_explicit, 'a', 'b')
+            
+            i(PutCoro, my_coro_asyncio('a', 'b'))
+            i(PutCoro, cs_acoro(my_coro_asyncio), 'a', 'b')
+
+    Args:
+        coro_worker (Worker): _description_
+
+    Returns:
+        Coroutine: _description_
+    """
+    if is_async(coro_worker):
+        @wraps(coro_worker)
+        async def wrapper(*args, **kwargs):
+            if isawaitable(coro_worker):
+                return await coro_worker
+            else:
+                return await coro_worker(*args, **kwargs)
+            
+        return wrapper
+    else:
+        @wraps(coro_worker)
+        async def wrapper(*args, **kwargs):
+            from cengal.parallel_execution.coroutines.coro_standard_services.run_coro import RunCoro
+            i: Interface = current_interface()
+            return await i(RunCoro, coro_worker, *args, **kwargs)
+            
+        return wrapper
 
 
 def coro_interfaces_arg_manager(event_loop, coro_scheduler: CoroScheduler):

@@ -21,6 +21,7 @@ __all__ = ['prepare_for_composition']
 
 import ctypes
 from ctypes import wintypes
+from cengal.system import OS_TYPE
 
 
 """
@@ -32,7 +33,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.2.6"
+__version__ = "3.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -41,6 +42,9 @@ __status__ = "Development"
 
 
 def prepare_for_composition(hwnd):
+    if 'Windows' != OS_TYPE:
+        return
+    
     dwm = ctypes.windll.dwmapi
 
     # needs pointertomarginsstruct
