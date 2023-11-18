@@ -16,7 +16,8 @@
 # limitations under the License.
 
 
-__all__ = ['Instance', 'InstanceRequest', 'fast_wait', 'afast_wait']
+__all__ = ['Instance', 'InstanceRequest', 'fast_wait', 'afast_wait', 'fast_get', 'fast_set',
+           'fast_wait_explicit', 'afast_wait_explicit', 'fast_get_explicit', 'fast_set_explicit']
 
 from cengal.parallel_execution.coroutines.coro_scheduler import *
 from cengal.parallel_execution.coroutines.coro_tools.await_coro import *
@@ -41,7 +42,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -207,6 +208,19 @@ class Instance(DualImmediateProcessingServiceMixin, TypedService[Union[None, Any
 InstanceRequest.default_service_type = Instance
 
 
+def fast_wait_explicit(i: Interface, key: Union[Type, Hashable]) -> Any:
+    loop: CoroScheduler = i._loop
+    instance_service: Instance = loop.get_service_instance_fast(Instance)
+    need_to_wait: bool = False
+    try:
+        return instance_service.inline_get(key)
+    except KeyError:
+        need_to_wait = True
+    
+    if need_to_wait:
+        return i(InstanceRequest().wait(key))
+
+
 def fast_wait(key: Union[Type, Hashable]) -> Any:
     i: Interface = current_interface()
     loop: CoroScheduler = i._loop
@@ -221,6 +235,19 @@ def fast_wait(key: Union[Type, Hashable]) -> Any:
         return i(InstanceRequest().wait(key))
 
 
+async def afast_wait_explicit(i: Interface, key: Union[Type, Hashable]) -> Any:
+    loop: CoroScheduler = i._loop
+    instance_service: Instance = loop.get_service_instance_fast(Instance)
+    need_to_wait: bool = False
+    try:
+        return instance_service.inline_get(key)
+    except KeyError:
+        need_to_wait = True
+    
+    if need_to_wait:
+        return await i(InstanceRequest().wait(key))
+
+
 async def afast_wait(key: Union[Type, Hashable]) -> Any:
     i: Interface = current_interface()
     loop: CoroScheduler = i._loop
@@ -233,3 +260,29 @@ async def afast_wait(key: Union[Type, Hashable]) -> Any:
     
     if need_to_wait:
         return await i(InstanceRequest().wait(key))
+
+
+def fast_get_explicit(i: Interface, key: Union[Type, Hashable]) -> Any:
+    loop: CoroScheduler = i._loop
+    instance_service: Instance = loop.get_service_instance_fast(Instance)
+    return instance_service.inline_get(key)
+
+
+def fast_get(key: Union[Type, Hashable]) -> Any:
+    i: Interface = current_interface()
+    loop: CoroScheduler = i._loop
+    instance_service: Instance = loop.get_service_instance_fast(Instance)
+    return instance_service.inline_get(key)
+
+
+def fast_set_explicit(i: Interface, key: Union[Type, Hashable], instance: Any):
+    loop: CoroScheduler = i._loop
+    instance_service: Instance = loop.get_service_instance_fast(Instance)
+    instance_service.inline_set(key, instance)
+
+
+def fast_set(key: Union[Type, Hashable], instance: Any):
+    i: Interface = current_interface()
+    loop: CoroScheduler = i._loop
+    instance_service: Instance = loop.get_service_instance_fast(Instance)
+    instance_service.inline_set(key, instance)

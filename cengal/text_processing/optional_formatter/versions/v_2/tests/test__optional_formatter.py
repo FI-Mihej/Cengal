@@ -16,7 +16,7 @@
 # limitations under the License.
 
 import unittest
-from cengal.text_processing import OptionalFormatter, OptionalFormatterHandy
+from cengal.text_processing.optional_formatter.versions.v_2 import OptionalFormatter, OptionalFormatterHandy, IT, AK
 from enum import Enum
 
 """
@@ -28,7 +28,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -57,24 +57,24 @@ TA = TimeAttributes
 class TestOptionalFormatter(unittest.TestCase):
     def setUp(self):
         self.formatter = OptionalFormatter((TA.years, TA.months, TA.days), {
-            TA.years : ('- ', '|(years)', '%{year}%', '|.', '; '),
-            TA.months: ('- ', '|(months)', '%{1}%', '|.', '; '),
+            TA.years : IT('- ', '|(years)', '%{year}%', '|.', '; '),
+            TA.months: IT('- ', '|(months)', '%{1}%', '|.', '; '),
             TA.days  : ('- ', '|(days)', '%{}%', '|.', '; ')
         })
 
     def test_all_parameters_are_present(self):
         result = self.formatter({
-            TA.years: ((1, "2",), {'year': 4, 'some': "5"}),
-            TA.months: ((1, "2", 3, TA.months), dict()),
-            TA.days : ((1, "2", 3, TA.months), {'some': 6})
+            TA.years: AK(1, "2", year=4, some=5),
+            TA.months: AK(1, "2", 3, TA.months),
+            TA.days : AK(1, "2", 3, TA.months, some=6)
         })
         expected_result = '|(years)%4%; - %2%; - %1%|.'
         self.assertEqual(result, expected_result, 'incorrect result')
 
     def test_some_parameters_are_present(self):
         result = self.formatter({
-            TA.years: ((1, "2",), {'year': 4, 'some': "5"}),
-            TA.days : ((1, "2", 3, TA.months), {'some': 6})
+            TA.years: AK(1, "2", year=4, some=5),
+            TA.days : AK(1, "2", 3, TA.months, some=6)
         })
         expected_result = '|(years)%4%; - %1%|.'
         self.assertEqual(result, expected_result, 'incorrect result')
@@ -89,48 +89,36 @@ class TestOptionalFormatter(unittest.TestCase):
         expected_result = ''
         self.assertEqual(result, expected_result, 'incorrect result')
 
-    @unittest.expectedFailure
     def test_blank_parameters_are_present_years(self):
-        result = self.formatter({
-            TA.years: (tuple(), dict())
-        })
-        expected_result = ''
-        self.assertEqual(result, expected_result, 'incorrect result')
+        with self.assertRaises(KeyError) as cm:
+            result = self.formatter({
+                TA.years: AK()
+            })
 
-    @unittest.expectedFailure
     def test_blank_parameters_are_present_months(self):
-        result = self.formatter({
-            TA.months: (tuple(), dict())
-        })
-        expected_result = ''
-        self.assertEqual(result, expected_result, 'incorrect result')
+        with self.assertRaises(IndexError) as cm:
+            result = self.formatter({
+                TA.months: AK()
+            })
 
-    @unittest.expectedFailure
     def test_blank_parameters_are_present_days(self):
-        result = self.formatter({
-            TA.days: (tuple(), dict())
-        })
-        expected_result = ''
-        self.assertEqual(result, expected_result, 'incorrect result')
+        with self.assertRaises(IndexError) as cm:
+            result = self.formatter({
+                TA.days: AK()
+            })
 
-    @unittest.expectedFailure
     def test_wrong_parameters_are_present_1(self):
         with self.subTest('1'):
-            result = self.formatter({TA.years: (1, 2)})
-            expected_result = ''
-            self.assertEqual(result, expected_result, 'incorrect result')
+            with self.assertRaises(KeyError) as cm:
+                result = self.formatter({TA.years: AK(1, 2)})
 
-    @unittest.expectedFailure
     def test_wrong_parameters_are_present_2(self):
-        result = self.formatter({TA.months: 1})
-        expected_result = ''
-        self.assertEqual(result, expected_result, 'incorrect result')
+        with self.assertRaises(IndexError) as cm:
+            result = self.formatter({TA.months: 1})
 
-    @unittest.expectedFailure
     def test_wrong_parameters_are_present_4(self):
-        result = self.formatter(1)
-        expected_result = ''
-        self.assertEqual(result, expected_result, 'incorrect result')
+        with self.assertRaises(TypeError) as cm:
+            result = self.formatter(1)
 
 
 if __name__ == '__main__':

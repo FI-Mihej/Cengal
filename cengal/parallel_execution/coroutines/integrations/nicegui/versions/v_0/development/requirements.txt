@@ -1,1 +1,2 @@
 nicegui
+git+https://github.com/YouCannotBurnMyShadow/aioipinfo.git

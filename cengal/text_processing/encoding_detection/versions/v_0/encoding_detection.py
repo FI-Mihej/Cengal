@@ -18,6 +18,13 @@
 
 from typing import Tuple, Union
 import cchardet as chardet
+from cengal.modules_management.alternative_import import alt_import
+with alt_import('cchardet') as chardet:
+    if chardet is None:
+        CHARDET_PRESENT: bool = False
+    else:
+        CHARDET_PRESENT = True
+
 from charset_normalizer import detect as cn_detect
 from cengal.text_processing.text_processing import Text, normalize_text
 from cengal.text_processing.utf_bom_processing import *
@@ -32,7 +39,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -53,7 +60,10 @@ def detect_and_decode(text: Union[bytes, bytearray]) -> Tuple[str, str, bytes]:
     else:
         try_charset_normalizer = False
         try:
-            detection = chardet.detect(text)
+            if CHARDET_PRESENT:
+                detection = chardet.detect(text)
+            else:
+                try_charset_normalizer = True
         except LookupError:
             try_charset_normalizer = True
         

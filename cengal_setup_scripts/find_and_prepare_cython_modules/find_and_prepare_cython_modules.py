@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -37,7 +37,8 @@ __status__ = "Development"
 from typing import Dict, Tuple, Union, Iterable, List, Callable
 from cengal.system import CENGAL_IS_IN_BUILD_MODE
 from cengal.build_tools.find_and_prepare_cython_modules import find_and_prepare_cython_modules as find_and_prepare_cython_modules_orig, \
-    sdist as sdist_orig, build as build_orig, build_ext as build_ext_orig, BuildConfig as BuildConfig_orig, Distribution, \
+    sdist as sdist_orig, build as build_orig, build_ext as build_ext_orig, \
+    BuildConfig as BuildConfig_orig, Distribution, \
     find_good_packages as find_good_packages_orig, find_package_data as find_package_data_orig
 from cengal.file_system.path_manager import path_relative_to_src, RelativePath, get_relative_path_part, sep
 
@@ -47,7 +48,7 @@ MODULES_TO_IGNORE = {'cengal._template_module'}
 PYTHON_2_MODULES = {'cengal.cross_version.console_print.python2'}
 EXCLUDE_FROM_PACKAGES = [
             'tests', 'tests.*', 'multiproject', 'multiproject.*', 'examples', 'examples.*', 'docs', 'docs.*', 'benchmarks', 'benchmarks.*', 
-            'cengal.egg-info', 'cengal.egg-info.*', 'dist', '.eggs', '.idea', '.vscode',
+            'cengal.egg-info', 'cengal.egg-info.*', 'dist', '.eggs', '.idea', '.vscode', 'package',
         ]
 
 

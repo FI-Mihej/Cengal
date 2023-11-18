@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import errno
 from contextlib import contextmanager
 import shutil
 import os
@@ -33,7 +34,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -196,17 +197,20 @@ def file_list_traversal(root_dir, filter: Callable = None, remove_empty_dirpaths
 
 
 def clear_dir(full_dir_path):
-    dir_path, sub_dir_names, file_names = filtered_file_list(full_dir_path, FilteringType.off)
-    for sub_dir in sub_dir_names:
-        full_sub_dir_path = os.path.join(dir_path, sub_dir)
-        shutil.rmtree(full_sub_dir_path, ignore_errors=True)
-    for file in file_names:
-        full_file_name = os.path.join(dir_path, file)
-        os.remove(full_file_name)
+    full_dir_path = os.path.normpath(full_dir_path)
+    if (os.path.exists(full_dir_path) and os.path.isdir(full_dir_path)):
+        dir_path, sub_dir_names, file_names = filtered_file_list(full_dir_path, FilteringType.off)
+        for sub_dir in sub_dir_names:
+            full_sub_dir_path = os.path.join(dir_path, sub_dir)
+            shutil.rmtree(full_sub_dir_path, ignore_errors=True)
+        for file in file_names:
+            full_file_name = os.path.join(dir_path, file)
+            os.remove(full_file_name)
 
 
 @contextmanager
 def change_current_dir(new_current_dir):
+    new_current_dir = os.path.normpath(new_current_dir)
     cur_dir = os.getcwd()
     os.chdir(new_current_dir)
     try:
@@ -247,4 +251,19 @@ def current_src_dir(depth: Optional[int] = 1):
 def ensure_dir(dir_path):
     dir_path = os.path.normpath(dir_path)
     if not (os.path.exists(dir_path) and os.path.isdir(dir_path)):
-        os.makedirs(dir_path, exist_ok=True)
+        try:
+            os.makedirs(dir_path, exist_ok=True)
+        except OSError as er:
+            # Windows can raise spurious ENOTEMPTY errors. See https://github.com/pypa/pip/issues/6426
+            if (errno.EEXIST != er.errno) and (errno.ENOTEMPTY != er.errno):
+                raise
+
+
+def ensure_empty_dir(dir_path):
+    ensure_dir(dir_path)
+    clear_dir(dir_path)
+
+
+def dir_exists(dir_path) -> bool:
+    dir_path = os.path.normpath(dir_path)
+    return os.path.exists(dir_path) and os.path.isdir(dir_path)

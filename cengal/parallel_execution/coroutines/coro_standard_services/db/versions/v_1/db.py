@@ -16,7 +16,8 @@
 # limitations under the License.
 
 
-__all__ = ['default_env_path_and_params', 'Db', 'DbRequest', 'KeyType', 'RawKeyType', 'ValueType', 'RawValueType', 'DbId', 'DbName', 'DbKeyError']
+__all__ = ['default_env_path_and_params', 'Db', 'DbRequest', 'KeyType', 'RawKeyType', 'ValueType', 'RawValueType', 
+           'DbId', 'EnvId', 'DbName', 'DbKeyError', 'EnvInfo']
 
 from cengal.parallel_execution.coroutines.coro_scheduler import *
 from cengal.parallel_execution.coroutines.coro_scheduler.versions.v_0.coro_scheduler import ServiceRequest
@@ -56,7 +57,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -264,12 +265,13 @@ def normalize_compound_key(key: KeyType) -> NormalizedKeyType:
 
 
 class DbRequest(ServiceRequest):
-    def __init__(self, env_id: EnvId = None, db_id: DbId = None, needs_sync: bool = False):
+    def __init__(self, env_id: EnvId = None, db_id: DbId = None, needs_sync: bool = False, can_wait: bool = False):
         super().__init__()
         self.env_id: EnvId = env_id
         self.db_id: DbId = db_id
         self.needs_sync: bool = needs_sync
         self.provide_to_request_handler = True
+        self.can_wait: bool = can_wait  # TODO: implement. If True then request can wait for a next iteration in attempt to create a bunch of requests. If False then request will be processed immediately.
     
     def _copy(self) -> 'DbRequest':
         return DbRequest(self.env_id, self.db_id, self.needs_sync)
@@ -277,8 +279,8 @@ class DbRequest(ServiceRequest):
     def set_root_path_to_db_environments(self, root_path_to_db_environments: str) -> bool:
         return self._save_to_copy(0, root_path_to_db_environments)
     
-    def open_databases(self, db_ids: Set[DbId]) -> None:
-        return self._save_to_copy(1, db_ids)
+    def open_databases(self, db_ids: Set[DbId], *args, **kwargs) -> None:
+        return self._save_to_copy(1, db_ids, *args, **kwargs)
     
     def drop_db(self, db_id: DbId, delete: bool = False) -> None:
         return self._save_to_copy(2, db_id, delete)
@@ -368,8 +370,8 @@ class DbRequest(ServiceRequest):
         # On the other hand it will lock environment and all databases in it until coroutine will be finished.
         return self._save_to_copy(29, env_id, callable_or_coro)
 
-    def open_db_environment(self, env_id: EnvId, env_path: Union[None, str], *args, **kwargs) -> EnvId:
-        return self._save_to_copy(13, env_id, env_path, *args, **kwargs)
+    def open_db_environment(self, env_id: EnvId, env_path: Union[None, str], can_be_written_externally: bool, *args, **kwargs) -> EnvId:
+        return self._save_to_copy(13, env_id, env_path, can_be_written_externally, *args, **kwargs)
     
     def close_db_environment(self, env_id: EnvId) -> None:
         return self._save_to_copy(18, env_id)
@@ -516,6 +518,7 @@ class Db(Service, EntityStatsMixin):
         self.get_items_range_queue: Dict[EnvId, Dict[CoroID, Tuple[DbId, RawKeyType, RawKeyType, int, bool]]] = dict()
         # self.get_all_items_queue: List[Tuple[CoroID, DbId, EnvId]] = list()
         self.get_all_items_queue: Dict[EnvId, List[Tuple[CoroID, DbId]]] = dict()
+        self.open_db_environment_requests: Dict[CoroID, Tuple[EnvId, Union[None, str], bool, Tuple, Dict]] = dict()
         self.root_path_to_db_environments_rel: RelativePath = None
         self.app_name_waiter: CoroWrapperBase = None
         self.default_db_environment: lmdb.Environment = None
@@ -683,6 +686,23 @@ class Db(Service, EntityStatsMixin):
 
         get_items_range_queue_buff = self.get_items_range_queue
         self.get_items_range_queue = type(get_items_range_queue_buff)()
+
+        open_db_environment_requests_buff: Dict[CoroID, Tuple[EnvId, Union[None, str], bool, Tuple, Dict]] = self.open_db_environment_requests
+        self.open_db_environment_requests = type(open_db_environment_requests_buff)()
+
+        # open_db_environment
+        for coro_id, request_info in open_db_environment_requests_buff.items():
+            env_id, env_path, can_be_written_externally, args, kwargs = request_info
+            if env_id in self.db_environments:
+                self.register_response(coro_id, self.db_environments[env_id])
+            else:
+                exception = None
+                try:
+                    result = self._init_db_env(env_id, env_path, can_be_written_externally, *args, **kwargs)
+                except:
+                    exception = get_exception()
+
+                self.register_response(coro_id, result, exception)
 
         # put
         def put_handler(env_info: EnvInfo, put_info: Dict[DbId, Dict[RawKeyType, List[Union[RawValueType, RawValueInfo]]]]):
@@ -1111,6 +1131,7 @@ class Db(Service, EntityStatsMixin):
 
     def in_work(self) -> bool:
         result: bool = bool(self.default_db_environment is None) \
+                            or bool(self.open_db_environment_requests) \
                             or bool(self.get_first_queue) \
                             or bool(self.get_last_queue) \
                             or bool(self.get_n_items_queue) \
@@ -1134,7 +1155,7 @@ class Db(Service, EntityStatsMixin):
         else:
             return True, 0
 
-    def _init_db_env(self, env_id: EnvId, env_path: Union[None, str], can_be_written_externally: bool, *args, **kwargs) -> lmdb.Environment:
+    def _init_db_env(self, env_id: EnvId, env_path: Union[None, str], can_be_written_externally: bool, *args, **kwargs) -> EnvInfo:
         if env_id in self.db_environments:
             return self.db_environments[env_id]
 
@@ -1165,15 +1186,10 @@ class Db(Service, EntityStatsMixin):
         env_info: EnvInfo = self._init_db_env(None, *args, **kwargs)
         self.default_db_environment = env_info
 
-    def _on_open_db_environment(self, request: DbRequest, env_id: EnvId, env_path: Union[None, str], can_be_written_externally: bool, *args, **kwargs) -> ServiceProcessingResponse:
-        result: EnvInfo = None
-        try:
-            result = self._init_db_env(env_id, env_path, can_be_written_externally, *args, **kwargs)
-        except:
-            exception = get_exception()
-            return True, result, exception
-        
-        return True, result.env_id, None
+    def _on_open_db_environment(self, request: DbRequest, env_id: EnvId, env_path: Union[None, str], can_be_written_externally: bool, *args, **kwargs) -> Tuple[bool, EnvInfo, Exception]:
+        self.open_db_environment_requests[self.current_caller_coro_info.coro_id] = (env_id, env_path, can_be_written_externally, args, kwargs)
+        self.make_live()
+        return False, None, None
     
     @check_request
     def _on_close_db_environment(self, request: DbRequest):
@@ -1595,7 +1611,7 @@ class Db(Service, EntityStatsMixin):
         self.make_live()
         return True, result_items, None
     
-    def _on_open_databases(self, request: DbRequest, db_ids: Set[DbId]) -> ServiceProcessingResponse:
+    def _on_open_databases(self, request: DbRequest, db_ids: Set[DbId], *args, **kwargs) -> ServiceProcessingResponse:
         try:
             env_info: EnvInfo = self.db_environments[request.env_id]
         except KeyError:
@@ -1603,7 +1619,7 @@ class Db(Service, EntityStatsMixin):
             return True, None, exception
         
         for db_id in db_ids:
-            env_info.open_db(db_id)
+            env_info.open_db(db_id, *args, **kwargs)
         
         env_info.env.sync(True)
         return True, None, None

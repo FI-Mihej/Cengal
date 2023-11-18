@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -34,7 +34,7 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-__all__ = ['RunCoro']
+__all__ = ['RunCoro', 'arun_coro_fast', 'run_coro_fast', 'arun_coro', 'run_coro']
 
 from cengal.parallel_execution.coroutines.coro_scheduler import *
 from cengal.introspection.inspect import get_exception, get_exception_tripple
@@ -87,3 +87,37 @@ class RunCoro(ServiceWithADirectRequestMixin, TypedService[Any]):
         self.results[coro.coro_id] = (coro.last_result, coro.exception)
         self.make_live()
         return True
+
+
+async def arun_coro_fast(i: Interface, coro_worker: AnyWorker, *args, **kwargs) -> Any:
+    coro_type: CoroType = find_coro_type(coro_worker)
+    if CoroType.awaitable == coro_type:
+        return await coro_worker(i, *args, **kwargs)
+    else:
+        return await i(RunCoro, coro_worker, *args, **kwargs)
+
+
+def run_coro_fast(i: Interface, coro_worker: AnyWorker, *args, **kwargs) -> Any:
+    coro_type: CoroType = find_coro_type(coro_worker)
+    if CoroType.greenlet == coro_type:
+        return coro_worker(i, *args, **kwargs)
+    else:
+        return i(RunCoro, coro_worker, *args, **kwargs)
+
+
+async def arun_coro(coro_worker: AnyWorker, *args, **kwargs) -> Any:
+    i: Interface = current_interface()
+    coro_type: CoroType = find_coro_type(coro_worker)
+    if CoroType.awaitable == coro_type:
+        return await coro_worker(i, *args, **kwargs)
+    else:
+        return await i(RunCoro, coro_worker, *args, **kwargs)
+
+
+def run_coro(coro_worker: AnyWorker, *args, **kwargs) -> Any:
+    i: Interface = current_interface()
+    coro_type: CoroType = find_coro_type(coro_worker)
+    if CoroType.greenlet == coro_type:
+        return coro_worker(i, *args, **kwargs)
+    else:
+        return i(RunCoro, coro_worker, *args, **kwargs)

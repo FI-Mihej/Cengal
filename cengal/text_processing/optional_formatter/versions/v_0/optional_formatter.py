@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -75,7 +75,7 @@ class OptionalFormatterHandy(OptionalFormatter):
     Example:
         f = OptionalFormatterHandy('hour', 'word', 'minute', 'second', 'millisecond',
                                    hour=('', '|(hours)', '{}', '|', ''),
-                                   hour=('', '|(word)', '-"{}"-', '|', ''),
+                                   word=('', '|(word)', '-"{}"-', '|', ''),
                                    minutes=(':', '|(minutes)', '{}', '|', ''),
                                    seconds=(':', '|(seconds)', '{}', '|', ''),
                                    millisecond=('.', '|(millisecond)', '{}', '|', ''))
@@ -86,7 +86,7 @@ class OptionalFormatterHandy(OptionalFormatter):
         f(hour=((0,), dict()), minutes=((15,), dict()), seconds=((54,), dict()), millisecond=((0,), dict()))
         >> |(hours)0:15:54.0|
 
-        f(hour=minutes=((15,), dict()), seconds=((54,), dict()))
+        f(minutes=((15,), dict()), seconds=((54,), dict()))
         >> |(minutes)15:54|
 
         f(word=(('HELLO!',), dict()), hour=((4,), dict()), minutes=((15,), dict()), seconds=((54,), dict()), millisecond=((341,), dict()))

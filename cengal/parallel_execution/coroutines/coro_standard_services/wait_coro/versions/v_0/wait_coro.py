@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -34,7 +34,7 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-__all__ = ['WaitCoro', 'PutSingleCoroParams', 'PSCP', 'WaitCoroRequest', 'CoroutineNotFoundError']
+__all__ = ['WaitCoro', 'PutSingleCoroParams', 'PSCP', 'WaitCoroRequest', 'CoroutineNotFoundError', 'SubCoroutineNotFoundError', 'TimeoutError', 'SubTimeoutError']
 
 from cengal.parallel_execution.coroutines.coro_scheduler import *
 from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import PutCoro
@@ -359,7 +359,7 @@ class PutListMethod(ServiceRequestMethodMixin):
                         del self.called_by[coro_id]
                         index = self.coro_indexes[requester_id][coro_id]
                         del self.coro_indexes[requester_id][coro_id]
-                        self.caller_results[requester_id][index] = (coro_id, None, coro.exception)
+                        self.caller_results[requester_id][index] = (coro_id, None, coro.exception)  # TODO: should return TimeoutError exception instead
                         if kill_on_timeout:
                             kill_coro_on(get_interface_and_loop_with_explicit_loop(self.service._loop), coro_id, tree)
 

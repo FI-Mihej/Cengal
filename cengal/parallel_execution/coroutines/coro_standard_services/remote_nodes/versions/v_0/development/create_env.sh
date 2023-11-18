@@ -18,4 +18,13 @@ cd $WORKDIR/venv/bin
 source activate
 
 cd $WORKDIR
-pip install -r ./requirements.txt
+
+requirements_txt=./requirements.txt
+if [ -f "$requirements_txt" ]; then
+    pip install -r $requirements_txt
+fi
+
+requirements_py=./__requirements__.py
+if [ -f "$requirements_py" ]; then
+    python $requirements_py
+fi

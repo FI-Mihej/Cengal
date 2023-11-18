@@ -16,7 +16,8 @@
 # limitations under the License.
 
 
-__all__ = ['start_admin', 'cs_init']
+__all__ = ['start_admin', 'cs_init', 'SchedulerPerformanceFormatter', 'scheduler_stats_aggregator_provider', 'CSStatsFormatterMultiprocess',
+           'CorosLogsProvider', 'CoroLogsAppendFormatter', 'CoroLogsAppendFormatterParts']
 
 
 """
@@ -28,7 +29,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -56,6 +57,7 @@ from cengal.parallel_execution.coroutines.coro_standard_services.fast_aggregator
 from cengal.parallel_execution.coroutines.coro_standard_services.log import *
 from cengal.parallel_execution.coroutines.coro_standard_services.instance import InstanceRequest
 from cengal.parallel_execution.coroutines.coro_tools.coro_flow_control import graceful_coro_destroyer, agraceful_coro_destroyer, GracefulCoroDestroy
+from cengal.parallel_execution.coroutines.coro_tools.lock import Lock
 from cengal.statistics.normal_distribution import average
 from cengal.parallel_execution.multiprocess.multiprocessing_task_runner import *
 from cengal.text_processing.text_processing import normalize_line_separators_and_tabs
@@ -68,6 +70,8 @@ from cengal.user_interface.gui.tkinter.components.aggregator_view import *
 from cengal.math.numbers import RationalNumber
 from cengal.code_flow_control.args_manager import args_kwargs_to_str, ArgsKwargs
 from greenlet import GreenletExit
+from enum import IntFlag, auto
+from uuid import uuid4
 
 
 command_executor_aggregator_view_key = 'command_executor_aggregator'
@@ -286,6 +290,7 @@ class CSStatsFormatterMultiprocess:
             'filtered_paths': self.filtered_paths
         }
         
+        self.worker_lock: Lock = Lock(f'CSStatsFormatterMultiprocess.worker__{uuid4()}')
         self.worker: SubprocessWorker = SubprocessWorker(settings)
         self.worker.start(wait_for_process_readyness=False)
         self.worker_is_ready: bool = False
@@ -294,7 +299,9 @@ class CSStatsFormatterMultiprocess:
         need_to_wait = True
         while need_to_wait:
             try:
-                self.worker.wait_for_subprocess_readines(block=False)
+                async with self.worker_lock:
+                    self.worker.wait_for_subprocess_readines(block=False)
+
                 need_to_wait = False
             except SubprocessIsNotReadyError:
                 await i(Sleep, 0.1)
@@ -305,8 +312,12 @@ class CSStatsFormatterMultiprocess:
         while not self.worker_is_ready:
             await i(Sleep, 0.1)
     
-    def start(self, wr: TkObjWrapper):
-        wr.put_coro(self._worker_readyness_waiting_coro)
+    def start(self, wr: Optional[TkObjWrapper] = None):
+        if wr is None:
+            i = current_interface()
+            i(PutCoro, self._worker_readyness_waiting_coro)
+        else:
+            wr.put_coro(self._worker_readyness_waiting_coro)
     
     def stop(self):
         self._stop = True
@@ -316,49 +327,53 @@ class CSStatsFormatterMultiprocess:
         except:
             need_to_block = True
         
-        if need_to_block:
-            self.worker.stop()
-        else:
-            run_in_thread_pool_fast(i, self.worker.stop)
+        with self.worker_lock:
+            if need_to_block:
+                self.worker.stop()
+            else:
+                run_in_thread_pool_fast(i, self.worker.stop)
         
     def update_filtered_paths(self, filtered_paths: List[Sequence[str]]):
         i: Interface = current_interface()
         self.filtered_paths = filtered_paths
-        self.worker.send_data_to_subprocess({
-            'type': 'filter',
-            'data': self.filtered_paths
-        })
+        with self.worker_lock:
+            if not self._stop:
+                self.worker.send_data_to_subprocess({
+                    'type': 'filter',
+                    'data': self.filtered_paths
+                })
     
     def __call__(self, data):
-        if not self.worker_is_ready:
-            # return data
-            return '<<Waiting for subprocess to start...>>'
-        
-        i: Interface = current_interface()
-        self.worker.send_data_to_subprocess({
-            'type': 'data',
-            'data': data
-        })
-        result = None
-        got_result = False
-        while (not got_result) and (not self._stop):
-            try:
-                result = self.worker.get_answer_from_subprocess(block=False)
-            except Empty:
-                pass
-            else:
-                got_result = True
+        with self.worker_lock:
+            if not self.worker_is_ready:
+                # return data
+                return '<<Waiting for subprocess to start...>>'
             
-            if got_result:
-                if 'data' != result['type']:
-                    got_result = False
+            i: Interface = current_interface()
+            self.worker.send_data_to_subprocess({
+                'type': 'data',
+                'data': data
+            })
+            result = None
+            got_result = False
+            while (not got_result) and (not self._stop):
+                try:
+                    result = self.worker.get_answer_from_subprocess(block=False)
+                except Empty:
+                    pass
+                else:
+                    got_result = True
+                
+                if got_result:
+                    if 'data' != result['type']:
+                        got_result = False
+                
+                if not got_result:
+                    i(Sleep, 0.01)
             
-            if not got_result:
-                i(Sleep, 0.01)
-        
-        result = result['data']
-        result = f'{i.coro_id}. CoroScheduler stats:\n{result}'
-        return result
+            result = '' if result is None else result['data']
+            result = f'{i.coro_id}. CoroScheduler stats:\n{result}'
+            return result
     
     @staticmethod
     def process_initializer(init_data) -> Any:
@@ -431,10 +446,24 @@ class CorosMaxExecutionTimesProvider:
         return self._formatter('Coros Lifetime Max Execution Times', data)
 
 
+class CoroLogsAppendFormatterParts(IntFlag):
+    none = 0
+    prompt_string = auto()
+    time = auto()
+    caller_info = auto()
+    logging_level = auto()
+    log = auto()
+    coros_traceback = auto()
+    file_name_and_line_number = auto()
+    traceback = auto()
+    all = prompt_string | time | caller_info | logging_level | log | coros_traceback | file_name_and_line_number | traceback
+
+
 class CoroLogsAppendFormatter(AggregatorAppendFormatter):
-    def __init__(self, initial_text: str) -> None:
+    def __init__(self, initial_text: str, desired_parts: CoroLogsAppendFormatterParts = CoroLogsAppendFormatterParts.all) -> None:
         super().__init__(initial_text)
         self._prompt_string: str = f'>>> {"-"*80}'
+        self.desired_parts: CoroLogsAppendFormatterParts = desired_parts
 
     def __call__(self, data: List[Tuple[Tuple, Dict, Dict[str, Any]]]) -> Any:
         if data:
@@ -448,24 +477,37 @@ class CoroLogsAppendFormatter(AggregatorAppendFormatter):
             return f'{self._prompt_string}\n{args_kwargs_to_str(args, kwargs)}'
         else:
             output_strings: List[str] = list()
-            output_strings.append(self._prompt_string)
-            output_strings.append(f'> Time: {info[InfoFields.current_time]}; Perf Counter: {info[InfoFields.perf_counter_time]:17.6f}')
-            output_strings.append(f'> λ: {info[InfoFields.caller_info]}')
-            if InfoFields.logging_level in info:
-                output_strings.append(f'> Logging level: {info[InfoFields.logging_level]}')
+            if CoroLogsAppendFormatterParts.prompt_string in self.desired_parts:
+                output_strings.append(self._prompt_string)
+
+            if CoroLogsAppendFormatterParts.time in self.desired_parts:
+                output_strings.append(f'> Time: {info[InfoFields.current_time]}; Perf Counter: {info[InfoFields.perf_counter_time]:17.6f}')
+
+            if CoroLogsAppendFormatterParts.caller_info in self.desired_parts:
+                output_strings.append(f'> λ: {info[InfoFields.caller_info]}')
+
+            if CoroLogsAppendFormatterParts.logging_level in self.desired_parts:
+                if InfoFields.logging_level in info:
+                    output_strings.append(f'> Logging level: {info[InfoFields.logging_level]}')
             
-            output_strings.append(args_kwargs_to_str(args, kwargs))
-            coro_parents_strings: List[str] = info[InfoFields.coro_parents_strings]
-            if coro_parents_strings:
-                coro_parents_text: str = '\n'.join(coro_parents_strings)
-                output_strings.append(f'> Coros traceback:\n{coro_parents_text}')
+            if CoroLogsAppendFormatterParts.log in self.desired_parts:
+                output_strings.append(args_kwargs_to_str(args, kwargs))
+
+            if CoroLogsAppendFormatterParts.coros_traceback in self.desired_parts:
+                coro_parents_strings: List[str] = info[InfoFields.coro_parents_strings]
+                if coro_parents_strings:
+                    coro_parents_text: str = '\n'.join(coro_parents_strings)
+                    output_strings.append(f'> Coros traceback:\n{coro_parents_text}')
             
-            output_strings.append(f'> @ {info[InfoFields.file_name]}:{info[InfoFields.line_number]}')
-            traceback_strings: List[str] = info[InfoFields.traceback_strings]
-            if traceback_strings:
-                traceback_text: str = '\n'.join(traceback_strings)
-                traceback_text = traceback_text.strip('\n')
-                output_strings.append(f'> Traceback:\n{traceback_text}')
+            if CoroLogsAppendFormatterParts.file_name_and_line_number in self.desired_parts:
+                output_strings.append(f'> @ {info[InfoFields.file_name]}:{info[InfoFields.line_number]}')
+
+            if CoroLogsAppendFormatterParts.traceback in self.desired_parts:
+                traceback_strings: List[str] = info[InfoFields.traceback_strings]
+                if traceback_strings:
+                    traceback_text: str = '\n'.join(traceback_strings)
+                    traceback_text = traceback_text.strip('\n')
+                    output_strings.append(f'> Traceback:\n{traceback_text}')
             
             return '\n'.join(output_strings)
 
@@ -493,7 +535,7 @@ class CorosLogsProvider:
     
     def stop(self):
         self._stop = True
-        self.i(PutCoro, self._force_stop)
+        current_interface()(PutCoro, self._force_stop)
     
     async def _force_stop(self, i: Interface):
         if self._update_coro_id is not None:
@@ -557,11 +599,11 @@ class CorosLogsProvider:
 
 
 class SchedulerPerformanceFormatter:
-    def __init__(self, external_items_key: Hashable, internal_items_key: Hashable, lifetime_stats_key: Hashable, stats_key: Hashable, window_size: int):
-        self.external_items_key: Hashable = external_items_key
-        self.internal_items_key: Hashable = internal_items_key
-        self.lifetime_stats_key: Hashable = lifetime_stats_key
-        self.stats_key: Hashable = stats_key
+    def __init__(self, loop_iteration_delta_times_key: Hashable, loop_iteration_delta_times_lifetime_stats_key: Hashable, loop_iteration_delta_times_stats_key: Hashable, window_size: int):
+        self.external_items_key: Hashable = loop_iteration_delta_times_key
+        self.internal_items_key: Hashable = f'internal_scheduler_tdelta__{uuid4()}'
+        self.lifetime_stats_key: Hashable = loop_iteration_delta_times_lifetime_stats_key
+        self.stats_key: Hashable = loop_iteration_delta_times_stats_key
         self.window_size: int = window_size
         self.fac = FastAggregatorClient()
         self.i: Interface = None
@@ -577,6 +619,7 @@ class SchedulerPerformanceFormatter:
         settings.working_function = self.process_worker
         settings.transport = Transport.queue
         settings.sendable_data_type = SendableDataType.marshalable
+        self.worker_lock: Lock = Lock(f'SchedulerPerformanceFormatter.worker__{uuid4()}')
         self.worker: SubprocessWorker = SubprocessWorker(settings)
         self.worker.start(wait_for_process_readyness=False)
         self.worker_is_ready: bool = False
@@ -585,7 +628,9 @@ class SchedulerPerformanceFormatter:
         need_to_wait = True
         while need_to_wait:
             try:
-                self.worker.wait_for_subprocess_readines(block=False)
+                async with self.worker_lock:
+                    self.worker.wait_for_subprocess_readines(block=False)
+                
                 need_to_wait = False
             except SubprocessIsNotReadyError:
                 await i(Sleep, 0.1)
@@ -600,14 +645,14 @@ class SchedulerPerformanceFormatter:
         if self.i is None:
             self.i = current_interface()
         
-        if wr:
-            wr.put_coro(self._worker_readyness_waiting_coro)
-            wr.put_coro(self._update)
-            wr.put_coro(self._update_stats)
-        else:
+        if wr is None:
             self.i(PutCoro, self._worker_readyness_waiting_coro)
             self.i(PutCoro, self._update)
             self.i(PutCoro, self._update_stats)
+        else:
+            wr.put_coro(self._worker_readyness_waiting_coro)
+            wr.put_coro(self._update)
+            wr.put_coro(self._update_stats)
     
     def stop(self):
         self._stop = True
@@ -617,10 +662,11 @@ class SchedulerPerformanceFormatter:
         except:
             need_to_block = True
         
-        if need_to_block:
-            self.worker.stop()
-        else:
-            run_in_thread_pool_fast(i, self.worker.stop)
+        with self.worker_lock:
+            if need_to_block:
+                self.worker.stop()
+            else:
+                run_in_thread_pool_fast(i, self.worker.stop)
     
     def _update(self, i: Interface):
         i(RunCoro, self.wait_for_worker_readyness)
@@ -679,21 +725,22 @@ class SchedulerPerformanceFormatter:
             i(Sleep, 0.2)
     
     def compute_stats(self, i: Interface, data):
-        self.worker.send_data_to_subprocess(data)
-        result = None
-        got_result = False
-        while not got_result:
-            try:
-                result = self.worker.get_answer_from_subprocess(block=False)
-            except Empty:
-                pass
-            else:
-                got_result = True
-            
-            if not got_result:
-                i(Sleep, 0.005)
-            
-        return result
+        with self.worker_lock:
+            self.worker.send_data_to_subprocess(data)
+            result = None
+            got_result = False
+            while not got_result:
+                try:
+                    result = self.worker.get_answer_from_subprocess(block=False)
+                except Empty:
+                    pass
+                else:
+                    got_result = True
+                
+                if not got_result:
+                    i(Sleep, 0.005)
+                
+            return result
     
     @staticmethod
     def process_initializer(init_data):
@@ -703,7 +750,8 @@ class SchedulerPerformanceFormatter:
     def process_worker(global_data, data):
         from cengal.statistics.normal_distribution import count_99_95_68
         val_99, val_95, val_68, max_deviation, min_deviation = count_99_95_68(data)
-        iter_per_sec = 1 / average(data)
+        average_data = average(data)
+        iter_per_sec = 0 if 0 == average_data else (1 / average_data)
         return (iter_per_sec, val_99, val_95, val_68, max_deviation, min_deviation)
         
     @staticmethod
@@ -839,7 +887,7 @@ class Application(ttkb.Window):
         self.scheduler_stats_help_button = ttkb.Button(self.scheduler_stats_control_frame, text=self.scheduler_stats_help_button_text, width=self.scheduler_stats_help_button_text_len, bootstyle="info", command=self.scheduler_stats_help_button_on_click)
         self.scheduler_stats_help_button_tooltip = ToolTipHovered(self.scheduler_stats_help_button, 'Console description and help')
 
-        self.coro_scheduler_view = AggregatorView(False, False, 'coro scheduler stats', 1, self.sfmp, 25, 23, self.scheduler_stats_frame)
+        self.coro_scheduler_view = AggregatorView(False, False, 'coro_scheduler_stats', 1, self.sfmp, 25, 23, self.scheduler_stats_frame)
 
         self.coro_logs_formatter: CoroLogsAppendFormatter = CoroLogsAppendFormatter('Coro Logs')
         self.coro_logs_provider: CorosLogsProvider = CorosLogsProvider('coro scheduler logs', None, 0.25)
@@ -853,10 +901,10 @@ class Application(ttkb.Window):
         
         self.coros_max_execution_times = AggregatorView(False, False, 'coros max execution times', 0.75, self.cmet.stats_formatter, 25, 13, self)
         
-        self.spf = SchedulerPerformanceFormatter('scheduler tdelta', 'internal scheduler tdelta', 'scheduler lifetime stats', 'scheduler stats', 5000)
+        self.spf = SchedulerPerformanceFormatter('loop_iteration_delta_times', 'loop_iteration_delta_times_lifetime_stats', 'loop_iteration_delta_times_stats', 5000)
         
         self.scheduler_tdelta_formatter = AggregatorAppendFormatter('Scheduler TDelta')
-        self.scheduler_tdelta = AggregatorView(True, False, 'scheduler tdelta', 0.1, self.scheduler_tdelta_formatter, 22, 13, self)
+        self.scheduler_tdelta = AggregatorView(True, False, 'loop_iteration_delta_times', 0.1, self.scheduler_tdelta_formatter, 22, 13, self)
         self.scheduler_tdelta.default_auto_scroll = False
         self.scheduler_tdelta.max_len = 1000
         
@@ -871,9 +919,9 @@ class Application(ttkb.Window):
         self.command_executor_aggregator_append_view.max_len = 5000
         FastAggregatorClient()(command_executor_aggregator_append_view_key, str())
 
-        self.scheduler_lifetime_stats = AggregatorView(False, False, 'scheduler lifetime stats', 0.3, self.spf.lifetime_stats_formatter, 36, 5, self)
+        self.scheduler_lifetime_stats = AggregatorView(False, False, 'loop_iteration_delta_times_lifetime_stats', 0.3, self.spf.lifetime_stats_formatter, 36, 5, self)
         
-        self.scheduler_stats = AggregatorView(False, False, 'scheduler stats', 0.3, self.spf.stats_formatter, 36, 7, self)
+        self.scheduler_stats = AggregatorView(False, False, 'loop_iteration_delta_times_stats', 0.3, self.spf.stats_formatter, 36, 7, self)
 
         self.pack_children(self.current_children_pack_type)
 
@@ -1061,7 +1109,7 @@ def coro_scheduler_admin__view(i: Interface, on_close: Optional[AnyWorker] = Non
         i(RunCoro, on_close)
 
 
-def scheduler_stats_aggregator_provider(i: Interface):
+def scheduler_stats_aggregator_provider(i: Interface, fac_key: str = 'coro_scheduler_stats'):
     cs: CoroScheduler = i._loop
     fac = FastAggregatorClient()
     while True:
@@ -1069,7 +1117,7 @@ def scheduler_stats_aggregator_provider(i: Interface):
         result = dict()
         name, stats = cs.get_entity_stats(stats_level)
         result[name] = stats
-        fac('coro scheduler stats', result)
+        fac(fac_key, result)
         i(Sleep, 0.5)
 
 

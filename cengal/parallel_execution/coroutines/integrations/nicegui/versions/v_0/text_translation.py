@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -36,6 +36,8 @@ __status__ = "Development"
 
 from cengal.parallel_execution.coroutines.coro_scheduler import Interface, current_interface, CoroID
 from nicegui.elements.mixins.text_element import TextElement
+from nicegui.elements.select import Select
+from nicegui.elements.tabs import Tab
 from cengal.text_processing.text_translator import TranslationLanguageId, TextEntityId, TextTranslator, TranslationLanguageChooser, \
     TranslationLanguageMapper, TranslatableText, tt, TranslateMe, TMe, tme, TranslatableTextElement, TTE
 from cengal.introspection.inspect import is_callable
@@ -55,11 +57,27 @@ class NiceguiTranslatableTextElement(TranslatableTextElement[TextElement]):
         if text_element is None:
             return None
         
-        if isinstance(text_element.text, TranslateMe):
-            if text_element.text:
-                self.elements_and_their_translatable_text[text_element] = text_element.text
-            
-            text_element.text = text_element.text.to_str(self.text_translator, self.text_translation_language_chooser.end_lang)
+        if isinstance(text_element, TextElement):
+            if isinstance(text_element.text, TranslateMe):
+                if text_element.text:
+                    self.elements_and_their_translatable_text[text_element] = text_element.text
+                
+                text_element.text = text_element.text.to_str(self.text_translator, self.text_translation_language_chooser.end_lang)
+        elif isinstance(text_element, Select):
+            if 'label' in text_element._props:
+                text: TranslateMe = text_element._props['label']
+                if isinstance(text, TranslateMe):
+                    if text:
+                        self.elements_and_their_translatable_text[text_element] = text
+                    
+                    text_element._props['label'] = text.to_str(self.text_translator, self.text_translation_language_chooser.end_lang)
+        elif isinstance(text_element, Tab):
+            text: TranslateMe = text_element._props['label']
+            if isinstance(text, TranslateMe):
+                if text:
+                    self.elements_and_their_translatable_text[text_element] = text
+                
+                text_element._props['label'] = text.to_str(self.text_translator, self.text_translation_language_chooser.end_lang)
         
         return text_element
 

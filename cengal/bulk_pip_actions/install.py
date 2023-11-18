@@ -32,7 +32,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -112,22 +112,33 @@ def _filtered_file_list_traversal(root_dir, filtering_type, extentions_set=None,
     return result_list
 
 
+# def pip_install(name_or_path):
+#     command_line = None
+#     pip_name = None
+#     if 'nt' == os.name:
+#         path_to_interpreter = sys.executable
+#         interpreter_root_dir_name = os.path.dirname(path_to_interpreter)
+#         path_to_pip = os.path.join(interpreter_root_dir_name, 'Scripts', 'pip.exe')
+#         pip_name_template = '"{}"'
+#         pip_name = pip_name_template.format(path_to_pip)
+#     else:
+#         if '2' == PYTHON_VERSION[0]:
+#             pip_name = 'pip'
+#         elif '3' == PYTHON_VERSION[0]:
+#             pip_name = 'pip3'
+#     command_line_template = '{pip_name} install --upgrade {package_name_or_path}'
+#     command_line = command_line_template.format(pip_name=pip_name, package_name_or_path=name_or_path)
+#     os.system(command_line)
+
+
 def pip_install(name_or_path):
-    command_line = None
-    pip_name = None
+    path_to_interpreter = sys.executable
     if 'nt' == os.name:
-        path_to_interpreter = sys.executable
-        interpreter_root_dir_name = os.path.dirname(path_to_interpreter)
-        path_to_pip = os.path.join(interpreter_root_dir_name, 'Scripts', 'pip.exe')
-        pip_name_template = '"{}"'
-        pip_name = pip_name_template.format(path_to_pip)
-    else:
-        if '2' == PYTHON_VERSION[0]:
-            pip_name = 'pip'
-        elif '3' == PYTHON_VERSION[0]:
-            pip_name = 'pip3'
-    command_line_template = '{pip_name} install --upgrade {package_name_or_path}'
-    command_line = command_line_template.format(pip_name=pip_name, package_name_or_path=name_or_path)
+        path_to_interpreter_template = '"{}"'
+        path_to_interpreter = path_to_interpreter_template.format(path_to_interpreter)
+
+    command_line_template = '{path_to_interpreter} -m pip install --upgrade {package_name_or_path}'
+    command_line = command_line_template.format(path_to_interpreter=path_to_interpreter, package_name_or_path=name_or_path)
     os.system(command_line)
 
 

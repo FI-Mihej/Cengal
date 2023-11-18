@@ -15,36 +15,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unittest
-from cengal.time_management.relative_time.approximate_representation import ApproximateTimeRepresentation
 
 """
 Module Docstring
 Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
+
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
 __status__ = "Development"
 # __status__ = "Production"
-class TestApproximateTimeRepresentation(unittest.TestCase):
-    def test_all_parameters_are_present(self):
-        tr = ApproximateTimeRepresentation(3.045678, crop=False)
-        tr_res = tr.format()
-        print(tr_res)
-        tr_res = tr.format_cropped()
-        print(tr_res)
-        tr_res = str(tr)
-        print(tr_res)
-        expected_result = '|(years)%4%; - %2%; - %1%|.'
-        self.assertEqual(1, 1, 'incorrect result')
 
 
-if __name__ == '__main__':
-    unittest.main()
+from cengal.hardware.info.cpu.versions.v_1 import *

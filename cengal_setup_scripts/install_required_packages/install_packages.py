@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -75,7 +75,6 @@ class PyPiModules(ModulesLists):
 
             # ==================
             # OPTIONAL PACKAGES:
-            'msgpack-python',
         ]
 
         self.cpython3 = [
@@ -83,7 +82,6 @@ class PyPiModules(ModulesLists):
 
             # ==================
             # OPTIONAL PACKAGES:
-            'msgpack-python',
         ]
 
         self.pypy2 = [
@@ -174,22 +172,22 @@ class PyPiModules(ModulesLists):
             # ==================
             # OPTIONAL PACKAGES:
             'simplejson',
-            'pyasn1',  # already preinstalled in Ubuntu 14.04 x64
+            # 'pyasn1',  # already preinstalled in Ubuntu 14.04 x64
             'cbor',
             'cbor2',
             'ujson',
             'orjson',
-            'python3-dtls',
             'cloudpickle',
+            'python3-dtls',
             'psutil',
             'ttkbootstrap',
             'pprintpp'
         ]
 
-        self.windows_allowed = {
-            # 'pyinstaller',
-            # 'pywin32',
-        }
+        # self.windows_allowed = {
+        #     # 'pyinstaller',
+        #     # 'pywin32',
+        # }
 
         self.windows_forbidden = {
             'virtualenv',
@@ -226,10 +224,23 @@ class PyPiModules(ModulesLists):
         if (PYTHON_VERSION_INT[:3] < (3, 5, 0)):
             self.universal.insert(0, 'typing')  # for pypy3 and Python2 only: it is backport from python35
         
+        if (PYTHON_VERSION_INT[:3] < (3, 8, 0)):
+            self.cpython2.insert(0, 'msgpack-python')
+            self.cpython3.insert(0, 'msgpack-python')
+        
+        if (PYTHON_VERSION_INT[:3] >= (3, 8, 0)):
+            self.cpython2.insert(0, 'msgpack')
+            self.cpython3.insert(0, 'msgpack')
+        
         if (PYTHON_VERSION_INT[:3] < (3, 11, 1)):
-            self.universal.insert(0, 'charset_normalizer')  # 2023.01.27: 3.11.1 is not supported yet: error: longintrepr.h: No such file or directory
             self.universal.insert(0, 'cchardet')  # 2023.01.27: 3.11.1 is not supported yet: error: longintrepr.h: No such file or directory
             self.universal.insert(0, 'http-parser')  # 2023.01.27: 3.11.1 is not supported yet: error: longintrepr.h: No such file or directory
+        
+        if (PYTHON_VERSION_INT[:3] < (3, 13, 0)):
+            self.universal.insert(0, 'charset_normalizer')  # 2023.11.16: 3.12 is declared to be supported. Testing required
+        
+        if (PYTHON_VERSION_INT[:3] >= (3, 12, 0)):
+            self.windows_allowed.add('patch-ng')  # `Exception: Building py-lmdb from source on Windows requires the "patch-ng" python module.`. 2023.11.18: py-lmdb does not support 3.12 yet. Testing required
 
 
 class ExternalGitModules(ModulesLists):
@@ -299,13 +310,13 @@ def install_bundled(args=None):
 
 
 def get_pypi_requirements_list() -> List[str]:
-    pypi_modules: List[str] = PyPiModules()
+    pypi_modules: PyPiModules = PyPiModules()
     return pypi_modules.chosen_packages()
 
 
 def get_remote_requirements_list() -> List[str]:
     result: List[str] = list()
-    pypi_modules = PyPiModules()
+    pypi_modules: PyPiModules = PyPiModules()
     result.extend(pypi_modules.chosen_packages())
     external_git_modules = ExternalGitModules()
     result.extend(external_git_modules.chosen_packages())
@@ -316,7 +327,7 @@ def main(args=None):
     if args is None:
         args = sys.argv[1:]
 
-    all_modules = [
+    all_modules: List[ModulesLists] = [
         PyPiModules(),
         ExternalGitModules(),
         ZipModules(),

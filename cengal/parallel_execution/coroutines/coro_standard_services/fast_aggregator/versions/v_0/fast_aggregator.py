@@ -24,7 +24,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -117,9 +117,9 @@ class FastAggregator(DualImmediateProcessingServiceMixin, TypedService[Any]):
             self.requester_by_key[key] = deque()
         
         if (not queued) and (self.requester_by_key[key]):
-            self.requester_by_key[key][0].add(self.current_caller_coro_info().coro_id)
+            self.requester_by_key[key][0].add(self.current_caller_coro_info.coro_id)
         else:
-            self.requester_by_key[key].append({self.current_caller_coro_info().coro_id})
+            self.requester_by_key[key].append({self.current_caller_coro_info.coro_id})
 
         self.make_live()
         return False, None, None

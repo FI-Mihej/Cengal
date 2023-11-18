@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -860,6 +860,9 @@ class CoroSchedulerBase(Iterable, EntityStatsMixin):
         self.sliding_window = deque(maxlen=1000)
         self.need_to_log_loop_start_and_end: bool = True
         self.on_destroyed_handlers: Set[Callable] = set()
+        self._coroutines_can_switch_directly: bool = False
+        self._next_coroutine: Optional[CoroWrapperBase] = None
+        self._is_current_coro_was_new_born: Union[bool, None] = None
 
     def get_entity_stats(self, stats_level: 'EntityStatsMixin.StatsLevel' = EntityStatsMixin.StatsLevel.debug) -> Tuple[str, Dict[str, Any]]:
         if EntityStatsMixin.StatsLevel.info == stats_level:
@@ -1027,18 +1030,24 @@ class CoroSchedulerBase(Iterable, EntityStatsMixin):
         return self.make_service_dead_impl(self.services_impostrors.get(service_type, service_type))
 
     def set_coro_time_measurement(self, need_to_measure_coro_time: bool):
+        previous_value = self.need_to_measure_coro_time
         self.need_to_measure_coro_time = need_to_measure_coro_time
         if need_to_measure_coro_time:
             self.get_coro_start_time = perf_counter
         else:
             self.get_coro_start_time = self._fake_perf_counter
+        
+        return previous_value
 
     def set_coro_history_gathering(self, need_to_gather_coro_history: bool):
+        previous_value = self.need_to_gather_coro_history
         self.need_to_gather_coro_history = need_to_gather_coro_history
         if need_to_gather_coro_history:
             self.coro_history_gatherer = self._default_coro_history_gatherer
         else:
             self.coro_history_gatherer = self._fake_method
+        
+        return previous_value
     
     def _default_coro_history_gatherer(self, original_worker: Callable, coro_wrapper: 'CoroWrapperBase'):
         coro_id: CoroID = coro_wrapper.coro_id
@@ -1052,11 +1061,14 @@ class CoroSchedulerBase(Iterable, EntityStatsMixin):
         self.coro_workers_history[original_worker].add(coro_id)
 
     def set_loop_iteration_time_measurement(self, need_to_measure_loop_iteration_time: bool):
+        previous_value = self.need_to_measure_loop_iteration_time
         self.need_to_measure_loop_iteration_time = need_to_measure_loop_iteration_time
         if need_to_measure_loop_iteration_time:
             self.get_loop_iteration_start_time = perf_counter
         else:
             self.get_loop_iteration_start_time = self._fake_perf_counter
+        
+        return previous_value
     
     def _new_coro_type_normalizer(self, coro_type: Optional[CoroType]) -> CoroType:
         raise NotImplementedError
@@ -1215,7 +1227,7 @@ class CoroSchedulerBase(Iterable, EntityStatsMixin):
         return True
     
     
-    def process_coro_exit_status(self, coro: 'CoroWrapperBase', coro_exit_status: 'CoroExitStatus'):
+    def process_coro_exit_status(self, coro: 'CoroWrapperBase', coro_exit_status: Optional['CoroExitStatus']):
         try:
             if coro_exit_status is None:
                 self._run_global_on_coro_del_handlers(coro)
@@ -1601,7 +1613,17 @@ class CoroSchedulerBase(Iterable, EntityStatsMixin):
 
             new_born_coroutines_buff = self.new_born_coroutines
             # self.new_born_coroutines = type(new_born_coroutines_buff)()
+
+            # TODO: we need to give first coro a list of all coros and an index (0 at the moment)
+            # coro will make required work, find next Greenlet coro in the list and will swithch
+            # to it given same list and an updated index. Next coro will do the same.
+            # then an every coro returns and as result we will return here. After that,
+            # loop will process all Asyncio coroutines in a normal maner
+            # if self._coroutines_can_switch_directly:
+            #     pass
+            
             self.new_born_coroutines = list()
+            self._is_current_coro_was_new_born = True
             for coro in new_born_coroutines_buff:
                 coro: CoroWrapperBase = coro
                 if self.execute_global_on_start_handlers(coro):
@@ -1646,7 +1668,17 @@ class CoroSchedulerBase(Iterable, EntityStatsMixin):
 
             responses_buff = self.responses
             # self.responses = type(responses_buff)()
+            
+            # TODO: we need to give first coro a list of all coros and an index (0 at the moment)
+            # coro will make required work, find next Greenlet coro in the list and will swithch
+            # to it given same list and an updated index. Next coro will do the same.
+            # then an every coro returns and as result we will return here. After that,
+            # loop will process all Asyncio coroutines in a normal maner
+            # if self._coroutines_can_switch_directly:
+            #     pass
+            
             self.responses = list()
+            self._is_current_coro_was_new_born = False
             for response in responses_buff:
                 coro_id = response.coro_id
                 if coro_id not in self.coroutines:
@@ -1699,6 +1731,7 @@ class CoroSchedulerBase(Iterable, EntityStatsMixin):
                     self.process_coro_exit_status(coro, coro_exit_status)
                     # minus_delta_time += cpu_clock_cycles() - minus_start_time
 
+            self._is_current_coro_was_new_born = None
             requests_buff = self.requests
             # self.requests = type(requests_buff)()
             self.requests = list()
@@ -1782,6 +1815,7 @@ class CoroSchedulerGreenlet(CoroSchedulerBase):
         self.root_coro_iteration = greenlet(self._iter_wrapper)  # type: Coro
         # self._root_coro = None                                     # type: Optional[Coro]
         self.root_coro = None                                     # type: Optional[Coro]
+        self._coroutines_can_switch_directly = True
     
     def _new_coro_type_normalizer(self, coro_type: Optional[CoroType]) -> CoroType:
         return coro_type or CoroType.auto
@@ -2682,7 +2716,16 @@ class InterfaceGreenlet(Interface):
         self.in_work = True
         # if __debug__: dlog(f'λ <= (request): <{func_info(self._coro.worker.worker, False)}>: {service_type}, {args}, {kwargs}')
         try:
-            response: Response = self._loop.root_coro.switch(Request(self._coro, service_type, *args, **kwargs))
+            loop: CoroSchedulerGreenlet = self._loop
+            response: Response = loop.root_coro.switch(Request(self._coro, service_type, *args, **kwargs))
+            # TODO: we will switch to the next coro and do necessary preparations and reactions
+            # if loop._coroutines_can_switch_directly:
+            #     if loop._is_current_coro_was_new_born:  
+            #         ...
+            #     else:
+            #         ...
+            # else:
+            #     response: Response = loop.root_coro.switch(Request(self._coro, service_type, *args, **kwargs))
         except AttributeError:
             # if __debug__: dlog(f'x λ: {id(self._loop)}, {self._loop}, root_coro: {self._loop.root_coro}; root_coro_iteration: {self._loop.root_coro_iteration}; current_loop: {self._loop.current_loop()}; current_interface: {self._loop.current_interface()}')
             raise

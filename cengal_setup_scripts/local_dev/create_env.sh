@@ -2,8 +2,7 @@
 
 SCRIPT=`realpath $BASH_SOURCE`
 SCRIPTPATH=`dirname $SCRIPT`
-WORKDIR=`realpath $SCRIPTPATH/..`
-ROOT_DIR=`realpath $WORKDIR/../..`
+WORKDIR=`realpath $SCRIPTPATH/../..`
 
 cd $WORKDIR
 
@@ -12,12 +11,20 @@ if [ ! -d $WORKDIR/venv ]; then
 fi
 virtualenv -p python3.8 $WORKDIR/venv
 
-echo "export PYTHONPATH=$ROOT_DIR/package:\$PYTHONPATH" >> $WORKDIR/venv/bin/activate
-echo "export $(grep -v '^#' .docker/app/local.env | xargs)" >> $WORKDIR/venv/bin/activate
-echo "export MY_ENV_VAR=12345" >> $WORKDIR/venv/bin/activate
-
 cd $WORKDIR/venv/bin
 source activate
 
 cd $WORKDIR
-pip install -r ./requirements.txt
+
+python3 -m pip install --upgrade pip
+python3 -m pip install --upgrade setuptools
+
+requirements_txt=./requirements.txt
+if [ -f "$requirements_txt" ]; then
+    pip install -r $requirements_txt
+fi
+
+requirements_py=./__requirements__.py
+if [ -f "$requirements_py" ]; then
+    python $requirements_py
+fi

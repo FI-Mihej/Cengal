@@ -20,7 +20,7 @@ from math import modf
 from enum import Enum
 from copy import copy
 from cengal.data_manipulation.help_tools import inverse_mapping
-from cengal.text_processing.optional_formatter import OptionalFormatter
+from cengal.text_processing.optional_formatter.versions.v_0 import OptionalFormatter
 from ....constants import *
 
 """
@@ -32,7 +32,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -111,7 +111,7 @@ DEFAULT_ATTRIBUTES_ASCENDING = sorted(DEFAULT_ATTRIBUTES, key=lambda item: item.
 DEFAULT_ATTRIBUTES_DESCENDING = sorted(DEFAULT_ATTRIBUTES, key=lambda item: item.value, reverse=True)
 
 
-_DEFAULT_FORMATTER = OptionalFormatter(tuple(DEFAULT_ATTRIBUTES_DESCENDING), {
+DEFAULT_FORMATTER = OptionalFormatter(tuple(DEFAULT_ATTRIBUTES_DESCENDING), {
     TimeAttributes.years: ('',  'Y', '{}', '', '-'),
     TimeAttributes.months: ('', 'M',  '{}', '', '-'),
     TimeAttributes.days: ('', 'D', '{}', '', ' '),
@@ -121,7 +121,7 @@ _DEFAULT_FORMATTER = OptionalFormatter(tuple(DEFAULT_ATTRIBUTES_DESCENDING), {
     TimeAttributes.microseconds: ('.', 'μs', '{0:0>6}', '', '')
 })
 
-_FULL_FORMATTER = OptionalFormatter(tuple(ATTRIBUTES_DESCENDING), {
+FULL_FORMATTER = OptionalFormatter(tuple(ATTRIBUTES_DESCENDING), {
     TimeAttributes.millennia: ('', '', 'Millennia: {}', '', ', '),
     TimeAttributes.centuries: ('', '', 'Centuries: {}', '', ', '),
     TimeAttributes.decades: ('', '', 'Decades: {}', '', ', '),
@@ -206,16 +206,16 @@ class ApproximateTimeRepresentation:
             return False
 
     def format(self, formatter: Union[OptionalFormatter, None]=None) -> str:
-        formatter = formatter or _DEFAULT_FORMATTER
+        formatter = formatter or DEFAULT_FORMATTER
         args = tuple()
         return formatter(self._construct_formatter_dict(self.values))
 
     def format_cropped(self, formatter: Union[OptionalFormatter, None]=None) -> str:
-        formatter = formatter or _DEFAULT_FORMATTER
+        formatter = formatter or DEFAULT_FORMATTER
         return formatter(self._construct_formatter_dict(self.cropped_values))
 
     def __str__(self):
-        formatter = _FULL_FORMATTER
+        formatter = FULL_FORMATTER
         return '{class_name}{{{data}}}'.format(class_name=self.__class__.__name__,
                                                data=formatter(self._construct_formatter_dict(self.values)))
 

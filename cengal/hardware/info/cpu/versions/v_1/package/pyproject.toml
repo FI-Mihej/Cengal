@@ -1,0 +1,4 @@
+[build-system]
+# Minimum requirements for the build system to execute.
+# requires = ["setuptools", "wheel", "debugpy", "cengal[file_system__path_manager__versions__v_0]"]  # PEP 508 specifications.
+requires = ["setuptools", "wheel", "debugpy", "cengal"]  # PEP 508 specifications.

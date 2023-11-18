@@ -7,6 +7,7 @@
 
 # https://packaging.python.org/specifications/recording-installed-packages/
 
+sudo chown -R $(id -u):$(id -g) .
 python3 -m pip uninstall cengal
 rm -rf ./cengal.egg-info
 # https://setuptools.pypa.io/en/latest/userguide/development_mode.html#limitations

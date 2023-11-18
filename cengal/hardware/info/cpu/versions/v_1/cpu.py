@@ -21,10 +21,20 @@ __all__ = ['CpuInfo', 'cpu_info']
 
 # from operator import is_
 from typing import Dict
-import cpuinfo
+from cengal.modules_management.alternative_import import alt_import
+with alt_import('cpuinfo') as cpuinfo:
+    if cpuinfo is None:
+        CPUINFO_PRESENT: bool = False
+    else:
+        CPUINFO_PRESENT = True
+
 from cengal.modules_management.ignore_in_build_mode import ignore_in_build_mode
+PSUTIL_PRESENT: bool = False
 with ignore_in_build_mode():
     import psutil
+    with alt_import('psutil') as psutil:
+        if psutil is not None:
+            PSUTIL_PRESENT = True
 
 
 """
@@ -36,7 +46,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -45,11 +55,11 @@ __status__ = "Development"
 
 
 class CpuInfo:
-    _cache = None
+    _cache: Dict = None
 
     def __init__(self):
         if self._cache is None:
-            self._cache_friendly = cpuinfo.get_cpu_info()
+            self._cache_friendly: Dict = cpuinfo.get_cpu_info() if CPUINFO_PRESENT else dict()
             self._cache = self._normalize_cpu_info_values(self._cache_friendly)
     
     def _normalize_cpu_info_values(self, cpu_info_dict: Dict) -> Dict:
@@ -231,11 +241,11 @@ class CpuInfo:
     
     @property
     def cores_num(self):
-        return psutil.cpu_count(logical=False)
+        return psutil.cpu_count(logical=False) if PSUTIL_PRESENT else 0
     
     @property
     def virtual_cores_num(self):
-        return psutil.cpu_count(logical=True)
+        return psutil.cpu_count(logical=True) if PSUTIL_PRESENT else 0
     
     @property
     def l2_cache_size_per_core(self) -> int:

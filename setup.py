@@ -25,7 +25,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -53,9 +53,9 @@ setuptools._install_setup_requires({'setup_requires': ['py-cpuinfo', 'Cython']})
 
 from cengal_setup_scripts.install_required_packages.install_packages import install_bundled, get_pypi_requirements_list, get_remote_requirements_list
 install_bundled()
-from cengal_setup_scripts.find_and_prepare_cython_modules import find_and_prepare_cython_modules, build, build_ext, sdist, find_good_packages, find_package_data
+from cengal_setup_scripts.find_and_prepare_cython_modules import find_and_prepare_cython_modules, build, build_ext, sdist, \
+    find_good_packages, find_package_data
 from cengal.file_system.path_manager import path_relative_to_src
-from Cython.Build import cythonize
 
 
 with open(path_relative_to_src('README.md'), 'r') as fh:
@@ -98,6 +98,9 @@ setuptools.setup(
     package_data=packages_data_dict,
     setup_requires=pypi_requirements_list,
     install_requires=pypi_requirements_list,
+    # extras_require={
+    #     'hardware__info__cpu__versions__v_1': ['py-cpuinfo'],
+    # },
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: Apache Software License',

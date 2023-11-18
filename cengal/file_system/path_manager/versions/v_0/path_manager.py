@@ -15,10 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = ['RelativePath', 'relative_to_src', 'path_relative_to_src', 'relative_to_cwd', 'path_relative_to_cwd', 'WrongBaseDirError', 'get_relative_path_part', 'sep']
+__all__ = ['RelativePath', 'relative_to_src', 'path_relative_to_src', 'relative_to_cwd', 
+           'path_relative_to_cwd', 'WrongBaseDirError', 'get_relative_path_part', 'sep', 
+           'canonical_path']
 
 import os
-from os.path import normpath, sep
+from os.path import normpath, expanduser, realpath, abspath, normcase, sep
 from typing import Optional
 from cengal.file_system.directory_manager import current_src_dir
 from cengal.text_processing.text_processing import removeprefix
@@ -32,7 +34,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -94,3 +96,17 @@ def get_relative_path_part(path: str, base_dir: str) -> str:
         relative_part = removeprefix(relative_part, sep)
     
     return relative_part
+
+
+def canonical_path(path: str, resolve_symlinks: bool = True) -> str:
+    """
+    Convert a path to its canonical, case-normalized, absolute version.
+    """
+
+    path = expanduser(path)
+    if resolve_symlinks:
+        path = realpath(path)
+    else:
+        path = abspath(path)
+    
+    return normcase(path)
