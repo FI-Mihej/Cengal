@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,10 +35,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.4.0"
+__version__ = "4.0.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -60,7 +60,7 @@ IS_RUNNING_IN_PYCHARM: bool = "PYCHARM_HOSTED" in os.environ
 
 RAW_OS_PLATFORM: str = sys.platform  # 'emscripten', 'wasi', 'darwin', 'win32', 'cygwin', 'linux', 'linux2', 'linux3', 'darwin', 'freebsd8', 'aix', aix5', 'aix7', ...
 OS_API_TYPE: str = os.name  # The following names have currently been registered: 'posix', 'nt', 'java'. Android and iOS will return 'posix'.
-OS_TYPE: str = platform.system()  # 'Linux', 'Windows', 'Darwin'
+OS_TYPE: str = platform.system()  # 'Linux', 'Windows', 'Darwin', 'Java'
 
 IS_RUNNING_IN_EMSCRIPTEN: bool = 'emscripten' == sys.platform
 IS_RUNNING_IN_WASI: bool = 'wasi' == sys.platform

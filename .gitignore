@@ -278,6 +278,17 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Setup
+/MANIFEST.in
+/pyproject.toml
+/requirements.txt
+/setup.py
+/build_wheel__linux.sh
+/build_wheel__windows__2019.cmd
+/build_wheel__windows__2022.cmd
+/rename_wheel.sh
+/rename_wheel.cmd
+/setup_shell_main_sdist
+
 # Other
 .vscode/settings.json
-MANIFEST.in

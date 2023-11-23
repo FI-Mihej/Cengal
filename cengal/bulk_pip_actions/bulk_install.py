@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,10 +27,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 """
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.4.0"
+__version__ = "4.0.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -98,27 +98,28 @@ class ModulesLists(object):
         if cpu_info().is_x86:
             self._allowed.update(self.arch__x86__allowed)
             self._forbidden.update(self.arch__x86__forbidden)
-        elif 'x86_64'.casefold() == arch:
-            self._allowed.update(self.arch__x86_64__allowed)
-            self._forbidden.update(self.arch__x86_64__forbidden)
-        elif 'x86_32'.casefold() == arch:
-            self._allowed.update(self.arch__x86_32__allowed)
-            self._forbidden.update(self.arch__x86_32__forbidden)
-        elif cpu_info().is_arm:
+            if 'x86_64'.casefold() == arch:
+                self._allowed.update(self.arch__x86_64__allowed)
+                self._forbidden.update(self.arch__x86_64__forbidden)
+            elif 'x86_32'.casefold() == arch:
+                self._allowed.update(self.arch__x86_32__allowed)
+                self._forbidden.update(self.arch__x86_32__forbidden)
+        
+        if cpu_info().is_arm:
             self._allowed.update(self.arch__ARM__allowed)
             self._forbidden.update(self.arch__ARM__forbidden)
-        elif 'ARM_8'.casefold() == arch:
-            self._allowed.update(self.arch__ARM_8__allowed)
-            self._forbidden.update(self.arch__ARM_8__forbidden)
-        elif ('ARM_8'.casefold() == arch) and (64 == cpu_info().bits):
-            self._allowed.update(self.arch__ARM_8_64__allowed)
-            self._forbidden.update(self.arch__ARM_8_64__forbidden)
-        elif ('ARM_8'.casefold() == arch) and (32 == cpu_info().bits):
-            self._allowed.update(self.arch__ARM_8_32__allowed)
-            self._forbidden.update(self.arch__ARM_8_32__forbidden)
-        elif 'ARM_7'.casefold() == arch:
-            self._allowed.update(self.arch__ARM_7__allowed)
-            self._forbidden.update(self.arch__ARM_7__forbidden)
+            if 'ARM_8'.casefold() == arch:
+                self._allowed.update(self.arch__ARM_8__allowed)
+                self._forbidden.update(self.arch__ARM_8__forbidden)
+            elif ('ARM_8'.casefold() == arch) and (64 == cpu_info().bits):
+                self._allowed.update(self.arch__ARM_8_64__allowed)
+                self._forbidden.update(self.arch__ARM_8_64__forbidden)
+            elif ('ARM_8'.casefold() == arch) and (32 == cpu_info().bits):
+                self._allowed.update(self.arch__ARM_8_32__allowed)
+                self._forbidden.update(self.arch__ARM_8_32__forbidden)
+            elif 'ARM_7'.casefold() == arch:
+                self._allowed.update(self.arch__ARM_7__allowed)
+                self._forbidden.update(self.arch__ARM_7__forbidden)
 
         modules = list()
         modules += self.universal
@@ -135,12 +136,7 @@ class ModulesLists(object):
                 modules += self.pypy3
             modules += self.python3
 
-        if self._allowed:
-            new_modules = list()
-            for item in modules:
-                if item in self._allowed:
-                    new_modules.append(item)
-            modules = new_modules
+        modules.extend(self._allowed)
 
         if self._forbidden:
             new_modules = list()

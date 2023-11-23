@@ -1,3 +1,0 @@
-[build-system]
-# Minimum requirements for the build system to execute.
-requires = ["setuptools", "wheel", "Cython>=0.29.34", "py-cpuinfo", "debugpy"]  # PEP 508 specifications.

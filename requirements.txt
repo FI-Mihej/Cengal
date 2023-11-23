@@ -1,3 +1,0 @@
-debugpy
-py-cpuinfo
-psutil

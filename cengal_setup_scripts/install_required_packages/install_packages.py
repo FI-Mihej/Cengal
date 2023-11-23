@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.4.0"
+__version__ = "4.0.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -241,6 +241,21 @@ class PyPiModules(ModulesLists):
         
         if (PYTHON_VERSION_INT[:3] >= (3, 12, 0)):
             self.windows_allowed.add('patch-ng')  # `Exception: Building py-lmdb from source on Windows requires the "patch-ng" python module.`. 2023.11.18: py-lmdb does not support 3.12 yet. Testing required
+            self._forbidden.add('lmdb')  # 2023.11.21: There is no wheels for pypy3.12 and above.
+        
+        if 'PyPy'.lower() == PLATFORM_NAME.lower():
+            if (PYTHON_VERSION_INT[:2] == (3, 10)):
+                self.windows_forbidden.add('lmdb')  # 2023.11.21: There is no wheels for pypy3.9 on Windows.
+
+            if (PYTHON_VERSION_INT[:2] != (3, 9)) and (PYTHON_VERSION_INT[:2] != (2, 7)):
+                self.windows_allowed.add('patch-ng')  # 2023.11.21: There is only wheels for pypy2.7 and pypy3.9 on Windows
+
+            if (PYTHON_VERSION_INT[:2] != (2, 7)):
+                self.osx_allowed.add('patch-ng')  # 2023.11.21: There is only wheel for pypy2.7 on OSX
+            
+            self._forbidden.add('orjson')  # 2023.11.21: There is no wheels for PyPy on Windows. And for build it requires Rust build tools to be installed
+            self.arch__ARM__allowed.add('patch-ng')  # 2023.11.21: There is no prebuilt wheel for ARM
+            self.windows_forbidden.add('psutil')  # 2023.11.21: It won't compile under PyPy3.9 or PyPy3.10 on Windows
 
 
 class ExternalGitModules(ModulesLists):

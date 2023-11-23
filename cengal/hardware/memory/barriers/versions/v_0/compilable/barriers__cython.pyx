@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
+# Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 
 
 __author__ = "ButenkoMS <gtalk@butenkoms.space>"
-__copyright__ = "Copyright © 2012-2023 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
+__copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "3.4.0"
+__version__ = "4.0.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -138,6 +138,10 @@ IF (UNAME_SYSNAME == "Windows") and (UNAME_MACHINE in ("x86_64", "x86", "i386", 
     cpdef void mm_clflush(int p):
         _mm_clflush(<void*> p)
 
+    
+    cpdef void sync_synchronize():
+        MemoryBarrier()
+
 
     full_memory_barrier = memory_barrier
 
@@ -232,10 +236,6 @@ ELIF (UNAME_SYSNAME == 'Windows') and UNAME_MACHINE.startswith("arm"):
 
     cpdef void mm_pause():
         pass
-
-    
-    cpdef void sync_synchronize():
-        MemoryBarrier()
 
     
     cpdef void sync_synchronize():

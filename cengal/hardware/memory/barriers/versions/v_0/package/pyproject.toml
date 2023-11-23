@@ -1,0 +1,97 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cengal_memory_barriers"
+dynamic = ["version"]
+description = "Extended, cached CPU info with consistent output format"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.8"
+authors = [
+    { name = "ButenkoMS", email = "gtalk@butenkoms.space" },
+]
+keywords = [
+    "cengal",
+    "cpu",
+    "hardware",
+    "info",
+]
+classifiers = [
+    'Programming Language :: Python :: 3',
+    'License :: OSI Approved :: Apache Software License',
+    'Operating System :: OS Independent',
+    'Development Status :: 5 - Production/Stable',
+    'Environment :: Console',
+    'Environment :: MacOS X',
+    'Environment :: Web Environment',
+    'Environment :: WebAssembly',
+    'Environment :: Win32 (MS Windows)',
+    'Environment :: X11 Applications',
+    'Intended Audience :: Developers',
+    'Intended Audience :: Education',
+    'Intended Audience :: Information Technology',
+    'Intended Audience :: Manufacturing',
+    'Intended Audience :: Science/Research',
+    'Intended Audience :: Telecommunications Industry',
+    'Operating System :: Android',
+    'Operating System :: MacOS',
+    'Operating System :: MacOS :: MacOS X',
+    'Operating System :: Microsoft :: Windows',
+    'Operating System :: Microsoft :: Windows :: Windows 7',
+    'Operating System :: Microsoft :: Windows :: Windows 8',
+    'Operating System :: Microsoft :: Windows :: Windows 8.1',
+    'Operating System :: Microsoft :: Windows :: Windows 10',
+    'Operating System :: Microsoft :: Windows :: Windows 11',
+    'Operating System :: Microsoft :: Windows :: Windows Vista',
+    'Operating System :: Microsoft :: Windows :: Windows XP',
+    'Operating System :: Microsoft :: Windows :: Windows Server 2008',
+    'Operating System :: Microsoft :: Windows :: Windows Server 2003',
+    'Operating System :: Microsoft :: Windows :: Windows NT/2000',
+    'Operating System :: POSIX',
+    'Operating System :: POSIX :: BSD',
+    'Operating System :: POSIX :: BSD :: OpenBSD',
+    'Operating System :: POSIX :: BSD :: FreeBSD',
+    'Operating System :: POSIX :: BSD :: NetBSD',
+    'Operating System :: POSIX :: Linux',
+    'Operating System :: Unix',
+    'Operating System :: iOS',
+    'Programming Language :: Cython',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: Implementation',
+    'Programming Language :: Python :: Implementation :: CPython',
+    'Programming Language :: Python :: Implementation :: PyPy',
+    'Programming Language :: Python :: Implementation :: MicroPython',
+    'Topic :: Software Development',
+    'Topic :: Software Development :: Libraries',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+    'Topic :: System',
+    'Topic :: System :: Hardware',
+    'Topic :: System :: Hardware :: Symmetric Multi-processing',
+    'Typing :: Typed',
+]
+dependencies = [
+    "cengal",
+]
+
+[project.urls]
+Homepage = "https://github.com/FI-Mihej/cengal_memory_barriers"
+
+[tool.hatch.version]
+path = "cengal_memory_barriers/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/cengal_memory_barriers",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = [
+    "/cengal_memory_barriers",
+]

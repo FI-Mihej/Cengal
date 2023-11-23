@@ -4,9 +4,6 @@
 * Target architectures: x64, x86, ARM
 * Target interpreters: CPython, PyPy
 * Recommended Python versions: 3.8+
-* Minimal Python versions: 3.1; 2.7
-
-Not all features are accessible on every target platform or architecture.
 
 # Installation
 
@@ -360,6 +357,6 @@ Installation process requires compilation (prebuild Wheels are not prepared yet)
 
 # License
 
-Copyright © 2012-2023 ButenkoMS. All rights reserved.
+Copyright © 2012-2024 ButenkoMS. All rights reserved.
 
 Licensed under the Apache License, Version 2.0.

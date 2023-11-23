@@ -1,0 +1,5 @@
+setuptools
+wheel
+debugpy
+py-cpuinfo
+charset-normalizer; python_version < "3.13"
