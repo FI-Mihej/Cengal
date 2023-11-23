@@ -16,7 +16,7 @@
 # limitations under the License.
 
 
-__all__ = ['get_dict_item', 'get_dict_item_default', 'set_dict_item', 'del_dict_item', 'try_del_dict_item', 'srt_to_dict_path', 'dict_path_to_str']
+__all__ = ['get_dict_item', 'get_dict_item_default', 'set_dict_item', 'change_dict_item', 'del_dict_item', 'try_del_dict_item', 'srt_to_dict_path', 'dict_path_to_str']
 
 
 """
@@ -28,7 +28,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.0.3"
+__version__ = "4.1.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -66,6 +66,20 @@ def set_dict_item(data: Dict, keys: List[Hashable], value):
             rv[key] = value
             break
 
+        if key not in rv:
+            rv[key] = dict()
+
+        rv = rv[key]
+
+
+def change_dict_item(data: Dict, keys: List[Hashable], value):
+    rv = data
+    path_len = len(keys)
+    for index, key in enumerate(keys):
+        if index == path_len - 1:
+            rv[key] = value
+            break
+
         rv = rv[key]
         
 
@@ -81,11 +95,12 @@ def del_dict_item(data: Dict, keys: List[Hashable]):
     return rv
         
 
-def try_del_dict_item(data: Dict, keys: List[Hashable]):
+def try_del_dict_item(data: Dict, keys: List[Hashable]) -> bool:
     try:
         del_dict_item(data, keys)
+        return True
     except KeyError:
-        pass
+        return False
 
 
 def srt_to_dict_path(str_path) -> List[str]:

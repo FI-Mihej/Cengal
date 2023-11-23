@@ -24,7 +24,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.0.3"
+__version__ = "4.1.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -133,14 +133,14 @@ class UsedPorts:
             if not port_info.port_lords:
                 port_info.port_lords.add(not_used_port)
     
-    def port(self, protocol: Protocol, ports_range: slice, statuses: Union[PortStatus, Set[PortStatus]]) -> 'PortsIterator':
-        return PortsIterator(self, protocol, ports_range, statuses, 1)
+    def port(self, protocol: Protocol, port_or_range: Union[int, slice, Tuple[int, int]], statuses: Union[PortStatus, Set[PortStatus]]) -> 'PortsIterator':
+        return PortsIterator(self, protocol, port_or_range, statuses, 1)
     
-    def range(self, protocol: Protocol, ports_range: slice, statuses: Union[PortStatus, Set[PortStatus]], desired_number_of_ports: int) -> 'PortsIterator':
-        return PortsIterator(self, protocol, ports_range, statuses, desired_number_of_ports)
+    def range(self, protocol: Protocol, port_or_range: Union[int, slice, Tuple[int, int]], statuses: Union[PortStatus, Set[PortStatus]], desired_number_of_ports: int) -> 'PortsIterator':
+        return PortsIterator(self, protocol, port_or_range, statuses, desired_number_of_ports)
     
-    def __call__(self, protocol: Protocol, ports_range: slice, statuses: Union[PortStatus, Set[PortStatus]], desired_number_of_ports: int) -> 'PortsIterator':
-        return self.range(protocol, ports_range, statuses, desired_number_of_ports)
+    def __call__(self, protocol: Protocol, port_or_range: Union[int, slice, Tuple[int, int]], statuses: Union[PortStatus, Set[PortStatus]], desired_number_of_ports: int) -> 'PortsIterator':
+        return self.range(protocol, port_or_range, statuses, desired_number_of_ports)
 
 
 class UnaceptablePortsRangeTypeError(Exception):
@@ -148,14 +148,16 @@ class UnaceptablePortsRangeTypeError(Exception):
 
 
 class PortsIterator:
-    def __init__(self, used_ports: UsedPorts, protocol: Protocol, ports_range: Union[slice, Tuple[int, int]], statuses: Union[PortStatus, Set[PortStatus]], desired_number_of_ports: int) -> None:
+    def __init__(self, used_ports: UsedPorts, protocol: Protocol, port_or_range: Union[int, slice, Tuple[int, int]], statuses: Union[PortStatus, Set[PortStatus]], desired_number_of_ports: int) -> None:
         self.used_ports: UsedPorts = used_ports
         self.protocol: Protocol = protocol
-        self.ports_range: slice = ports_range
-        if isinstance(ports_range, slice):
-            pass
-        elif isinstance(ports_range, tuple):
-            self.ports_range = slice(*ports_range)
+        self.ports_range: slice = None
+        if isinstance(port_or_range, int):
+            self.ports_range = slice(port_or_range, port_or_range + 1)
+        elif isinstance(port_or_range, slice):
+            self.ports_range = port_or_range
+        elif isinstance(port_or_range, tuple):
+            self.ports_range = slice(*port_or_range)
         else:
             raise UnaceptablePortsRangeTypeError
         

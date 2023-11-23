@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.0.3"
+__version__ = "4.1.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -34,61 +34,77 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
+#!/usr/bin/env python
+# coding=utf-8
+
+
+
+
+"""
+Module Docstring
+Docstrings: http://www.python.org/dev/peps/pep-0257/
+"""
+
+
+
+
+
+from cengal.data_manipulation.dict_path import *
 from pprint import pprint
 from typing import Dict, List
 
 
-def get_dict_item(keys, data: Dict):
-    rv = data
-    for key in keys:
-        rv = rv[key]
+# def get_dict_item(keys, data: Dict):
+#     rv = data
+#     for key in keys:
+#         rv = rv[key]
     
-    return rv
+#     return rv
 
 
-def get_dict_item_default(keys, data: Dict, default=None):
-    rv = data
-    for key in keys:
-        try:
-            rv = rv[key]
-        except KeyError:
-            return default
+# def get_dict_item_default(keys, data: Dict, default=None):
+#     rv = data
+#     for key in keys:
+#         try:
+#             rv = rv[key]
+#         except KeyError:
+#             return default
     
-    return rv
+#     return rv
 
 
-def set_dict_item(keys, data: Dict, value):
-    rv = data
-    path_len = len(keys)
-    for index, key in enumerate(keys):
-        if index == path_len - 1:
-            rv[key] = value
-            break
+# def set_dict_item(keys, data: Dict, value):
+#     rv = data
+#     path_len = len(keys)
+#     for index, key in enumerate(keys):
+#         if index == path_len - 1:
+#             rv[key] = value
+#             break
 
-        rv = rv[key]
+#         rv = rv[key]
         
 
-def del_dict_item(keys, data: Dict):
-    rv = data
-    path_len = len(keys)
-    for index, key in enumerate(keys):
-        rv = rv[key]
-        if index == path_len - 2:
-            del rv[keys[-1]]
-            break
+# def del_dict_item(keys, data: Dict):
+#     rv = data
+#     path_len = len(keys)
+#     for index, key in enumerate(keys):
+#         rv = rv[key]
+#         if index == path_len - 2:
+#             del rv[keys[-1]]
+#             break
     
-    return rv
+#     return rv
         
 
-def try_del_dict_item(keys, data: Dict):
-    try:
-        del_dict_item(keys, data)
-    except KeyError:
-        pass
+# def try_del_dict_item(keys, data: Dict):
+#     try:
+#         del_dict_item(keys, data)
+#     except KeyError:
+#         pass
 
 
-def srt_to_dict_path(str_path) -> List[str]:
-    return eval(str_path)
+# def srt_to_dict_path(str_path) -> List[str]:
+#     return eval(str_path)
 
 
 j = {"app": {
@@ -113,15 +129,18 @@ j = {"app": {
 }}
 path_str = "['app', 'Garden', 'Flowers', 'White Flower']"
 
-del_dict_item(srt_to_dict_path(path_str), j)
+del_dict_item(j, srt_to_dict_path(path_str))
 pprint(j)
 try:
-    print(get_dict_item(['app', 'Garden', 'Flowers', 'White Flower'], j))
+    print(get_dict_item(j, ['app', 'Garden', 'Flowers', 'White Flower']))
 except KeyError:
     print("Key not found")
 
-print(get_dict_item_default(['app', 'Garden', 'Flowers', 'White Flower'], j))
-set_dict_item(['app', 'Garden', 'Flowers', 'White Flower'], j, 'Jasmine')
+print(get_dict_item_default(j, ['app', 'Garden', 'Flowers', 'White Flower']))
+set_dict_item(j, ['app', 'Garden', 'Flowers', 'White Flower'], 'Jasmine')
 pprint(j)
-del_dict_item(srt_to_dict_path(path_str), j)
-del_dict_item(srt_to_dict_path(path_str), j)
+del_dict_item(j, srt_to_dict_path(path_str))
+try:
+    del_dict_item(j, srt_to_dict_path(path_str))
+except KeyError:
+    print("Key not found")

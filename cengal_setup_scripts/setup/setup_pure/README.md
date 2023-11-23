@@ -1,14 +1,16 @@
 # cengal_pure
 
-This package is pure-Python Cengal package:
-* extensions are not compiled
-* requirements are not installed automatically
+This is the pure-Python Cengal package, designed for compatibility across a wide range of Python versions. It does not include compiled extensions, and mandatory requirements are not automatically installed.
 
-As result, this package can be installed even on Python 2.7 or Python 3.1. Not all modules will be able to work properly however under a such old interpreters.
+As a result, 'cengal-pure' can be installed on older Python versions like 2.7 or 3.1. Please note that while it provides compatibility, not all modules may function optimally on such legacy interpreters.
 
 In order to install Cengal with compiled extensions and with all requirements, execute either:
 * `pip install cengal_light[full]` - will install Cengal as well as most of requirements
 * `pip install cengal` - Recommended - will install `cengal_light[full]` as well as some missed requirements
+
+# Cengal
+
+Cengal is a versatile Python library designed for a wide range of applications. To enhance performance, certain modules within Cengal have been implemented using Cython and/or C.
 
 # Cengal compatibility and requirements
 
@@ -19,7 +21,9 @@ In order to install Cengal with compiled extensions and with all requirements, e
 
 # Installation
 
-`pip install cengal` will install prebuilt wheels for both Windows and Linux
+To get started with Cengal, you can easily install it along with all the mandatory dependencies by running `pip install cengal`. This command not only installs Cengal and its required dependencies but also takes care of fetching and installing prebuilt wheels tailored for the Cengal library. These wheels are compatible with both Windows and Linux systems and work seamlessly with both CPython and PyPy interpreters.
+
+If you prefer to install Cengal without its dependencies, you can opt for the 'cengal-light' package, which serves as the backend for the 'cengal' package. Simply run `pip install cengal-light` to get the lightweight version of Cengal.
 
 # Documentation
 
@@ -27,17 +31,35 @@ In order to install Cengal with compiled extensions and with all requirements, e
 
 For example [Cengal Coroutines Concepts & Usage](https://github.com/FI-Mihej/Cengal/wiki/Cengal-Coroutines)
 
+# Stand-Alone Packages for Specific Cengal Modules
+
+To cater to varying needs and streamline the installation process, I've introduced stand-alone packages for select Cengal modules. These packages are designed to offer users the ability to install specific Cengal functionality without the burden of the library's full set of dependencies.
+
+The core of this approach lies in our 'cengal-light' package, which houses both Python and compiled Cengal modules. The 'cengal' package itself serves as a lightweight shell, devoid of its own modules, but dependent on 'cengal-light[full]' for a complete Cengal library installation with all required dependencies.
+
+For users seeking individual Cengal features or looking to minimize dependencies, our stand-alone packages provide a convenient solution. Each stand-alone package is dedicated to a specific Cengal module and relies on 'cengal-light' as its sole dependency.
+
+Below, you'll find a list of these stand-alone packages, each corresponding to a distinct Cengal module:
+
+* [cengal_memory_barriers](https://github.com/FI-Mihej/cengal_memory_barriers) (package for `cengal.hardware.memory.barriers` module): Fast crossplatform memory barriers for Python.
+* [cengal_cpu_info](https://github.com/FI-Mihej/cengal_cpu_info) (package for `cengal.hardware.info.cpu` module): Extended, cached CPU info with consistent output format.
+
+Stay tuned for future additions to our collection of stand-alone packages!
+
 # Exclusive Features: No Alternatives Online
 
-## Run concurently following components in a Single (!) Thread
+## Concurrent Execution of blocking CPU-Bound and GUI Tasks on a Single Thread
 
+Cengal offers a unique and powerful feature that allows you to execute a diverse set of tasks concurrently on a single thread, effectively managing CPU-bound and GUI-related operations without introducing the complexity of multithreading or multiprocessing. Notably, Cengal can convert `blocking CPU-bound` functions into proper asynchronous coroutines, preventing them from blocking the thread for extended periods.
+
+### Examples
+
+In this example, an application concurrently (at the same time) executes all of the following components within a single thread:
 * own **blocking** CPU-bound function
 * third-party **blocking** CPU-bound function
 * Tkinter application
 * CustomTkinter application
 * asyncio-based file reading task.
-
-### Examples
 
 #### YouTube Showcase
 
@@ -55,21 +77,21 @@ For example [Cengal Coroutines Concepts & Usage](https://github.com/FI-Mihej/Cen
 * [Decorator which converts blocking code to concurrent code](https://github.com/FI-Mihej/Cengal/wiki/Decorator-which-converts-blocking-code-to-concurrent-code)
 
 
-## True Interprocess Shared Memory (Proof of Concept Stage)
+## True Interprocess Shared Memory (Proof of Concept)
 
-Share your data between your Python processes (2 processes currently) and work with them as usual. Work across different processes is made turn by turn (fast operation: using full memory barrier instead of system calls)
+Cengal introduces a novel approach to interprocess shared memory, currently at the proof of concept stage. With this feature, you can seamlessly share data between your Python processes (currently limited to 2 processes) and work with them just as you would in a single process. The underlying mechanism optimizes cross-process communication by employing efficient memory barriers instead of resource-intensive system calls.
 
-Supported types (currently):
+Supported data types (current stage):
 
-* `list` - Unlike `multiprocessing.shared_memory.ShareableList`: **mutable** and **resizable** between different processes, supports other containers (lists, tuples, dicts) as an items and implements all `list` methods. Faster than `multiprocessing.shared_memory.ShareableList`.
-* `dict` - *currently immutable*
+* `list`: Unlike `multiprocessing.shared_memory.ShareableList`, Cengal's shared lists are both `mutable` and `resizable` between different processes. They support various container types (lists, tuples, dicts) as items and implement all standard `list` methods. Plus, they offer superior performance compared to `multiprocessing.shared_memory.ShareableList`.
+* `dict`: Currently immutable.
 * `tuple`
 * `str`
 * `bytes`
 * `bytearray`
 * `bool`
-* `float` - Unlike values in `multiprocessing.shared_memory.ShareableList`, supports Addition Assignment (`shared_list[20] += 999.3`) and all other native methods and operators
-* `int` - int64, currently. Unlike values in `multiprocessing.shared_memory.ShareableList`, supports Addition Assignment (`shared_list[15] += 999`) and all other native methods and operators
+* `float`: Cengal's shared float values support Addition Assignment (`shared_list[20] += 999.3`) and all other native methods and operators, unlike values in `multiprocessing.shared_memory.ShareableList`.
+* `int`: Currently limited to int64. Similar to shared float values, Cengal's shared integers support Addition Assignment (`shared_list[15] += 999`) and all other native methods and operators.
 * `None`
 
 ### Examples
@@ -128,9 +150,9 @@ p.join()
 
 ### Performance Benchmark results
 
-Shared `list` container (which is not yet fully optimizes currently) is already faster than `multiprocessing.shared_memory.ShareableList`.
-And unlike `multiprocessing.shared_memory.ShareableList` supports Addition Assignment (`shared_list[15] += 999`) and all other native methods and operators of items.
-It provides an ability to make more than 30000000 reads/writes per second of an int64 value (`shared_list[2] = 1234` / `val = shared_list[7]`) or more than 1450000 addition assignments per second (`shared_list[15] += 999`).
+In the realm of performance, Cengal's shared `list` container, although not yet fully optimized, is already outpacing the performance of `multiprocessing.shared_memory.ShareableList`. What sets it apart is its comprehensive support for native methods and operators, including Addition Assignment (`shared_list[15] += 999`), a feature unavailable in `multiprocessing.shared_memory.ShareableList`.
+
+Cengal's shared `list` container demonstrates remarkable speed, boasting the ability to handle over 30,000,000 reads/writes per second for an int64 value (`shared_list[2] = 1234` / `val = shared_list[7]`), or more than 1,450,000 addition assignments per second (`shared_list[15] += 999`). These performance figures underscore the efficiency and versatility of Cengal's interprocess shared memory solution, even in its current state.
 
 [Benchmark Results](https://github.com/FI-Mihej/Cengal/blob/master/cengal/hardware/memory/shared_memory/versions/v_0/development/benchmark_results.md)
 
