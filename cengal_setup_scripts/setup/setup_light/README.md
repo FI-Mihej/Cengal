@@ -41,6 +41,7 @@ Below, you'll find a list of these stand-alone packages, each corresponding to a
 
 * [cengal_memory_barriers](https://github.com/FI-Mihej/cengal_memory_barriers) (package for `cengal.hardware.memory.barriers` module): Fast crossplatform memory barriers for Python.
 * [cengal_cpu_info](https://github.com/FI-Mihej/cengal_cpu_info) (package for `cengal.hardware.info.cpu` module): Extended, cached CPU info with consistent output format.
+* [cengal_app_dir_path_finder](https://github.com/FI-Mihej/cengal_app_dir_path_finder) (package for `cengal.file_system.app_fs_structure.app_dir_path` module): Offering a unified API for easy retrieval of OS-specific application directories, enhancing data management across Windows, Linux, and macOS.
 
 Stay tuned for future additions to our collection of stand-alone packages!
 
