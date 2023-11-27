@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.0"
+__version__ = "4.1.1"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -112,7 +112,7 @@ class EssenceModelInheritanceAbstract:
     def em_all_interfaces(self) -> Set[Type['EssenceInterface']]:
         raise NotImplementedError
 
-    def _em_check_applicability_of_interfaces(self) -> NoReturn:
+    def _em_check_applicability_of_interfaces(self) -> None:
         raise NotImplementedError
 
     def em_on_model_updated(self, interface_class: Type['EssenceInterface'], *args, **kwargs):
@@ -276,7 +276,7 @@ class EssenceModel(EssenceModelInheritanceAbstract, EssenceModelInjectionAbstrac
             injected_models_all_interfaces.update(model.em_all_interfaces())
         return own_all_interfaces | injected_models_all_interfaces
 
-    def _em_check_applicability_of_interfaces(self) -> NoReturn:
+    def _em_check_applicability_of_interfaces(self) -> None:
         new_interfaces = dict()
         new_possible_interfaces = dict()
 

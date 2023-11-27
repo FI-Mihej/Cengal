@@ -17,7 +17,7 @@
 
 import os.path
 from os.path import expanduser
-from cengal.text_processing import get_text_in_brackets
+from cengal.text_processing.help_tools import get_text_in_brackets
 import copy
 from enum import Enum
 from contextlib import contextmanager
@@ -31,7 +31,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.0"
+__version__ = "4.1.1"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"

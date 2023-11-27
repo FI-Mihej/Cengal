@@ -1,3 +1,11 @@
+![PyPI - Downloads](https://img.shields.io/pypi/dm/cengal-light)
+
+![PyPI - Version](https://img.shields.io/pypi/v/cengal-light) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cengal-light) ![PyPI - Implementation](https://img.shields.io/pypi/implementation/cengal-light) ![PyPI - Format](https://img.shields.io/pypi/format/cengal-light)
+
+![Static Badge](https://img.shields.io/badge/wheels-Linux_%7C_Windows-blue) ![Static Badge](https://img.shields.io/badge/OS-Linux_%7C_Windows_%7C_macOS-blue)
+
+![GitHub tag (with filter)](https://img.shields.io/github/v/tag/FI-Mihej/Cengal) ![PyPI - Status](https://img.shields.io/pypi/status/cengal) ![GitHub License](https://img.shields.io/github/license/FI-Mihej/Cengal)
+
 # cengal_pure
 
 This is the pure-Python Cengal package, designed for compatibility across a wide range of Python versions. It does not include compiled extensions, and mandatory requirements are not automatically installed.
@@ -343,12 +351,12 @@ More than 190 modules
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Python                         636          18572          21458          59787
-Cython                           9            686            415           1817
+Python                         644          20190          12546          55420
+Cython                           9            704            280           1745
 C                                2             39             26            163
 C/C++ Header                     2             14             26             37
 -------------------------------------------------------------------------------
-SUM:                           649          19311          21925          61804
+SUM:                           657          20947          12878          57365
 -------------------------------------------------------------------------------
 ```
 

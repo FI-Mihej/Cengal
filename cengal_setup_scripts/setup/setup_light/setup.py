@@ -25,7 +25,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.0"
+__version__ = "4.1.1"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -173,6 +173,9 @@ setuptools.setup(
         'cengal__text_processing__encoding_detection': [
             "charset-normalizer; python_version < '3.13'", 
             "chardet; python_version < '3.11'",
+        ],
+        'cengal__file_system__app_fs_structure__app_dir_path': [
+            "pyobjc; platform_system == 'Darwin'",
         ],
         'full': [
             "psutil; platform_python_implementation != 'PyPy' or platform_system != 'Windows'",
