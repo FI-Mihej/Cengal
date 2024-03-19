@@ -28,7 +28,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -54,7 +54,7 @@ class CompositorCS(PTGCompositor):
         self.setup_coro_worker: AnyWorker = setup_coro_worker
         self.setup_coro_worker_args: Tuple = args
         self.setup_coro_worker_kwargs: Dict = kwargs
-        self.cs: CoroScheduler = None
+        self.cs: CoroSchedulerType = None
         self.setup_coro_worker_value_holder: ValueExistence = None
 
     def ensure_cs(self):
@@ -93,7 +93,7 @@ class WindowManagerCS(PTGWindowManager):
 
     def init_cs(self, setup_coro_worker: AnyWorker, *args, **kwargs):
         reinterpret_cast(CompositorCS, self.compositor)
-        self.cs: CoroScheduler = None
+        self.cs: CoroSchedulerType = None
         self.compositor.init_cs(setup_coro_worker, *args, **kwargs)
     
     def put_coro(self, coro_worker: AnyWorker, *args, **kwargs):

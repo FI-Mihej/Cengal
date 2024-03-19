@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -53,6 +53,7 @@ class AddToCompoundDict:
         #     self.original_dict[key] = self._default_value()
         self.original_dict.setdefault(key, self._default_value())
         result = self._mediator(self.original_dict, key, value)
-        # if result is not None:
-        if isinstance(result, ValueExistence):
-            self.original_dict[key] = result.value
+        if result is not None:
+            self.original_dict[key] = result[1]
+        # if isinstance(result, ValueExistence):
+        #     self.original_dict[key] = result.value

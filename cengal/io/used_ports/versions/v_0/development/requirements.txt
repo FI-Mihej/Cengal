@@ -1,2 +1,7 @@
+wheel
+setuptools
+cengal-light
+
+lxml
 pandas
 requests

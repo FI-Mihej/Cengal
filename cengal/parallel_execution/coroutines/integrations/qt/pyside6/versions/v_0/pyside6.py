@@ -66,7 +66,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -74,7 +74,7 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-from cengal.parallel_execution.coroutines.coro_scheduler import CoroScheduler, Interface, Coro, AnyWorker, current_interface, current_coro_scheduler, cs_coro, cs_acoro
+from cengal.parallel_execution.coroutines.coro_scheduler import CoroScheduler, CoroSchedulerType, Interface, Coro, AnyWorker, current_interface, current_coro_scheduler, cs_coro, cs_acoro
 from cengal.parallel_execution.coroutines.coro_standard_services.loop_yield import gly, CoroPriority, gly_patched, agly_patched
 from cengal.parallel_execution.coroutines.coro_standard_services.run_coro import RunCoro
 from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import PutCoro
@@ -211,9 +211,9 @@ def modal(callable_with_modal, *args, **kwargs):
     class ShowModal(QObject):
         signal = Signal()
 
-        def __init__(self, cs: CoroScheduler, result_event: Hashable):
+        def __init__(self, cs: CoroSchedulerType, result_event: Hashable):
             super().__init__()
-            self.cs: CoroScheduler = cs
+            self.cs: CoroSchedulerType = cs
             self.result_event: Hashable = result_event
             self.signal.connect(self.show_modal, Qt.ConnectionType.QueuedConnection)
 
@@ -232,9 +232,9 @@ async def amodal(callable_with_modal, *args, **kwargs):
     class ShowModal(QObject):
         signal = Signal()
 
-        def __init__(self, cs: CoroScheduler, result_event: Hashable):
+        def __init__(self, cs: CoroSchedulerType, result_event: Hashable):
             super().__init__()
-            self.cs: CoroScheduler = cs
+            self.cs: CoroSchedulerType = cs
             self.result_event: Hashable = result_event
             self.signal.connect(self.show_modal, Qt.ConnectionType.QueuedConnection)
 
@@ -265,7 +265,7 @@ class CoroSlot:
         self._coro = coro
 
         def func_wrapper(*args, **kwargs):
-            cs: CoroScheduler = current_coro_scheduler()
+            cs: CoroSchedulerType = current_coro_scheduler()
             service: PutCoro = cs.get_service_instance(PutCoro)
             return service._add_direct_request(cs_coro(coro), *args, **kwargs)
         
@@ -303,7 +303,7 @@ class CoroSlot:
         self._coro = coro
 
         def func_wrapper(*args, **kwargs):
-            cs: CoroScheduler = current_coro_scheduler()
+            cs: CoroSchedulerType = current_coro_scheduler()
             service: PutCoro = cs.get_service_instance(PutCoro)
             return service._add_direct_request(coro, *args, **kwargs)
         
@@ -372,7 +372,7 @@ csex = coro_slot_explicit
 def qt_exec_in_coro(func: Callable, default_priority: CoroPriority = CoroPriority.normal) -> Callable:
     @wraps(func)
     def wrapper(*args, **kwargs):
-        cs: CoroScheduler = current_coro_scheduler()
+        cs: CoroSchedulerType = current_coro_scheduler()
         cs.high_cpu_utilisation_mode = False
         cs.use_internal_sleep = False
         i: Interface = current_interface()
@@ -424,7 +424,7 @@ class CoroThreadWorker(QObject):
     def __init__(self, worker: AnyWorker) -> None:
         super().__init__()
         self._worker: AnyWorker = worker
-        self._cs: CoroScheduler = None
+        self._cs: CoroSchedulerType = None
         self.allowed_to_run = False
 
     def run(self):

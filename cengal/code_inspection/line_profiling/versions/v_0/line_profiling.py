@@ -18,6 +18,7 @@
 from contextlib import contextmanager
 from cengal.code_flow_control.smart_values.versions.v_0 import ResultExistence
 from cengal.system import PYTHON_VERSION_INT
+import sys
 
 """
 Module Docstring
@@ -28,7 +29,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -59,7 +60,7 @@ def set_profiler(allow_profiling=True):
         prof = LineProfiler()
     else:
         prof = DumbProfiler()
-    if PYTHON_VERSION_INT[0] >= 3:
+    if sys.version_info >= (3,):
         import builtins
     else:
         import __builtin__ as builtins

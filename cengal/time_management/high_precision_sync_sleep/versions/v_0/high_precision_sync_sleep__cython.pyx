@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -34,7 +34,7 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-IF (UNAME_SYSNAME == "Windows") and (UNAME_MACHINE in ("x86_64", "x86", "i386", "i686", "AMD64")):
+IF (CD_UNAME_SYSNAME == "Windows") and (CD_UNAME_MACHINE in ("x86_64", "x86", "i386", "i686", "AMD64")):
     cdef extern from "<immintrin.h>" nogil:
         void _mm_pause()
 
@@ -43,7 +43,7 @@ IF (UNAME_SYSNAME == "Windows") and (UNAME_MACHINE in ("x86_64", "x86", "i386", 
         _mm_pause()
 
 
-ELIF (UNAME_SYSNAME in ("Linux", "Darwin")) and (UNAME_MACHINE in ("x86_64", "x86", "i386", "i686", "AMD64")):
+ELIF (CD_UNAME_SYSNAME in ("Linux", "Darwin")) and (CD_UNAME_MACHINE in ("x86_64", "x86", "i386", "i686", "AMD64")):
     cdef extern from "<immintrin.h>" nogil:
         void _mm_pause()
 
@@ -57,7 +57,7 @@ ELSE:
         pass
 
 
-IF UNAME_SYSNAME == "Windows":
+IF CD_UNAME_SYSNAME == "Windows":
     from libc.time cimport clock, CLOCKS_PER_SEC, clock_t
 
     cdef extern from "Windows.h":
@@ -78,7 +78,7 @@ IF UNAME_SYSNAME == "Windows":
 
     hps_sleep = high_precision_sync_sleep = cython_spinwait
 
-ELIF UNAME_SYSNAME in ("Linux", "Darwin"):
+ELIF CD_UNAME_SYSNAME in ("Linux", "Darwin"):
     cdef extern from "time.h":
         struct timespec:
             long tv_sec
@@ -103,7 +103,7 @@ ELIF UNAME_SYSNAME in ("Linux", "Darwin"):
     
     hps_sleep = high_precision_sync_sleep = cython_nanosleep
 
-ELIF UNAME_SYSNAME == "Emscripten":
+ELIF CD_UNAME_SYSNAME == "Emscripten":
     from libc.stdint cimport uint32_t
 
     cdef extern from "emscripten.h":

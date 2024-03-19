@@ -3,3 +3,4 @@ wheel
 debugpy
 py-cpuinfo
 charset-normalizer; python_version < "3.13"
+typing_extensions

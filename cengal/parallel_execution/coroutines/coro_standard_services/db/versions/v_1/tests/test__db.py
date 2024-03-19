@@ -24,7 +24,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -39,7 +39,7 @@ from cengal.time_management.run_time import RT
 from cengal.introspection.inspect import get_exception, pifrl
 
 from cengal.parallel_execution.coroutines.coro_tools.run_in_loop import run_in_loop
-from cengal.parallel_execution.coroutines.coro_scheduler import CoroScheduler, Interface, CoroWrapperBase, CoroID, GreenletExit, AnyWorker, current_interface
+from cengal.parallel_execution.coroutines.coro_scheduler import CoroScheduler, CoroSchedulerType, Interface, CoroWrapperBase, CoroID, GreenletExit, AnyWorker, current_interface
 from cengal.parallel_execution.coroutines.coro_standard_services.sleep import Sleep
 from cengal.parallel_execution.coroutines.coro_standard_services.cpu_tick_count_per_second import CpuTickCountPerSecond
 from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import PutCoro, PutCoroRequest
@@ -60,7 +60,7 @@ from shutil import rmtree
 
 async def wait_for_db_env_unlocked(db_request: DbRequest):
     i: Interface = current_interface()
-    loop: CoroScheduler = i._loop
+    loop: CoroSchedulerType = i._loop
     db_service: Db = loop.get_service_instance(Db)
     while db_request.env_id in db_service.write_locked:
         await i(Sleep, 0.01)
@@ -68,7 +68,7 @@ async def wait_for_db_env_unlocked(db_request: DbRequest):
 
 async def destroy_db_service(with_data: bool = False):
     i: Interface = current_interface()
-    loop: CoroScheduler = i._loop
+    loop: CoroSchedulerType = i._loop
     db_service: Db = loop.get_service_instance(Db)
     dir_to_delete = db_service.root_path_to_db_environments_rel('')
     while db_service.write_locked:
@@ -128,7 +128,7 @@ class TestCaseForDb(unittest.TestCase):
     def test_00_register_service(self):
         pifrl()
         async def coro(i: Interface, db_request: DbRequest) -> None:
-            loop: CoroScheduler = i._loop
+            loop: CoroSchedulerType = i._loop
             loop.register_service(Db)
             await i(Sleep, 0.01)
             db_service = loop.get_service_instance(Db)
@@ -145,7 +145,7 @@ class TestCaseForDb(unittest.TestCase):
         async def coro(i: Interface, db_request: DbRequest) -> None:
             await i(Db)
             await i(Sleep, 0.1)
-            loop: CoroScheduler = i._loop
+            loop: CoroSchedulerType = i._loop
             db_service: Db = loop.get_service_instance(Db)
             await i(Db)
             while db_service.default_db_environment is None:

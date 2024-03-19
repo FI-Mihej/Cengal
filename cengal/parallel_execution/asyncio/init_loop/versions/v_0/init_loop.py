@@ -24,17 +24,23 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
 __status__ = "Development"
 # __status__ = "Production"
 
-__all__ = ['init_loop']
+
+__all__ = ['init_loop', 'restore_default_loop']
+
 
 import asyncio
 import os
+
+
+def restore_default_loop():
+    asyncio.set_event_loop_policy(None)
 
 
 def init_loop():

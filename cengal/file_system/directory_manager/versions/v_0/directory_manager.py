@@ -20,10 +20,11 @@ from contextlib import contextmanager
 import shutil
 import os
 import os.path
+from pathlib import PurePath
 from enum import Enum
 import hashlib
 from cengal.introspection.inspect import frame
-from typing import Optional, Callable, Set, Tuple
+from typing import Optional, Callable, Set, Tuple, Union, List, Any
 
 """
 Module Docstring
@@ -34,7 +35,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -150,7 +151,7 @@ class FilteringEntity(Enum):
     aggregated = 3
 
 
-def file_list_traversal(root_dir, filter: Callable = None, remove_empty_dirpaths=False):
+def file_list_traversal(root_dir: str, filter: Callable = None, remove_empty_dirpaths=False) -> Union[Any, List[Tuple[str, List[str], List[str]]]]:
     """
     :param root_dir: str(); r'C:\dir\path'
     :param filtering_type: FilteringType()
@@ -180,6 +181,91 @@ def file_list_traversal(root_dir, filter: Callable = None, remove_empty_dirpaths
         for dirname in dirnames:
             if filter(FilteringEntity.dirname, (dirpath, dirname)):
                 new_dirnames.append(dirname)
+
+        new_filenames = list()
+        for filename in filenames:
+            if filter(FilteringEntity.filename, (dirpath, filename)):
+                new_filenames.append(filename)
+        
+        if remove_empty_dirpaths:
+            if not new_filenames and not new_dirnames:
+                continue
+
+        result = (dirpath, new_dirnames, new_filenames)
+        result_list.append(result)
+
+    return filter(FilteringEntity.aggregated, result_list)
+
+
+def file_list_traversal_ex(
+        root_dir: str, 
+        filter: Callable = None, 
+        remove_empty_dirpaths=False,
+        subignore_by_dirname=True,
+        subignore_by_dirpath=True,
+        subignore: Optional[Set[str]] = None
+        ) -> Union[Any, List[Tuple[str, List[str], List[str]]]]:
+    """
+    :param root_dir: str(); r'C:\dir\path'
+    :param filtering_type: FilteringType()
+    :param extentions_set: set(); {'.upk', '.txt'}
+    :return: list() of tuple(); list of (dirpath, dirnames, new_filenames)
+    """
+
+    if filter is None:
+        def default_filter(filtering_entity: FilteringEntity, data):
+            if FilteringEntity.aggregated == filtering_entity:
+                return data
+            else:
+                return True
+
+        filter = default_filter
+
+    subignore = set() if subignore is None else subignore
+    def is_subignored(dir_path: str) -> bool:
+        if not subignore:
+            return False
+
+        if dir_path in subignore:
+            return True
+        
+        while True:
+            new_dir_name = os.path.dirname(dir_path)
+            if new_dir_name == dir_path:
+                break
+            
+            if new_dir_name in subignore:
+                return True
+
+            dir_path = new_dir_name
+
+        return False
+
+    result_list = list()
+    for raw_result in os.walk(root_dir):
+        dirpath = raw_result[0]
+        dirnames = raw_result[1]
+        filenames = raw_result[2]
+
+        if is_subignored(dirpath):
+            continue
+        
+        if not filter(FilteringEntity.dirpath, (dirpath, dirnames, filenames)):
+            if subignore_by_dirpath:
+                subignore.add(dirpath)
+            
+            continue
+
+        new_dirnames = list()
+        for dirname in dirnames:
+            if is_subignored(os.path.join(dirpath, dirname)):
+                continue
+
+            if filter(FilteringEntity.dirname, (dirpath, dirname)):
+                new_dirnames.append(dirname)
+            else:
+                if subignore_by_dirname:
+                    subignore.add(os.path.join(dirpath, dirname))
 
         new_filenames = list()
         for filename in filenames:
@@ -265,5 +351,23 @@ def ensure_empty_dir(dir_path):
 
 
 def dir_exists(dir_path) -> bool:
-    dir_path = os.path.normpath(dir_path)
+    dir_path: str = os.path.normpath(dir_path)
     return os.path.exists(dir_path) and os.path.isdir(dir_path)
+
+
+class DirNotExistsError(Exception):
+    pass
+
+
+def dir_empty(dir_path) -> bool:
+    dir_path: str = os.path.normpath(dir_path)
+    if not dir_exists(dir_path):
+        raise DirNotExistsError
+
+    dir_path, sub_dir_names, file_names = filtered_file_list(dir_path, FilteringType.off)
+    return (not sub_dir_names) and (not file_names)
+
+
+def path_relative_to_current_dir(relative_path: Optional[str]=None) -> str:
+    relative_path = relative_path or str()
+    return os.path.normpath(os.path.join(os.getcwd(), os.path.normpath(relative_path)))

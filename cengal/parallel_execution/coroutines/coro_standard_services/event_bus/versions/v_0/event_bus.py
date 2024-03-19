@@ -39,7 +39,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -66,7 +66,7 @@ class EventBusRequest(ServiceRequest):
 
 
 class EventBus(Service, EntityStatsMixin):
-    def __init__(self, loop: CoroScheduler):
+    def __init__(self, loop: CoroSchedulerType):
         super(EventBus, self).__init__(loop)
 
         self._request_workers = {
@@ -127,7 +127,7 @@ class EventBus(Service, EntityStatsMixin):
                                     handlers: Dict[EventID, Set[Handler]],
                                     priority: CoroPriority
                                     ):
-                loop: CoroScheduler = interface._loop
+                loop: CoroSchedulerType = interface._loop
                 current_coro_interface_buff: Interface = loop.current_coro_interface
                 ly = await agly(priority)
                 for event in interested_events:
@@ -198,7 +198,7 @@ EventBusRequest.default_service_type = EventBus
 
 
 def try_send_event(
-        backup_scheduler: Optional[CoroScheduler],
+        backup_scheduler: Optional[CoroSchedulerType],
         event: EventID, data: Any):
     def event_sender(
             interface: Interface,

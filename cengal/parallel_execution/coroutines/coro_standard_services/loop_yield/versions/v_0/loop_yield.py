@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -201,7 +201,7 @@ class LoopYieldManagedAsync(LoopYieldManagedBase):
 
 class LoopYieldManagedAsyncExternal(LoopYieldManagedBase):
     def __init__(self, task_id: int, time_atom: ValueExistence,
-                 default_priority: CoroPriority, service: Type[Service], coro_scheduler: CoroScheduler, asyncio_loop: asyncio.AbstractEventLoop):
+                 default_priority: CoroPriority, service: Type[Service], coro_scheduler: CoroSchedulerType, asyncio_loop: asyncio.AbstractEventLoop):
         super(LoopYieldManagedAsyncExternal, self).__init__(None, time_atom, default_priority, service)
         self.task_id = task_id
         self.coro_scheduler = coro_scheduler
@@ -244,7 +244,7 @@ class ThisCoroWasRequestedToBeKilled(Exception):
 
 
 class LoopYieldPriorityScheduler(TypedService[None], EntityStatsMixin):
-    def __init__(self, loop: CoroScheduler):
+    def __init__(self, loop: CoroSchedulerType):
         super(LoopYieldPriorityScheduler, self).__init__(loop)
 
         # loop.add_global_on_coro_del_handler(self._on_coro_del_handler_global)  # Todo: switch to local coro del handler
@@ -586,7 +586,7 @@ agly = aget_loop_yield
 
 @asynccontextmanager
 @async_generator
-async def external_aget_loop_yield(default_priority: CoroPriority = CoroPriority.normal, coro_scheduler: Optional[CoroScheduler]=None, asyncio_loop: Optional[asyncio.AbstractEventLoop]=None):
+async def external_aget_loop_yield(default_priority: CoroPriority = CoroPriority.normal, coro_scheduler: Optional[CoroSchedulerType]=None, asyncio_loop: Optional[asyncio.AbstractEventLoop]=None):
     if coro_scheduler is None:
         coro_scheduler = CoroScheduler.current_loop()
     

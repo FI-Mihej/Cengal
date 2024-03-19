@@ -25,7 +25,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -67,6 +67,7 @@ setup_requires = [
     "py-cpuinfo",
     "Cython>=0.29.34",
     "patch-ng; python_version >= '3.12' or (platform_python_implementation == 'PyPy' and platform_system == 'Windows')",
+    "typing_extensions",
 ]
 pypi_requirements_list = get_pypi_requirements_list()
 if 'patch-ng' in pypi_requirements_list:
@@ -112,6 +113,12 @@ setuptools.setup(
     # extras_require={
     #     'hardware__info__cpu__versions__v_1': ['py-cpuinfo'],
     # },
+    entry_points={
+        'console_scripts': [
+            'cengal__package__create = cengal.build_tools.packages.create:main',
+            'cengal__package__add_project = cengal.build_tools.packages.add_project:main',
+        ],
+    },
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: Apache Software License',

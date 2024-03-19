@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -36,12 +36,12 @@ __status__ = "Development"
 
 __all__ = ['adump', 'adumps', 'aload', 'aloads']
 
-from cengal.parallel_execution.coroutines.coro_scheduler.versions.v_0.coro_scheduler import CoroScheduler, Interface
+from cengal.parallel_execution.coroutines.coro_scheduler import CoroScheduler, CoroSchedulerType, Interface
 from .json import *
 from cengal.parallel_execution.coroutines.coro_tools.await_coro import await_coro
 
 
-async def adump(cs: CoroScheduler, *args, **kwargs):
+async def adump(cs: CoroSchedulerType, *args, **kwargs):
     # You may use
     # ly = None, priority: CoroPriority = CoroPriority.normal
     # as an additional parameters in order to configure LowLatencyJSONEncoder
@@ -53,7 +53,7 @@ async def adump(cs: CoroScheduler, *args, **kwargs):
     return await await_coro(cs, coro)
 
 
-async def adumps(cs: CoroScheduler, *args, **kwargs):
+async def adumps(cs: CoroSchedulerType, *args, **kwargs):
     # You may use
     # ly = None, priority: CoroPriority = CoroPriority.normal
     # as an additional parameters in order to configure LowLatencyJSONEncoder
@@ -65,7 +65,7 @@ async def adumps(cs: CoroScheduler, *args, **kwargs):
     return await await_coro(cs, coro)
 
 
-async def aload(cs: CoroScheduler, *args, **kwargs):
+async def aload(cs: CoroSchedulerType, *args, **kwargs):
     # You may use
     # ly = None, priority: CoroPriority = CoroPriority.normal
     # as an additional parameters in order to configure LowLatencyJSONEncoder
@@ -78,7 +78,7 @@ async def aload(cs: CoroScheduler, *args, **kwargs):
     return await await_coro(cs, coro)
 
 
-async def aloads(cs: CoroScheduler, *args, **kwargs):
+async def aloads(cs: CoroSchedulerType, *args, **kwargs):
     # You may use
     # ly = None, priority: CoroPriority = CoroPriority.normal
     # as an additional parameters in order to configure LowLatencyJSONEncoder

@@ -17,6 +17,8 @@
 
 __all__ = [
     'ServiceWithADirectRequestMixin', 
+    'put_request_to_service',
+    'try_put_request_to_service',
     'put_request_to_service_with_context', 
     'try_put_request_to_service_with_context', 
     'make_request_to_service_with_context', 
@@ -44,7 +46,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -57,7 +59,7 @@ class ServiceWithADirectRequestMixin:
         raise NotImplementedError
 
 
-def put_request_to_service_with_context(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], service_type: Type[ServiceWithADirectRequestMixin], *args, **kwargs) -> ValueExistence:
+def put_request_to_service_with_context(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], service_type: Type[ServiceWithADirectRequestMixin], *args, **kwargs) -> ValueExistence:
     loop, interface, coro_alive = context
     if loop is None:
         raise CoroSchedulerContextIsNotAvailable
@@ -67,7 +69,7 @@ def put_request_to_service_with_context(context: Tuple[Optional[CoroScheduler], 
     return service._add_direct_request(*args, **kwargs)
 
 
-def try_put_request_to_service_with_context(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], service_type: Type[ServiceWithADirectRequestMixin], *args, **kwargs) -> ValueExistence:
+def try_put_request_to_service_with_context(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], service_type: Type[ServiceWithADirectRequestMixin], *args, **kwargs) -> ValueExistence:
     loop, interface, coro_alive = context
     if loop is None:
         return None
@@ -77,60 +79,68 @@ def try_put_request_to_service_with_context(context: Tuple[Optional[CoroSchedule
     return service._add_direct_request(*args, **kwargs)
 
 
-def make_request_to_service_with_context(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], service_type: Type[ServiceWithADirectRequestMixin], *args, **kwargs) -> ValueExistence:
+def make_request_to_service_with_context(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], service_type: Type[ServiceWithADirectRequestMixin], *args, **kwargs) -> ValueExistence:
     loop, interface, coro_alive = context
     if loop is None:
         raise CoroSchedulerContextIsNotAvailable
 
     if coro_alive and isinstance(interface, InterfaceGreenlet):
         # In greenlet coroutine
-        return ValueExistence(True, interface(service_type, *args, **kwargs))
+        return True, interface(service_type, *args, **kwargs)
     else:
         # Outside the loop or in the service
         service: ServiceWithADirectRequestMixin = loop.get_service_instance(service_type)
         return service._add_direct_request(*args, **kwargs)
 
 
-def try_make_request_to_service_with_context(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], service_type: Type[ServiceWithADirectRequestMixin], *args, **kwargs) -> ValueExistence:
+def try_make_request_to_service_with_context(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], service_type: Type[ServiceWithADirectRequestMixin], *args, **kwargs) -> ValueExistence:
     loop, interface, coro_alive = context
     if loop is None:
         return None
 
     if coro_alive and isinstance(interface, InterfaceGreenlet):
         # In greenlet coroutine
-        return ValueExistence(True, interface(service_type, *args, **kwargs))
+        return True, interface(service_type, *args, **kwargs)
     else:
         # Outside the loop or in the service
         service: ServiceWithADirectRequestMixin = loop.get_service_instance(service_type)
         return service._add_direct_request(*args, **kwargs)
 
 
-async def amake_request_to_service_with_context(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], service_type: Type[ServiceWithADirectRequestMixin], *args, **kwargs) -> ValueExistence:
+async def amake_request_to_service_with_context(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], service_type: Type[ServiceWithADirectRequestMixin], *args, **kwargs) -> ValueExistence:
     loop, interface, coro_alive = context
     if loop is None:
         raise CoroSchedulerContextIsNotAvailable
 
     if coro_alive and isinstance(interface, InterfaceAsyncAwait):
         # In awaitable coroutine
-        return ValueExistence(True, await interface(service_type, *args, **kwargs))
+        return True, await interface(service_type, *args, **kwargs)
     else:
         # Outside the loop or in the service
         service: ServiceWithADirectRequestMixin = loop.get_service_instance(service_type)
         return service._add_direct_request(*args, **kwargs)
 
 
-async def atry_make_request_to_service_with_context(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], service_type: Type[ServiceWithADirectRequestMixin], *args, **kwargs) -> ValueExistence:
+async def atry_make_request_to_service_with_context(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], service_type: Type[ServiceWithADirectRequestMixin], *args, **kwargs) -> ValueExistence:
     loop, interface, coro_alive = context
     if loop is None:
         return None
 
     if coro_alive and isinstance(interface, InterfaceAsyncAwait):
         # In awaitable coroutine
-        return ValueExistence(True, await interface(service_type, *args, **kwargs))
+        return True, await interface(service_type, *args, **kwargs)
     else:
         # Outside the loop or in the service
         service: ServiceWithADirectRequestMixin = loop.get_service_instance(service_type)
         return service._add_direct_request(*args, **kwargs)
+
+
+def put_request_to_service(service_type: Type[ServiceWithADirectRequestMixin], *args, **kwargs) -> ValueExistence:
+    return put_request_to_service_with_context(get_interface_and_loop_with_backup_loop(), service_type, *args, **kwargs)
+
+
+def try_put_request_to_service(service_type: Type[ServiceWithADirectRequestMixin], *args, **kwargs) -> ValueExistence:
+    return try_put_request_to_service_with_context(get_interface_and_loop_with_backup_loop(), service_type, *args, **kwargs)
 
 
 def make_request_to_service(service_type: Type[ServiceWithADirectRequestMixin], *args, **kwargs) -> ValueExistence:

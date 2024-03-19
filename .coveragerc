@@ -13,3 +13,7 @@ omit =
     */versions/v_*/development
     __init__.py
     __x__build_config.py
+    __requirements__.py
+    ./cengal/io/asock_io/*
+    ./cengal/universal_parser/*
+    ./cengal/io/net_io/*

@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = ['ProcessPoolRuntimeError', 'ExecutorSetupBase', 'ExecutorTypeSetup', 'ExecutorInstanceSetup', 'InitializerSetup', 'ProcessPoolSetup', 'ProcessPool']
+__all__ = ['run_coroutine_in_new_thread', 'ProcessPoolRuntimeError', 'ExecutorSetupBase', 'ExecutorTypeSetup', 'ExecutorInstanceSetup', 'InitializerSetup', 'ProcessPoolSetup', 'ProcessPool']
 
 """
 Module Docstring
@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -34,12 +34,15 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
+from cengal.introspection.inspect import get_exception, is_async
+from cengal.code_flow_control.smart_values import ResultHolder
+
 import sys
 import asyncio
 from concurrent.futures import Executor
+from threading import Thread
 from functools import partial
 from typing import Callable, Optional, Type, Any, Tuple
-from cengal.introspection.inspect import get_exception, is_async
 
 
 class ProcessPoolRuntimeError(RuntimeError):
@@ -77,6 +80,32 @@ class ProcessPoolSetup:
         self.is_multiprocessing: bool = is_multiprocessing
 
 
+def run_coroutine_in_new_thread(coro: Callable, *args, **kwargs) -> Any:
+    def thread_worker(result_holder: ResultHolder, coro: Callable, *args, **kwargs):
+        result = None
+        exception = None
+        try:
+            import asyncio
+            result = asyncio.run(coro(*args, **kwargs))
+        except:
+            exception = get_exception()
+        
+        result_holder.value = (result, exception)
+    
+    result_holder: ResultHolder = ResultHolder()
+    thread_args = [result_holder, coro,] + list(args)
+    thread: Thread = Thread(target=thread_worker, args=thread_args, kwargs=kwargs)
+    thread.start()
+    thread.join()
+    if result_holder:
+        result, exception = result_holder.value
+    else:
+        result = None
+        exception = RuntimeError('ProcessPool internal error')
+    
+    return result, exception
+
+
 class ProcessPool:
     def __init__(self, executor_setup: ExecutorSetupBase, initializer_setup: Optional[InitializerSetup] = None, process_pool_setup: Optional[ProcessPoolSetup] = None) -> None:
         self.executor_setup: ExecutorSetupBase = executor_setup
@@ -94,7 +123,7 @@ class ProcessPool:
         if self.initializer_setup is not None:
             self.partial_pool_initializer = partial(ProcessPool._initializer, self.initializer_setup.initializer, *self.initializer_setup.args, **self.initializer_setup.kwargs)
         
-        if 7 <= sys.version_info[1]:
+        if (3, 7) <= sys.version_info:
             if isinstance(self.executor_setup, ExecutorInstanceSetup):
                 self.executor = self.executor_setup.executor
             elif isinstance(self.executor_setup, ExecutorTypeSetup):
@@ -134,13 +163,45 @@ class ProcessPool:
             process_initialized = False
         
         if not process_initialized:
-            partial_pool_initializer()
+            if partial_pool_initializer is not None:
+                partial_pool_initializer()
+            
             process_initialized = True
         
-        return worker(*args, **kwargs)
+        return ProcessPool._pool_worker(worker, *args, **kwargs)
 
     @staticmethod
-    async def _apool_worker(worker: Callable, *args, **kwargs) -> Tuple[Any, Optional[BaseException]]:
+    def _apool_worker(result_holder: ResultHolder, worker: Callable, *args, **kwargs) -> Tuple[Any, Optional[BaseException]]:
+        result = None
+        exception = None
+        try:
+            import asyncio
+            result = asyncio.run(worker(*args, **kwargs))
+        except:
+            exception = get_exception()
+        
+        result_holder.value = (result, exception)
+    
+    @staticmethod
+    def _apool_worker(worker: Callable, *args, **kwargs) -> Tuple[Any, Optional[BaseException]]:
+        return run_coroutine_in_new_thread(worker, *args, **kwargs)
+
+    @staticmethod
+    def _apool_worker_wrapper(partial_pool_initializer: Callable, worker: Callable, *args, **kwargs) -> Tuple[Any, Optional[BaseException]]:
+        global process_initialized
+        if 'process_initialized' not in globals():
+            process_initialized = False
+        
+        if not process_initialized:
+            if partial_pool_initializer is not None:
+                partial_pool_initializer()
+
+            process_initialized = True
+        
+        return ProcessPool._apool_worker(worker, *args, **kwargs)
+
+    @staticmethod
+    async def _a_single_process_pool_worker(worker: Callable, *args, **kwargs) -> Tuple[Any, Optional[BaseException]]:
         result = None
         exception = None
         try:
@@ -151,30 +212,40 @@ class ProcessPool:
         return result, exception
 
     @staticmethod
-    async def _apool_worker_wrapper(partial_pool_initializer: Callable, worker: Callable, *args, **kwargs) -> Tuple[Any, Optional[BaseException]]:
+    async def _a_single_process_pool_worker_wrapper(partial_pool_initializer: Callable, worker: Callable, *args, **kwargs) -> Tuple[Any, Optional[BaseException]]:
         global process_initialized
         if 'process_initialized' not in globals():
             process_initialized = False
         
         if not process_initialized:
-            partial_pool_initializer()
+            if partial_pool_initializer is not None:
+                partial_pool_initializer()
+
             process_initialized = True
         
-        return await worker(*args, **kwargs)
+        return await ProcessPool._a_single_process_pool_worker(worker, *args, **kwargs)
 
     async def pool_execute(self, worker: Callable, *args, **kwargs) -> Any:
-        if (7 <= sys.version_info[1]) or (self.partial_pool_initializer is None):
-            partial_pool_worker = partial(ProcessPool._pool_worker, worker, *args, **kwargs)
-        else:
-            partial_pool_worker = partial(ProcessPool._pool_worker_wrapper, self.partial_pool_initializer, worker, *args, **kwargs)
-            
         if self.process_pool_setup.is_multiprocessing:
+            if ((3, 7) <= sys.version_info) or (self.partial_pool_initializer is None):
+                if is_async(worker):
+                    partial_pool_worker = partial(ProcessPool._apool_worker, worker, *args, **kwargs)
+                else:
+                    partial_pool_worker = partial(ProcessPool._pool_worker, worker, *args, **kwargs)
+            else:
+                if is_async(worker):
+                    partial_pool_worker = partial(ProcessPool._apool_worker_wrapper, self.partial_pool_initializer, worker, *args, **kwargs)
+                else:
+                    partial_pool_worker = partial(ProcessPool._pool_worker_wrapper, self.partial_pool_initializer, worker, *args, **kwargs)
+            
             result: Tuple[Any, Optional[BaseException]] = await self.process_pool_setup.loop.run_in_executor(self.executor, partial_pool_worker)
         else:
             if is_async(worker):
-                result = await worker(*args, **kwargs)
+                a_single_process_pool_worker = partial(ProcessPool._a_single_process_pool_worker_wrapper, self.partial_pool_initializer, worker, *args, **kwargs)
+                result = await a_single_process_pool_worker()
             else:
-                result = worker(*args, **kwargs)
+                partial_pool_worker = partial(ProcessPool._pool_worker_wrapper, self.partial_pool_initializer, worker, *args, **kwargs)
+                result = partial_pool_worker()
         
         result, exception = result
         
@@ -197,7 +268,7 @@ class ProcessPool:
 #     global executor_init_params
 #     executor_init_params = (('hello pool',), dict())
 #     global executor
-#     if 7 <= sys.version_info[1]:
+#     if (3, 7) <= sys.version_info:
 #         pool_args, pool_kwargs = executor_init_params
 #         partial_pool_initializer = partial(pool_initializer, *pool_args, **pool_kwargs)
 #         executor = ProcessPoolExecutor(max_workers=2, initializer=partial_pool_initializer)
@@ -234,7 +305,7 @@ class ProcessPool:
         
 
 # async def pool_execute(*args, **kwargs):
-#     if 7 <= sys.version_info[1]:
+#     if (3, 7) <= sys.version_info:
 #         partial_pool_worker = partial(pool_worker, *args, **kwargs)
 #     else:
 #         partial_pool_worker = partial(pool_worker_wrapper, executor_init_params, *args, **kwargs)

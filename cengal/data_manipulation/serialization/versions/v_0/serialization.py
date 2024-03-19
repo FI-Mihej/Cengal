@@ -15,12 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import enum
-import gc
-from functools import lru_cache
-from typing import Set, Union, Optional, Any, Dict, Tuple
+from cengal.code_flow_control.gc import DisableGC
 from cengal.modules_management.alternative_import import alt_import
 from cengal.time_management.repeat_for_a_time import Tracer
+from cengal.time_management.load_best_timer import perf_counter
+import enum
+from functools import lru_cache
+from typing import Set, Union, Optional, Any, Dict, Tuple, List
 
 
 """
@@ -32,7 +33,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -77,6 +78,7 @@ class DataFormats(enum.Enum):
 
 
 SerializerFeatures = Set[Union[Tags, DataFormats]]
+SerializerFeaturesTuple = Tuple[Union[Tags, DataFormats]]
 
 
 # !!! Keep an order! Add new serializers to the end of the list only !!!
@@ -121,6 +123,55 @@ class Serializers(enum.Enum):
     msgspec_messagepack = 37
     msgspec_yaml = 38
     msgspec_toml = 39
+
+
+import datetime
+import decimal
+import fractions
+import re
+from email.message import Message as emailMessage
+import uuid
+import ipaddress
+from types import CodeType
+none_type = type(None)
+SUPPORTED_TYPES = {
+    Serializers.json: {int, float, bool, none_type, str, list, dict},
+    Serializers.simplejson: {int, float, bool, none_type, str, list, dict},
+    Serializers.ujson: {int, float, bool, none_type, str, list, dict},
+    Serializers.orjson: {int, float, bool, none_type, str, list, dict},
+    Serializers.tnetstring: {int, float, bool, none_type, str, list, dict},
+    Serializers.pynetstring: {int, float, bool, none_type, str, list, dict},
+    Serializers.msgpack: {int, float, bool, none_type, str, bytes, list, dict},
+    Serializers.msgpack_fast: {int, float, bool, none_type, str, bytes, tuple, dict},
+    Serializers.cbor: {int, float, bool, none_type, str, list, dict},
+    Serializers.cbor2: {
+        int, float, bool, none_type, str, list, dict,
+        datetime.datetime, datetime.date, decimal.Decimal, fractions.Fraction,
+        re.Pattern, emailMessage, uuid.UUID, set, 
+        ipaddress.IPv4Address, ipaddress.IPv6Address, ipaddress.IPv4Network, ipaddress.IPv6Network,
+    },
+    Serializers.marshal: {
+        bool, int, float, complex, str, bytes, bytearray, tuple, list, set, frozenset, dict,
+        CodeType, none_type, Ellipsis, StopIteration
+    },
+    Serializers.pickle: {},
+    Serializers.cpickle: {},
+    Serializers.cloudpickle: {},
+    Serializers.msgspec_messagepack: {int, float, bool, none_type, str, bytes, list, dict},
+    Serializers.msgspec_json: {int, float, bool, none_type, str, list, dict},
+    Serializers.msgspec_yaml: {
+        int, float, bool, none_type, str, list, dict,
+        datetime.datetime, datetime.date,
+    },
+    # Serializers.msgspec_toml: {
+    #     int, float, bool, none_type, str, list, dict,
+    #     datetime.datetime, datetime.date, datetime.time,
+    # },
+    Serializers.msgspec_toml: {
+        str, dict,
+        datetime.datetime, datetime.date, datetime.time,
+    },
+}
 
 
 SERIALIZERS_DESCRIPTION = {
@@ -573,7 +624,7 @@ class Serializer:
     def _msgpack__dump(*args, **kwargs):
         result_kwargs = {
             # 'encoding': 'utf-8',  # PendingDeprecationWarning: encoding is deprecated.
-            'use_bin_type': True
+            'use_bin_type': True,
         }
         result_kwargs.update(kwargs)
         msgpack.dump(*args, **result_kwargs)
@@ -582,7 +633,7 @@ class Serializer:
     def _msgpack__dumps(*args, **kwargs):
         result_kwargs = {
             # 'encoding': 'utf-8',  # PendingDeprecationWarning: encoding is deprecated.
-            'use_bin_type': True
+            'use_bin_type': True,
         }
         result_kwargs.update(kwargs)
         return msgpack.dumps(*args, **result_kwargs)
@@ -592,12 +643,13 @@ class Serializer:
         result_kwargs = {
             # 'encoding': 'utf-8',  # PendingDeprecationWarning: encoding is deprecated, Use raw=False instead.
             'raw': False,
-            'use_list': True
+            'use_list': True,
+            'strict_map_key': False,
         }
         result_kwargs.update(kwargs)
-        gc.disable()
-        result = msgpack.load(*args, **result_kwargs)
-        gc.enable()
+        with DisableGC():
+            result = msgpack.load(*args, **result_kwargs)
+        
         return result
 
     @staticmethod
@@ -605,12 +657,13 @@ class Serializer:
         result_kwargs = {
             # 'encoding': 'utf-8',  # PendingDeprecationWarning: encoding is deprecated, Use raw=False instead.
             'raw': False,
-            'use_list': True
+            'use_list': True,
+            'strict_map_key': False,
         }
         result_kwargs.update(kwargs)
-        gc.disable()
-        result = msgpack.loads(*args, **result_kwargs)
-        gc.enable()
+        with DisableGC():
+            result = msgpack.loads(*args, **result_kwargs)
+        
         return result
 
     # msgpack_fast
@@ -640,9 +693,9 @@ class Serializer:
             'use_list': False
         }
         result_kwargs.update(kwargs)
-        gc.disable()
-        result = msgpack.load(*args, **result_kwargs)
-        gc.enable()
+        with DisableGC():
+            result = msgpack.load(*args, **result_kwargs)
+        
         return result
 
     @staticmethod
@@ -653,9 +706,9 @@ class Serializer:
             'use_list': False
         }
         result_kwargs.update(kwargs)
-        gc.disable()
-        result = msgpack.loads(*args, **result_kwargs)
-        gc.enable()
+        with DisableGC():
+            result = msgpack.loads(*args, **result_kwargs)
+        
         return result
 
     # msgspec_messagepack
@@ -669,16 +722,16 @@ class Serializer:
 
     @staticmethod
     def _msgspec_messagepack__load(fp, *args, **kwargs):
-        gc.disable()
-        result = msgspec.msgpack.decode(fp.read(), *args, **kwargs)
-        gc.enable()
+        with DisableGC():
+            result = msgspec.msgpack.decode(fp.read(), *args, **kwargs)
+        
         return result
 
     @staticmethod
     def _msgspec_messagepack__loads(*args, **kwargs):
-        gc.disable()
-        result = msgspec.msgpack.decode(*args, **kwargs)
-        gc.enable()
+        with DisableGC():
+            result = msgspec.msgpack.decode(*args, **kwargs)
+        
         return result
 
     # msgspec_json
@@ -692,16 +745,16 @@ class Serializer:
 
     @staticmethod
     def _msgspec_json__load(fp, *args, **kwargs):
-        gc.disable()
-        result = msgspec.json.decode(fp.read(), *args, **kwargs)
-        gc.enable()
+        with DisableGC():
+            result = msgspec.json.decode(fp.read(), *args, **kwargs)
+        
         return result
 
     @staticmethod
     def _msgspec_json__loads(*args, **kwargs):
-        gc.disable()
-        result = msgspec.json.decode(*args, **kwargs)
-        gc.enable()
+        with DisableGC():
+            result = msgspec.json.decode(*args, **kwargs)
+        
         return result
 
     # msgspec_yaml
@@ -715,16 +768,16 @@ class Serializer:
 
     @staticmethod
     def _msgspec_yaml__load(fp, *args, **kwargs):
-        gc.disable()
-        result = msgspec.yaml.decode(fp.read(), *args, **kwargs)
-        gc.enable()
+        with DisableGC():
+            result = msgspec.yaml.decode(fp.read(), *args, **kwargs)
+        
         return result
 
     @staticmethod
     def _msgspec_yaml__loads(*args, **kwargs):
-        gc.disable()
-        result = msgspec.yaml.decode(*args, **kwargs)
-        gc.enable()
+        with DisableGC():
+            result = msgspec.yaml.decode(*args, **kwargs)
+        
         return result
 
     # msgspec_toml
@@ -738,16 +791,16 @@ class Serializer:
 
     @staticmethod
     def _msgspec_toml__load(fp, *args, **kwargs):
-        gc.disable()
-        result = msgspec.toml.decode(fp.read(), *args, **kwargs)
-        gc.enable()
+        with DisableGC():
+            result = msgspec.toml.decode(fp.read(), *args, **kwargs)
+        
         return result
 
     @staticmethod
     def _msgspec_toml__loads(*args, **kwargs):
-        gc.disable()
-        result = msgspec.toml.decode(*args, **kwargs)
-        gc.enable()
+        with DisableGC():
+            result = msgspec.toml.decode(*args, **kwargs)
+        
         return result
 
     # cbor
@@ -856,21 +909,21 @@ class Serializer:
     def _cloudpickle__dump(*args, **kwargs):
         result_kwargs = {'protocol': -1}
         result_kwargs.update(kwargs)
-        cPickle.dump(*args, **result_kwargs)
+        cloudpickle.dump(*args, **result_kwargs)
 
     @staticmethod
     def _cloudpickle__dumps(*args, **kwargs):
         result_kwargs = {'protocol': -1}
         result_kwargs.update(kwargs)
-        return cPickle.dumps(*args, **result_kwargs)
+        return cloudpickle.dumps(*args, **result_kwargs)
 
     @staticmethod
     def _cloudpickle__load(*args, **kwargs):
-        return cPickle.load(*args, **kwargs)
+        return cloudpickle.load(*args, **kwargs)
 
     @staticmethod
     def _cloudpickle__loads(*args, **kwargs):
-        return cPickle.loads(*args, **kwargs)
+        return cloudpickle.loads(*args, **kwargs)
 
 
 def get_an_appropriate_serializers(desired_features: SerializerFeatures) -> Set[Serializers]:
@@ -889,11 +942,17 @@ SerializerFootprint = int
 def serializer_benchmark(serializer_type: Serializers, test_data: Optional[Any], test_time: float = 1.0
                          ) -> Tuple[SerializerPerformance, SerializerFootprint]:
     serializer = Serializer(serializer_type)
+    measurements: List[float] = list()
     tr = Tracer(test_time)
     while tr.iter():
+        start_time = perf_counter()
         serializer.loads(serializer.dumps(test_data))
+        measurements.append(perf_counter() - start_time)
+
+    best_measurement: float = min(measurements)
+    best_performance: Optional[float] = (1 / best_measurement) if best_measurement else None
     data_dump = serializer.dumps(test_data)
-    return tr.iter_per_time_unit, len(data_dump)
+    return tr.iter_per_time_unit, best_performance, len(data_dump)
 
 
 def get_most_efficient_serializers(desired_features: SerializerFeatures,
@@ -911,13 +970,15 @@ def get_most_efficient_serializers(desired_features: SerializerFeatures,
     benchmark_results = dict()  # type: Dict[float, Set[Serializers]]
     serializers_data = set()  # type: Set[Tuple[Serializers, SerializerPerformance, SerializerFootprint]]
     for serializer_type in appropriate_serializers:
-        gc.disable()
-        performance, dump_size = serializer_benchmark(serializer_type, test_data, test_time)
-        gc.enable()
-        if performance not in benchmark_results:
-            benchmark_results[performance] = set()
-        benchmark_results[performance].add(serializer_type)
-        serializers_data.add((serializer_type, performance, dump_size))
+        with DisableGC():
+            performance, best_performance, dump_size = serializer_benchmark(serializer_type, test_data, test_time)
+        
+        if best_performance not in benchmark_results:
+            benchmark_results[best_performance] = set()
+        
+        benchmark_results[best_performance].add(serializer_type)
+        serializers_data.add((serializer_type, best_performance, dump_size))
+    
     best_performance = max(benchmark_results)
     best_serializers = benchmark_results[best_performance]
     return best_serializers, serializers_data
@@ -959,7 +1020,7 @@ def test_data_factory(test_data_type: TestDataType):
                         }
                     }
                 }
-            ]*15,
+            ]*2,
             'To all!': '!!1'
         }
     elif TestDataType.deep_small == test_data_type:
@@ -1019,3 +1080,12 @@ def test_data_factory(test_data_type: TestDataType):
             ]*20,
             'To all!': '!!1'*100
         }
+
+
+@lru_cache(maxsize=100)
+def best_serializer_for_standard_data(desired_features_tuple: SerializerFeaturesTuple,
+                                   test_data_type: Optional[TestDataType] = None,
+                                   test_time: float = 1.0
+                                   ) -> Serializer:
+    test_data_type = TestDataType.small if test_data_type is None else test_data_type
+    return best_serializer(set(desired_features_tuple), test_data_factory(test_data_type), test_time)

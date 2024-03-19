@@ -25,7 +25,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -69,6 +69,7 @@ setup_requires = [
     "py-cpuinfo",
     "Cython>=0.29.34",
     "patch-ng; python_version >= '3.12' or (platform_python_implementation == 'PyPy' and platform_system == 'Windows')",
+    "typing_extensions",
 ]
 pypi_requirements_list = get_pypi_requirements_list()
 if 'patch-ng' in pypi_requirements_list:
@@ -111,56 +112,81 @@ setuptools.setup(
     package_data=packages_data_dict,
     setup_requires=setup_requires,
     # setup_requires=pypi_requirements_list,
+    entry_points={
+        'console_scripts': [
+            'cengal__package__create = cengal.build_tools.packages.create:main',
+            'cengal__package__add_project = cengal.build_tools.packages.add_project:main',
+        ],
+    },
     extras_require={
+        'setuprequires': setup_requires,
+        'entities__asm_functions': [
+            'py-cpuinfo>=7.0.0',
+        ],
         'hardware__info__cpu__versions__v_0': [
+            'typing_extensions',
             'py-cpuinfo',
         ],
         'hardware__info__cpu__versions__v_1': [
+            'typing_extensions',
             'py-cpuinfo',
             "psutil; platform_python_implementation != 'PyPy' or platform_system != 'Windows'",
         ],
         'cengal__time_management__relative_time__relativedelta': [
+            'typing_extensions',
             'python-dateutil',
         ],
         'cengal__web_tools__help_tools': [
+            'typing_extensions',
             'requests',
             "http_parser; python_version < '3.11'",
         ],
         'cengal__user_interface__console__chooser': [
+            'typing_extensions',
             'colorama',
         ],
         'cengal__user_interface__console__colorama_helpers': [
+            'typing_extensions',
             'colorama',
         ],
         'cengal__parallel_execution__coroutines': [
+            'typing_extensions',
             'greenlet',
         ],
         'cengal__parallel_execution__coroutines__coro_standard_services__db': [
+            'typing_extensions',
             "patch-ng; ('ARM' in platform_machine) or ((python_version >= '3.12' and platform_python_implementation == 'CPython') or (platform_python_implementation == 'PyPy' and ((platform_system == 'Windows' and python_version != '3.9' and python_version != '2.7') or (platform_system == 'Darwin' and python_version != '2.7'))))",
             "lmdb; python_version != '3.10' or platform_python_implementation != 'PyPy' or platform_system != 'Windows'",
         ],
         'cengal__parallel_execution__coroutines__coro_standard_services__lmdb': [
+            'typing_extensions',
             "patch-ng; ('ARM' in platform_machine) or ((python_version >= '3.12' and platform_python_implementation == 'CPython') or (platform_python_implementation == 'PyPy' and ((platform_system == 'Windows' and python_version != '3.9' and python_version != '2.7') or (platform_system == 'Darwin' and python_version != '2.7'))))",
             "lmdb; python_version != '3.10' or platform_python_implementation != 'PyPy' or platform_system != 'Windows'",
         ],
         'cengal__parallel_execution__coroutines__coro_standard_services__log': [
+            'typing_extensions',
             "patch-ng; ('ARM' in platform_machine) or ((python_version >= '3.12' and platform_python_implementation == 'CPython') or (platform_python_implementation == 'PyPy' and ((platform_system == 'Windows' and python_version != '3.9' and python_version != '2.7') or (platform_system == 'Darwin' and python_version != '2.7'))))",
             "lmdb; python_version != '3.10' or platform_python_implementation != 'PyPy' or platform_system != 'Windows'",
         ],
         'cengal__parallel_execution__coroutines__coro_standard_services__loop_yield': [
+            'typing_extensions',
             'async_generator',
         ],
         'cengal__parallel_execution__coroutines__coro_standard_services__read_write_locker': [
+            'typing_extensions',
             'async_generator',
         ],
         'cengal__parallel_execution__coroutines__coro_standard_services__tkinter': [
+            'typing_extensions',
             'async_generator',
         ],
         'cengal__parallel_execution__coroutines__coro_tools__loop_administration__admin_tk': [
+            'typing_extensions',
             'ttkbootstrap',
             'pprintpp',
         ],
         'cengal__data_manipulation__serialization': [
+            'typing_extensions',
             "orjson; platform_python_implementation != 'PyPy'",
             'simplejson', 'cbor', 'cbor2', 'ujson', 'cloudpickle', 
             "msgpack-python; python_version < '3.8' and platform_python_implementation == 'CPython'",
@@ -168,21 +194,34 @@ setuptools.setup(
             "msgpack-pypy; platform_python_implementation == 'PyPy'",
         ],
         'cengal__user_interface__gui__tkinter': [
+            'typing_extensions',
             'ttkbootstrap',
         ],
         'cengal__text_processing__encoding_detection': [
+            'typing_extensions',
             "charset-normalizer; python_version < '3.13'", 
             "chardet; python_version < '3.11'",
         ],
         'cengal__file_system__app_fs_structure__app_dir_path': [
+            'typing_extensions',
             "pyobjc; platform_system == 'Darwin'",
         ],
+        'cengal__build_tools__packages__create': [
+            'typing_extensions',
+            "aiodns",
+            "aiohttp",
+        ],
+        'cengal__build_tools__gather_docs': [
+            'pdoc',
+        ],
         'full': [
+            'typing_extensions',
+            'pdoc',
             "psutil; platform_python_implementation != 'PyPy' or platform_system != 'Windows'",
             "orjson; platform_python_implementation != 'PyPy'",
             "patch-ng; ('ARM' in platform_machine) or ((python_version >= '3.12' and platform_python_implementation == 'CPython') or (platform_python_implementation == 'PyPy' and ((platform_system == 'Windows' and python_version != '3.9' and python_version != '2.7') or (platform_system == 'Darwin' and python_version != '2.7'))))",
             "lmdb; python_version != '3.10' or platform_python_implementation != 'PyPy' or platform_system != 'Windows'",
-            'py-cpuinfo', 'python-dateutil', 'greenlet', 'greenlet', 'async_generator',
+            'py-cpuinfo>=7.0.0', 'python-dateutil', 'greenlet', 'greenlet', 'async_generator',
             'ttkbootstrap', 'pprintpp', 'requests', 'simplejson', 'cbor', 'cbor2', 'ujson', 'cloudpickle', 
             "http_parser; python_version < '3.11'",
             "msgpack-python; python_version < '3.8' and platform_python_implementation == 'CPython'",
@@ -190,13 +229,17 @@ setuptools.setup(
             "msgpack-pypy; platform_python_implementation == 'PyPy'",
             "charset-normalizer; python_version < '3.13'", 
             "chardet; python_version < '3.11'",
+            "aiodns",
+            "aiohttp",
         ], 
         'all': [
+            'typing_extensions',
+            'pdoc',
             "psutil; platform_python_implementation != 'PyPy' or platform_system != 'Windows'",
             "orjson; platform_python_implementation != 'PyPy'",
             "patch-ng; ('ARM' in platform_machine) or ((python_version >= '3.12' and platform_python_implementation == 'CPython') or (platform_python_implementation == 'PyPy' and ((platform_system == 'Windows' and python_version != '3.9' and python_version != '2.7') or (platform_system == 'Darwin' and python_version != '2.7'))))",
             "lmdb; python_version != '3.10' or platform_python_implementation != 'PyPy' or platform_system != 'Windows'",
-            'py-cpuinfo', 'python-dateutil', 'greenlet', 'greenlet', 'async_generator',
+            'py-cpuinfo>=7.0.0', 'python-dateutil', 'greenlet', 'greenlet', 'async_generator',
             'ttkbootstrap', 'pprintpp', 'requests', 'simplejson', 'cbor', 'cbor2', 'ujson', 'cloudpickle', 
             "http_parser; python_version < '3.11'",
             "msgpack-python; python_version < '3.8' and platform_python_implementation == 'CPython'",
@@ -204,6 +247,8 @@ setuptools.setup(
             "msgpack-pypy; platform_python_implementation == 'PyPy'",
             "charset-normalizer; python_version < '3.13'", 
             "chardet; python_version < '3.11'",
+            "aiodns",
+            "aiohttp",
         ], 
     },
     classifiers=[

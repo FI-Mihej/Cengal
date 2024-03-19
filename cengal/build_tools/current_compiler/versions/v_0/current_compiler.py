@@ -16,7 +16,7 @@
 # limitations under the License.
 
 
-__all__ = ['compiler_type', 'compiler_name']
+__all__ = ['compiler_type', 'compiler_name', 'compiler_string', 'compiler_string_escaped']
 
 
 """
@@ -28,7 +28,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -37,6 +37,7 @@ __status__ = "Development"
 
 
 from distutils import sysconfig
+from cengal.os.execute import escape_text
 
 
 compiler_name_raw: str = sysconfig.get_config_var("CC")
@@ -46,7 +47,9 @@ if compiler_name_raw is None:
     else:
         compiler_name_raw = 'msvc'
 
-compiler_name: str = compiler_name_raw.replace(' ', '\ ')
+compiler_name: str = compiler_name_raw.split()[0] if compiler_name_raw else str()
+compiler_string: str = compiler_name_raw
+compiler_string_escaped: str = escape_text(compiler_name_raw)
 
 if "gcc" in compiler_name_raw.lower():
     compiler_type: str = 'gcc'

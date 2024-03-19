@@ -33,7 +33,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -210,7 +210,7 @@ class Chain:
 
         self._bool_result()
         import_depth = 0
-        full_link_info = (self._internal_links_index.get_new_ID(), self._current_link_id, self._current_link_info,
+        full_link_info = (self._internal_links_index(), self._current_link_id, self._current_link_info,
                            self._current_link_result, import_depth)
         self._full_history.append(full_link_info)
         self._links_library[self._current_link_id] = full_link_info
@@ -285,7 +285,7 @@ class Chain:
     def process_history_import(self, his_ex):
         history = his_ex.history
         for another_link in history:
-            full_link_info = (self._internal_links_index.get_new_ID(), another_link[1], another_link[2],
+            full_link_info = (self._internal_links_index(), another_link[1], another_link[2],
                                another_link[3], another_link[4] + 1)
             self._full_history.append(full_link_info)
 
@@ -310,8 +310,8 @@ class Chain:
 @contextmanager
 def link(chain, link_id, link_info=None, link_results_criteria=None, ignore_link_result_criteria=None):
     if link_id is None:
-        link_id = (chain._reserve_link_id_generator.counter,
-                    chain._reserve_link_id_generator.get_new_ID())
+        new_id = chain._reserve_link_id_generator()
+        link_id = (new_id, new_id)
 
     if chain._closeable and chain._closed:
         raise ChainClosed(chain, link_id, link_info)

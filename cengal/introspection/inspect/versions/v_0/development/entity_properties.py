@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -35,28 +35,42 @@ __status__ = "Development"
 
 
 from cengal.parallel_execution.coroutines.coro_standard_services.wait_coro import WaitCoroRequest
-from cengal.introspection.inspect import entity_properties
+from cengal.introspection.inspect import entity_properties, entity_repr, entity_properties_values, entity_repr_limited_try_qualname
 
 
-print(dir(WaitCoroRequest))
+print(f'{dir(WaitCoroRequest)=}')
 print()
 
-print(dir(WaitCoroRequest()))
-print()
-
-
-print(entity_properties(WaitCoroRequest))
+print(f'{dir(WaitCoroRequest())=}')
 print()
 
 
-print(entity_properties(WaitCoroRequest()))
+print(f'{entity_properties(WaitCoroRequest)=}')
 print()
 
+
+print(f'{entity_properties(WaitCoroRequest())=}')
+print()
+
+print(f'{entity_repr(WaitCoroRequest())=}')
+print()
+
+print(f'{entity_repr_limited_try_qualname(WaitCoroRequest())=}')
+print()
+
+print(f'{entity_properties_values(WaitCoroRequest())=}')
+print()
 
 def my_func(a, b, *, c, d):
     return a + b + c + d
 
 my_func.my_property = 2
 
-print(entity_properties(my_func))
+print(f'{entity_repr(my_func)=}')
+print()
+
+print(f'{entity_repr_limited_try_qualname(my_func)=}')
+print()
+
+print(f'{entity_properties(my_func)=}')
 print()

@@ -1,0 +1,4 @@
+wheel
+setuptools
+cengal-light
+py_cpuinfo>=7.0.0

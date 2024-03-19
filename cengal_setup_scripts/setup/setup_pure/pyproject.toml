@@ -7,4 +7,5 @@ requires = [
     "Cython>=0.29.34", 
     "py-cpuinfo", 
     "charset-normalizer; python_version < '3.13'", 
+    "typing_extensions"
 ]  # PEP 508 specifications.

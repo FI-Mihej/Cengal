@@ -38,7 +38,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -93,7 +93,7 @@ if sys.version_info >= (3, 11):
         return code.co_qualname
 
 
-def get_code(x=None) -> CodeType:
+def get_code(x = None) -> CodeType:
     if x is None:
         return
     
@@ -118,6 +118,33 @@ def get_code(x=None) -> CodeType:
     #     raise TypeError(f'Expected a code object or an entity with code, but got {type(x)}')
     
     return x
+
+
+def has_code(x = None) -> bool:
+    if x is None:
+        return False
+    
+    if isinstance(x, CodeType):
+        return True
+    
+    # Extract functions from methods.
+    if hasattr(x, '__func__'):
+        return True
+    # Extract compiled code objects from...
+    if hasattr(x, '__code__'):  # ...a function, or
+        return True
+    elif hasattr(x, 'gi_code'):  #...a generator object, or
+        return True
+    elif hasattr(x, 'ag_code'):  #...an asynchronous generator object, or
+        return True
+    elif hasattr(x, 'cr_code'):  #...a coroutine, or
+        return True
+    elif hasattr(x, 'f_code'):  #...a frame.
+        return True
+    # else:
+    #     raise TypeError(f'Expected a code object or an entity with code, but got {type(x)}')
+    
+    return False
 
 
 class CodeTypeEnum(Enum):
@@ -170,7 +197,8 @@ def set_code(x, code: CodeType):
     return x
 
 
-if (3, 11) > PYTHON_VERSION_INT[:1]:
+if sys.version_info < (3, 11):
+# if (3, 11) > PYTHON_VERSION_INT[:1]:
     def modify_code(original_code: CodeType, co_code, co_consts, co_names, co_varnames):
         co_nlocals = len(co_varnames)
         return CodeType(
@@ -295,7 +323,7 @@ if (3, 11) > PYTHON_VERSION_INT[:1]:
     def arg_to_op_index(arg: int) -> int:
         return arg // 2
 
-elif (3, 11) >= PYTHON_VERSION_INT[:1]:
+elif sys.version_info == (3, 11):
     from dis import _is_backward_jump
 
     def find_ops_with_labels(code):

@@ -15,13 +15,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+__all__ = [
+    'get_file_hash', 
+    'get_file_modification_date', 
+    'current_src_file_dir', 
+    'path_relative_to_current_src', 
+    'path_relative_to_current_dir', 
+    'file_exists', 
+    'full_ext', 
+    'full_ext_parts', 
+    'last_ext', 
+    'has_ext', 
+    'file_name', 
+]
+
+
 import hashlib
 # import os
 import datetime
 import inspect
 from typing import Optional
-from os import getcwd
-from os.path import exists, isfile, normpath, dirname, getmtime, realpath, join
+from os import getcwd, extsep
+from os.path import exists, isfile, normpath, dirname, getmtime, realpath, join, basename
 
 """
 Module Docstring
@@ -32,7 +48,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -70,3 +86,23 @@ def path_relative_to_current_dir(relative_path: Optional[str]=None) -> str:
 
 def file_exists(file_path: str) -> bool:
     return exists(file_path) and isfile(file_path)
+
+
+def full_ext(file_path: str) -> str:
+    return extsep.join(basename(normpath(file_path)).split(extsep)[1:])
+
+
+def full_ext_parts(file_path: str) -> str:
+    return basename(normpath(file_path)).split(extsep)[1:]
+
+
+def last_ext(file_path: str) -> str:
+    return basename(normpath(file_path)).split(extsep)[-1]
+
+
+def has_ext(file_path: str) -> str:
+    return extsep in basename(normpath(file_path))
+
+
+def file_name(file_path: str) -> str:
+    return basename(normpath(file_path)).split(extsep)[0]

@@ -42,7 +42,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -60,7 +60,7 @@ class InstanceRequest(ServiceRequest):
 
 
 class Instance(DualImmediateProcessingServiceMixin, TypedService[Union[None, Any]], EntityStatsMixin):
-    def __init__(self, loop: CoroScheduler):
+    def __init__(self, loop: CoroSchedulerType):
         super(Instance, self).__init__(loop)
         self.instances: Dict = dict()
         self._default_init()
@@ -209,7 +209,7 @@ InstanceRequest.default_service_type = Instance
 
 
 def fast_wait_explicit(i: Interface, key: Union[Type, Hashable]) -> Any:
-    loop: CoroScheduler = i._loop
+    loop: CoroSchedulerType = i._loop
     instance_service: Instance = loop.get_service_instance_fast(Instance)
     need_to_wait: bool = False
     try:
@@ -223,7 +223,7 @@ def fast_wait_explicit(i: Interface, key: Union[Type, Hashable]) -> Any:
 
 def fast_wait(key: Union[Type, Hashable]) -> Any:
     i: Interface = current_interface()
-    loop: CoroScheduler = i._loop
+    loop: CoroSchedulerType = i._loop
     instance_service: Instance = loop.get_service_instance_fast(Instance)
     need_to_wait: bool = False
     try:
@@ -236,7 +236,7 @@ def fast_wait(key: Union[Type, Hashable]) -> Any:
 
 
 async def afast_wait_explicit(i: Interface, key: Union[Type, Hashable]) -> Any:
-    loop: CoroScheduler = i._loop
+    loop: CoroSchedulerType = i._loop
     instance_service: Instance = loop.get_service_instance_fast(Instance)
     need_to_wait: bool = False
     try:
@@ -250,7 +250,7 @@ async def afast_wait_explicit(i: Interface, key: Union[Type, Hashable]) -> Any:
 
 async def afast_wait(key: Union[Type, Hashable]) -> Any:
     i: Interface = current_interface()
-    loop: CoroScheduler = i._loop
+    loop: CoroSchedulerType = i._loop
     instance_service: Instance = loop.get_service_instance_fast(Instance)
     need_to_wait: bool = False
     try:
@@ -263,26 +263,26 @@ async def afast_wait(key: Union[Type, Hashable]) -> Any:
 
 
 def fast_get_explicit(i: Interface, key: Union[Type, Hashable]) -> Any:
-    loop: CoroScheduler = i._loop
+    loop: CoroSchedulerType = i._loop
     instance_service: Instance = loop.get_service_instance_fast(Instance)
     return instance_service.inline_get(key)
 
 
 def fast_get(key: Union[Type, Hashable]) -> Any:
     i: Interface = current_interface()
-    loop: CoroScheduler = i._loop
+    loop: CoroSchedulerType = i._loop
     instance_service: Instance = loop.get_service_instance_fast(Instance)
     return instance_service.inline_get(key)
 
 
 def fast_set_explicit(i: Interface, key: Union[Type, Hashable], instance: Any):
-    loop: CoroScheduler = i._loop
+    loop: CoroSchedulerType = i._loop
     instance_service: Instance = loop.get_service_instance_fast(Instance)
     instance_service.inline_set(key, instance)
 
 
 def fast_set(key: Union[Type, Hashable], instance: Any):
     i: Interface = current_interface()
-    loop: CoroScheduler = i._loop
+    loop: CoroSchedulerType = i._loop
     instance_service: Instance = loop.get_service_instance_fast(Instance)
     instance_service.inline_set(key, instance)

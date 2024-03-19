@@ -20,7 +20,7 @@ __all__ = ['GracefulCoroDestroy', 'graceful_coro_destroyer', 'agraceful_coro_des
 
 
 from typing import Optional, Type, Any, Hashable, cast, Set, Callable
-from cengal.parallel_execution.coroutines.coro_scheduler import CoroScheduler, Interface, CoroID, ExplicitWorker, Worker, CoroWrapperBase, get_interface_for_an_explicit_loop, current_interface, current_coro_scheduler
+from cengal.parallel_execution.coroutines.coro_scheduler import CoroScheduler, CoroSchedulerType, Interface, CoroID, ExplicitWorker, Worker, CoroWrapperBase, get_interface_for_an_explicit_loop, current_interface, current_coro_scheduler
 from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import PutCoro, put_coro_to, put_coro, get_set_of_all_coro_children
 from cengal.parallel_execution.coroutines.coro_standard_services.sleep import Sleep
 from cengal.parallel_execution.coroutines.coro_standard_services.simple_yield import Yield
@@ -40,7 +40,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -139,7 +139,7 @@ def set_my_exit_handler(handler: Callable[[CoroWrapperBase], Optional[bool]]) ->
 
 
 def set_exit_handler(handler: Callable[[CoroWrapperBase], Optional[bool]], coro_id: Optional[CoroID] = None) -> bool:
-    current_loop: CoroScheduler = current_coro_scheduler()
+    current_loop: CoroSchedulerType = current_coro_scheduler()
     if coro_id is None:
         i: Interface = current_loop.current_interface()
         if i is None:
@@ -169,7 +169,7 @@ def kill_my_children_on_exit() -> bool:
 
 
 def kill_children_on_exit(coro_id: Optional[CoroID] = None) -> bool:
-    current_loop: CoroScheduler = current_coro_scheduler()
+    current_loop: CoroSchedulerType = current_coro_scheduler()
     if coro_id is None:
         i: Interface = current_loop.current_interface()
         if i is None:

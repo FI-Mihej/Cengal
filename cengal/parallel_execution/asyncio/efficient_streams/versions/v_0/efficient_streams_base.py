@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -38,7 +38,7 @@ __all__ = ['StreamType', 'GateSecurityPolicy', 'IOCoreMemoryManagement', 'Stream
 
 
 from enum import Enum
-from cengal.hardware.info.cpu.versions.v_1 import CpuInfo
+from cengal.hardware.info.cpu.versions.v_1 import cpu_info
 from cengal.io.core.memory_management import IOCoreMemoryManagement
 from cengal.code_flow_control.smart_values.versions import ValueExistence
 from typing import Optional
@@ -63,7 +63,7 @@ class StreamManagerIOCoreMemoryManagement(IOCoreMemoryManagement):
         super(StreamManagerIOCoreMemoryManagement, self).__init__()
 
         self.socket_write_fixed_buffer_size = ValueExistence(True,
-                                                             CpuInfo().l2_cache_size_per_virtual_core)
+                                                             cpu_info().l2_cache_size_per_virtual_core)
 
     def link_to(self, parent):
         super(StreamManagerIOCoreMemoryManagement, self).link_to(parent)

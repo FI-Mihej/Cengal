@@ -24,7 +24,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -41,7 +41,7 @@ from cengal.introspection.inspect import get_exception, pifrl
 from cengal.parallel_execution.coroutines.coro_tools.run_in_loop import run_in_loop
 import cengal.parallel_execution.coroutines.coro_scheduler
 # cengal.parallel_execution.coroutines.coro_scheduler.CoroScheduler = cengal.parallel_execution.coroutines.coro_scheduler.CoroSchedulerAwaitable
-from cengal.parallel_execution.coroutines.coro_scheduler import CoroScheduler, Interface, CoroWrapperBase, CoroID, GreenletExit, AnyWorker, current_interface
+from cengal.parallel_execution.coroutines.coro_scheduler import CoroScheduler, CoroSchedulerType, Interface, CoroWrapperBase, CoroID, GreenletExit, AnyWorker, current_interface
 from cengal.parallel_execution.coroutines.coro_standard_services.sleep import Sleep
 from cengal.parallel_execution.coroutines.coro_standard_services.cpu_tick_count_per_second import CpuTickCountPerSecond
 from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import PutCoro, PutCoroRequest

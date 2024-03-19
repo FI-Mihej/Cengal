@@ -25,10 +25,11 @@ import sys
 from enum import Enum
 from typing import Dict, Set, List, Tuple, Union, Type, Optional, Any, Deque
 from cengal.parallel_execution.coroutines.coro_scheduler import *
+from cengal.parallel_execution.coroutines.coro_standard_services_internal_lib.service_with_a_direct_request import *
 from cengal.parallel_execution.coroutines.coro_standard_services.loop_yield import *
 from cengal.parallel_execution.coroutines.coro_standard_services.event_bus import EventID, Handler
 from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import *
-from cengal.code_flow_control.smart_values.versions.v_1 import ValueExistence
+from cengal.code_flow_control.smart_values import ValueExistence
 from cengal.introspection.inspect import get_exception
 from cengal.time_management.repeat_for_a_time import Tracer
 from collections import deque
@@ -43,7 +44,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -62,24 +63,32 @@ class AsyncEventBusRequest(ServiceRequest):
                    priority: Optional[CoroPriority]=CoroPriority.low) -> None:
         return self._save(2, event, data, priority)
 
+    def get_event(self, event: EventID, default: Any = None) -> ValueExistence[Any]:
+        return self._save(3, event, default)
+
+    def flush_event_data(self, event: EventID) -> ValueExistence[Any]:
+        return self._save(5, event)
+
     def wait(self, event: EventID) -> Any:
         """
         Will block coroutine untill result is ready
         :param event:
         :return: event data
         """
-        return self._save(3, event)
+        return self._save(4, event)
 
 
-class AsyncEventBus(Service, EntityStatsMixin):
-    def __init__(self, loop: CoroScheduler):
+class AsyncEventBus(ServiceWithADirectRequestMixin, Service, EntityStatsMixin):
+    def __init__(self, loop: CoroSchedulerType):
         super(AsyncEventBus, self).__init__(loop)
 
         self._request_workers = {
             0: self._on_register_handler,
             1: self._on_remove_handler,
             2: self._on_send_event,
-            3: self._on_wait,
+            3: self._on_get_event,
+            4: self._on_wait,
+            5: self._on_flush_event_data,
         }
 
         self.waiters: Dict[EventID, Set[CoroID]] = dict()
@@ -186,7 +195,7 @@ class AsyncEventBus(Service, EntityStatsMixin):
                     handlers_info_list: List[Tuple[(Handler, EventID, Any)]],
                     priority: CoroPriority,
                 ):
-                    loop: CoroScheduler = interface._loop
+                    loop: CoroSchedulerType = interface._loop
                     current_coro_interface_buff: Interface = loop.current_coro_interface
                     ly = await agly(priority)
                     for handler, event, data in handlers_info_list:
@@ -242,6 +251,25 @@ class AsyncEventBus(Service, EntityStatsMixin):
 
         return True, None, None
 
+    def _add_direct_request(self, event: EventID, data: Any, priority: Optional[CoroPriority]=CoroPriority.low) -> ValueExistence:
+        self._on_send_event(event, data, priority)
+        return (True, None)
+
+    def _on_get_event(self, event: EventID, default: Any = None) -> Tuple[bool, ValueExistence, None]:
+        for _, events in self.events.items():
+            if event in events:
+                return (True, events[event].popleft(), None)
+        
+        return (True, (False, default), None)
+
+    def _on_flush_event_data(self, event: EventID):
+        for _, events in self.events.items():
+            if event in events:
+                del events[event]
+                return (True, True, None)
+        
+        return (True, False, None)
+
     def _on_wait(self, event: EventID):
         requester_id = self.current_caller_coro_info.coro_id
         requester = self.current_caller_coro_info.coro
@@ -281,7 +309,7 @@ AsyncEventBusRequest.default_service_type = AsyncEventBus
 
 
 def try_send_async_event(
-        backup_scheduler: Optional[CoroScheduler],
+        backup_scheduler: Optional[CoroSchedulerType],
         event: EventID, data: Any, priority: Optional[CoroPriority]=CoroPriority.low):
     def event_sender(
             interface: Interface,

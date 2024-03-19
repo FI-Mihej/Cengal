@@ -30,7 +30,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -1816,7 +1816,7 @@ class SharedMemory:
 
         # print(bytes(self._shared_memory.buf[0:120]))
     
-    def read_mem(self, offset: Offset, size: Size, text: str = None) -> List[int]:
+    def read_mem(self, offset: Offset, size: Size) -> List[int]:
         result = list()
         for i in range(size):
             result.append(read_uint8(self.base_address, offset + i))

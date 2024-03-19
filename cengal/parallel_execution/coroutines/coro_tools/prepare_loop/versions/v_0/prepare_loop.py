@@ -46,7 +46,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -58,7 +58,7 @@ class LoopWasEndedBeforeSetupWasPrepared(Exception):
     pass
 
 
-def prepare_loop(setup_coro_worker: Optional[AnyWorker], *args, **kwargs) -> Tuple[CoroScheduler, ValueExistence[Any]]:
+def prepare_loop(setup_coro_worker: Optional[AnyWorker], *args, **kwargs) -> Tuple[CoroSchedulerType, ValueExistence[Any]]:
     cs = CoroScheduler()
     set_primary_coro_scheduler(cs)
     cs.turn_on_embedded_mode(True)
@@ -108,7 +108,7 @@ def prepare_loop(setup_coro_worker: Optional[AnyWorker], *args, **kwargs) -> Tup
     return cs, result
 
 
-def prepare_fast_loop(setup_coro_worker: Optional[AnyWorker], *args, **kwargs) -> Tuple[CoroScheduler, ValueExistence[Any]]:
+def prepare_fast_loop(setup_coro_worker: Optional[AnyWorker], *args, **kwargs) -> Tuple[CoroSchedulerType, ValueExistence[Any]]:
     """30% faster than prepare_loop()
 
     Args:

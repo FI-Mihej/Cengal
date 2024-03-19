@@ -46,7 +46,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -95,7 +95,7 @@ async def _awaitable_async_coro_wrapper(interface: Interface, future: asyncio.Fu
 
 
 def await_coro_fast(loop: asyncio.AbstractEventLoop,
-                    scheduler: CoroScheduler, coro_type: Optional[CoroType], coro_worker: Worker, *args, **kwargs
+                    scheduler: CoroSchedulerType, coro_type: Optional[CoroType], coro_worker: Worker, *args, **kwargs
                     ) -> asyncio.Future:
     coro_type = coro_type or CoroType.auto
     if CoroType.auto == coro_type:
@@ -112,7 +112,7 @@ def await_coro_fast(loop: asyncio.AbstractEventLoop,
     return future
 
 
-def await_coro(scheduler: CoroScheduler, coro_worker: Worker, *args, **kwargs) -> asyncio.Future:
+def await_coro(scheduler: CoroSchedulerType, coro_worker: Worker, *args, **kwargs) -> asyncio.Future:
     return await_coro_fast(asyncio.get_event_loop(), scheduler, None, coro_worker, *args, **kwargs)
 
 
@@ -153,14 +153,14 @@ def _async_task_runner_coro_worker(interface: Interface, service_type: ServiceTy
 
 
 def await_task_fast(loop: asyncio.AbstractEventLoop,
-                    scheduler: CoroScheduler, service_type: ServiceType, *args, **kwargs
+                    scheduler: CoroSchedulerType, service_type: ServiceType, *args, **kwargs
                     ) -> asyncio.Future:
     future = loop.create_future()
     put_request_to_service_with_context(get_interface_and_loop_with_explicit_loop(scheduler), PutCoro, ExplicitWorker(CoroType.greenlet, _async_coro_wrapper), future, _async_task_runner_coro_worker, service_type, *args, **kwargs)
     return future
 
 
-def await_task(scheduler: CoroScheduler, service_type: ServiceType, *args, **kwargs) -> asyncio.Future:
+def await_task(scheduler: CoroSchedulerType, service_type: ServiceType, *args, **kwargs) -> asyncio.Future:
     return await_task_fast(asyncio.get_event_loop(), scheduler, service_type, *args, **kwargs)
 
 
@@ -176,10 +176,10 @@ def await_task_prim(service_type: ServiceType, *args, **kwargs) -> asyncio.Futur
     return await_task_fast(asyncio.get_event_loop(), available_coro_scheduler(), service_type, *args, **kwargs)
 
 
-def cs_awaitable(coro_worker: Worker) -> Coroutine:
+def cs_awaitable(coro_worker: Callable) -> Callable:
     """Decorator. Without arguments. Makes any Cengal coro awaitable from the async code (like coroutines in asyncio)
     Example:
-        from cengal.parallel_execution.coroutines.coro_sheduler import cs_acoro
+        from cengal.parallel_execution.coroutines.coro_scheduler import cs_acoro
         from cengal.parallel_execution.coroutines.coro_standard_services.run_coro import RunCoro
         from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import PutCoro
         from cengal.parallel_execution.coroutines.coro_standard_services.sleep import Sleep
@@ -310,24 +310,26 @@ def cs_awaitable(coro_worker: Worker) -> Coroutine:
     """
     if is_async(coro_worker):
         @wraps(coro_worker)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             if isawaitable(coro_worker):
                 return await coro_worker
             else:
                 return await coro_worker(*args, **kwargs)
-            
+        
+        wrapper: coro_worker
         return wrapper
     else:
         @wraps(coro_worker)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             from cengal.parallel_execution.coroutines.coro_standard_services.run_coro import RunCoro
             i: Interface = current_interface()
-            return await i(RunCoro, coro_worker, *args, **kwargs)
-            
+            return await i(RunCoro, cs_coro(coro_worker), *args, **kwargs)
+        
+        wrapper: coro_worker
         return wrapper
 
 
-def coro_interfaces_arg_manager(event_loop, coro_scheduler: CoroScheduler):
+def coro_interfaces_arg_manager(event_loop, coro_scheduler: CoroSchedulerType):
     acf = ArgsManager(
         EArgs(event_loop, coro_scheduler, CoroType.auto),
     ).callable(await_coro_fast)
@@ -339,7 +341,7 @@ def coro_interfaces_arg_manager(event_loop, coro_scheduler: CoroScheduler):
 
 
 class RunSchedulerInAsyncioLoop:
-    def __init__(self, scheduler: CoroScheduler, idle_time: Optional[Union[int, float]]=None, loop: Optional[asyncio.AbstractEventLoop]=None, execute_every_X_iterations: int = 1):
+    def __init__(self, scheduler: CoroSchedulerType, idle_time: Optional[Union[int, float]]=None, loop: Optional[asyncio.AbstractEventLoop]=None, execute_every_X_iterations: int = 1):
         self.scheduler = scheduler
         self.scheduler.on_woke_up_callback = self.on_woke_up_callback
         if idle_time is None:

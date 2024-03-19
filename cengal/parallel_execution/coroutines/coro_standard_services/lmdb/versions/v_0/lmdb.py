@@ -50,7 +50,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -116,7 +116,7 @@ def make_key_frozen(key):
     
 
 class Lmdb(Service, EntityStatsMixin):
-    def __init__(self, loop: CoroScheduler):
+    def __init__(self, loop: CoroSchedulerType):
         super(Lmdb, self).__init__(loop)
         self.default_db_name: DbName = b'__default__'
         self.drop_db_requests: Dict[CoroID, Tuple[Hashable, bool]] = dict()
@@ -139,16 +139,17 @@ class Lmdb(Service, EntityStatsMixin):
         self.deletes_num: int = 0
         self.db_drops_num: int = 0
         self.write_locked_coro_id: Optional[CoroID] = None
-        self.serializer = best_serializer({DataFormats.binary,
-                                           Tags.can_use_bytes,
-                                           Tags.decode_str_as_str,
-                                           Tags.decode_list_as_list,
-                                           Tags.decode_bytes_as_bytes,
-                                           Tags.superficial,
-                                           Tags.current_platform,
-                                           Tags.multi_platform},
-                                          test_data_factory(TestDataType.small),
-                                          0.1)
+        # self.serializer = best_serializer_for_standard_data((DataFormats.binary,
+        #                                    Tags.can_use_bytes,
+        #                                    Tags.decode_str_as_str,
+        #                                    Tags.decode_list_as_list,
+        #                                    Tags.decode_bytes_as_bytes,
+        #                                    Tags.superficial,
+        #                                    Tags.current_platform,
+        #                                    Tags.multi_platform),
+        #                                   TestDataType.small,
+        #                                   0.1)
+        self.serializer = Serializer(Serializers.msgspec_messagepack)
 
         self._request_workers = {
             0: self._on_set_db_environment_path,

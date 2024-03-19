@@ -24,7 +24,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -38,8 +38,14 @@ from cengal.text_processing.text_processing import Text, replace_text, replace_s
 from typing import List, Tuple, Optional, Callable
 
 
-def patch_text(text: Text, patch: List[Tuple[Text, Text]], encoding: Optional[str] = DEFAULT_ENCODING, normalizer: Optional[Callable] = None) -> Text:
+def patch_text(
+        text: Text, 
+        patch: List[Tuple[Text, Text]], 
+        count: int = 1, 
+        encoding: Optional[str] = DEFAULT_ENCODING, 
+        normalizer: Optional[Callable] = None
+        ) -> Text:
     for before, after in patch:
-        text = replace_text(text, before, after, count=1, encoding=encoding, normalizer=normalizer)
+        text = replace_text(text, before, after, count=count, encoding=encoding, normalizer=normalizer)
     
     return text

@@ -24,7 +24,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -74,7 +74,7 @@ class ServerSideClient(NamedConnectionsClient):
     #     #     # print(f'writable_data len: {len(writable_data)}')
     #     #     writer.write(writable_data)
 
-    #     data_chunk_len = int(CpuInfo().l2_cache_size_per_virtual_core / len(data))
+    #     data_chunk_len = int(cpu_info().l2_cache_size_per_virtual_core / len(data))
     #     writer.start_aw()
     #     stime = perf_counter()
     #     dtime = 0
@@ -88,7 +88,7 @@ class ServerSideClient(NamedConnectionsClient):
     #         else:
     #             writer.owrite(marshal.dumps(data * randomized_data_size(data_chunk_len)))
 
-    #         await writer.ar_drain_enough()
+    #         await writer.aw_drain_enough()
     #         dtime = perf_counter() - stime
         
     #     await writer.full_drain()

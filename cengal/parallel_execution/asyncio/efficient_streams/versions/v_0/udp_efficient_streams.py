@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -61,7 +61,7 @@ from cengal.io.asock_io.versions.v_1.recv_buff_size_computer.recv_buff_size_comp
 # from cengal.io.asock_io.versions.v_1.base import IOCoreMemoryManagement
 from cengal.parallel_execution.asyncio.atasks import create_task
 from cengal.parallel_execution.asyncio.timed_yield import TimedYield
-from cengal.hardware.info.cpu.versions.v_1 import CpuInfo
+from cengal.hardware.info.cpu import cpu_info
 # from cengal.data_containers.dynamic_list_of_pieces import DynamicListOfPiecesDequeWithLengthControl
 # from cengal.data_containers.fast_fifo import FIFODequeWithLengthControl, FIFOIsEmpty
 # from cengal.data_manipulation.front_triggerable_variable import FrontTriggerableVariable, FrontTriggerableVariableType
@@ -264,14 +264,14 @@ class UdpStreamReader(OriginalStreamReader, StreamReaderAbstract):
         self._smart_buffer: DynamicListOfPiecesDequeWithLengthControl = self._stream_manager.input_from_client_container_type(
             external_data_length=self._stream_manager.io_memory_management.global_in__data_full_size)
         self.recv_buff_size_computer = RecvBuffSizeComputer()
-        cpu_info = CpuInfo()
-        # self.recv_buff_size_computer.max_recv_buff_size = cpu_info.l3_cache_size
-        # self.recv_buff_size_computer.max_recv_buff_size = cpu_info.l2_cache_size_per_virtual_core
-        # self.recv_buff_size_computer.max_recv_buff_size = CpuInfo().l3_cache_size_per_virtual_core
+        cpu_info_inst = cpu_info()
+        # self.recv_buff_size_computer.max_recv_buff_size = cpu_info_inst.l3_cache_size
+        # self.recv_buff_size_computer.max_recv_buff_size = cpu_info_inst.l2_cache_size_per_virtual_core
+        # self.recv_buff_size_computer.max_recv_buff_size = cpu_info_inst.l3_cache_size_per_virtual_core
         # self.recv_buff_size_computer.max_recv_buff_size = 3145728
         self.recv_buff_size_computer.max_recv_buff_size = 10 * 1024**2
         # self.recv_buff_size_computer.max_recv_buff_size = 1024
-        print(f'max_recv_buff_size: {self.recv_buff_size_computer.max_recv_buff_size}')
+        # print(f'max_recv_buff_size: {self.recv_buff_size_computer.max_recv_buff_size}')
         self.limit_by_limit: bool = True
         self.limit_by_global_in__data_size_limit: bool = True
     
@@ -823,7 +823,7 @@ class UdpStreamWriter(OriginalStreamWriter, StreamWriterAbstract):
         
         return result
     
-    def stop_ar(self, timeout: Optional[Union[int, float]] = 0):
+    async def stop_aw(self, timeout: Optional[Union[int, float]] = 0):
         """_summary_
 
         Args:
@@ -832,20 +832,20 @@ class UdpStreamWriter(OriginalStreamWriter, StreamWriterAbstract):
         Returns:
             _type_: _description_
         """
-        return self.stop_autonomous_writer(timeout)
+        return await self.stop_autonomous_writer(timeout)
     
     async def autonomous_writer_drain_enough(self, lower_water_size: Optional[int] = None):
         if lower_water_size is None:
             lower_water_size = self.socket_write_fixed_buffer_size.value * 3
             # print(f'lower_water_size: {lower_water_size}')
-            # lower_water_size = CpuInfo().l3_cache_size
+            # lower_water_size = cpu_info().l3_cache_size
         
         if lower_water_size <= self._output_to_client.size():
             future: Future = self._loop.create_future()
             self._autonomous_writer_drain_enough_futures.append((lower_water_size, future))
             await future
     
-    async def ar_drain_enough(self):
+    async def aw_drain_enough(self):
         await self.autonomous_writer_drain_enough()
     
     def optimized_write_message(self, data):

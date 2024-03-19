@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -34,7 +34,17 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-__all__ = ['PutCoro', 'PutCoroRequest', 'put_current_from_other_service', 'put_from_other_service', 'put_root_from_other_service', 'put_coro_to', 'try_put_coro_to', 'aput_coro_to', 'atry_put_coro_to', 'put_coro', 'try_put_coro', 'aput_coro', 'atry_put_coro', 'travers_through_all_coro_children_on', 'try_travers_through_all_coro_children_on', 'travers_through_all_coro_children', 'try_travers_through_all_coro_children', 'get_set_of_all_coro_children_on', 'try_get_set_of_all_coro_children_on', 'get_set_of_all_coro_children', 'try_get_set_of_all_coro_children', 'travers_through_all_coro_parents_on', 'try_travers_through_all_coro_parents_on', 'travers_through_all_coro_parents', 'try_travers_through_all_coro_parents', 'get_set_of_all_coro_parents_on', 'try_get_set_of_all_coro_parents_on', 'get_set_of_all_coro_parents', 'try_get_set_of_all_coro_parents']
+__all__ = [
+    'TaskIsNotFinished', 'TaskIsFinished', 'Task', 
+    'PutCoro', 'PutCoroRequest', 'put_current_from_other_service', 'put_from_other_service', 'put_root_from_other_service', 
+    'put_coro_to', 'try_put_coro_to', 'aput_coro_to', 'atry_put_coro_to', 'put_coro', 'try_put_coro', 'aput_coro', 
+    'atry_put_coro', 'travers_through_all_coro_children_on', 'try_travers_through_all_coro_children_on', 
+    'travers_through_all_coro_children', 'try_travers_through_all_coro_children', 'get_set_of_all_coro_children_on', 
+    'try_get_set_of_all_coro_children_on', 'get_set_of_all_coro_children', 'try_get_set_of_all_coro_children', 
+    'travers_through_all_coro_parents_on', 'try_travers_through_all_coro_parents_on', 'travers_through_all_coro_parents', 
+    'try_travers_through_all_coro_parents', 'get_set_of_all_coro_parents_on', 'try_get_set_of_all_coro_parents_on', 
+    'get_set_of_all_coro_parents', 'try_get_set_of_all_coro_parents', 'get_set_of_all_coros_on', 
+    'try_get_set_of_all_coros_on', 'get_set_of_all_coros', 'try_get_set_of_all_coros']
 
 from cengal.parallel_execution.coroutines.coro_scheduler import *
 from cengal.parallel_execution.coroutines.coro_standard_services_internal_lib.service_with_a_direct_request import *
@@ -42,6 +52,73 @@ from cengal.code_flow_control.smart_values import ValueExistence
 from cengal.introspection.inspect import get_exception, get_exception_tripple
 from cengal.data_manipulation.tree_traversal import KeyMultiValueTreeTraversal, KeyValueTreeTraversal
 from typing import Hashable, Tuple, List, Optional, Any, Union, cast, Dict, Callable, Set
+
+
+class TaskIsNotFinished(Exception):
+    pass
+
+
+class TaskIsFinished(Exception):
+    pass
+
+
+class Task:
+    def __init__(self, coro_wrapper: CoroWrapperBase):
+        self._coro_wrapper = coro_wrapper
+        self._coro_id = coro_wrapper.coro_id
+        self._coro_wrapper.add_on_coro_del_handler(self._on_coro_del_handler)
+        self._done: bool = False
+        self._result: Any = None
+        self._exception: Exception = None
+        self._on_done_handlers: Set[Callable[['Task'], None]] = set()
+    
+    def _on_coro_del_handler(self, coro_wrapper: CoroWrapperBase) -> bool:
+        self._result = self._coro_wrapper.last_result
+        self._exception = self._coro_wrapper.exception
+        self._coro_wrapper = None
+        self._done = True
+        for handler in self._on_done_handlers:
+            handler(self)
+        
+        return True
+    
+    @property
+    def coro_id(self):
+        return self._coro_id
+    
+    @property
+    def coro_wrapper(self):
+        if self._done:
+            raise TaskIsFinished()
+
+        return self._coro_wrapper
+    
+    @property
+    def result(self):
+        if not self._done:
+            raise TaskIsNotFinished()
+        
+        if self._exception is not None:
+            raise self._exception
+        
+        return self._result
+    
+    def done(self) -> bool:
+        return self._done
+    
+    def __bool__(self) -> bool:
+        return self._done
+
+    def __nonzero__(self):
+        return self.__bool__()
+    
+    def add_on_done_handler(self, handler: Callable[['Task'], None]) -> bool:
+        if self._done:
+            handler(self)
+        else:
+            self._on_done_handlers.add(handler)
+        
+        return True
 
 
 class PutCoroRequest(ServiceRequest):
@@ -62,9 +139,15 @@ class PutCoroRequest(ServiceRequest):
     def put_background_coro(self, coro_worker: AnyWorker, *args, **kwargs) -> ServiceRequest:
         return self._save(4, coro_worker, args, kwargs)
 
+    def task(self, coro_worker: AnyWorker, *args, **kwargs) -> ServiceRequest:
+        return self._save(5, coro_worker, args, kwargs, False)
+
+    def background_task(self, coro_worker: AnyWorker, *args, **kwargs) -> ServiceRequest:
+        return self._save(5, coro_worker, args, kwargs, True)
+
 
 class PutCoro(ServiceWithADirectRequestMixin, DualImmediateProcessingServiceMixin, TypedService[CoroID]):
-    def __init__(self, loop: CoroScheduler):
+    def __init__(self, loop: CoroSchedulerType):
         super(PutCoro, self).__init__(loop)
         self._tree_monitoring_turned_on: bool = None
         self._single_task_registration_or_immediate_processing_single_impl: Callable = None
@@ -78,6 +161,7 @@ class PutCoro(ServiceWithADirectRequestMixin, DualImmediateProcessingServiceMixi
             0: self._turn_on_tree_monitoring,
             1: self._tree_monitoring_state,
             4: self._put_background_coro,
+            5: self._task,
         }
 
         self.direct_requests: List[Tuple] = list()
@@ -137,6 +221,12 @@ class PutCoro(ServiceWithADirectRequestMixin, DualImmediateProcessingServiceMixi
         ) -> CoroWrapperBase:
         return self._single_task_registration_or_immediate_processing_single_impl_impl(coro_id, coro_worker, *args, **kwargs)
     
+    def put_task_from_other_service(
+            self, coro_id: CoroID, coro_worker: AnyWorker, args, kwargs
+        ) -> Task:
+        coro: CoroWrapperBase = self._single_task_registration_or_immediate_processing_single_impl_impl(coro_id, coro_worker, *args, **kwargs)
+        return Task(coro)
+    
     def put_root_from_other_service(
             self, coro_worker: AnyWorker, *args, **kwargs
         ) -> CoroWrapperBase:
@@ -153,6 +243,15 @@ class PutCoro(ServiceWithADirectRequestMixin, DualImmediateProcessingServiceMixi
             return True, None, get_exception()
 
         return True, coro.coro_id, None
+    
+    def _task(self, coro_worker: AnyWorker, args: Tuple, kwargs: Dict, background: bool):
+        try:
+            coro: CoroWrapperBase = self._single_task_registration_or_immediate_processing_single_impl(coro_worker, *args, **kwargs)
+            coro.is_background_coro = background
+        except:
+            return True, None, get_exception()
+
+        return True, Task(coro), None
 
     def full_processing_iteration(self):
         if self._dead_coroutines:
@@ -189,7 +288,7 @@ class PutCoro(ServiceWithADirectRequestMixin, DualImmediateProcessingServiceMixi
     def _add_direct_request(self, coro_worker: AnyWorker, *args, **kwargs) -> ValueExistence[None]:
         self.direct_requests.append((coro_worker, args, kwargs))
         self.make_live()
-        return ValueExistence()
+        return (False, None)
 
     def _on_coro_del_handler(self, coro: CoroWrapperBase) -> bool:
         self._dead_coroutines.add(coro.coro_id)
@@ -204,7 +303,7 @@ class PutCoro(ServiceWithADirectRequestMixin, DualImmediateProcessingServiceMixi
         result = set()
         def handler(deep, parent, child: ValueExistence[CoroID], index):
             if child:
-                result.add(child.value)
+                result.add(child[1])
         
         self.travers_through_all_children(coro_id, handler)
         result.discard(coro_id)
@@ -222,6 +321,11 @@ class PutCoro(ServiceWithADirectRequestMixin, DualImmediateProcessingServiceMixi
         
         self.travers_through_all_parents(coro_id, handler)
         result.discard(coro_id)
+        return result
+    
+    def get_set_of_all_coros(self):
+        result = set(self._tree_children_by_parent.keys())
+        result.update(self._tree_parent_by_child.keys())
         return result
 
     def in_work(self) -> bool:
@@ -247,17 +351,17 @@ def put_root_from_other_service(current_service: Service, coro_worker: AnyWorker
     return put_coro.put_root_from_other_service(coro_worker, *args, **kwargs)
 
 
-def put_coro_to(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], coro_worker: AnyWorker, *args, **kwargs) -> ValueExistence[Optional[CoroID]]:
+def put_coro_to(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], coro_worker: AnyWorker, *args, **kwargs) -> ValueExistence[Optional[CoroID]]:
     """_summary_
         context can be generated by one of the [interface_and_loop_with_backup_loop, get_interface_and_loop_with_backup_loop, interface_and_loop_with_explicit_loop, get_interface_and_loop_with_explicit_loop, interface_for_an_explicit_loop, get_interface_for_an_explicit_loop] functions from the cengal/parallel_execution/coroutines/coro_scheduler module
         
         An example:
 
-        from cengal.parallel_execution.coroutines.coro_scheduler import get_interface_and_loop_with_explicit_loop, CoroScheduler, ExplicitWorker, Worker, CoroID
+        from cengal.parallel_execution.coroutines.coro_scheduler import get_interface_and_loop_with_explicit_loop, CoroSchedulerType, ExplicitWorker, Worker, CoroID
         from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import put_coro_to
         from typing import Optional, Union
 
-        def my_func(loop: CoroScheduler, coro_worker: AnyWorker, a, b) -> Optional[CoroID]:
+        def my_func(loop: CoroSchedulerType, coro_worker: AnyWorker, a, b) -> Optional[CoroID]:
             resulting_coro_id: Optional[CoroID] = None
             try:
                 result = put_coro_to(get_interface_and_loop_with_explicit_loop(loop), coro_worker, a, b)
@@ -272,7 +376,7 @@ def put_coro_to(context: Tuple[Optional[CoroScheduler], Optional[Interface], boo
             return resulting_coro_id
         
     Args:
-        context (Tuple[Optional[CoroScheduler], Optional[Interface], bool]): _description_
+        context (Tuple[Optional[CoroSchedulerType], Optional[Interface], bool]): _description_
         coro_worker (AnyWorker): _description_
 
     Returns:
@@ -281,17 +385,17 @@ def put_coro_to(context: Tuple[Optional[CoroScheduler], Optional[Interface], boo
     return make_request_to_service_with_context(context, PutCoro, coro_worker, *args, **kwargs)
 
 
-def try_put_coro_to(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], coro_worker: AnyWorker, *args, **kwargs) -> ValueExistence[Optional[CoroID]]:
+def try_put_coro_to(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], coro_worker: AnyWorker, *args, **kwargs) -> ValueExistence[Optional[CoroID]]:
     """_summary_
         context can be generated by one of the [interface_and_loop_with_backup_loop, get_interface_and_loop_with_backup_loop, interface_and_loop_with_explicit_loop, get_interface_and_loop_with_explicit_loop, interface_for_an_explicit_loop, get_interface_for_an_explicit_loop] functions from the cengal/parallel_execution/coroutines/coro_scheduler module
         
         An example:
 
-        from cengal.parallel_execution.coroutines.coro_scheduler import get_interface_and_loop_with_explicit_loop, CoroScheduler, ExplicitWorker, Worker, CoroID
+        from cengal.parallel_execution.coroutines.coro_scheduler import get_interface_and_loop_with_explicit_loop, CoroSchedulerType, ExplicitWorker, Worker, CoroID
         from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import try_put_coro_to
         from typing import Optional, Union
 
-        def my_func(loop: CoroScheduler, coro_worker: AnyWorker, a, b) -> Optional[CoroID]:
+        def my_func(loop: CoroSchedulerType, coro_worker: AnyWorker, a, b) -> Optional[CoroID]:
             resulting_coro_id: Optional[CoroID] = None
             result = put_coro_to(get_interface_and_loop_with_explicit_loop(loop), coro_worker, a, b)
             if result:
@@ -305,7 +409,7 @@ def try_put_coro_to(context: Tuple[Optional[CoroScheduler], Optional[Interface],
             return resulting_coro_id
         
     Args:
-        context (Tuple[Optional[CoroScheduler], Optional[Interface], bool]): _description_
+        context (Tuple[Optional[CoroSchedulerType], Optional[Interface], bool]): _description_
         coro_worker (AnyWorker): _description_
 
     Returns:
@@ -314,11 +418,11 @@ def try_put_coro_to(context: Tuple[Optional[CoroScheduler], Optional[Interface],
     return try_make_request_to_service_with_context(context, PutCoro, coro_worker, *args, **kwargs)
 
 
-async def aput_coro_to(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], coro_worker: AnyWorker, *args, **kwargs) -> ValueExistence[CoroID]:
+async def aput_coro_to(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], coro_worker: AnyWorker, *args, **kwargs) -> ValueExistence[CoroID]:
     return await amake_request_to_service_with_context(context, PutCoro, coro_worker, *args, **kwargs)
 
 
-async def atry_put_coro_to(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], coro_worker: AnyWorker, *args, **kwargs) -> ValueExistence[Optional[CoroID]]:
+async def atry_put_coro_to(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], coro_worker: AnyWorker, *args, **kwargs) -> ValueExistence[Optional[CoroID]]:
     return await atry_make_request_to_service_with_context(context, PutCoro, coro_worker, *args, **kwargs)
 
 
@@ -341,12 +445,12 @@ async def atry_put_coro(coro_worker: AnyWorker, *args, **kwargs) -> ValueExisten
 # ==================================================
 
 
-def travers_through_all_coro_children_on(prioritized_coro_scheduler: Optional[CoroScheduler], coro_id, handler: Callable[[int, CoroID, CoroID, int], None], on_switched_to_stack_based_implementation: Optional[Callable]=None) -> ValueExistence[CoroID]:
+def travers_through_all_coro_children_on(prioritized_coro_scheduler: Optional[CoroSchedulerType], coro_id, handler: Callable[[int, CoroID, CoroID, int], None], on_switched_to_stack_based_implementation: Optional[Callable]=None) -> ValueExistence[CoroID]:
     put_coro: PutCoro = service_with_explicit_loop(PutCoro, prioritized_coro_scheduler)
     return put_coro.travers_through_all_children(coro_id, handler, on_switched_to_stack_based_implementation)
 
 
-def try_travers_through_all_coro_children_on(prioritized_coro_scheduler: Optional[CoroScheduler], coro_id, handler: Callable[[int, CoroID, CoroID, int], None], on_switched_to_stack_based_implementation: Optional[Callable]=None) -> ValueExistence[Optional[CoroID]]:
+def try_travers_through_all_coro_children_on(prioritized_coro_scheduler: Optional[CoroSchedulerType], coro_id, handler: Callable[[int, CoroID, CoroID, int], None], on_switched_to_stack_based_implementation: Optional[Callable]=None) -> ValueExistence[Optional[CoroID]]:
     put_coro: PutCoro = get_service_with_explicit_loop(PutCoro, prioritized_coro_scheduler)
     if put_coro is not None:
         return put_coro.travers_through_all_children(coro_id, handler, on_switched_to_stack_based_implementation)
@@ -363,12 +467,12 @@ def try_travers_through_all_coro_children(coro_id, handler: Callable[[int, CoroI
 # ==================================================
 
 
-def get_set_of_all_coro_children_on(prioritized_coro_scheduler: Optional[CoroScheduler], coro_id) -> Set[CoroID]:
+def get_set_of_all_coro_children_on(prioritized_coro_scheduler: Optional[CoroSchedulerType], coro_id) -> Set[CoroID]:
     put_coro: PutCoro = service_with_explicit_loop(PutCoro, prioritized_coro_scheduler)
     return put_coro.get_set_of_all_children(coro_id)
 
 
-def try_get_set_of_all_coro_children_on(prioritized_coro_scheduler: Optional[CoroScheduler], coro_id) -> Optional[Set[CoroID]]:
+def try_get_set_of_all_coro_children_on(prioritized_coro_scheduler: Optional[CoroSchedulerType], coro_id) -> Optional[Set[CoroID]]:
     put_coro: PutCoro = get_service_with_explicit_loop(PutCoro, prioritized_coro_scheduler)
     if put_coro is not None:
         return put_coro.get_set_of_all_children(coro_id)
@@ -385,12 +489,12 @@ def try_get_set_of_all_coro_children(coro_id) -> Optional[Set[CoroID]]:
 # ==================================================
 
 
-def travers_through_all_coro_parents_on(prioritized_coro_scheduler: Optional[CoroScheduler], coro_id, handler: Callable[[int, CoroID, CoroID, int], None], on_switched_to_stack_based_implementation: Optional[Callable]=None) -> ValueExistence[CoroID]:
+def travers_through_all_coro_parents_on(prioritized_coro_scheduler: Optional[CoroSchedulerType], coro_id, handler: Callable[[int, CoroID, CoroID, int], None], on_switched_to_stack_based_implementation: Optional[Callable]=None) -> ValueExistence[CoroID]:
     put_coro: PutCoro = service_with_explicit_loop(PutCoro, prioritized_coro_scheduler)
     return put_coro.travers_through_all_parents(coro_id, handler, on_switched_to_stack_based_implementation)
 
 
-def try_travers_through_all_coro_parents_on(prioritized_coro_scheduler: Optional[CoroScheduler], coro_id, handler: Callable[[int, CoroID, CoroID, int], None], on_switched_to_stack_based_implementation: Optional[Callable]=None) -> ValueExistence[Optional[CoroID]]:
+def try_travers_through_all_coro_parents_on(prioritized_coro_scheduler: Optional[CoroSchedulerType], coro_id, handler: Callable[[int, CoroID, CoroID, int], None], on_switched_to_stack_based_implementation: Optional[Callable]=None) -> ValueExistence[Optional[CoroID]]:
     put_coro: PutCoro = get_service_with_explicit_loop(PutCoro, prioritized_coro_scheduler)
     if put_coro is not None:
         return put_coro.travers_through_all_parents(coro_id, handler, on_switched_to_stack_based_implementation)
@@ -407,12 +511,12 @@ def try_travers_through_all_coro_parents(coro_id, handler: Callable[[int, CoroID
 # ==================================================
 
 
-def get_set_of_all_coro_parents_on(prioritized_coro_scheduler: Optional[CoroScheduler], coro_id) -> ValueExistence[CoroID]:
+def get_set_of_all_coro_parents_on(prioritized_coro_scheduler: Optional[CoroSchedulerType], coro_id) -> ValueExistence[CoroID]:
     put_coro: PutCoro = service_with_explicit_loop(PutCoro, prioritized_coro_scheduler)
     return put_coro.get_set_of_all_parents(coro_id)
 
 
-def try_get_set_of_all_coro_parents_on(prioritized_coro_scheduler: Optional[CoroScheduler], coro_id) -> ValueExistence[Optional[CoroID]]:
+def try_get_set_of_all_coro_parents_on(prioritized_coro_scheduler: Optional[CoroSchedulerType], coro_id) -> ValueExistence[Optional[CoroID]]:
     put_coro: PutCoro = get_service_with_explicit_loop(PutCoro, prioritized_coro_scheduler)
     if put_coro is not None:
         return put_coro.get_set_of_all_parents(coro_id)
@@ -424,3 +528,25 @@ def get_set_of_all_coro_parents(coro_id) -> ValueExistence[CoroID]:
 
 def try_get_set_of_all_coro_parents(coro_id) -> ValueExistence[Optional[CoroID]]:
     return try_get_set_of_all_coro_parents_on(get_available_coro_scheduler(), coro_id)
+
+
+# ==================================================
+
+
+def get_set_of_all_coros_on(prioritized_coro_scheduler: Optional[CoroSchedulerType]) -> ValueExistence[CoroID]:
+    put_coro: PutCoro = service_with_explicit_loop(PutCoro, prioritized_coro_scheduler)
+    return put_coro.get_set_of_all_coros()
+
+
+def try_get_set_of_all_coros_on(prioritized_coro_scheduler: Optional[CoroSchedulerType]) -> ValueExistence[Optional[CoroID]]:
+    put_coro: PutCoro = get_service_with_explicit_loop(PutCoro, prioritized_coro_scheduler)
+    if put_coro is not None:
+        return put_coro.get_set_of_all_coros()
+
+
+def get_set_of_all_coros() -> ValueExistence[CoroID]:
+    return get_set_of_all_coros_on(get_available_coro_scheduler())
+
+
+def try_get_set_of_all_coros() -> ValueExistence[Optional[CoroID]]:
+    return try_get_set_of_all_coros_on(get_available_coro_scheduler())

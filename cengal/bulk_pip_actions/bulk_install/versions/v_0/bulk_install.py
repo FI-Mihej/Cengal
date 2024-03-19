@@ -30,7 +30,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -149,8 +149,9 @@ class ModulesLists(object):
 
     def bulk_install(self):
         modules = self.chosen_packages()
-        print('INSTALLING: {}'.format(modules))
-        print()
+        if modules:
+            print('INSTALLING: {}'.format(modules))
+            print()
 
-        for item in modules:
-            install(item, self.list_type)
+            for item in modules:
+                install(item, self.list_type)

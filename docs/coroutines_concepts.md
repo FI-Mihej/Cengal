@@ -1,4 +1,4 @@
-# Coroutines Concepts
+## Coroutines Concepts
 
 Asyncio-compatible loops and Trio/Curio have quite monolithic architecture an as result it is quite hard to extend them. For example Uvloop has no shared code with asyncio. Also functionality is quite limited: launch timer (usually with an accuracy no better than once per 0.0167 sec on Windows) or coroutine and do some IO. Other extensions must handle all work with user code by them selves (handle singletons, ensure that all instances of some class are in sync between each other and the core of the extension, etc.). It is not such easy task to implement and usually leads to more errors than it can be in better case.
 
@@ -6,17 +6,17 @@ Cengal coroutines on the other hand, are like microkernel: they have small core 
 
 An each coroutine has a set of on_delete handlers. It can be empty. Many of services use this functionality. Both developer and user can use this functionality as well.
 
-# Types of coroutines
+## Types of coroutines
 
 Cengal has two types of coroutines: async-await based and greenlets based. Both of them are executed concurrently within the same loop.
 
-## Advantages of async-await coroutines
+### Advantages of async-await coroutines
 
 You can use any Asyncio code (and potentially Trio/Curio code) from inside of this coroutines. It is not an attempt of emulating subset of Asyncio API like in Trio. All alien requests are redirected to Asyncio loop (either external or internal). As result, Cengal do not need to constantly monitor changes in Asyncio/Uvloop to be in sync. Any Asyncio-compatible loop (Uvloop for example) is already supported and will be supported.
 
 Supported on all Python compatible platforms. Including Emscripten an as a result - PyScript.
 
-## Advantages of greenlet coroutines
+### Advantages of greenlet coroutines
 
 Such a coroutine can be executed from any general synchronous Python code with ability to yield to the main loop. Cengal is using them to convert third-party synchronous libraries (Tkinter, Qt, wxWidget, Kivy, etc.) to asynchronous without changing their code.
 
@@ -24,21 +24,21 @@ Do not require "async" and "await" words spamming across the code.
 
 You do not need to write two version of same function (one for sync and other for async code) unlike any async-await code. Just check is you are in the loop or not. Also you can use default loop (if registered in the current thread) or some variable with an explicit link to the loop instance.
 
-## Disadvantages of greenlet coroutines
+### Disadvantages of greenlet coroutines
 
 Number of supported platforms is currently limited to Windows, Mac OS X / iOS, Linux / Android. Emscripten (and PyScript) is not currently supported.
 
 Support of Emscripten is planned (by using different C code in addition to greenlets).
 
-# Imports
+## Imports
 
-## Main
+### Main
 
 User-useful imports:
 
 ```python
 from cengal.parallel_execution.coroutines.coro_scheduler import (
-    CoroID, Interface, CoroScheduler,
+    CoroID, Interface, CoroScheduler, CoroSchedulerType,
     Coro, CoroType, 
     cs_coro, cs_acoro, 
     ExplicitWorker, AnyWorker, 
@@ -55,7 +55,7 @@ or in general
 from cengal.parallel_execution.coroutines.coro_scheduler import *
 ```
 
-## Standard Services
+### Standard Services
 
 Standard services:
 ```python
@@ -91,7 +91,7 @@ from cengal.parallel_execution.coroutines.coro_standard_services.tkinter import 
 from cengal.parallel_execution.coroutines.coro_standard_services.wait_coro import *
 ```
 
-## Tools
+### Tools
 
 ```python
 from cengal.parallel_execution.coroutines.coro_tools.await_coro import *
@@ -103,7 +103,7 @@ from cengal.parallel_execution.coroutines.coro_tools.run_in_loop import *
 from cengal.parallel_execution.coroutines.coro_tools.wait_coro import *
 ```
 
-## Integrations
+### Integrations
 
 In some cases it is enough to create a set of functions or coroutines to integrate with some third-party package instead of new stand-alone service creation. For example: `customtkinter` requires one single small function to be used in addition to Tkinter Service; and it is can be handfull to register `uvloop` as a default asyncio-compatible loop automatically, if it is awailable. 
 
@@ -116,9 +116,9 @@ from cengal.parallel_execution.coroutines.integrations.uvicorn import *
 from cengal.parallel_execution.coroutines.integrations.uvloop import *
 ```
 
-# Explicit Syntax
+## Explicit Syntax
 
-## Async-Await
+### Async-Await
 
 ```python
 async def sub_coro(i: Interface, ...):
@@ -151,7 +151,7 @@ class Class:
         ...
 ```
 
-## Greenlets
+### Greenlets
 
 ```python
 def sub_coro(i: Interface, ...):
@@ -184,9 +184,9 @@ class Class:
         ...
 ```
 
-# Implicit Syntax
+## Implicit Syntax
 
-## Async-Await
+### Async-Await
 
 ```python
 async def implicit_coro(...):
@@ -209,7 +209,7 @@ class Class:
         ...
 ```
 
-## Greenlets
+### Greenlets
 
 ```python
 def implicit_coro(...):
@@ -232,7 +232,7 @@ class Class:
         ...
 ```
 
-# Working with services
+## Working with services
 
 Calls to services are made through the Interface instances which are provided by loop to an each coroutine. Each such a call to the service returns execution back to the loop until coroutine receives a response from the service.
 
@@ -261,11 +261,11 @@ def coro(i: Interface) -> str:
     i(FastAggregatorRequest().wait(DataStreamID))
     i(FastAggregatorWaitFor(DataStreamID))
 
-    result: str = i(RunCoro, my_concat_str_coro, 'hello', 'coro')  ## will create a new coro and waits until it will be finished
+    result: str = i(RunCoro, my_concat_str_coro, 'hello', 'coro')  # will create a new coro and waits until it will be finished
 
-    coro_id: CoroID = i(PutCoro, my_concat_str_coro, 'hello', 'coro')  ## Creates coroutine and returns its ID
-    i(WaitCoro, WaitCoroRequest(result_required=False).single(coro_id))  ## Will wait until coro with coro_id will be finished. (Coro can be already finished before this call - it's totaly OK)
-    result: str = i(WaitCoro, WaitCoroRequest().single(coro_id))  ## Will wait until coro with coro_id will be finished. (Will raise `SubCoroutineNotFoundError` if coro was already finished before this call)
+    coro_id: CoroID = i(PutCoro, my_concat_str_coro, 'hello', 'coro')  # Creates coroutine and returns its ID
+    i(WaitCoro, WaitCoroRequest(result_required=False).single(coro_id))  # Will wait until coro with coro_id will be finished. (Coro can be already finished before this call - it's totaly OK)
+    result: str = i(WaitCoro, WaitCoroRequest().single(coro_id))  # Will wait until coro with coro_id will be finished. (Will raise `SubCoroutineNotFoundError` if coro was already finished before this call)
     assert 'hello coro' == result
 
     i(WaitCoroRequest(timeout=0.01, kill_on_timeout=True, tree=True).list([
@@ -290,11 +290,11 @@ async def coro(i: Interface) -> str:
     await i(FastAggregatorRequest().wait(DataStreamID))
     await i(FastAggregatorWaitFor(DataStreamID))
 
-    result: str = await i(RunCoro, my_concat_str_coro, 'hello', 'coro')  ## will create a new coro and waits until it will be finished
+    result: str = await i(RunCoro, my_concat_str_coro, 'hello', 'coro')  # will create a new coro and waits until it will be finished
 
-    coro_id: CoroID = await i(PutCoro, my_concat_str_coro, 'hello', 'coro')  ## Creates coroutine and returns its ID
-    await i(WaitCoro, WaitCoroRequest(result_required=False).single(coro_id))  ## Will wait until coro with coro_id will be finished. (Coro can be already finished before this call - it's totaly OK)
-    result: str = await i(WaitCoro, WaitCoroRequest().single(coro_id))  ## Will wait until coro with coro_id will be finished. (Will raise `SubCoroutineNotFoundError` if coro was already finished before this call)
+    coro_id: CoroID = await i(PutCoro, my_concat_str_coro, 'hello', 'coro')  # Creates coroutine and returns its ID
+    await i(WaitCoro, WaitCoroRequest(result_required=False).single(coro_id))  # Will wait until coro with coro_id will be finished. (Coro can be already finished before this call - it's totaly OK)
+    result: str = await i(WaitCoro, WaitCoroRequest().single(coro_id))  # Will wait until coro with coro_id will be finished. (Will raise `SubCoroutineNotFoundError` if coro was already finished before this call)
     assert 'hello coro' == result
 
     await i(WaitCoroRequest(timeout=0.01, kill_on_timeout=True, tree=True).list([
@@ -312,7 +312,7 @@ async def coro(i: Interface) -> str:
     return 'Hello World'
 ```
 
-# Work with different coroutines types
+## Work with different coroutines types
 
 We can make general call (for a greenlet coro) or await (for an async coro) when we are working with the same coroutine type.
 

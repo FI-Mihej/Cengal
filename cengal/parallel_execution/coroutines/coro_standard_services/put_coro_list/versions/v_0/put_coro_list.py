@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -38,7 +38,7 @@ __all__ = ['PutSingleCoroParams', 'PSCP', 'PutCoroList', 'put_coro_list_to', 'tr
 
 
 from cengal.parallel_execution.coroutines.coro_scheduler import *
-from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import PutCoro
+from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import PutCoro, Task
 from cengal.parallel_execution.coroutines.coro_standard_services_internal_lib.service_with_a_direct_request import *
 from cengal.code_flow_control.smart_values import ValueExistence
 from cengal.introspection.inspect import get_exception, get_exception_tripple
@@ -60,28 +60,31 @@ PSCP = PutSingleCoroParams
 
 
 class PutCoroList(TypedService[List[Tuple[Optional[CoroID], Optional[Exception]]]], ServiceWithADirectRequestMixin):
-    def __init__(self, loop: CoroScheduler):
+    def __init__(self, loop: CoroSchedulerType):
         super(PutCoroList, self).__init__(loop)
         self.direct_requests: List[Tuple] = list()
 
     def single_task_registration_or_immediate_processing(
-            self, coro_list: Sequence[PutSingleCoroParams]
-    ) -> Tuple[bool, Optional[CoroID], Any]:
+            self, coro_list: Sequence[PutSingleCoroParams], tasks: bool = False
+    ) -> Tuple[bool, Union[List[CoroID], List[Task]], Any]:
         results = list()
         try:
             put_coro: PutCoro = self._loop.get_service_instance(PutCoro)
             caller_coro_id: CoroID = self.current_caller_coro_info.coro_id
             for request in coro_list:
-                result_coro_id = None
+                result = None
                 exception = None
                 try:
                     coro_worker, args, kwargs = request()
-                    coro = put_coro.put_from_other_service(caller_coro_id, coro_worker, *args, **kwargs)
-                    result_coro_id = coro.coro_id
+                    if tasks:
+                        result = put_coro.put_task_from_other_service(caller_coro_id, coro_worker, *args, **kwargs)
+                    else:
+                        coro = put_coro.put_from_other_service(caller_coro_id, coro_worker, *args, **kwargs)
+                        result = coro.coro_id
                 except:
                     exception = get_exception()
 
-                results.append((result_coro_id, exception))
+                results.append((result, exception))
         except:
             return True, results, get_exception()
 
@@ -106,26 +109,26 @@ class PutCoroList(TypedService[List[Tuple[Optional[CoroID], Optional[Exception]]
     def _add_direct_request(self, coro_list: Sequence[PutSingleCoroParams]) -> ValueExistence[None]:
         self.direct_requests.append(coro_list)
         self.make_live()
-        return ValueExistence()
+        return (False, None)
 
     def in_work(self) -> bool:
         result = bool(self.direct_requests)
         return self.thrifty_in_work(result)
 
 
-def put_coro_list_to(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], coro_list: Sequence[PutSingleCoroParams]) -> ValueExistence[CoroID]:
+def put_coro_list_to(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], coro_list: Sequence[PutSingleCoroParams]) -> ValueExistence[CoroID]:
     return make_request_to_service_with_context(context, PutCoroList, coro_list)
 
 
-def try_put_coro_list_to(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], coro_list: Sequence[PutSingleCoroParams]) -> ValueExistence[Optional[CoroID]]:
+def try_put_coro_list_to(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], coro_list: Sequence[PutSingleCoroParams]) -> ValueExistence[Optional[CoroID]]:
     return try_make_request_to_service_with_context(context, PutCoroList, coro_list)
 
 
-async def aput_coro_list_to(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], coro_list: Sequence[PutSingleCoroParams]) -> ValueExistence[CoroID]:
+async def aput_coro_list_to(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], coro_list: Sequence[PutSingleCoroParams]) -> ValueExistence[CoroID]:
     return await amake_request_to_service_with_context(context, PutCoroList, coro_list)
 
 
-async def atry_put_coro_list_to(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], coro_list: Sequence[PutSingleCoroParams]) -> ValueExistence[Optional[CoroID]]:
+async def atry_put_coro_list_to(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], coro_list: Sequence[PutSingleCoroParams]) -> ValueExistence[Optional[CoroID]]:
     return await atry_make_request_to_service_with_context(context, PutCoroList, coro_list)
 
 

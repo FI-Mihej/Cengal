@@ -48,7 +48,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -499,24 +499,73 @@ class TestCaseState:
         if self.call_stack_per_test != self.expected_call_stack_per_test:
             raise CallStackIsNotEqualError(f'Expected call stacks: {self.expected_call_stack_per_test}\nActual call stacks: {self.call_stack_per_test}')
 
-    def register_intro(self, raise_exceptions: Optional[bool] = None) -> ContextManager:
-        def context_manager(self: 'TestCaseState'):
-            current_entity: Callable = find_current_entity(2)
-            code_params_with_values: CodeParamsWithValues = intro_func_params_with_values(2)
-            result_holder: ValueHolder = ValueHolder()
-            exception_holder: ValueHolder = ValueHolder()
-            try:
-                yield result_holder
-            except:
-                exception_holder.value = get_exception()
-                if raise_exceptions or ((raise_exceptions is None) and self.raise_exceptions):
-                    raise
-            finally:
-                current_call_state: CallState = CallState(current_entity, code_params_with_values, result_holder, exception_holder)
-                self.call_stack.append(current_call_state)
-                self.check_current_state_item()
+    def register_intro(self, raise_exceptions: Optional[bool] = None) -> ContextManager[ValueHolder]:
+        class RIContextManager:
+            def __init__(self, testcasestate: 'TestCaseState') -> None:
+                self.testcasestate: 'TestCaseState' = testcasestate
+                self.current_entity: Callable = None
+                self.code_params_with_values: CodeParamsWithValues = None
+                self.result_holder: ValueHolder = ValueHolder()
+                self.exception_holder: ValueHolder = ValueHolder()
+                self.args: Tuple = tuple()
+                self.kwargs: Dict = dict()
+            
+            def __enter__(self) -> ValueHolder:
+                self.current_entity: Callable = find_current_entity(2)
+                self.code_params_with_values: CodeParamsWithValues = intro_func_params_with_values(2)
+                self.args = self.code_params_with_values.positional + self.code_params_with_values.positional_only
+                self.args = tuple((arg[1] for arg in self.args))
+                self.kwargs = dict(self.code_params_with_values.keyword_only)
+                return self.result_holder
+            
+            def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+                result = None
+                if exc_type is not None:
+                    self.exception_holder.value = exc_val.with_traceback(exc_tb)
+                    if raise_exceptions or ((raise_exceptions is None) and self.testcasestate.raise_exceptions):
+                        result = True
+
+                current_call_state: CallState = CallState(self.current_entity, self.code_params_with_values, self.args, self.kwargs, self.result_holder, self.exception_holder)
+                self.testcasestate.call_stack.append(current_call_state)
+                self.testcasestate.check_current_state_item()
+                return result
         
-        return context_manager(self)
+        return RIContextManager(self)
+
+        # def context_manager(self: 'TestCaseState'):
+        #     current_entity: Callable = find_current_entity(2)
+        #     code_params_with_values: CodeParamsWithValues = intro_func_params_with_values(2)
+        #     result_holder: ValueHolder = ValueHolder()
+        #     exception_holder: ValueHolder = ValueHolder()
+        #     try:
+        #         yield result_holder
+        #     except:
+        #         exception_holder.value = get_exception()
+        #         if raise_exceptions or ((raise_exceptions is None) and self.raise_exceptions):
+        #             raise
+        #     finally:
+        #         current_call_state: CallState = CallState(current_entity, code_params_with_values, result_holder, exception_holder)
+        #         self.call_stack.append(current_call_state)
+        #         self.check_current_state_item()
+        
+        # return context_manager(self)
+
+    # @contextmanager
+    # def register_intro(self, raise_exceptions: Optional[bool] = None) -> ContextManager[ValueHolder]:
+    #     current_entity: Callable = find_current_entity(2)
+    #     code_params_with_values: CodeParamsWithValues = intro_func_params_with_values(2)
+    #     result_holder: ValueHolder = ValueHolder()
+    #     exception_holder: ValueHolder = ValueHolder()
+    #     try:
+    #         yield result_holder
+    #     except:
+    #         exception_holder.value = get_exception()
+    #         if raise_exceptions or ((raise_exceptions is None) and self.raise_exceptions):
+    #             raise
+    #     finally:
+    #         current_call_state: CallState = CallState(current_entity, code_params_with_values, result_holder, exception_holder)
+    #         self.call_stack.append(current_call_state)
+    #         self.check_current_state_item()
     
     ri = register_intro
     

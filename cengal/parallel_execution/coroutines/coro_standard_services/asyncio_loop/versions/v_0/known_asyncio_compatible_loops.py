@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -37,7 +37,7 @@ __status__ = "Development"
 __all__ = ['prepare_loop', 'restore_loop', 'DerivedFromProactorEventLoop', 'DerivedFromSelectorEventLoop', 'DerivedFromUVLoop']
 
 
-from cengal.parallel_execution.coroutines.coro_scheduler import CoroScheduler, Interface, Coro, AnyWorker, current_interface, current_coro_scheduler, cs_coro, cs_acoro
+from cengal.parallel_execution.coroutines.coro_scheduler import CoroSchedulerType, Interface, Coro, AnyWorker, current_interface, current_coro_scheduler, cs_coro, cs_acoro
 from cengal.data_manipulation.conversion.reinterpret_cast import reinterpret_cast
 from cengal.data_manipulation.conversion.reinterpret_cast_management.manager import BaseAutoDerivedObjWrapper
 from asyncio import SelectorEventLoop, AbstractEventLoop
@@ -54,21 +54,21 @@ from typing import Type, Tuple, Dict, Callable, Any
 
 def call_soon(self, callback, *args, **kwargs):
     from .asyncio_loop import AsyncioLoop
-    cs: CoroScheduler = self._cs
+    cs: CoroSchedulerType = self._cs
     service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
     service.register_new_asyncio_request()
     return SelectorEventLoop.call_soon(self, callback, *args, **kwargs)
 
 def call_later(self, delay, callback, *args, **kwargs):
     from .asyncio_loop import AsyncioLoop
-    cs: CoroScheduler = self._cs
+    cs: CoroSchedulerType = self._cs
     service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
     service.register_new_asyncio_request()
     return SelectorEventLoop.call_later(self, delay, callback, *args, **kwargs)
 
 def call_at(self, when, callback, *args, **kwargs):
     from .asyncio_loop import AsyncioLoop
-    cs: CoroScheduler = self._cs
+    cs: CoroSchedulerType = self._cs
     service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
     service.register_new_asyncio_request()
     return SelectorEventLoop.call_at(self, when, callback, *args, **kwargs)
@@ -77,7 +77,7 @@ def call_at(self, when, callback, *args, **kwargs):
 
 def create_task(self, coro, **kwargs):
     from .asyncio_loop import AsyncioLoop
-    cs: CoroScheduler = self._cs
+    cs: CoroSchedulerType = self._cs
     service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
     service.register_new_asyncio_request()
     return SelectorEventLoop.create_task(self, coro, **kwargs)
@@ -86,28 +86,28 @@ def create_task(self, coro, **kwargs):
 
 def call_soon_threadsafe(self, callback, *args, **kwargs):
     from .asyncio_loop import AsyncioLoop
-    cs: CoroScheduler = self._cs
+    cs: CoroSchedulerType = self._cs
     service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
     service.register_new_asyncio_request()
     return SelectorEventLoop.call_soon_threadsafe(self, callback, *args, **kwargs)
 
 def run_in_executor(self, executor, func, *args):
     from .asyncio_loop import AsyncioLoop
-    cs: CoroScheduler = self._cs
+    cs: CoroSchedulerType = self._cs
     service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
     service.register_new_asyncio_request()
     return SelectorEventLoop.run_in_executor(self, executor, func, *args)
 
 def add_reader(self, fd, callback, *args):
     from .asyncio_loop import AsyncioLoop
-    cs: CoroScheduler = self._cs
+    cs: CoroSchedulerType = self._cs
     service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
     service.register_new_asyncio_request()
     return SelectorEventLoop.add_reader(self, fd, callback, *args)
 
 def add_writer(self, fd, callback, *args):
     from .asyncio_loop import AsyncioLoop
-    cs: CoroScheduler = self._cs
+    cs: CoroSchedulerType = self._cs
     service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
     service.register_new_asyncio_request()
     return SelectorEventLoop.add_writer(self, fd, callback, *args)
@@ -116,7 +116,7 @@ def add_writer(self, fd, callback, *args):
 
 def add_signal_handler(self, sig, callback, *args):
     from .asyncio_loop import AsyncioLoop
-    cs: CoroScheduler = self._cs
+    cs: CoroSchedulerType = self._cs
     service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
     service.register_new_asyncio_request()
     return SelectorEventLoop.add_signal_handler(self, sig, callback, *args)
@@ -173,21 +173,21 @@ if _proactor_present:
     class DerivedFromProactorEventLoop(ProactorEventLoop):
         def call_soon(self, callback, *args, **kwargs):
             from .asyncio_loop import AsyncioLoop
-            cs: CoroScheduler = self._cs
+            cs: CoroSchedulerType = self._cs
             service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
             service.register_new_asyncio_request()
             return ProactorEventLoop.call_soon(self, callback, *args, **kwargs)
 
         def call_later(self, delay, callback, *args, **kwargs):
             from .asyncio_loop import AsyncioLoop
-            cs: CoroScheduler = self._cs
+            cs: CoroSchedulerType = self._cs
             service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
             service.register_new_asyncio_request()
             return ProactorEventLoop.call_later(self, delay, callback, *args, **kwargs)
 
         def call_at(self, when, callback, *args, **kwargs):
             from .asyncio_loop import AsyncioLoop
-            cs: CoroScheduler = self._cs
+            cs: CoroSchedulerType = self._cs
             service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
             service.register_new_asyncio_request()
             return ProactorEventLoop.call_at(self, when, callback, *args, **kwargs)
@@ -196,7 +196,7 @@ if _proactor_present:
 
         def create_task(self, coro, **kwargs):
             from .asyncio_loop import AsyncioLoop
-            cs: CoroScheduler = self._cs
+            cs: CoroSchedulerType = self._cs
             service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
             service.register_new_asyncio_request()
             return ProactorEventLoop.create_task(self, coro, **kwargs)
@@ -205,28 +205,28 @@ if _proactor_present:
 
         def call_soon_threadsafe(self, callback, *args, **kwargs):
             from .asyncio_loop import AsyncioLoop
-            cs: CoroScheduler = self._cs
+            cs: CoroSchedulerType = self._cs
             service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
             service.register_new_asyncio_request()
             return ProactorEventLoop.call_soon_threadsafe(self, callback, *args, **kwargs)
 
         def run_in_executor(self, executor, func, *args):
             from .asyncio_loop import AsyncioLoop
-            cs: CoroScheduler = self._cs
+            cs: CoroSchedulerType = self._cs
             service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
             service.register_new_asyncio_request()
             return ProactorEventLoop.run_in_executor(self, executor, func, *args)
 
         def add_reader(self, fd, callback, *args):
             from .asyncio_loop import AsyncioLoop
-            cs: CoroScheduler = self._cs
+            cs: CoroSchedulerType = self._cs
             service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
             service.register_new_asyncio_request()
             return ProactorEventLoop.add_reader(self, fd, callback, *args)
 
         def add_writer(self, fd, callback, *args):
             from .asyncio_loop import AsyncioLoop
-            cs: CoroScheduler = self._cs
+            cs: CoroSchedulerType = self._cs
             service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
             service.register_new_asyncio_request()
             return ProactorEventLoop.add_writer(self, fd, callback, *args)
@@ -235,7 +235,7 @@ if _proactor_present:
 
         def add_signal_handler(self, sig, callback, *args):
             from .asyncio_loop import AsyncioLoop
-            cs: CoroScheduler = self._cs
+            cs: CoroSchedulerType = self._cs
             service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
             service.register_new_asyncio_request()
             return ProactorEventLoop.add_signal_handler(self, sig, callback, *args)
@@ -244,21 +244,21 @@ if _proactor_present:
 class DerivedFromSelectorEventLoop(SelectorEventLoop):
     def call_soon(self, callback, *args, **kwargs):
         from .asyncio_loop import AsyncioLoop
-        cs: CoroScheduler = self._cs
+        cs: CoroSchedulerType = self._cs
         service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
         service.register_new_asyncio_request()
         return SelectorEventLoop.call_soon(self, callback, *args, **kwargs)
 
     def call_later(self, delay, callback, *args, **kwargs):
         from .asyncio_loop import AsyncioLoop
-        cs: CoroScheduler = self._cs
+        cs: CoroSchedulerType = self._cs
         service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
         service.register_new_asyncio_request()
         return SelectorEventLoop.call_later(self, delay, callback, *args, **kwargs)
 
     def call_at(self, when, callback, *args, **kwargs):
         from .asyncio_loop import AsyncioLoop
-        cs: CoroScheduler = self._cs
+        cs: CoroSchedulerType = self._cs
         service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
         service.register_new_asyncio_request()
         return SelectorEventLoop.call_at(self, when, callback, *args, **kwargs)
@@ -267,7 +267,7 @@ class DerivedFromSelectorEventLoop(SelectorEventLoop):
 
     def create_task(self, coro, **kwargs):
         from .asyncio_loop import AsyncioLoop
-        cs: CoroScheduler = self._cs
+        cs: CoroSchedulerType = self._cs
         service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
         service.register_new_asyncio_request()
         return SelectorEventLoop.create_task(self, coro, **kwargs)
@@ -276,28 +276,28 @@ class DerivedFromSelectorEventLoop(SelectorEventLoop):
 
     def call_soon_threadsafe(self, callback, *args, **kwargs):
         from .asyncio_loop import AsyncioLoop
-        cs: CoroScheduler = self._cs
+        cs: CoroSchedulerType = self._cs
         service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
         service.register_new_asyncio_request()
         return SelectorEventLoop.call_soon_threadsafe(self, callback, *args, **kwargs)
 
     def run_in_executor(self, executor, func, *args):
         from .asyncio_loop import AsyncioLoop
-        cs: CoroScheduler = self._cs
+        cs: CoroSchedulerType = self._cs
         service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
         service.register_new_asyncio_request()
         return SelectorEventLoop.run_in_executor(self, executor, func, *args)
 
     def add_reader(self, fd, callback, *args):
         from .asyncio_loop import AsyncioLoop
-        cs: CoroScheduler = self._cs
+        cs: CoroSchedulerType = self._cs
         service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
         service.register_new_asyncio_request()
         return SelectorEventLoop.add_reader(self, fd, callback, *args)
 
     def add_writer(self, fd, callback, *args):
         from .asyncio_loop import AsyncioLoop
-        cs: CoroScheduler = self._cs
+        cs: CoroSchedulerType = self._cs
         service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
         service.register_new_asyncio_request()
         return SelectorEventLoop.add_writer(self, fd, callback, *args)
@@ -306,7 +306,7 @@ class DerivedFromSelectorEventLoop(SelectorEventLoop):
 
     def add_signal_handler(self, sig, callback, *args):
         from .asyncio_loop import AsyncioLoop
-        cs: CoroScheduler = self._cs
+        cs: CoroSchedulerType = self._cs
         service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
         service.register_new_asyncio_request()
         return SelectorEventLoop.add_signal_handler(self, sig, callback, *args)
@@ -315,21 +315,21 @@ class DerivedFromSelectorEventLoop(SelectorEventLoop):
 class DerivedFromUVLoop(UVLoop):
     def call_soon(self, callback, *args, context=None):
         from .asyncio_loop import AsyncioLoop
-        cs: CoroScheduler = self._cs
+        cs: CoroSchedulerType = self._cs
         service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
         service.register_new_asyncio_request()
         return UVLoop.call_soon(self, callback, *args, context=context)
 
     def call_later(self, delay, callback, *args, context=None):
         from .asyncio_loop import AsyncioLoop
-        cs: CoroScheduler = self._cs
+        cs: CoroSchedulerType = self._cs
         service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
         service.register_new_asyncio_request()
         return UVLoop.call_later(self, delay, callback, *args, context=context)
 
     def call_at(self, when, callback, *args, context=None):
         from .asyncio_loop import AsyncioLoop
-        cs: CoroScheduler = self._cs
+        cs: CoroSchedulerType = self._cs
         service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
         service.register_new_asyncio_request()
         return UVLoop.call_at(self, when, callback, *args, context=context)
@@ -338,7 +338,7 @@ class DerivedFromUVLoop(UVLoop):
 
     def create_task(self, coro, *, name=None, context=None):
         from .asyncio_loop import AsyncioLoop
-        cs: CoroScheduler = self._cs
+        cs: CoroSchedulerType = self._cs
         service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
         service.register_new_asyncio_request()
         return UVLoop.create_task(self, coro, name=name, context=context)
@@ -347,28 +347,28 @@ class DerivedFromUVLoop(UVLoop):
 
     def call_soon_threadsafe(self, callback, *args, context=None):
         from .asyncio_loop import AsyncioLoop
-        cs: CoroScheduler = self._cs
+        cs: CoroSchedulerType = self._cs
         service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
         service.register_new_asyncio_request()
         return UVLoop.call_soon_threadsafe(self, callback, *args, context=context)
 
     def run_in_executor(self, executor, func, *args):
         from .asyncio_loop import AsyncioLoop
-        cs: CoroScheduler = self._cs
+        cs: CoroSchedulerType = self._cs
         service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
         service.register_new_asyncio_request()
         return UVLoop.run_in_executor(self, executor, func, *args)
 
     def add_reader(self, fd, callback, *args):
         from .asyncio_loop import AsyncioLoop
-        cs: CoroScheduler = self._cs
+        cs: CoroSchedulerType = self._cs
         service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
         service.register_new_asyncio_request()
         return UVLoop.add_reader(self, fd, callback, *args)
 
     def add_writer(self, fd, callback, *args):
         from .asyncio_loop import AsyncioLoop
-        cs: CoroScheduler = self._cs
+        cs: CoroSchedulerType = self._cs
         service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
         service.register_new_asyncio_request()
         return UVLoop.add_writer(self, fd, callback, *args)
@@ -377,7 +377,7 @@ class DerivedFromUVLoop(UVLoop):
 
     def add_signal_handler(self, sig, callback, *args):
         from .asyncio_loop import AsyncioLoop
-        cs: CoroScheduler = self._cs
+        cs: CoroSchedulerType = self._cs
         service: AsyncioLoop = cs.get_service_instance(AsyncioLoop)
         service.register_new_asyncio_request()
         return UVLoop.add_signal_handler(self, sig, callback, *args)

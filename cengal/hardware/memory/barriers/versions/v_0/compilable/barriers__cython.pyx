@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -34,7 +34,7 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-IF UNAME_SYSNAME == "Windows":
+IF CD_UNAME_SYSNAME == "Windows":
     cdef extern from "Windows.h":
         void MemoryBarrier()
 
@@ -98,7 +98,7 @@ ELSE:
     full_memory_barrier = py_atomic_thread_fence__memory_order_seq_cst
 
 
-IF (UNAME_SYSNAME == "Windows") and (UNAME_MACHINE in ("x86_64", "x86", "i386", "i686", "AMD64")):
+IF (CD_UNAME_SYSNAME == "Windows") and (CD_UNAME_MACHINE in ("x86_64", "x86", "i386", "i686", "AMD64")):
     cdef extern from "<emmintrin.h>" nogil:
         void _mm_mfence()
 
@@ -145,7 +145,7 @@ IF (UNAME_SYSNAME == "Windows") and (UNAME_MACHINE in ("x86_64", "x86", "i386", 
 
     full_memory_barrier = memory_barrier
 
-ELIF (UNAME_SYSNAME in ("Linux", "Darwin")) and (UNAME_MACHINE in ("x86_64", "x86", "i386", "i686", "AMD64")):
+ELIF (CD_UNAME_SYSNAME in ("Linux", "Darwin")) and (CD_UNAME_MACHINE in ("x86_64", "x86", "i386", "i686", "AMD64")):
     cdef extern from "<emmintrin.h>" nogil:
         void _mm_mfence()
 
@@ -203,19 +203,19 @@ ELIF (UNAME_SYSNAME in ("Linux", "Darwin")) and (UNAME_MACHINE in ("x86_64", "x8
 
 
     # An alternative to mm_clflush() in GCC and Clang compilers
-    cpdef void clear_cache(int beg, int end) nogil:
+    cpdef void clear_cache(int beg, int end):
         __clear_cache(<char*>beg, <char*>end)
 
 
     full_memory_barrier = mm_mfence
 
-ELIF (UNAME_SYSNAME == 'Windows') and UNAME_MACHINE.startswith("arm"):
+ELIF (CD_UNAME_SYSNAME == 'Windows') and CD_UNAME_MACHINE.startswith("arm"):
     cdef extern from "arm64_neon.h" nogil:
         void __iso_volatile_store16(void* p, unsigned long long val)
 
 
     # An alternative to mm_clflush() for ARM in Visual Studio compiler
-    cpdef void iso_volatile_store16(int p, unsigned long long val) nogil:
+    cpdef void iso_volatile_store16(int p, unsigned long long val):
         __iso_volatile_store16(<void*> p, val)
 
 
@@ -244,7 +244,7 @@ ELIF (UNAME_SYSNAME == 'Windows') and UNAME_MACHINE.startswith("arm"):
 
     full_memory_barrier = memory_barrier
 
-ELIF UNAME_SYSNAME in ("Linux", "Darwin") and UNAME_MACHINE.startswith("arm"):
+ELIF CD_UNAME_SYSNAME in ("Linux", "Darwin") and CD_UNAME_MACHINE.startswith("arm"):
     cdef extern from * nogil:
         void __sync_synchronize()
 
@@ -258,7 +258,7 @@ ELIF UNAME_SYSNAME in ("Linux", "Darwin") and UNAME_MACHINE.startswith("arm"):
 
 
     # An alternative to mm_clflush() for ARM in GCC and Clang compilers
-    cpdef void clear_cache(int beg, int end) nogil:
+    cpdef void clear_cache(int beg, int end):
         __clear_cache(<char*>beg, <char*>end)
 
 
@@ -284,7 +284,7 @@ ELIF UNAME_SYSNAME in ("Linux", "Darwin") and UNAME_MACHINE.startswith("arm"):
     cpdef void memory_barrier():
         __sync_synchronize()
 
-ELIF UNAME_SYSNAME == "Emscripten":
+ELIF CD_UNAME_SYSNAME == "Emscripten":
     cdef extern from * nogil:
         void __sync_synchronize()
 
@@ -298,7 +298,7 @@ ELIF UNAME_SYSNAME == "Emscripten":
 
 
     # Probably can be used as an alternative to mm_clflush() for Emscripten
-    cpdef void py_emscripten_atomic_fence() nogil:
+    cpdef void py_emscripten_atomic_fence():
         emscripten_atomic_fence()
 
     
@@ -352,5 +352,5 @@ ELSE:
         atomic_thread_fence(_MEMORY_ORDER_SEQ_CST)
 
 
-IF UNAME_SYSNAME == "Windows":
+IF CD_UNAME_SYSNAME == "Windows":
     full_memory_barrier = memory_barrier

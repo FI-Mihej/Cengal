@@ -25,7 +25,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -40,6 +40,8 @@ from cengal.text_processing.encoding_detection import detect_and_decode
 from cengal.text_processing.text_processing import find_text, replace_slice
 from cengal.text_processing.brackets_processing import BracketPair, Bracket, replace_text_with_brackets, find_text_with_brackets
 from os.path import splitext, join
+from cengal.build_tools.ensure_copyright import ensure_copyright as ensure_copyright_orig
+import sys
 
 
 head_string = \
@@ -76,7 +78,7 @@ credits_string = \
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -86,60 +88,18 @@ credits_bracket_pair: BracketPair = BracketPair([Bracket('__author__ =')], [Brac
 
 
 def main():
+    silent: bool = '--silent' in sys.argv
     cengal_root_dir: str = path_relative_to_current_src('../..')
-    travers_result = filtered_file_list_traversal(cengal_root_dir, FilteringType.including, {'.pyx', '.py'}, remove_empty_items=True, use_spinner=False)
-    files_processed: int = 0
-    try:
-        for dir_path, dirs, files in travers_result:
-            for file in files:
-                file_path = join(dir_path, file)
-                print()
-                print(f'... Processing: {file_path}')
-                try:
-                    with open(file_path, 'r+b') as file:
-                        text, text_encoding, bom_bytes = detect_and_decode(file.read())
-                        if not bom_bytes:
-                            text_encoding = 'utf-8'
-                        
-                        head_string_pos = find_text(text, head_string, 0, len(head_string) * 2)
-                        license_string_pos = find_text_with_brackets(text, license_bracket_pair)
-                        module_docstring_string_pos = find_text(text, module_docstring_string)
-                        credits_string_pos = find_text_with_brackets(text, credits_bracket_pair)
-                        
-                        replace_only: bool = bool(head_string_pos is not None) and bool(license_string_pos is not None) and bool(credits_string_pos is not None)
-                        if replace_only:
-                            text, _ = replace_text_with_brackets(text, license_bracket_pair, license_string, 1)
-                            text, _ = replace_text_with_brackets(text, credits_bracket_pair, credits_string, 1)
-                        else:
-                            head_string_pos = find_text(text, head_string, 0, len(head_string) * 2)
-                            if head_string_pos is not None:
-                                text, _ = replace_slice(text, head_string_pos, str())
-                            
-                            license_string_pos = find_text_with_brackets(text, license_bracket_pair)
-                            if license_string_pos is not None:
-                                text, _ = replace_slice(text, license_string_pos, str())
-                            
-                            module_docstring_string_pos = find_text(text, module_docstring_string)
-                            if module_docstring_string_pos is not None:
-                                text, _ = replace_slice(text, module_docstring_string_pos, str())
-                            
-                            credits_string_pos = find_text_with_brackets(text, credits_bracket_pair)
-                            if credits_string_pos is not None:
-                                text, _ = replace_slice(text, credits_string_pos, str())
-
-                            new_head: str = head_string + '\n\n' + license_string + '\n\n\n' + module_docstring_string + '\n\n\n' + credits_string + '\n\n\n'
-                            text = new_head + text
-                        
-                        file.seek(0, 0)
-                        file.truncate(0)
-                        data = bom_bytes + text.encode(text_encoding)
-                        file.write(data)
-                        files_processed += 1
-                finally:
-                    print(f'Done: {file_path}')
-    finally:
-        print()
-        print(f'Files procesed: {files_processed}')
+    ensure_copyright_orig(
+        cengal_root_dir,
+        head_string,
+        license_string,
+        license_bracket_pair,
+        module_docstring_string,
+        credits_string,
+        credits_bracket_pair,
+        silent=silent,
+    )
 
 
 if '__main__' == __name__:

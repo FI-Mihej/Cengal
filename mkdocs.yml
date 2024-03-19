@@ -1,0 +1,50 @@
+site_name: Cengal Documentation
+site_url: https://FI-Mihej.github.io/Cengal
+repo_url: https://github.com/FI-Mihej/Cengal
+copyright: Copyright © 2012-2024 ButenkoMS. All rights reserved.
+theme:
+  name: material
+  palette:
+
+    # # Palette toggle for automatic mode
+    # - media: "(prefers-color-scheme)"
+    #   toggle:
+    #     icon: material/brightness-auto
+    #     name: Switch to light mode
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default 
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # # Palette toggle for dark mode
+    # - media: "(prefers-color-scheme: dark)"
+    #   scheme: slate
+    #   toggle:
+    #     icon: material/brightness-4
+    #     name: Switch to system preference
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+plugins:
+  - search
+  # - mkapi
+# - mkdocstrings:
+#     default_handler: python
+#     handlers:
+#       python:
+#         options:
+#           show_source: true
+# nav:
+#   - index.md
+#   - interprocess_shared_memory.md
+#   - coroutines_concepts.md
+#   - forced_concurrency.md
+#   - API: $api/cengal.***

@@ -20,7 +20,6 @@ __all__ = ['default_env_path_and_params', 'Db', 'DbRequest', 'KeyType', 'RawKeyT
            'DbId', 'EnvId', 'DbName', 'DbKeyError', 'EnvInfo']
 
 from cengal.parallel_execution.coroutines.coro_scheduler import *
-from cengal.parallel_execution.coroutines.coro_scheduler.versions.v_0.coro_scheduler import ServiceRequest
 from cengal.parallel_execution.coroutines.coro_tools.await_coro import *
 from cengal.parallel_execution.coroutines.coro_standard_services.asyncio_loop import *
 from cengal.parallel_execution.coroutines.coro_standard_services.loop_yield import CoroPriority
@@ -64,7 +63,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -501,7 +500,7 @@ def check_request(method: Callable):
     
 
 class Db(Service, EntityStatsMixin):
-    def __init__(self, loop: CoroScheduler):
+    def __init__(self, loop: CoroSchedulerType):
         super(Db, self).__init__(loop)
         self.default_env_name: str = '__default__.dbenv'
         self.default_envs_dir: str = 'db_envs'
@@ -546,7 +545,7 @@ class Db(Service, EntityStatsMixin):
         self.db_drops_num: int = 0
         self.write_locked_coro_id: Set[CoroID] = set()
         self.wake_up_handle_registered: bool = False
-        # self.serializer = best_serializer({
+        # self.serializer = best_serializer_for_standard_data((
         #                                     DataFormats.binary,
         #                                     DataFormats.messagepack,
         #                                     Tags.can_use_bytes,
@@ -556,8 +555,8 @@ class Db(Service, EntityStatsMixin):
         #                                     Tags.superficial,
         #                                     Tags.current_platform,
         #                                     Tags.multi_platform,
-        #                                 },
-        #                                 test_data_factory(TestDataType.small),
+        #                                 ),
+        #                                 TestDataType.small,
         #                                 0.1)
         self.serializer = Serializer(Serializers.msgspec_messagepack)
         self._request_workers = {

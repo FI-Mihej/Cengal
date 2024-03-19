@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -58,7 +58,7 @@ class KillSingleCoroParams:
 
 
 class KillCoroList(TypedService[List[Tuple[Optional[bool], Optional[Exception]]]], ServiceWithADirectRequestMixin):
-    def __init__(self, loop: CoroScheduler):
+    def __init__(self, loop: CoroSchedulerType):
         super(KillCoroList, self).__init__(loop)
         self.direct_requests: List[Tuple] = list()
 
@@ -123,26 +123,26 @@ class KillCoroList(TypedService[List[Tuple[Optional[bool], Optional[Exception]]]
     def _add_direct_request(self, coro_list: Sequence[Union[CoroID, KillSingleCoroParams]]) -> ValueExistence[None]:
         self.direct_requests.append(coro_list)
         self.make_live()
-        return ValueExistence()
+        return (False, None)
 
     def in_work(self) -> bool:
         result: bool = bool(self.direct_requests)
         return self.thrifty_in_work(result)
 
 
-def kill_coro_list_on(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], coro_list: Sequence[Union[CoroID, KillSingleCoroParams]]) -> ValueExistence[Sequence[Tuple[bool, Optional[Exception]]]]:
+def kill_coro_list_on(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], coro_list: Sequence[Union[CoroID, KillSingleCoroParams]]) -> ValueExistence[Sequence[Tuple[bool, Optional[Exception]]]]:
     return make_request_to_service_with_context(context, KillCoroList, coro_list)
 
 
-def try_kill_coro_list_on(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], coro_list: Sequence[Union[CoroID, KillSingleCoroParams]]) -> ValueExistence[Optional[Sequence[Tuple[bool, Optional[Exception]]]]]:
+def try_kill_coro_list_on(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], coro_list: Sequence[Union[CoroID, KillSingleCoroParams]]) -> ValueExistence[Optional[Sequence[Tuple[bool, Optional[Exception]]]]]:
     return try_make_request_to_service_with_context(context, KillCoroList, coro_list)
 
 
-async def akill_coro_list_on(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], coro_list: Sequence[Union[CoroID, KillSingleCoroParams]]) -> ValueExistence[Sequence[Tuple[bool, Optional[Exception]]]]:
+async def akill_coro_list_on(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], coro_list: Sequence[Union[CoroID, KillSingleCoroParams]]) -> ValueExistence[Sequence[Tuple[bool, Optional[Exception]]]]:
     return await amake_request_to_service_with_context(context, KillCoroList, coro_list)
 
 
-async def atry_kill_coro_list_on(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], coro_list: Sequence[Union[CoroID, KillSingleCoroParams]]) -> ValueExistence[Optional[Sequence[Tuple[bool, Optional[Exception]]]]]:
+async def atry_kill_coro_list_on(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], coro_list: Sequence[Union[CoroID, KillSingleCoroParams]]) -> ValueExistence[Optional[Sequence[Tuple[bool, Optional[Exception]]]]]:
     return await atry_make_request_to_service_with_context(context, KillCoroList, coro_list)
 
 

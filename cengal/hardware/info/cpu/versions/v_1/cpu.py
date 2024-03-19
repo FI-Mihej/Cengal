@@ -20,7 +20,6 @@ __all__ = ['CpuInfo', 'cpu_info']
 
 
 # from operator import is_
-from typing import Dict
 from cengal.modules_management.alternative_import import alt_import
 with alt_import('cpuinfo') as cpuinfo:
     if cpuinfo is None:
@@ -35,6 +34,9 @@ with ignore_in_build_mode():
         if psutil is not None:
             PSUTIL_PRESENT = True
 
+import sys
+from typing import Dict, Set, Optional
+
 
 """
 Module Docstring
@@ -45,7 +47,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -53,13 +55,111 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
+if hasattr(cpuinfo.cpuinfo, '_check_arch'):
+    check_arch = getattr(cpuinfo.cpuinfo, '_check_arch')
+    try:
+        check_arch()
+    except:
+        CPUINFO_PRESENT = False
+
+
+_known_gathering_methods_names = (
+    '_get_cpu_info_from_wmic',
+    '_get_cpu_info_from_registry',
+    '_get_cpu_info_from_proc_cpuinfo',
+    '_get_cpu_info_from_cpufreq_info',
+    '_get_cpu_info_from_lscpu',
+    '_get_cpu_info_from_sysctl',
+    '_get_cpu_info_from_kstat',
+    '_get_cpu_info_from_dmesg',
+    '_get_cpu_info_from_cat_var_run_dmesg_boot',
+    '_get_cpu_info_from_ibm_pa_features',
+    '_get_cpu_info_from_sysinfo',
+    '_get_cpu_info_from_cpuid',
+    '_get_cpu_info_from_platform_uname',
+)
+last_stage = len(_known_gathering_methods_names) - 1
+stage_after_last = last_stage + 1
+
+
+_can_use_lazy_gathering = True
+if hasattr(cpuinfo.cpuinfo, '_copy_new_fields'):
+    copy_new_fields = getattr(cpuinfo.cpuinfo, '_copy_new_fields')
+elif hasattr(cpuinfo.cpuinfo, 'CopyNewFields'):
+    copy_new_fields = getattr(cpuinfo.cpuinfo, 'CopyNewFields')
+else:
+    _can_use_lazy_gathering = False
+
+
+def get_cpu_info_lazy(desired_keys = None, stage = 0, info = None):
+    stage = stage if stage is not None else 0
+    stage = stage if stage >= 0 else last_stage
+
+    arch, bits = cpuinfo.cpuinfo._parse_arch(cpuinfo.cpuinfo.DataSource.arch_string_raw)
+
+    friendly_maxsize = { 2**31-1: '32 bit', 2**63-1: '64 bit' }.get(sys.maxsize) or 'unknown bits'
+    friendly_version = "{0}.{1}.{2}.{3}.{4}".format(*sys.version_info)
+    PYTHON_VERSION = "{0} ({1})".format(friendly_version, friendly_maxsize)
+
+    info = {
+        'python_version' : PYTHON_VERSION,
+        'cpuinfo_version' : cpuinfo.cpuinfo.CPUINFO_VERSION,
+        'cpuinfo_version_string' : cpuinfo.cpuinfo.CPUINFO_VERSION_STRING,
+        'arch' : arch,
+        'bits' : bits,
+        'count' : cpuinfo.cpuinfo.DataSource.cpu_count,
+        'arch_string_raw' : cpuinfo.cpuinfo.DataSource.arch_string_raw,
+    } if info is None else info
+
+    if desired_keys is None:
+        return info, stage
+
+    desired_keys = desired_keys if isinstance(desired_keys, set) else set(desired_keys)
+    flags: bool = 'flags' in desired_keys
+
+    if (not flags) & (not (desired_keys - set(info.keys()))):
+        return info, stage
+    
+    current_stage = -1
+    for method_name in _known_gathering_methods_names:
+        current_stage += 1
+        if current_stage < stage:
+            continue
+
+        if hasattr(cpuinfo.cpuinfo, method_name):
+            method = getattr(cpuinfo.cpuinfo, method_name)
+            copy_new_fields(info, method())
+            if (not flags) & (not (desired_keys - set(info.keys()))):
+                break
+    
+    next_stage = current_stage + 1
+    if next_stage >= stage_after_last:
+        next_stage = None
+    
+    return info, next_stage
+
+
 class CpuInfo:
     _cache: Dict = None
+    _stage: int = None
+    _cache_friendly: Dict = None
+    _cores_num: int = None
+    _virtual_cores_num: int = None
 
-    def __init__(self):
-        if self._cache is None:
-            self._cache_friendly: Dict = cpuinfo.get_cpu_info() if CPUINFO_PRESENT else dict()
-            self._cache = self._normalize_cpu_info_values(self._cache_friendly)
+    def __init__(self, desired_keys: Optional[Set[str]] = None, stage: Optional[int] = 0, info: Dict = None):
+        if CpuInfo._cores_num is None:
+            CpuInfo._cores_num = psutil.cpu_count(logical=False) if PSUTIL_PRESENT else 0
+        
+        if CpuInfo._virtual_cores_num is None:
+            CpuInfo._virtual_cores_num = psutil.cpu_count(logical=True) if PSUTIL_PRESENT else 0
+        
+        if CpuInfo._cache is None:
+            if _can_use_lazy_gathering:
+                CpuInfo._cache_friendly, CpuInfo._stage = get_cpu_info_lazy(desired_keys, stage, info) if CPUINFO_PRESENT else ((dict(), stage) if info is None else (info, stage))
+            else:
+                CpuInfo._cache_friendly = cpuinfo.get_cpu_info() if CPUINFO_PRESENT else (dict() if info is None else info)
+            
+            CpuInfo._cache = self._normalize_cpu_info_values(CpuInfo._cache_friendly)
     
     def _normalize_cpu_info_values(self, cpu_info_dict: Dict) -> Dict:
         result = dict()
@@ -137,114 +237,128 @@ class CpuInfo:
             result[key] = value
         
         return result
+
+    def _ensure_field(self, field_name):
+        if not CPUINFO_PRESENT:
+            return field_name
+        
+        if not _can_use_lazy_gathering:
+            return field_name
+
+        if ('flags' != field_name) & (field_name in self._cache):
+            return field_name
+
+        CpuInfo._cache_friendly, CpuInfo._stage = get_cpu_info_lazy({field_name,}, CpuInfo._stage, CpuInfo._cache_friendly)
+        CpuInfo._cache = self._normalize_cpu_info_values(CpuInfo._cache_friendly)
+        return field_name
     
     @property
     def python_version(self):
-        return self._cache.get('python_version', str())
+        return self._cache.get(self._ensure_field('python_version'), str())
     
     @property
     def cpuinfo_version(self):
-        return self._cache.get('cpuinfo_version', (0, 0, 0))
+        return self._cache.get(self._ensure_field('cpuinfo_version'), (0, 0, 0))
     
     @property
     def cpuinfo_version_string(self):
-        return self._cache.get('cpuinfo_version_string', str())
+        return self._cache.get(self._ensure_field('cpuinfo_version_string'), str())
     
     @property
     def python_hz_advertised_friendlyversion(self):
-        return self._cache.get('hz_advertised_friendly', str())
+        return self._cache.get(self._ensure_field('hz_advertised_friendly'), str())
     
     @property
     def hz_actual_friendly(self):
-        return self._cache.get('hz_actual_friendly', str())
+        return self._cache.get(self._ensure_field('hz_actual_friendly'), str())
     
     @property
     def hz_advertised(self):
-        return self._cache.get('hz_advertised', (0, 0))
+        return self._cache.get(self._ensure_field('hz_advertised'), (0, 0))
     
     @property
     def hz_actual(self):
-        return self._cache.get('hz_actual', (0, 0))
+        return self._cache.get(self._ensure_field('hz_actual'), (0, 0))
     
     @property
     def arch(self):
-        return self._cache.get('arch', str())
+        return self._cache.get(self._ensure_field('arch'), str())
     
     @property
     def bits(self):
-        return self._cache.get('bits', 0)
+        return self._cache.get(self._ensure_field('bits'), 0)
     
     @property
     def count(self):
-        return self._cache.get('count', 0)
+        return self._cache.get(self._ensure_field('count'), 0)
     
     @property
     def l1_data_cache_size(self):
-        return self._cache.get('l1_data_cache_size', 0)
+        return self._cache.get(self._ensure_field('l1_data_cache_size'), 0)
     
     @property
     def l1_instruction_cache_size(self):
-        return self._cache.get('l1_instruction_cache_size', 0)
+        return self._cache.get(self._ensure_field('l1_instruction_cache_size'), 0)
     
     @property
     def l2_cache_size(self):
-        return self._cache.get('l2_cache_size', 0)
+        return self._cache.get(self._ensure_field('l2_cache_size'), 0)
     
     @property
     def l2_cache_line_size(self):
-        return self._cache.get('l2_cache_line_size', 0)
+        return self._cache.get(self._ensure_field('l2_cache_line_size'), 0)
     
     @property
     def l2_cache_associativity(self):
-        return self._cache.get('l2_cache_associativity', 0)
+        return self._cache.get(self._ensure_field('l2_cache_associativity'), 0)
     
     @property
     def l3_cache_size(self):
-        return self._cache.get('l3_cache_size', 0)
+        return self._cache.get(self._ensure_field('l3_cache_size'), 0)
     
     @property
     def stepping(self):
-        return self._cache.get('stepping', 0)
+        return self._cache.get(self._ensure_field('stepping'), 0)
     
     @property
     def model(self):
-        return self._cache.get('model', 0)
+        return self._cache.get(self._ensure_field('model'), 0)
     
     @property
     def family(self):
-        return self._cache.get('family', 0)
+        return self._cache.get(self._ensure_field('family'), 0)
     
     @property
     def processor_type(self):
-        return self._cache.get('processor_type', 0)
+        return self._cache.get(self._ensure_field('processor_type'), 0)
     
     @property
     def flags(self):
-        return self._cache.get('flags', list())
+        return self._cache.get(self._ensure_field('flags'), list())
     
     @property
     def vendor_id_raw(self):
-        return self._cache.get('vendor_id_raw', str())
+        return self._cache.get(self._ensure_field('vendor_id_raw'), str())
     
     @property
     def hardware_raw(self):
-        return self._cache.get('hardware_raw', str())
+        return self._cache.get(self._ensure_field('hardware_raw'), str())
     
     @property
     def brand_raw(self):
-        return self._cache.get('brand_raw', str())
+        return self._cache.get(self._ensure_field('brand_raw'), str())
     
     @property
     def arch_string_raw(self):
-        return self._cache.get('arch_string_raw', str())
+        return self._cache.get(self._ensure_field('arch_string_raw'), str())
     
     @property
     def cores_num(self):
-        return psutil.cpu_count(logical=False) if PSUTIL_PRESENT else 0
+        return CpuInfo._cores_num if CpuInfo._cores_num else self.count
     
     @property
     def virtual_cores_num(self):
-        return psutil.cpu_count(logical=True) if PSUTIL_PRESENT else 0
+        return CpuInfo._virtual_cores_num if CpuInfo._virtual_cores_num else CpuInfo._cores_num
     
     @property
     def l2_cache_size_per_core(self) -> int:
@@ -281,6 +395,9 @@ class CpuInfo:
     @property
     def is_arm(self) -> bool:
         return self.arch.lower().startswith('arm')
+    
+    def gather_all(self):
+        self.flags
 
 
 _CPU_INFO = None

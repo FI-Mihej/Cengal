@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -60,79 +60,79 @@ cdef extern from "memory_access.h":
     void c_set_memory(unsigned long long base_address, unsigned long long offset, unsigned long long size, unsigned char value) nogil
     void c_zero_memory(unsigned long long base_address, unsigned long long offset, unsigned long long size) nogil
 
-cpdef void write_uint64(unsigned long long base_address, unsigned long long offset, unsigned long long value) noexcept nogil:
+cpdef void write_uint64(unsigned long long base_address, unsigned long long offset, unsigned long long value) noexcept:
     c_write_uint64(base_address, offset, value)
 
-cpdef unsigned long long read_uint64(unsigned long long base_address, unsigned long long offset) noexcept nogil:
+cpdef unsigned long long read_uint64(unsigned long long base_address, unsigned long long offset) noexcept:
     return c_read_uint64(base_address, offset)
 
-cpdef void write_int64(unsigned long long base_address, unsigned long long offset, long long value) noexcept nogil:
+cpdef void write_int64(unsigned long long base_address, unsigned long long offset, long long value) noexcept:
     c_write_int64(base_address, offset, value)
 
-cpdef long long read_int64(unsigned long long base_address, unsigned long long offset) noexcept nogil:
+cpdef long long read_int64(unsigned long long base_address, unsigned long long offset) noexcept:
     return c_read_int64(base_address, offset)
 
-cpdef void write_uint32(unsigned long long base_address, unsigned long long offset, unsigned int value) noexcept nogil:
+cpdef void write_uint32(unsigned long long base_address, unsigned long long offset, unsigned int value) noexcept:
     c_write_uint32(base_address, offset, value)
 
-cpdef unsigned int read_uint32(unsigned long long base_address, unsigned long long offset) noexcept nogil:
+cpdef unsigned int read_uint32(unsigned long long base_address, unsigned long long offset) noexcept:
     return c_read_uint32(base_address, offset)
 
-cpdef void write_int32(unsigned long long base_address, unsigned long long offset, int value) noexcept nogil:
+cpdef void write_int32(unsigned long long base_address, unsigned long long offset, int value) noexcept:
     c_write_int32(base_address, offset, value)
 
-cpdef int read_int32(unsigned long long base_address, unsigned long long offset) noexcept nogil:
+cpdef int read_int32(unsigned long long base_address, unsigned long long offset) noexcept:
     return c_read_int32(base_address, offset)
 
-cpdef void write_uint16(unsigned long long base_address, unsigned long long offset, unsigned short value) noexcept nogil:
+cpdef void write_uint16(unsigned long long base_address, unsigned long long offset, unsigned short value) noexcept:
     c_write_uint16(base_address, offset, value)
 
-cpdef unsigned short read_uint16(unsigned long long base_address, unsigned long long offset) noexcept nogil:
+cpdef unsigned short read_uint16(unsigned long long base_address, unsigned long long offset) noexcept:
     return c_read_uint16(base_address, offset)
 
-cpdef void write_int16(unsigned long long base_address, unsigned long long offset, short value) noexcept nogil:
+cpdef void write_int16(unsigned long long base_address, unsigned long long offset, short value) noexcept:
     c_write_int16(base_address, offset, value)
 
-cpdef short read_int16(unsigned long long base_address, unsigned long long offset) noexcept nogil:
+cpdef short read_int16(unsigned long long base_address, unsigned long long offset) noexcept:
     return c_read_int16(base_address, offset)
 
-cpdef void write_uint8(unsigned long long base_address, unsigned long long offset, unsigned char value) noexcept nogil:
+cpdef void write_uint8(unsigned long long base_address, unsigned long long offset, unsigned char value) noexcept:
     c_write_uint8(base_address, offset, value)
 
-cpdef unsigned char read_uint8(unsigned long long base_address, unsigned long long offset) noexcept nogil:
+cpdef unsigned char read_uint8(unsigned long long base_address, unsigned long long offset) noexcept:
     return c_read_uint8(base_address, offset)
 
-cpdef void write_int8(unsigned long long base_address, unsigned long long offset, char value) noexcept nogil:
+cpdef void write_int8(unsigned long long base_address, unsigned long long offset, char value) noexcept:
     c_write_int8(base_address, offset, value)
 
-cpdef char read_int8(unsigned long long base_address, unsigned long long offset) noexcept nogil:
+cpdef char read_int8(unsigned long long base_address, unsigned long long offset) noexcept:
     return c_read_int8(base_address, offset)
 
-cpdef void write_float(unsigned long long base_address, unsigned long long offset, float value) noexcept nogil:
+cpdef void write_float(unsigned long long base_address, unsigned long long offset, float value) noexcept:
     c_write_float(base_address, offset, value)
 
-cpdef float read_float(unsigned long long base_address, unsigned long long offset) noexcept nogil:
+cpdef float read_float(unsigned long long base_address, unsigned long long offset) noexcept:
     return c_read_float(base_address, offset)
 
-cpdef void write_double(unsigned long long base_address, unsigned long long offset, double value) noexcept nogil:
+cpdef void write_double(unsigned long long base_address, unsigned long long offset, double value) noexcept:
     c_write_double(base_address, offset, value)
 
-cpdef double read_double(unsigned long long base_address, unsigned long long offset) noexcept nogil:
+cpdef double read_double(unsigned long long base_address, unsigned long long offset) noexcept:
     return c_read_double(base_address, offset)
 
-cpdef void copy_memory(unsigned long long base_address, unsigned long long offset, unsigned long long size, unsigned long long source_offset) noexcept nogil:
+cpdef void copy_memory(unsigned long long base_address, unsigned long long offset, unsigned long long size, unsigned long long source_offset) noexcept:
     c_copy_memory(base_address, offset, size, source_offset)
 
-cpdef void copy_memory_from(unsigned long long base_address, unsigned long long offset, unsigned long long size, unsigned long long source_offset) noexcept nogil:
+cpdef void copy_memory_from(unsigned long long base_address, unsigned long long offset, unsigned long long size, unsigned long long source_offset) noexcept:
     c_copy_memory_from(base_address, offset, size, source_offset)
 
-cpdef void set_memory(unsigned long long base_address, unsigned long long offset, unsigned long long size, unsigned char value) noexcept nogil:
+cpdef void set_memory(unsigned long long base_address, unsigned long long offset, unsigned long long size, unsigned char value) noexcept:
     c_set_memory(base_address, offset, size, value)
 
-cpdef void zero_memory(unsigned long long base_address, unsigned long long offset, unsigned long long size) noexcept nogil:
+cpdef void zero_memory(unsigned long long base_address, unsigned long long offset, unsigned long long size) noexcept:
     c_zero_memory(base_address, offset, size)
 
-# cpdef unsigned long long list__get_item__impl(unsigned long long key, unsigned long long base_address, unsigned long long offset__pointer_to_internal_list, object get_obj_callback, unsigned long long & item_type, unsigned long long & need_to_raise_exception) nogil:
+# cpdef unsigned long long list__get_item__impl(unsigned long long key, unsigned long long base_address, unsigned long long offset__pointer_to_internal_list, object get_obj_callback, unsigned long long & item_type, unsigned long long & need_to_raise_exception):
 #     cdef unsigned long long pointer_to_internal_list
 #     cdef unsigned long long item_type_offset
 #     cdef unsigned long long item_value_offset

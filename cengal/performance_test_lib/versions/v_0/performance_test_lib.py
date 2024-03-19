@@ -17,11 +17,13 @@
 
 import copy
 import gc
+from cengal.code_flow_control.gc import DisableGC
 from contextlib import contextmanager
 from cengal.code_flow_control.smart_values.versions.v_2 import ValueExistence
 from cengal.parallel_execution.coroutines.coro_standard_services.lazy_print.versions.v_0.lazy_print import lprint
 from cengal.time_management.load_best_timer import perf_counter
 from cengal.time_management.repeat_for_a_time import Tracer, ClockType
+from typing import Generator, Any
 
 """
 Module Docstring
@@ -32,7 +34,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -47,7 +49,7 @@ class PerformanceTestResult(Exception):
 
 
 @contextmanager
-def test_run_time(test_name: str, number_of_iterations: int, throw_result: bool=False, throw_result_anyway: bool=True, ignore_index=False):
+def test_run_time(test_name: str, number_of_iterations: int, throw_result: bool=False, throw_result_anyway: bool=True, ignore_index=False) -> Generator[ValueExistence[int], Any, Any]:
     index = ValueExistence(True, copy.copy(number_of_iterations))
     start_time = perf_counter()
     exception_occures = False
@@ -202,17 +204,21 @@ class PrecisePerformanceTestTracer(Tracer):
         super().__init__(run_time, clock_type)
         self.suppress_exceptions = suppress_exceptions
         self.turn_off_gc = turn_off_gc
+        self.gc_was_enabled = None
 
     def __enter__(self):
         self._relevant_start_time = self._start_time = self._relevant_stop_time = self._end_time = self._clock()
         self._relevant_number_of_iterations_at_start = 0
         if self.turn_off_gc:
+            self.gc_was_enabled = gc.isenabled()
             gc.disable()
+        
         return range(self._last_tracked_number_of_iterations)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._relevant_stop_time = self._end_time = self._clock()
-        if self.turn_off_gc:
+        if self.turn_off_gc and self.gc_was_enabled:
             gc.enable()
+        
         if self.suppress_exceptions:
             return True

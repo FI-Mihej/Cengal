@@ -24,7 +24,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -38,12 +38,24 @@ from cengal.text_processing.text_processing import Text, replace_text, replace_s
 from typing import List, Tuple, Optional, Callable
 
 
-def patch_text(text: Text, patch: List[Tuple[BracketPair, Text]], encoding: Optional[str] = DEFAULT_ENCODING, normalizer: Optional[Callable] = None) -> Text:
-    for brackets_pair, after in patch:
-        old_text_slice = find_text_in_brackets(data, brackets_pair, encoding=encoding, normalizer=normalizer)
-        if old_text_slice is None:
-            continue
+def patch_text(
+    text: Text, 
+    patch: List[Tuple[BracketPair, Text]], 
+    count: int = 1, 
+    encoding: Optional[str] = DEFAULT_ENCODING, 
+    normalizer: Optional[Callable] = None
+    ) -> Text:
+    iter_num: int = 0
+    sub_iter_num: int = -1
+    while (0 != sub_iter_num) and ((iter_num < count) if (0 <= count) else True):
+        iter_num += 1
+        sub_iter_num = 0
+        for brackets_pair, after in patch:
+            old_text_slice = find_text_in_brackets(text, brackets_pair, encoding=encoding, normalizer=normalizer)
+            if old_text_slice is None:
+                continue
 
-        data, _ = replace_slice(data, old_text_slice, after, encoding=encoding, normalizer=normalizer)
+            text, _ = replace_slice(text, old_text_slice, after, encoding=encoding, normalizer=normalizer)
+            sub_iter_num += 1
 
     return text

@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -297,7 +297,7 @@ class StreamWriterAbstract:
         """
         raise NotImplementedError
     
-    def stop_ar(self, timeout: Optional[Union[int, float]] = 0):
+    async def stop_aw(self, timeout: Optional[Union[int, float]] = 0):
         """_summary_
 
         Args:
@@ -306,12 +306,12 @@ class StreamWriterAbstract:
         Returns:
             _type_: _description_
         """
-        return self.stop_autonomous_writer(timeout)
+        return await self.stop_autonomous_writer(timeout)
     
     async def autonomous_writer_drain_enough(self, lower_water_size: Optional[int] = None):
         raise NotImplementedError
     
-    async def ar_drain_enough(self):
+    async def aw_drain_enough(self):
         await self.autonomous_writer_drain_enough()
     
     def optimized_write_message(self, data):

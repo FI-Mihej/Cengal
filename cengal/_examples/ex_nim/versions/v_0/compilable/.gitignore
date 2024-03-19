@@ -1,0 +1,8 @@
+mymodule.pyd
+mymodule.so
+c__definitions.nim
+cengal_definitions.nim
+CompileTimeDefinitions.nim
+compile_time_py_definitions.nim
+mymodule.dll
+mymodule.dylib

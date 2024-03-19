@@ -24,7 +24,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -32,6 +32,7 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
+import codecs
 from locale import normalize
 from cengal.text_processing.encoding_detection import detect_and_decode
 from cengal.text_processing.text_patch.simple import patch_text
@@ -39,20 +40,49 @@ from cengal.text_processing.text_processing import DEFAULT_ENCODING
 from typing import List, Tuple, Optional, Callable
 
 
-def patch_text_file(file_path: str, patch: List[Tuple[str, str]], encoding: Optional[str] = DEFAULT_ENCODING, normalizer: Optional[Callable] = None):
+def patch_text_file(
+        file_path: str, 
+        patch: List[Tuple[str, str]], 
+        count: int = 1, 
+        encoding: Optional[str] = DEFAULT_ENCODING, 
+        normalizer: Optional[Callable] = None, 
+        fallback_to_utf_8: bool = True,
+        replace_errors: bool = True,
+        ):
     with open(file_path, 'r+b') as file:
         text, text_encoding, bom_bytes = detect_and_decode(file.read())
-        text = patch_text(text, patch, encoding, normalizer)
+        text = patch_text(text, patch, count, encoding, normalizer)
         file.seek(0, 0)
         file.truncate(0)
-        data = bom_bytes + text.encode(text_encoding)
+        try:
+            try:
+                data = bom_bytes + text.encode(text_encoding)
+            except UnicodeEncodeError:
+                if fallback_to_utf_8:
+                    bom_bytes = codecs.BOM_UTF8
+                    text_encoding = 'utf-8'
+                    data = bom_bytes + text.encode(text_encoding)
+                else:
+                    raise
+        except UnicodeEncodeError:
+            if replace_errors:
+                data = bom_bytes + text.encode(text_encoding, errors='replace')
+            else:
+                raise
+        
         file.write(data)
 
 
-def patch_bin_file(file_path: str, patch: List[Tuple[bytes, bytes]], encoding: Optional[str] = DEFAULT_ENCODING, normalizer: Optional[Callable] = None):
+def patch_bin_file(
+        file_path: str, 
+        patch: List[Tuple[bytes, bytes]], 
+        count: int = 1, 
+        encoding: Optional[str] = DEFAULT_ENCODING, 
+        normalizer: Optional[Callable] = None
+        ):
     with open(file_path, 'r+b') as file:
         data: bytes = file.read()
-        data = patch_text(data, patch, encoding, normalizer)
+        data = patch_text(data, patch, count, encoding, normalizer)
         file.seek(0, 0)
         file.truncate(0)
         file.write(data)

@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -37,11 +37,21 @@ __status__ = "Development"
 from cengal.file_system.path_manager import path_relative_to_src
 from cengal.build_tools.modules.create import create
 
+import argparse
+
 
 def main(sep: str = '/'):
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--path", help="`module/submodule` path")
+    args = parser.parse_args()
+
     cengal_dir = path_relative_to_src('../../cengal')
-    required_path_input = input(f'Enter `module/submodule` path: ')
-    return create(cengal_dir, required_path_input, sep)
+    if args.path:
+        required_path = args.path
+    else:
+        required_path = input(f'Enter `module/submodule` path: ')
+    
+    return create(cengal_dir, required_path, sep)
 
 
 if __name__ == '__main__':

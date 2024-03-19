@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -34,7 +34,7 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-IF IS_ARM == "True":
+IF CD_IS_ARM == 1:
     cdef extern from "cpu_clock_cycles.h":
         u64 c_cpu_clock_cycles() nogil
 
@@ -46,18 +46,18 @@ ELSE:
     cdef extern from "cpu_clock_cycles.h":
         unsigned long long c_cpu_clock_cycles() nogil
 
-    cpdef unsigned long long cpu_clock_cycles() nogil:
+    cpdef unsigned long long cpu_clock_cycles():
         return c_cpu_clock_cycles()
 
 
 cdef double _cycles_per_second = 1e9
 
 
-cpdef void set_cycles_per_second(double cycles_per_second) nogil:
+cpdef void set_cycles_per_second(double cycles_per_second):
     global _cycles_per_second
     _cycles_per_second = cycles_per_second
 
 
-cpdef double cpu_clock() nogil:
+cpdef double cpu_clock():
     return c_cpu_clock_cycles() / _cycles_per_second
 

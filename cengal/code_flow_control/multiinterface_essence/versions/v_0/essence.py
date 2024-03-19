@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -65,11 +65,12 @@ class EssenceInterfaceIsNotRegisteredError(UnsuitableEssenceInterfaceError, Esse
 
 
 class EssenceModelCanNotInjectSelfError(RuntimeError, EssenceModelException):
-    # Must be raised by EssenceModel.emi_inject_model when an object of a class A(EssenceModel) tries
-    #   to inject class A - type(self)
-    # This behavior is restricted since it may lead to: 
-    #   - endless recursion;
-    #   - interface collisions when high order model will include several instances of the same interface class.
+    """Must be raised by EssenceModel.emi_inject_model when an object of a class A(EssenceModel) tries
+    to inject class A - type(self)
+
+    This behavior is restricted since it may lead to: 
+        - endless recursion
+        - interface collisions when high order model will include several instances of the same interface class"""
     pass
 
 
@@ -179,17 +180,17 @@ class EssenceModelUnknownInjectionAbstract:
 
 
 class EssenceModel(EssenceModelInheritanceAbstract, EssenceModelInjectionAbstract, EssenceModelUnknownInjectionAbstract):
-    # Must contain related data in a consistent state.
-    #
-    # In order to do this, you must reload em_on_model_updated() and emi_on_injected_model_updated() methods.
-    # Your interfaces can provide some appropriate information though an additional parameters of em_on_model_updated()
-    # and emi_on_injected_model_updated() methods.
-    #
-    # Do not forget to:
-    #   - run `self._emi_notify_high_order_model_about_self_update(type(self), interface_class, *args, **kwargs)` at
-    #       the end of your em_on_model_updated()
-    #   - run `self._emi_notify_high_order_model_about_self_update(type(self), essence_model_class, *args, **kwargs)` at
-    #       the end of your emi_on_injected_model_updated()
+    """Must contain related data in a consistent state.
+    
+    In order to do this, you must reload `em_on_model_updated()` and `emi_on_injected_model_updated()` methods.
+    Your interfaces can provide some appropriate information though an additional `parameters of em_on_model_updated()`
+    and `emi_on_injected_model_updated()` methods.
+    
+    Do not forget to:
+      - run `self._emi_notify_high_order_model_about_self_update(type(self), interface_class, *args, **kwargs)` at
+          the end of your `em_on_model_updated()`
+      - run `self._emi_notify_high_order_model_about_self_update(type(self), essence_model_class, *args, **kwargs)` at
+          the end of your `emi_on_injected_model_updated()`"""
 
     emi_compatible_injectable_essence_model_classes: Set[Type['EssenceModel']] = set()
     # emu_compatible_high_order_essence_model_class: Optional[Type['EssenceModel']] = None
@@ -206,7 +207,7 @@ class EssenceModel(EssenceModelInheritanceAbstract, EssenceModelInjectionAbstrac
         self.__emu_unknown_injected_models: Dict[Type['EssenceModel'], 'EssenceModel'] = dict()
 
     def em_interface(self, interface_class: Type['EssenceInterface']) -> 'EssenceInterface':
-        # Should be called in order to get needed model interface
+        """Should be called in order to get needed model interface"""
         if interface_class in self.__em_interfaces:
             return self.__em_interfaces[interface_class]
         else:
@@ -296,9 +297,9 @@ class EssenceModel(EssenceModelInheritanceAbstract, EssenceModelInjectionAbstrac
         self.__em_possible_interfaces = new_possible_interfaces
 
     def em_on_model_updated(self, interface_class: Type['EssenceInterface'], *args, **kwargs):
-        # Must be run by EssenceInterface (by running EssenceInterface.notify_model_about_change method) after changing
-        #   model's data. It is enough to run in once per a method - at the end of the method work.
-        # In 'super' in method of inherit class should be run at the end of the method
+        """Must be run by EssenceInterface (by running EssenceInterface.notify_model_about_change method) after changing
+          model's data. It is enough to run in once per a method - at the end of the method work.
+        In 'super' in method of inherit class should be run at the end of the method"""
         self._em_check_applicability_of_interfaces()
         self._emu_notify_unknown_models_about_self_update()
         self._emi_notify_high_order_model_about_self_update(type(self), interface_class, *args, **kwargs)
@@ -325,7 +326,7 @@ class EssenceModel(EssenceModelInheritanceAbstract, EssenceModelInjectionAbstrac
             return False
 
     def emi_on_registered_in_high_order_model(self, high_order_model: 'EssenceModel'):
-        # Will be called after high order model successfully registered this mode
+        """Will be called after high order model successfully registered this mode"""
         self.__emi_high_order_model = high_order_model
 
     def emi_on_unregistering_from_high_order_model(self):
@@ -444,6 +445,7 @@ class EssenceInterface(Generic[Model]):
 
     def __init__(self, essence_model: Model, *args, **kwargs):
         self.essence_model: Model = essence_model
+        self.em: Model = essence_model
         self._on_applicability_changed_handlers: Set[Callable] = set()
         self._applicability_state: bool = None
         self.__check_essence_mode_type()

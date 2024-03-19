@@ -29,7 +29,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -47,7 +47,7 @@ class OptionalFormatter:
         self._item_positions = item_positions
         self._template_per_item = template_per_item
 
-    def __call__(self, arguments_per_item: Dict[Hashable, Union[AK, Any]]):
+    def __call__(self, arguments_per_item: Dict[Hashable, Union[AK, Any]]) -> str:
         result = str()
         is_first = True
         last_postfix = str()
@@ -137,5 +137,5 @@ class OptionalFormatterHandy(OptionalFormatter):
     def __init__(self, *item_positions: [str, ...], **template_per_item: [str, Union[IT, Tuple[str, str, str, str, str]]]):
         super().__init__(item_positions, template_per_item)
 
-    def __call__(self, **arguments_per_item: [str, Union[AK, Any]]):
+    def __call__(self, **arguments_per_item: [str, Union[AK, Any]]) -> str:
         return super(OptionalFormatterHandy, self).__call__(arguments_per_item)

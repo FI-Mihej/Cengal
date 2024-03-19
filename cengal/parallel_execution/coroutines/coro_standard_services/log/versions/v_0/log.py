@@ -62,7 +62,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -75,7 +75,7 @@ def get_coro_parents_path(coro_id: CoroID) -> List[CoroID]:
     result: List[CoroID] = list()
     def handler(deep, child, parent, index):
         if parent is not None:
-            coro_id = parent.value
+            coro_id = parent[1]
             parents.add(coro_id)
             result.append(coro_id)
     
@@ -83,7 +83,7 @@ def get_coro_parents_path(coro_id: CoroID) -> List[CoroID]:
     return result
 
 
-def coro_info_string(cs: CoroScheduler, coro_id: CoroID) -> str:
+def coro_info_string(cs: CoroSchedulerType, coro_id: CoroID) -> str:
     coro: Optional[CoroWrapperBase] = cs.get_coro(coro_id)
     if coro is None:
         return f'  CoroID: {coro_id:10}'
@@ -96,9 +96,9 @@ def coro_info_string(cs: CoroScheduler, coro_id: CoroID) -> str:
 
 
 def get_coro_parents_strings(coro_id: CoroID) -> List[str]:
-    coro_parents_path: List[ValueExistence[CoroID]] = get_coro_parents_path(coro_id)
+    coro_parents_path: List[CoroID] = get_coro_parents_path(coro_id)
     if coro_parents_path:
-        cs: CoroScheduler = get_current_coro_scheduler()
+        cs: CoroSchedulerType = get_current_coro_scheduler()
         if cs is None:
             return list([f'  CoroID: {coro_id:10}' for coro_id in coro_parents_path])
         else:
@@ -194,7 +194,7 @@ class LogRequest(ServiceRequest):
     
 
 class Log(TypedService[None], EntityStatsMixin):
-    def __init__(self, loop: CoroScheduler):
+    def __init__(self, loop: CoroSchedulerType):
         super(Log, self).__init__(loop)
         self.default_logs_dir: str = 'log.db'
         self.path_to_db_environment = None
@@ -217,15 +217,15 @@ class Log(TypedService[None], EntityStatsMixin):
         self.new_iteration_handlers_num: int = 0
         self.logger_handlers: Dict[logging.Logger, LoggingHandler] = dict()
         self.logger: logging.Logger = self._loop.logger
-        # self.serializer = best_serializer({DataFormats.binary,
+        # self.serializer = best_serializer_for_standard_data((DataFormats.binary,
         #                                    Tags.can_use_bytes,
         #                                    Tags.decode_str_as_str,
         #                                    Tags.decode_list_as_list,
         #                                    Tags.decode_bytes_as_bytes,
         #                                    Tags.superficial,
         #                                    Tags.current_platform,
-        #                                    Tags.multi_platform},
-        #                                   test_data_factory(TestDataType.small),
+        #                                    Tags.multi_platform),
+        #                                   TestDataType.small,
         #                                   0.1)
         self.serializer = Serializer(Serializers.msgspec_messagepack)
 
@@ -554,7 +554,7 @@ class LogClient:
         
         return args[0] if args else None
 
-    def put_log_fast(self, scheduler: CoroScheduler, *args, **kwargs) -> Optional[Any]:
+    def put_log_fast(self, scheduler: CoroSchedulerType, *args, **kwargs) -> Optional[Any]:
         if self.extended:
             log_ex_request: LogExtended = self.log_extended_request(*args, **kwargs)
             scheduler.get_service_instance_fast(Log).put_log_ex(*log_ex_request.args, **log_ex_request.kwargs)
@@ -565,7 +565,7 @@ class LogClient:
 
     plog_fast = put_log_fast
 
-    # async def aput_log_fast(self, scheduler: CoroScheduler, *args, **kwargs):
+    # async def aput_log_fast(self, scheduler: CoroSchedulerType, *args, **kwargs):
     #     if self.extended:
     #         log_ex_request: LogExtended = self.log_extended_request(*args, **kwargs)
     #         scheduler.get_service_instance_fast(Log).put_log_ex(*log_ex_request.args, **log_ex_request.kwargs)
@@ -611,15 +611,15 @@ def view_log(path_to_db_environment: Optional[str]=None, file_to_redirect_output
     try:
         db_environment = lmdb.open(path_to_db_environment, map_size=20 * 1024 ** 2, writemap=True, max_dbs=2)
         db = db_environment.open_db(b'logs')
-        # serializer = best_serializer({DataFormats.binary,
+        # serializer = best_serializer_for_standard_data((DataFormats.binary,
         #                               Tags.can_use_bytes,
         #                               Tags.decode_str_as_str,
         #                               Tags.decode_list_as_list,
         #                               Tags.decode_bytes_as_bytes, 
         #                               Tags.superficial,
         #                               Tags.current_platform,
-        #                               Tags.multi_platform},
-        #                              test_data_factory(TestDataType.small),
+        #                               Tags.multi_platform),
+        #                              TestDataType.small,
         #                              0.1)
         serializer = Serializer(Serializers.msgspec_messagepack)
         with db_environment.begin() as txn:
@@ -679,7 +679,7 @@ class LoggingHandler(logging.Handler):
     def __init__(self, log_service: Log, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.log_service: Log = log_service
-        self.cs: CoroScheduler = log_service._loop
+        self.cs: CoroSchedulerType = log_service._loop
 
     def emit(self, record: logging.LogRecord):
         log_entry = self.format(record)

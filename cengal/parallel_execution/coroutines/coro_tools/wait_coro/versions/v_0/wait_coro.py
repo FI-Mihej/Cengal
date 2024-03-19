@@ -39,7 +39,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -51,7 +51,7 @@ class LoopWasEndedBeforeResultWasComputed(Exception):
     pass
 
 
-def sync_coro_param(result_required: bool = True, timeout: Optional[float] = None, kill_on_timeout: bool = True, tree: bool = True, cs: Optional[CoroScheduler] = None, prepare_own_loop_if_not_found: bool = False, own_loop_shold_be_fast_loop: bool = True, own_loop_setup_coro_worker: Optional[AnyWorker] = None, own_loop_setup_coro_worker_args_kwargs: Optional[Tuple[Tuple, Dict]] = None):
+def sync_coro_param(result_required: bool = True, timeout: Optional[float] = None, kill_on_timeout: bool = True, tree: bool = True, cs: Optional[CoroSchedulerType] = None, prepare_own_loop_if_not_found: bool = False, own_loop_shold_be_fast_loop: bool = True, own_loop_setup_coro_worker: Optional[AnyWorker] = None, own_loop_setup_coro_worker_args_kwargs: Optional[Tuple[Tuple, Dict]] = None):
     """Decorator. With an arguments. Gives ability to execute any decorated Cengal coroutine from plain sync/async 
     code as a sync function. Can postpone execution to the actual loop when possible if None as an immediate result 
     (no result) is acceptible. Can start own loop if needed.
@@ -61,7 +61,7 @@ def sync_coro_param(result_required: bool = True, timeout: Optional[float] = Non
         timeout (Optional[float], optional): _description_. Defaults to None.
         kill_on_timeout (bool, optional): _description_. Defaults to True.
         tree (bool, optional): _description_. Defaults to True.
-        cs (Optional[CoroScheduler], optional): _description_. Defaults to None.
+        cs (Optional[CoroSchedulerType], optional): _description_. Defaults to None.
         prepare_own_loop_if_not_found (bool, optional): _description_. Defaults to False.
         own_loop_shold_be_fast_loop (bool, optional): _description_. Defaults to True.
         own_loop_setup_coro_worker (Optional[AnyWorker], optional): _description_. Defaults to None.

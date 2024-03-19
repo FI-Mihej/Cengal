@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -44,7 +44,7 @@ def gly_patch(entity: Callable) -> CodeType:
     # TODO: try to complise strings using _get_code_object() instead of get_code()
     entity_code_type: CodeTypeEnum = code_type(entity)
     if entity_code_type is None:
-        raise RuntimeError( 'Entity {entity} cann not be patched')
+        raise RuntimeError('Entity {entity} cann not be patched')
     
     fn_code = get_code(entity)
     op_sequence, labels, op_by_label = OpSequence.from_bytecode_sequence(fn_code.co_code)

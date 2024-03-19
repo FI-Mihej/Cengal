@@ -18,6 +18,10 @@ In order to install Cengal with all requirements execute either:
 
 Cengal is a versatile Python library designed for a wide range of applications. To enhance performance, certain modules within Cengal have been implemented using Cython and/or C.
 
+## API Design Approach
+
+The Cengal library adheres to an API design approach used in frameworks such as Qt. For those familiar with the C++ language, I will draw comparisons between the approaches of Qt and the C++ Standard Template Library (STL). The API provided by the STL was designed to significantly reduce the burden on programmers who develop the STL. This decision was logical from the standpoint of marketing the STL among compiler creators. However, this led to the usability of the STL for the user not being great. This is evident in the fact that the STL provides the most minimal possible API, and any conveniences must be programmed anew by each programmer every time - constantly reinventing the wheel. In contrast, Qt uses the opposite approach to API construction: classes have many methods whose purposes are similar, but are aimed at different usage models. This simplifies the use of Qt for users, speeds up the writing of the final code, and avoids many errors that we usually make when we write our own 'bicycles' for the same actions each time (not because the we are not smart, but because we are humans and therefore prone to make mistakes from time to time).
+
 # Cengal compatibility and requirements
 
 * Target platforms: Win32, Linux, OS X, Android, iOS, Emscripten
@@ -33,9 +37,15 @@ If you prefer to install Cengal without its dependencies, you can opt for the 'c
 
 # Documentation
 
+[Cengal Documentation](https://FI-Mihej.github.io/Cengal)
+
+For example [Cengal Coroutines Concepts & Usage](https://FI-Mihej.github.io/Cengal/coroutines_concepts/)
+
+or partially:
+
 [Cengal Wiki](https://github.com/FI-Mihej/Cengal/wiki)
 
-For example [Cengal Coroutines Concepts & Usage](https://github.com/FI-Mihej/Cengal/wiki/Cengal-Coroutines)
+For example [Wiki: Cengal Coroutines Concepts & Usage](https://github.com/FI-Mihej/Cengal/wiki/Cengal-Coroutines)
 
 # Stand-Alone Packages for Specific Cengal Modules
 
@@ -54,6 +64,18 @@ Below, you'll find a list of these stand-alone packages, each corresponding to a
 Stay tuned for future additions to our collection of stand-alone packages!
 
 # Exclusive Features: No Alternatives Online
+
+## Build system (work in progress)
+
+Automatic hackable build system for your package which supports Python modules made with different languages: Cython (including Python to Cython automatic compilation), C/C++, ObjectiveC, Go, Nim. Other languages support is in progress.
+
+Compiles your code, gather binary artifacts and puts them into your wheel.
+
+### Examples
+
+* [Compilable Golang module](https://github.com/FI-Mihej/Cengal/blob/master/cengal/_examples/ex_golang)
+* [Compilable Nim module](https://github.com/FI-Mihej/Cengal/blob/master/cengal/_examples/ex_nim)
+* [Pure Python module auto-compiled with Cython](https://github.com/FI-Mihej/Cengal/blob/master/examples/compiled_python)
 
 ## Concurrent Execution of blocking CPU-Bound and GUI Tasks on a Single Thread
 
@@ -341,20 +363,22 @@ Observe loop performance, services state and coroutines list with details. Use a
 
 ## Size of the Cengal library
 
-At the moment of 11 Oct 2023:
+At the moment of 19 Mar 2024:
 
-More than 190 modules
+Around 200 modules
 
 ```
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Python                         644          20190          12546          55420
-Cython                           9            704            280           1745
+Python                         751          23696          30083          77396
+Cython                          10            727            472           1892
 C                                2             39             26            163
 C/C++ Header                     2             14             26             37
+Go                               3             19             37             88
+Nim                              2             14              6             36
 -------------------------------------------------------------------------------
-SUM:                           657          20947          12878          57365
+SUM:                           770          24509          30650          79612
 -------------------------------------------------------------------------------
 ```
 
@@ -376,15 +400,11 @@ Counted with [cloc](https://github.com/AlDanial/cloc) util.
 
 [Ensures and updates copyright (with dates) in each Cengal's source file](https://github.com/FI-Mihej/Cengal/blob/master/cengal_setup_scripts/ensure_copyright/ensure_copyright.py)
 
-# Build
+# Manual Build
 
-`pip install cengal` on Mac OS X
+`pip install git+https://github.com/FI-Mihej/Cengal.git`
 
-or
-
-`pip install git+https://github.com/FI-Mihej/Cengal.git` on any system
-
-Installation process requires compilation (prebuild Wheels are not prepared yet). So ensure that:
+Installation process requires compilation. So ensure that:
 * GCC/Clang is installed in your Linux/WSL (`sudo apt-get --yes install build-essential` for Ubuntu. And `./before_install_on_wsl.sh` for Ubuntu under WSL for UI like Tkinter or Qt if you are using some kind of XServer on your host Windows)
 * At least `Visual Studio Community - Build Tools` are installed on your Windows and you are installing Cengal from within its `Developer Command Prompt` for an appropriate target CPU architecture (`x64 Native Tools Command Prompt for VS 2022` for example). Make sure that you have compatible version of Visual Studio for your target CPython interpreter (see `python -VV` command output. For example `Python 3.9.11 (tags/v3.9.11:2de452f, Mar 16 2022, 14:33:45) [MSC v.1929 64 bit (AMD64)]`: this python interpreter requires Visual Studio 2019 version 16.11.2+ according to `1929` word search in [Wikipedia page](https://en.wikipedia.org/wiki/Microsoft_Visual_C%2B%2B))
 

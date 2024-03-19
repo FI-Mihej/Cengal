@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-#if defined(IS_X86)
+#if defined(CF_IS_X86)
 
 #ifdef _MSC_VER
 
@@ -44,7 +44,7 @@ extern unsigned long long c_cpu_clock_cycles()
 
 #endif
 
-#elif defined(IS_ARM)
+#elif defined(CF_IS_ARM)
 
 extern u64 c_cpu_clock_cycles()
 {

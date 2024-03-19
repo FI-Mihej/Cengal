@@ -45,7 +45,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -122,12 +122,12 @@ class TextTranslatorError(Exception):
 class TextTranslator:
     @classmethod
     def from_json(cls, json_data: Union[bytes, str], encoding: Optional[str]=None):
-        serializer = best_serializer({DataFormats.json,
+        serializer = best_serializer_for_standard_data((DataFormats.json,
                                  Tags.decode_str_as_str,
                                  Tags.decode_list_as_list,
                                  Tags.superficial,
-                                 Tags.current_platform},
-                                test_data_factory(TestDataType.deep_large),
+                                 Tags.current_platform),
+                                TestDataType.deep_large,
                                 0.1)
         encoding = encoding or 'utf-8'
         if isinstance(json_data, bytes):
@@ -174,12 +174,12 @@ class TranslationLanguageMapper:
 class TranslationLanguageChooser:
     def __init__(self, text_translator: TextTranslator, 
                  translation_language_mapper: TranslationLanguageMapper,
-                 coro_scheduler: Optional[CoroScheduler]=None):
+                 coro_scheduler: Optional[CoroSchedulerType]=None):
         self._end_lang: Optional[TranslationLanguageId] = None
         self._lang: Optional[TranslationLanguageId] = None
         self.text_translator: TextTranslator = text_translator
         self.translation_language_mapper: TranslationLanguageMapper = translation_language_mapper
-        self.coro_scheduler: CoroScheduler = coro_scheduler or CoroScheduler.current_loop()
+        self.coro_scheduler: CoroSchedulerType = coro_scheduler or CoroScheduler.current_loop()
         self.translation_language_changed_event: str = str(uuid4())
     
     @property

@@ -28,7 +28,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -59,7 +59,7 @@ def run_forever(main, *, debug=False):
     Example:
         async def my_task():
             await asyncio.sleep(3)
-            print('will be finished before loop end unlike with the asyncio.run() call')
+            print('will be finished before loop ends unlike with the asyncio.run() call')
 
 
         async def main():

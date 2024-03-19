@@ -52,7 +52,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -60,7 +60,7 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-from cengal.parallel_execution.coroutines.coro_scheduler import CoroScheduler, Interface, CoroID, Coro, AnyWorker, current_interface, current_coro_scheduler, cs_coro, cs_acoro
+from cengal.parallel_execution.coroutines.coro_scheduler import CoroScheduler, CoroSchedulerType, Interface, CoroID, Coro, AnyWorker, current_interface, current_coro_scheduler, cs_coro, cs_acoro
 from cengal.parallel_execution.coroutines.coro_standard_services.loop_yield import gly, CoroPriority, gly_patched, agly_patched
 from cengal.parallel_execution.coroutines.coro_standard_services.run_coro import RunCoro
 from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import PutCoro
@@ -98,7 +98,7 @@ def sec_to_ms(sec: RationalNumber) -> int:
 
 class CoroApp(App):
     def __init__(self, default_priority: CoroPriority = CoroPriority.normal):
-        self._cs: CoroScheduler = current_coro_scheduler()
+        self._cs: CoroSchedulerType = current_coro_scheduler()
         self._cs.on_idle_handlers.add(self._on_system_loop_idle)
         self._cs.idle_managers_num += 1
         self._default_priority: CoroPriority = default_priority
@@ -229,7 +229,7 @@ def bind_running_asyncio_coro(wx_entity: Union[App, Frame, Dialog], coro_future:
 def wx_exec_in_coro(func: Callable) -> Callable:
     @wraps(func)
     def wrapper(*args, **kwargs):
-        cs: CoroScheduler = current_coro_scheduler()
+        cs: CoroSchedulerType = current_coro_scheduler()
         cs.high_cpu_utilisation_mode = False
         cs.use_internal_sleep = False
         i: Interface = current_interface()

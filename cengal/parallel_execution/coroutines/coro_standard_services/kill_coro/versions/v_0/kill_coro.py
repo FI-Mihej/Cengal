@@ -24,7 +24,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -44,7 +44,7 @@ from typing import Any, Optional, Tuple, Dict, Set, Union, List
 
 
 class KillCoro(TypedService[bool], ServiceWithADirectRequestMixin):
-    def __init__(self, loop: CoroScheduler):
+    def __init__(self, loop: CoroSchedulerType):
         super(KillCoro, self).__init__(loop)
         self.direct_requests: List[Tuple[CoroID, bool]] = list()
     
@@ -89,26 +89,26 @@ class KillCoro(TypedService[bool], ServiceWithADirectRequestMixin):
     def _add_direct_request(self, coro_id: CoroID, tree: bool = False) -> ValueExistence[None]:
         self.direct_requests.append((coro_id, tree))
         self.make_live()
-        return ValueExistence()
+        return (False, None)
 
     def in_work(self) -> bool:
         result = bool(self.direct_requests)
         return self.thrifty_in_work(result)
 
 
-def kill_coro_on(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], coro_id: CoroID, tree: bool = False) -> ValueExistence[bool]:
+def kill_coro_on(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], coro_id: CoroID, tree: bool = False) -> ValueExistence[bool]:
     return make_request_to_service_with_context(context, KillCoro, coro_id, tree)
 
 
-def try_kill_coro_on(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], coro_id: CoroID, tree: bool = False) -> ValueExistence[Optional[bool]]:
+def try_kill_coro_on(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], coro_id: CoroID, tree: bool = False) -> ValueExistence[Optional[bool]]:
     return try_make_request_to_service_with_context(context, KillCoro, coro_id, tree)
 
 
-async def akill_coro_on(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], coro_id: CoroID, tree: bool = False) -> ValueExistence[bool]:
+async def akill_coro_on(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], coro_id: CoroID, tree: bool = False) -> ValueExistence[bool]:
     return await amake_request_to_service_with_context(context, KillCoro, coro_id, tree)
 
 
-async def atry_kill_coro_on(context: Tuple[Optional[CoroScheduler], Optional[Interface], bool], coro_id: CoroID, tree: bool = False) -> ValueExistence[Optional[bool]]:
+async def atry_kill_coro_on(context: Tuple[Optional[CoroSchedulerType], Optional[Interface], bool], coro_id: CoroID, tree: bool = False) -> ValueExistence[Optional[bool]]:
     return await atry_make_request_to_service_with_context(context, KillCoro, coro_id, tree)
 
 

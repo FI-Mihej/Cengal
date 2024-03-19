@@ -35,7 +35,7 @@ from cengal.parallel_execution.asyncio.efficient_streams import StreamManagerIOC
 from cengal.code_flow_control.smart_values import ValueExistence
 from cengal.io.named_connections.named_connections_manager import NamedConnectionsManager
 from cengal.code_flow_control.args_manager import number_of_provided_args
-from cengal.data_manipulation.serialization import Serializer, Serializers, best_serializer
+from cengal.data_manipulation.serialization import Serializer, Serializers, best_serializer_for_standard_data
 from cengal.code_flow_control.args_manager import find_arg_position_and_value, UnknownArgumentError
 from cengal.data_generation.id_generator import IDGenerator, GeneratorType
 from cengal.system import PLATFORM_NAME, PYTHON_VERSION
@@ -62,7 +62,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -93,7 +93,7 @@ def is_current_platform(current_platform_name, foreign_platform_name):
 
 
 class RemoteNodes(DualImmediateProcessingServiceMixin, Service, EntityStatsMixin):
-    def __init__(self, loop: CoroScheduler):
+    def __init__(self, loop: CoroSchedulerType):
         super(RemoteNodes, self).__init__(loop)
         self._request_workers = {
             0: self._on_start,
@@ -106,7 +106,7 @@ class RemoteNodes(DualImmediateProcessingServiceMixin, Service, EntityStatsMixin
         self.servers: Dict[Hashable, RemoteServer] = dict()
         self.clients: Dict[Hashable, RemoteClient] = dict()
 
-        self.serializer__current_platform__custom_types: Serializer = best_serializer({
+        self.serializer__current_platform__custom_types: Serializer = best_serializer_for_standard_data((
             DataFormats.any,
             Tags.current_platform,
             Tags.deep,
@@ -117,10 +117,10 @@ class RemoteNodes(DualImmediateProcessingServiceMixin, Service, EntityStatsMixin
             Tags.decode_bytes_as_bytes,
             Tags.decode_tuple_as_tuple,
             Tags.decode_list_as_list,
-        }, test_data_factory(TestDataType.deep_large), 0.1)
+        ), TestDataType.deep_large, 0.1)
         print(self.serializer__current_platform__custom_types.serializer)
 
-        self.serializer__current_platform: Serializer = best_serializer({
+        self.serializer__current_platform: Serializer = best_serializer_for_standard_data((
             DataFormats.any,
             Tags.deep,
             Tags.can_use_set,
@@ -129,32 +129,32 @@ class RemoteNodes(DualImmediateProcessingServiceMixin, Service, EntityStatsMixin
             Tags.decode_bytes_as_bytes,
             Tags.decode_tuple_as_tuple,
             Tags.decode_list_as_list,
-        }, test_data_factory(TestDataType.deep_large), 0.1)
+        ), TestDataType.deep_large, 0.1)
         print(self.serializer__current_platform.serializer)
 
-        self.serializer__multi_platform: Serializer = best_serializer({
+        self.serializer__multi_platform: Serializer = best_serializer_for_standard_data((
             DataFormats.any,
             Tags.deep,
             Tags.multi_platform,
             Tags.can_use_bytes,
             Tags.decode_str_as_str,
             Tags.decode_list_as_list,
-        }, test_data_factory(TestDataType.deep_large), 0.1)
+        ), TestDataType.deep_large, 0.1)
         print(self.serializer__multi_platform.serializer)
 
-        self.serializer__multi_platform_fast: Serializer = best_serializer({
+        self.serializer__multi_platform_fast: Serializer = best_serializer_for_standard_data((
             DataFormats.any,
             Tags.deep,
             Tags.multi_platform,
             Tags.can_use_bytes,
-        }, test_data_factory(TestDataType.small), 0.1)
+        ), TestDataType.small, 0.1)
         print(self.serializer__multi_platform_fast.serializer)
 
-        self.serializer__multi_platform__initial_communication: Serializer = best_serializer({
+        self.serializer__multi_platform__initial_communication: Serializer = best_serializer_for_standard_data((
             DataFormats.json,
             Tags.deep,
             Tags.multi_platform,
-        }, test_data_factory(TestDataType.small), 0.1)
+        ), TestDataType.small, 0.1)
         print(self.serializer__multi_platform_fast.serializer)
     
     def serialize(self, foreign_platform_name, data) -> Tuple[Serializer, SerializerID, bytes]:

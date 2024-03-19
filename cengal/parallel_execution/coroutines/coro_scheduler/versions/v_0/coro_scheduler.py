@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -36,7 +36,7 @@ __status__ = "Development"
 
 __all__ = [
     'Counter', 'Iterable', 'ServiceResponseTypeVar', 'ServiceType', 'TypedServiceType', 'NormalizableServiceType', 
-    'ItemID', 'CoroID', 'Worker', 'GreenetCoro', 'ACoro', 'Coro', 'OnCoroDelHandler', 'cs_coro', 'cs_acoro',
+    'ItemID', 'CoroID', 'Worker', 'GreenetCoro', 'ACoro', 'Coro', 'OnCoroDelHandler', 'cs_coro', 'cs_acoro', 'cs_callable', 'cs_acallable', 
     'OutsideCoroSchedulerContext', 'current_coro_scheduler', 'get_current_coro_scheduler', 'set_primary_coro_scheduler', 
     'PrimaryCoroSchedulerWasNotSet', 'primary_coro_scheduler', 'get_primary_coro_scheduler', 'CoroSchedulerContextIsNotAvailable', 
     'available_coro_scheduler', 'get_available_coro_scheduler', 'WrongTypeOfShedulerError', 'InterfaceIsNotAvailableError', 
@@ -46,7 +46,7 @@ __all__ = [
     'get_interface_for_an_explicit_loop', 'service_with_backup_loop', 'get_service_with_backup_loop', 'service_with_explicit_loop', 
     'get_service_with_explicit_loop', 'service_fast_with_backup_loop', 'get_service_fast_with_backup_loop', 
     'service_fast_with_explicit_loop', 'get_service_fast_with_explicit_loop', 'CoroType', 'ExplicitWorker', 'AnyWorker', 
-    'CoroScheduler', 'CoroSchedulerGreenlet', 'CoroSchedulerAwaitable', 'current_interface', 'execute_coro', 'exec_coro', 'ecoro', 'aexecute_coro', 'aexec_coro', 'aecoro', 
+    'CoroScheduler', 'CoroSchedulerType' , 'CoroSchedulerGreenlet', 'CoroSchedulerAwaitable', 'current_interface', 'execute_coro', 'exec_coro', 'ecoro', 'aexecute_coro', 'aexec_coro', 'aecoro', 
     'around_await', 'Request', 'Response', 'DirectResponse', 'Interface', 'InterfaceGreenlet', 'find_coro_type', 
     'InterfaceAsyncAwait', 'InterfaceFake', 'InterfaceFakeAsyncAwait', 'CallerCoroInfo', 'ServiceRequest', 'TypedServiceRequest', 
     'ServiceRequestMethodMixin', 'DualImmediateProcessingServiceMixin', 'WrongServiceRequestError', 'Service', 'TypedService', 
@@ -62,6 +62,11 @@ import os
 import inspect
 from contextlib import contextmanager
 from typing import Coroutine, Dict, Tuple, List, Callable, Awaitable, Any, Optional, Type, Set, Union, Generator, AsyncGenerator, overload, Generic, TypeVar
+# try:
+#     from typing import TypeAlias, ParamSpec, Concatenate
+# except ImportError:
+#     from typing_extensions import TypeAlias, ParamSpec, Concatenate
+from typing_extensions import TypeAlias, ParamSpec, Concatenate
 from enum import Enum
 import types
 from cengal.time_management.load_best_timer import perf_counter
@@ -76,6 +81,7 @@ from cengal.time_management.sleep_tools import sleep
 from collections import deque
 from cengal.code_flow_control.args_manager import EntityArgsHolder, EntityArgsHolderExplicit
 from cengal.time_management.cpu_clock_cycles import cpu_clock_cycles
+from cengal.system import PYTHON_VERSION_INT
 from functools import wraps, update_wrapper
 
 
@@ -115,18 +121,31 @@ TypedServiceType = Type['TypedService[ServiceResponseTypeVar]']
 NormalizableServiceType = Union[Type['Service'], Type['TypedService[ServiceResponseTypeVar]'], Type['ServiceRequest'], Type['TypedServiceRequest[ServiceResponseTypeVar]'], 'Service', 'TypedService[ServiceResponseTypeVar]', 'ServiceRequest', 'TypedServiceRequest[ServiceResponseTypeVar]']
 ItemID = int
 CoroID = ItemID
-Worker = Callable[['Interface'], None]
+# Worker = Callable[['Interface'], Any]
+if sys.version_info >= (3, 10):
+    GreenletWoker = Callable[['Interface', ...], Any]
+    AsyncWoker = Callable[['Interface', ...], Awaitable[Any]]
+    Worker = Union[GreenletWoker, AsyncWoker]
+else:
+    GreenletWoker = Callable[['Interface'], Any]
+    AsyncWoker = Callable[['Interface'], Awaitable[Any]]
+    Worker = Union[GreenletWoker, AsyncWoker]
+
 GreenetCoro = greenlet
 ACoro = Union[Awaitable, Coroutine, Generator, AsyncGenerator, Callable]
 Coro = Union[GreenetCoro, ACoro]
 OnCoroDelHandler = Callable[['CoroWrapperBase'], bool]
 
 
-def cs_coro(coro_worker: Worker):
+CoroParams = ParamSpec("CoroParams")
+CoroResult = TypeVar("CoroResult")
+
+
+def cs_coro(coro_worker: Callable[CoroParams, CoroResult]) -> Callable[Concatenate['Interface', CoroParams], CoroResult]:
     """Decorator. Without arguments. Makes a greenlet Cengal coroutine from a pain function (which don't have an interface parameter)
 
     Args:
-        coro_worker (Worker): _description_
+        coro_worker (Callable): _description_
     """
     if is_async(coro_worker):
         async def wrapper(i: Interface, *args, **kwargs):
@@ -136,6 +155,7 @@ def cs_coro(coro_worker: Worker):
         update_wrapper(wrapper, coro_worker)
         wrapper.__signature__ = coro_worker_sign.replace(parameters=(inspect.Parameter('_interface_param_', inspect.Parameter.POSITIONAL_ONLY),) + tuple(coro_worker_sign.parameters.values()), return_annotation=coro_worker_sign.return_annotation)
         # wrapper.__name__ = coro_worker.__name__
+        wrapper: coro_worker
         return wrapper
     else:
         def wrapper(i: Interface, *args, **kwargs):
@@ -145,14 +165,15 @@ def cs_coro(coro_worker: Worker):
         update_wrapper(wrapper, coro_worker)
         wrapper.__signature__ = coro_worker_sign.replace(parameters=(inspect.Parameter('_interface_param_', inspect.Parameter.POSITIONAL_ONLY),) + tuple(coro_worker_sign.parameters.values()), return_annotation=coro_worker_sign.return_annotation)
         # wrapper.__name__ = coro_worker.__name__
+        wrapper: coro_worker
         return wrapper
 
 
-def cs_acoro(coro_aworker: Worker):
+def cs_acoro(coro_aworker: Callable[CoroParams, Awaitable[CoroResult]]) -> Callable[Concatenate['Interface', CoroParams], Awaitable[CoroResult]]:
     """Decorator. Without arguments. Makes an async Cengal coroutine from an async function (which don't have an interface parameter)
 
     Args:
-        coro_aworker (Worker): _description_
+        coro_aworker (Callable): _description_
     """    
     if is_async(coro_aworker):
         async def wrapper(i: Interface, *args, **kwargs):
@@ -162,6 +183,7 @@ def cs_acoro(coro_aworker: Worker):
         update_wrapper(wrapper, coro_aworker)
         wrapper.__signature__ = coro_worker_sign.replace(parameters=(inspect.Parameter('_interface_param_', inspect.Parameter.POSITIONAL_ONLY),) + tuple(coro_worker_sign.parameters.values()), return_annotation=coro_worker_sign.return_annotation)
         # wrapper.__name__ = coro_aworker.__name__
+        wrapper: coro_aworker
         return wrapper
     else:
         def wrapper(i: Interface, *args, **kwargs):
@@ -171,11 +193,76 @@ def cs_acoro(coro_aworker: Worker):
         update_wrapper(wrapper, coro_aworker)
         wrapper.__signature__ = coro_worker_sign.replace(parameters=(inspect.Parameter('_interface_param_', inspect.Parameter.POSITIONAL_ONLY),) + tuple(coro_worker_sign.parameters.values()), return_annotation=coro_worker_sign.return_annotation)
         wrapper.__name__ = coro_aworker.__name__
+        wrapper: coro_aworker
+        return wrapper
+
+
+def cs_callable(coro_worker: Callable[Concatenate['Interface', CoroParams], CoroResult]) -> Callable[CoroParams, CoroResult]:
+    """Decorator. Without arguments. Makes a callable sync Cengal coroutine (which don't have an interface parameter) from a sync Cengal coroutine
+
+    Args:
+        coro_worker (Callable): _description_
+    """
+    if is_async(coro_worker):
+        async def wrapper(*args, **kwargs):
+            i: Interface = current_interface()
+            return await coro_worker(i, *args, **kwargs)
+            
+        coro_worker_sign: inspect.Signature = inspect.signature(coro_worker)
+        update_wrapper(wrapper, coro_worker)
+        # wrapper.__signature__ = coro_worker_sign.replace(parameters=(inspect.Parameter('_interface_param_', inspect.Parameter.POSITIONAL_ONLY),) + tuple(coro_worker_sign.parameters.values()), return_annotation=coro_worker_sign.return_annotation)
+        wrapper.__signature__ = coro_worker_sign.replace(parameters=tuple(coro_worker_sign.parameters.values())[1:], return_annotation=coro_worker_sign.return_annotation)
+        # wrapper.__name__ = coro_worker.__name__
+        wrapper: coro_worker
+        return wrapper
+    else:
+        def wrapper(*args, **kwargs):
+            i: Interface = current_interface()
+            return coro_worker(i, *args, **kwargs)
+            
+        coro_worker_sign: inspect.Signature = inspect.signature(coro_worker)
+        update_wrapper(wrapper, coro_worker)
+        # wrapper.__signature__ = coro_worker_sign.replace(parameters=(inspect.Parameter('_interface_param_', inspect.Parameter.POSITIONAL_ONLY),) + tuple(coro_worker_sign.parameters.values()), return_annotation=coro_worker_sign.return_annotation)
+        wrapper.__signature__ = coro_worker_sign.replace(parameters=tuple(coro_worker_sign.parameters.values())[1:], return_annotation=coro_worker_sign.return_annotation)
+        # wrapper.__name__ = coro_worker.__name__
+        wrapper: coro_worker
+        return wrapper
+
+
+def cs_acallable(coro_aworker: Callable[Concatenate['Interface', CoroParams], Awaitable[CoroResult]]) -> Callable[CoroParams, Awaitable[CoroResult]]:
+    """Decorator. Without arguments. Makes a callable async Cengal coroutine (which don't have an interface parameter) from a async Cengal coroutine
+
+    Args:
+        coro_aworker (Callable): _description_
+    """
+    if is_async(coro_aworker):
+        async def wrapper(*args, **kwargs):
+            i: Interface = current_interface()
+            return await coro_aworker(i, *args, **kwargs)
+            
+        coro_worker_sign: inspect.Signature = inspect.signature(coro_aworker)
+        update_wrapper(wrapper, coro_aworker)
+        # wrapper.__signature__ = coro_worker_sign.replace(parameters=(inspect.Parameter('_interface_param_', inspect.Parameter.POSITIONAL_ONLY),) + tuple(coro_worker_sign.parameters.values()), return_annotation=coro_worker_sign.return_annotation)
+        wrapper.__signature__ = coro_worker_sign.replace(parameters=tuple(coro_worker_sign.parameters.values())[1:], return_annotation=coro_worker_sign.return_annotation)
+        # wrapper.__name__ = coro_aworker.__name__
+        wrapper: coro_aworker
+        return wrapper
+    else:
+        def wrapper(*args, **kwargs):
+            i: Interface = current_interface()
+            return coro_aworker(i, *args, **kwargs)
+            
+        coro_worker_sign: inspect.Signature = inspect.signature(coro_aworker)
+        update_wrapper(wrapper, coro_aworker)
+        # wrapper.__signature__ = coro_worker_sign.replace(parameters=(inspect.Parameter('_interface_param_', inspect.Parameter.POSITIONAL_ONLY),) + tuple(coro_worker_sign.parameters.values()), return_annotation=coro_worker_sign.return_annotation)
+        wrapper.__signature__ = coro_worker_sign.replace(parameters=tuple(coro_worker_sign.parameters.values())[1:], return_annotation=coro_worker_sign.return_annotation)
+        # wrapper.__name__ = coro_aworker.__name__
+        wrapper: coro_aworker
         return wrapper
 
 
 class _ThreadLocalCoroScheduler(local):
-    scheduler: Optional['CoroScheduler'] = None
+    scheduler: Optional['CoroSchedulerType'] = None
 
 
 _primary_coro_scheduler: _ThreadLocalCoroScheduler = _ThreadLocalCoroScheduler()
@@ -299,18 +386,18 @@ class OutsideCoroSchedulerContext(Exception):
     pass
 
 
-def current_coro_scheduler() -> 'CoroScheduler':
+def current_coro_scheduler() -> 'CoroSchedulerType':
     if _current_coro_scheduler.scheduler is None:
         raise OutsideCoroSchedulerContext
     
     return _current_coro_scheduler.scheduler
 
 
-def get_current_coro_scheduler() -> Optional['CoroScheduler']:
+def get_current_coro_scheduler() -> Optional['CoroSchedulerType']:
     return _current_coro_scheduler.scheduler
 
 
-def set_primary_coro_scheduler(coro_scheduler: 'CoroScheduler'):
+def set_primary_coro_scheduler(coro_scheduler: 'CoroSchedulerType'):
     _primary_coro_scheduler.scheduler = coro_scheduler
 
 
@@ -318,14 +405,14 @@ class PrimaryCoroSchedulerWasNotSet(Exception):
     pass
 
 
-def primary_coro_scheduler() -> 'CoroScheduler':
+def primary_coro_scheduler() -> 'CoroSchedulerType':
     if _primary_coro_scheduler.scheduler is None:
         raise PrimaryCoroSchedulerWasNotSet
     
     return _primary_coro_scheduler.scheduler
 
 
-def get_primary_coro_scheduler() -> Optional['CoroScheduler']:
+def get_primary_coro_scheduler() -> Optional['CoroSchedulerType']:
     return _primary_coro_scheduler.scheduler
 
 
@@ -333,7 +420,7 @@ class CoroSchedulerContextIsNotAvailable(Exception):
     pass
 
 
-def available_coro_scheduler() -> 'CoroScheduler':
+def available_coro_scheduler() -> 'CoroSchedulerType':
     if _current_coro_scheduler.scheduler:
         return _current_coro_scheduler.scheduler
     elif _primary_coro_scheduler.scheduler:
@@ -342,7 +429,7 @@ def available_coro_scheduler() -> 'CoroScheduler':
         raise CoroSchedulerContextIsNotAvailable
 
 
-def get_available_coro_scheduler() -> Optional['CoroScheduler']:
+def get_available_coro_scheduler() -> Optional['CoroSchedulerType']:
     if _current_coro_scheduler.scheduler:
         return _current_coro_scheduler.scheduler
     elif _primary_coro_scheduler.scheduler:
@@ -366,7 +453,7 @@ class CurrentCoroIsNotAliveError(Exception):
 # ==========================================================
 
 
-def loop_with_backup_loop(backup_scheduler: Optional['CoroScheduler'] = None) -> 'CoroScheduler':
+def loop_with_backup_loop(backup_scheduler: Optional['CoroSchedulerType'] = None) -> 'CoroSchedulerType':
     if backup_scheduler is not None:
         if not isinstance(backup_scheduler, CoroScheduler):
             raise WrongTypeOfShedulerError(f'Wrong type of the backup_scheduler ({repr(backup_scheduler)}): {type(backup_scheduler)}')
@@ -384,7 +471,7 @@ def loop_with_backup_loop(backup_scheduler: Optional['CoroScheduler'] = None) ->
     return loop
 
 
-def get_loop_with_backup_loop(backup_scheduler: Optional['CoroScheduler'] = None) -> Optional['CoroScheduler']:
+def get_loop_with_backup_loop(backup_scheduler: Optional['CoroSchedulerType'] = None) -> Optional['CoroSchedulerType']:
     if backup_scheduler is not None:
         if not isinstance(backup_scheduler, CoroScheduler):
             raise WrongTypeOfShedulerError(f'Wrong type of the backup_scheduler ({repr(backup_scheduler)}): {type(backup_scheduler)}')
@@ -399,7 +486,7 @@ def get_loop_with_backup_loop(backup_scheduler: Optional['CoroScheduler'] = None
     return loop
 
 
-def loop_with_explicit_loop(explicit_scheduler: Optional['CoroScheduler'] = None) -> 'CoroScheduler':
+def loop_with_explicit_loop(explicit_scheduler: Optional['CoroSchedulerType'] = None) -> 'CoroSchedulerType':
     loop = explicit_scheduler
     current_loop = CoroScheduler.current_loop()
     if loop is None:
@@ -417,7 +504,7 @@ def loop_with_explicit_loop(explicit_scheduler: Optional['CoroScheduler'] = None
     return loop
 
 
-def get_loop_with_explicit_loop(explicit_scheduler: Optional['CoroScheduler'] = None) -> Optional['CoroScheduler']:
+def get_loop_with_explicit_loop(explicit_scheduler: Optional['CoroSchedulerType'] = None) -> Optional['CoroSchedulerType']:
     loop = explicit_scheduler
     current_loop = CoroScheduler.current_loop()
     if loop is None:
@@ -433,7 +520,7 @@ def get_loop_with_explicit_loop(explicit_scheduler: Optional['CoroScheduler'] = 
 # ==========================================================
 
 
-def interface_and_loop_with_backup_loop(backup_scheduler: Optional['CoroScheduler'] = None) -> Tuple['CoroScheduler', 'Interface', bool]:
+def interface_and_loop_with_backup_loop(backup_scheduler: Optional['CoroSchedulerType'] = None) -> Tuple['CoroSchedulerType', 'Interface', bool]:
     if backup_scheduler is not None:
         if not isinstance(backup_scheduler, CoroScheduler):
             raise WrongTypeOfShedulerError(f'Wrong type of the backup_scheduler ({repr(backup_scheduler)}): {type(backup_scheduler)}')
@@ -466,7 +553,7 @@ def interface_and_loop_with_backup_loop(backup_scheduler: Optional['CoroSchedule
     return loop, interface, coro_alive
 
 
-def get_interface_and_loop_with_backup_loop(backup_scheduler: Optional['CoroScheduler'] = None) -> Tuple[Optional['CoroScheduler'], Optional['Interface'], bool]:
+def get_interface_and_loop_with_backup_loop(backup_scheduler: Optional['CoroSchedulerType'] = None) -> Tuple[Optional['CoroSchedulerType'], Optional['Interface'], bool]:
     if backup_scheduler is not None:
         if not isinstance(backup_scheduler, CoroScheduler):
             raise WrongTypeOfShedulerError(f'Wrong type of the backup_scheduler ({repr(backup_scheduler)}): {type(backup_scheduler)}')
@@ -490,7 +577,7 @@ def get_interface_and_loop_with_backup_loop(backup_scheduler: Optional['CoroSche
     return loop, interface, coro_alive
 
 
-def interface_and_loop_with_explicit_loop(explicit_scheduler: Optional['CoroScheduler'] = None) -> Tuple['CoroScheduler', 'Interface', bool]:
+def interface_and_loop_with_explicit_loop(explicit_scheduler: Optional['CoroSchedulerType'] = None) -> Tuple['CoroSchedulerType', 'Interface', bool]:
     loop = explicit_scheduler
     current_loop = CoroScheduler.current_loop()
     interface = None
@@ -526,7 +613,7 @@ def interface_and_loop_with_explicit_loop(explicit_scheduler: Optional['CoroSche
     return loop, interface, coro_alive
 
 
-def get_interface_and_loop_with_explicit_loop(explicit_scheduler: Optional['CoroScheduler'] = None) -> Tuple[Optional['CoroScheduler'], Optional['Interface'], bool]:
+def get_interface_and_loop_with_explicit_loop(explicit_scheduler: Optional['CoroSchedulerType'] = None) -> Tuple[Optional['CoroSchedulerType'], Optional['Interface'], bool]:
     loop = explicit_scheduler
     current_loop = CoroScheduler.current_loop()
     interface = None
@@ -553,7 +640,7 @@ def get_interface_and_loop_with_explicit_loop(explicit_scheduler: Optional['Coro
     return loop, interface, coro_alive
 
 
-def interface_for_an_explicit_loop(explicit_scheduler: 'CoroScheduler') -> Tuple['CoroScheduler', 'Interface', bool]:
+def interface_for_an_explicit_loop(explicit_scheduler: 'CoroSchedulerType') -> Tuple['CoroSchedulerType', 'Interface', bool]:
     loop = explicit_scheduler
     interface = None
     if loop is None:
@@ -579,7 +666,7 @@ def interface_for_an_explicit_loop(explicit_scheduler: 'CoroScheduler') -> Tuple
     return loop, interface, coro_alive
 
 
-def get_interface_for_an_explicit_loop(explicit_scheduler: 'CoroScheduler') -> Tuple[Optional['CoroScheduler'], Optional['Interface'], bool]:
+def get_interface_for_an_explicit_loop(explicit_scheduler: 'CoroSchedulerType') -> Tuple[Optional['CoroSchedulerType'], Optional['Interface'], bool]:
     loop = explicit_scheduler
     interface = None
     if loop is not None:
@@ -599,7 +686,7 @@ def get_interface_for_an_explicit_loop(explicit_scheduler: 'CoroScheduler') -> T
 
 # ==========================================================
 
-def service_with_backup_loop(service_type: Type['Service'], backup_scheduler: Optional['CoroScheduler'] = None) -> 'Service':
+def service_with_backup_loop(service_type: Type['Service'], backup_scheduler: Optional['CoroSchedulerType'] = None) -> 'Service':
     if backup_scheduler is not None:
         if not isinstance(backup_scheduler, CoroScheduler):
             raise WrongTypeOfShedulerError(f'Wrong type of the backup_scheduler ({repr(backup_scheduler)}): {type(backup_scheduler)}')
@@ -617,7 +704,7 @@ def service_with_backup_loop(service_type: Type['Service'], backup_scheduler: Op
     return loop.get_service_instance(service_type)
 
 
-def get_service_with_backup_loop(service_type: Type['Service'], backup_scheduler: Optional['CoroScheduler'] = None) -> Optional['Service']:
+def get_service_with_backup_loop(service_type: Type['Service'], backup_scheduler: Optional['CoroSchedulerType'] = None) -> Optional['Service']:
     if backup_scheduler is not None:
         if not isinstance(backup_scheduler, CoroScheduler):
             raise WrongTypeOfShedulerError(f'Wrong type of the backup_scheduler ({repr(backup_scheduler)}): {type(backup_scheduler)}')
@@ -635,7 +722,7 @@ def get_service_with_backup_loop(service_type: Type['Service'], backup_scheduler
         return loop.get_service_instance(service_type)
 
 
-def service_with_explicit_loop(service_type: Type['Service'], explicit_scheduler: Optional['CoroScheduler'] = None) -> 'Service':
+def service_with_explicit_loop(service_type: Type['Service'], explicit_scheduler: Optional['CoroSchedulerType'] = None) -> 'Service':
     loop = explicit_scheduler
     current_loop = CoroScheduler.current_loop()
     if loop is None:
@@ -653,7 +740,7 @@ def service_with_explicit_loop(service_type: Type['Service'], explicit_scheduler
     return loop.get_service_instance(service_type)
 
 
-def get_service_with_explicit_loop(service_type: Type['Service'], explicit_scheduler: Optional['CoroScheduler'] = None) -> Optional['Service']:
+def get_service_with_explicit_loop(service_type: Type['Service'], explicit_scheduler: Optional['CoroSchedulerType'] = None) -> Optional['Service']:
     loop = explicit_scheduler
     current_loop = CoroScheduler.current_loop()
     if loop is None:
@@ -672,7 +759,7 @@ def get_service_with_explicit_loop(service_type: Type['Service'], explicit_sched
 # ==========================================================
 
 
-def service_fast_with_backup_loop(service_type: Type['Service'], backup_scheduler: Optional['CoroScheduler'] = None) -> 'Service':
+def service_fast_with_backup_loop(service_type: Type['Service'], backup_scheduler: Optional['CoroSchedulerType'] = None) -> 'Service':
     if backup_scheduler is not None:
         if not isinstance(backup_scheduler, CoroScheduler):
             raise WrongTypeOfShedulerError(f'Wrong type of the backup_scheduler ({repr(backup_scheduler)}): {type(backup_scheduler)}')
@@ -690,7 +777,7 @@ def service_fast_with_backup_loop(service_type: Type['Service'], backup_schedule
     return loop.get_service_instance_fast(service_type)
 
 
-def get_service_fast_with_backup_loop(service_type: Type['Service'], backup_scheduler: Optional['CoroScheduler'] = None) -> Optional['Service']:
+def get_service_fast_with_backup_loop(service_type: Type['Service'], backup_scheduler: Optional['CoroSchedulerType'] = None) -> Optional['Service']:
     if backup_scheduler is not None:
         if not isinstance(backup_scheduler, CoroScheduler):
             raise WrongTypeOfShedulerError(f'Wrong type of the backup_scheduler ({repr(backup_scheduler)}): {type(backup_scheduler)}')
@@ -708,7 +795,7 @@ def get_service_fast_with_backup_loop(service_type: Type['Service'], backup_sche
         return loop.get_service_instance_fast(service_type)
 
 
-def service_fast_with_explicit_loop(service_type: Type['Service'], explicit_scheduler: Optional['CoroScheduler'] = None) -> 'Service':
+def service_fast_with_explicit_loop(service_type: Type['Service'], explicit_scheduler: Optional['CoroSchedulerType'] = None) -> 'Service':
     loop = explicit_scheduler
     current_loop = CoroScheduler.current_loop()
     if loop is None:
@@ -726,7 +813,7 @@ def service_fast_with_explicit_loop(service_type: Type['Service'], explicit_sche
     return loop.get_service_instance_fast(service_type)
 
 
-def get_service_fast_with_explicit_loop(service_type: Type['Service'], explicit_scheduler: Optional['CoroScheduler'] = None) -> Optional['Service']:
+def get_service_fast_with_explicit_loop(service_type: Type['Service'], explicit_scheduler: Optional['CoroSchedulerType'] = None) -> Optional['Service']:
     loop = explicit_scheduler
     current_loop = CoroScheduler.current_loop()
     if loop is None:
@@ -761,7 +848,7 @@ AnyWorker = Union[ExplicitWorker, Worker]
 
 
 @types.coroutine
-def yield_task_from_asyncawait(request: 'Request') -> 'Response':
+def yield_task_from_asyncawait(request: 'Request') -> Generator['Response', Any, Any]:
     response = yield request  # type: Response
     return response
 
@@ -1325,10 +1412,10 @@ class CoroSchedulerBase(Iterable, EntityStatsMixin):
         
         return False
     
-    def request_coro_throw_by_id(self, coro_id: CoroID, *args, **kwargs) -> Optional['CoroWrapperBase']:
+    def request_coro_throw_by_id(self, coro_id: CoroID) -> Optional['CoroWrapperBase']:
         coro, _, _ = self.find_coro_by_id(coro_id)
         if coro is not None:
-            coro.request_throw(*args, **kwargs)
+            coro.request_throw()
         
         return coro
 
@@ -1380,7 +1467,7 @@ class CoroSchedulerBase(Iterable, EntityStatsMixin):
         _current_coro_scheduler.scheduler = self
 
     @staticmethod
-    def current_loop() -> Optional['CoroScheduler']:
+    def current_loop() -> Optional['CoroSchedulerType']:
         return _current_coro_scheduler.scheduler
 
     def current_interface(self) -> Optional['Interface']:
@@ -1922,10 +2009,10 @@ class CoroSchedulerAwaitable(CoroSchedulerBase):
                 self.destroy()
 
 
-if greenlet_awailable:
-    CoroScheduler = CoroSchedulerGreenlet
-else:
-    CoroScheduler = CoroSchedulerAwaitable
+CoroScheduler = CoroSchedulerGreenlet if greenlet_awailable else CoroSchedulerAwaitable
+
+
+CoroSchedulerType: TypeAlias = Union[CoroSchedulerGreenlet, CoroSchedulerAwaitable]
 
 
 def current_interface() -> Optional['Interface']:
@@ -2091,7 +2178,7 @@ class CoroWrapperBase:
         self._throw_method(*args, **kwargs)
         self._current_call_method = self._call_method
     
-    def request_throw(self, *args, **kwargs) -> Any:
+    def request_throw(self) -> Any:
         self._current_call_method = self._current_throw_method_helper
     
     def _current_close_method_helper(self, *args, **kwargs):
@@ -2378,18 +2465,33 @@ class CoroWrapperAsyncAwait(CoroWrapperBase):
         except:
             self.in_run_state = False
             raise
-            
-    # def _throw_coroutine(self, *args, **kwargs):
-    def _throw_coroutine(self, ex_type, ex_value=None, ex_traceback=None):
-        try:
-            self.in_run_state = True
-            self.last_result = self.coro.throw(ex_type, ex_value, ex_traceback)  # self.coro.throw(type[, value[, traceback]])
-        except StopIteration as ex:
-            self.in_run_state = False
-            self.last_result = ex.value
-        except:
-            self.in_run_state = False
-            raise
+    
+    if sys.version_info >= (3, 12):
+    # if (3, 12) <= PYTHON_VERSION_INT:
+        def _throw_coroutine(self, ex_type, ex_value=None, ex_traceback=None):
+            try:
+                self.in_run_state = True
+                if ex_value is None:
+                    ex_value = ex_type()
+                
+                self.last_result = self.coro.throw(ex_value)  # Changed in version 3.12: The second signature (type[, value[, traceback]]) is deprecated and may be removed in a future version of Python.
+            except StopIteration as ex:
+                self.in_run_state = False
+                self.last_result = ex.value
+            except:
+                self.in_run_state = False
+                raise
+    else:
+        def _throw_coroutine(self, ex_type, ex_value=None, ex_traceback=None):
+            try:
+                self.in_run_state = True
+                self.last_result = self.coro.throw(ex_type, ex_value, ex_traceback)  # Changed in version 3.12: The second signature (type[, value[, traceback]]) is deprecated and may be removed in a future version of Python.
+            except StopIteration as ex:
+                self.in_run_state = False
+                self.last_result = ex.value
+            except:
+                self.in_run_state = False
+                raise
             
     def _close_coroutine(self, *args, **kwargs):
         try:

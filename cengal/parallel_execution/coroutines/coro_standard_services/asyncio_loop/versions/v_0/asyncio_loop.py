@@ -58,7 +58,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -137,7 +137,7 @@ asyncio_coro_request._is_coroutine = _is_coroutine
 
 
 class AsyncioLoop(Service, EntityStatsMixin):
-    def __init__(self, loop: CoroScheduler):
+    def __init__(self, loop: CoroSchedulerType):
         super(AsyncioLoop, self).__init__(loop)
         self.async_loop: Optional[AbstractEventLoop] = None
         self.internal_async_loop: Optional[AbstractEventLoop] = None
@@ -522,7 +522,7 @@ async def _internal_loop_holding_coro_run_once_based(i: Interface, service: Asyn
     from cengal.parallel_execution.coroutines.coro_standard_services.async_event_bus import AsyncEventBusRequest, try_send_async_event
     from .known_asyncio_compatible_loops import prepare_loop, restore_loop
 
-    cs: CoroScheduler = current_coro_scheduler()
+    cs: CoroSchedulerType = current_coro_scheduler()
     lyps: LoopYieldPriorityScheduler = cs.get_service_instance(LoopYieldPriorityScheduler)
     umsi: RationalNumber = get_usable_min_sleep_interval()
 

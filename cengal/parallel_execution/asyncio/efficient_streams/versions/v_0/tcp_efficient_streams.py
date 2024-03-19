@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -64,7 +64,7 @@ from cengal.io.asock_io.versions.v_1.recv_buff_size_computer.recv_buff_size_comp
 # from cengal.io.asock_io.versions.v_1.base import IOCoreMemoryManagement
 from cengal.parallel_execution.asyncio.atasks import create_task
 from cengal.parallel_execution.asyncio.timed_yield import TimedYield
-from cengal.hardware.info.cpu.versions.v_1 import CpuInfo
+from cengal.hardware.info.cpu import cpu_info
 # from cengal.data_containers.dynamic_list_of_pieces import DynamicListOfPiecesDequeWithLengthControl
 # from cengal.data_containers.fast_fifo import FIFODequeWithLengthControl, FIFOIsEmpty
 # from cengal.data_manipulation.front_triggerable_variable import FrontTriggerableVariable, FrontTriggerableVariableType
@@ -75,6 +75,8 @@ from typing import Sequence, Tuple, Type, Set, Optional, Union, List, cast
 from .efficient_streams_base_internal import *
 from .efficient_streams_base import *
 from .efficient_streams_abstract import *
+
+from contextlib import asynccontextmanager
 
 
 class TcpStreamManager(StreamManagerAbstract):
@@ -237,19 +239,19 @@ class TcpStreamManager(StreamManagerAbstract):
         message_size_len_encoded = await reader.readonly_exactly(1)
         message_size_len = int.from_bytes(message_size_len_encoded, 'little')
         can_be_established: bool = False
-        if message_size_len <= reader._message_protocol_settings._max_message_size_len:
-            message_size_encoded = await reader.readonly_exactly(message_size_len)
+        if message_size_len <= reader._message_protocol_settings.max_message_size_len:
+            message_size_encoded = (await reader.readonly_exactly(1 + message_size_len))[1:]
             message_size = int.from_bytes(message_size_encoded, 'little')
-            message = await reader.readonly_exactly(message_size)
-            if message == reader._message_protocol_settings._protocol_greeting:
+            message = (await reader.readonly_exactly(1 + message_size_len + message_size))[1 + message_size_len:]
+            if message == reader._message_protocol_settings.protocol_greeting:
                 can_be_established = True
         
         if can_be_established:
-            reader._message_protocol_settings._message_size_len = message_size_len
-            writer._protocol._message_protocol_settings._message_size_len = message_size_len
+            reader._message_protocol_settings.message_size_len = message_size_len
+            writer._protocol._message_protocol_settings.message_size_len = message_size_len
             await reader.readexactly(1)
             await reader.read_message()
-            message = len(reader._message_protocol_settings._message_size_len).to_bytes(1, 'little') + len(reader._message_protocol_settings._protocol_greeting).to_bytes(reader._message_protocol_settings._message_size_len, 'little') + reader._message_protocol_settings._protocol_greeting
+            message = reader._message_protocol_settings.message_size_len.to_bytes(1, 'little') + len(reader._message_protocol_settings.protocol_greeting).to_bytes(reader._message_protocol_settings.message_size_len, 'little') + reader._message_protocol_settings.protocol_greeting
             writer.write(message)
             await writer.full_drain()
             return True
@@ -257,22 +259,22 @@ class TcpStreamManager(StreamManagerAbstract):
             return False
     
     async def try_establish_message_protocol_client_side(self, reader: 'TcpStreamReader', writer: 'TcpStreamWriter') -> bool:
-        message = len(reader._message_protocol_settings._message_size_len).to_bytes(1, 'little') + len(reader._message_protocol_settings._protocol_greeting).to_bytes(reader._message_protocol_settings._message_size_len, 'little') + reader._message_protocol_settings._protocol_greeting
+        message = reader._message_protocol_settings.message_size_len.to_bytes(1, 'little') + len(reader._message_protocol_settings.protocol_greeting).to_bytes(reader._message_protocol_settings.message_size_len, 'little') + reader._message_protocol_settings.protocol_greeting
         writer.write(message)
         await writer.full_drain()
         message_size_len_encoded = await reader.readonly_exactly(1)
         message_size_len = int.from_bytes(message_size_len_encoded, 'little')
         can_be_established: bool = False
-        if message_size_len <= reader._message_protocol_settings._max_message_size_len:
-            message_size_encoded = await reader.readonly_exactly(message_size_len)
+        if message_size_len <= reader._message_protocol_settings.max_message_size_len:
+            message_size_encoded = (await reader.readonly_exactly(1 + message_size_len))[1:]
             message_size = int.from_bytes(message_size_encoded, 'little')
-            message = await reader.readonly_exactly(message_size)
-            if message == reader._message_protocol_settings._protocol_greeting:
+            message = (await reader.readonly_exactly(1 + message_size_len + message_size))[1 + message_size_len:]
+            if message == reader._message_protocol_settings.protocol_greeting:
                 can_be_established = True
         
         if can_be_established:
-            reader._message_protocol_settings._message_size_len = message_size_len
-            writer._protocol._message_protocol_settings._message_size_len = message_size_len
+            reader._message_protocol_settings.message_size_len = message_size_len
+            writer._protocol._message_protocol_settings.message_size_len = message_size_len
             await reader.readexactly(1)
             await reader.read_message()
             return True
@@ -296,10 +298,10 @@ class TcpStreamManager(StreamManagerAbstract):
 #     def __init__(self, manager: TcpStreamManager, original_stream_reader: OriginalStreamReader) -> None:
 #         self._stream_manager = manager
 #         self.recv_buff_size_computer = RecvBuffSizeComputer()
-#         cpu_info = CpuInfo()
-#         # self.recv_buff_size_computer.max_recv_buff_size = cpu_info.l3_cache_size
-#         # self.recv_buff_size_computer.max_recv_buff_size = cpu_info.l2_cache_size_per_virtual_core
-#         # self.recv_buff_size_computer.max_recv_buff_size = CpuInfo().l3_cache_size_per_virtual_core
+#         cpu_info_inst = cpu_info()
+#         # self.recv_buff_size_computer.max_recv_buff_size = cpu_info_inst.l3_cache_size
+#         # self.recv_buff_size_computer.max_recv_buff_size = cpu_info_inst.l2_cache_size_per_virtual_core
+#         # self.recv_buff_size_computer.max_recv_buff_size = cpu_info_inst.l3_cache_size_per_virtual_core
 #         # self.recv_buff_size_computer.max_recv_buff_size = 3145728
 #         self.recv_buff_size_computer.max_recv_buff_size = 10 * 1024**2
 #         # self.recv_buff_size_computer.max_recv_buff_size = 1024
@@ -382,14 +384,14 @@ class TcpStreamReader(OriginalStreamReader, StreamReaderAbstract):
         self._smart_buffer: DynamicListOfPiecesDequeWithLengthControl = self._stream_manager.input_from_client_container_type(
             external_data_length=self._stream_manager.io_memory_management.global_in__data_full_size)
         self.recv_buff_size_computer = RecvBuffSizeComputer()
-        cpu_info = CpuInfo()
-        # self.recv_buff_size_computer.max_recv_buff_size = cpu_info.l3_cache_size
-        # self.recv_buff_size_computer.max_recv_buff_size = cpu_info.l2_cache_size_per_virtual_core
-        # self.recv_buff_size_computer.max_recv_buff_size = CpuInfo().l3_cache_size_per_virtual_core
+        cpu_info_inst = cpu_info()
+        # self.recv_buff_size_computer.max_recv_buff_size = cpu_info_inst.l3_cache_size
+        # self.recv_buff_size_computer.max_recv_buff_size = cpu_info_inst.l2_cache_size_per_virtual_core
+        # self.recv_buff_size_computer.max_recv_buff_size = cpu_info_inst.l3_cache_size_per_virtual_core
         # self.recv_buff_size_computer.max_recv_buff_size = 3145728
         self.recv_buff_size_computer.max_recv_buff_size = 10 * 1024**2
         # self.recv_buff_size_computer.max_recv_buff_size = 1024
-        print(f'max_recv_buff_size: {self.recv_buff_size_computer.max_recv_buff_size}')
+        # print(f'max_recv_buff_size: {self.recv_buff_size_computer.max_recv_buff_size}')
         self.limit_by_limit: bool = True
         self.limit_by_global_in__data_size_limit: bool = True
     
@@ -776,12 +778,12 @@ class TcpStreamReader(OriginalStreamReader, StreamReaderAbstract):
         return data
     
     async def read_message(self):
-        message_len_encoded = await self.readexactly(self._message_protocol_settings._message_size_len)
+        message_len_encoded = await self.readexactly(self._message_protocol_settings.message_size_len)
         message_len = int.from_bytes(message_len_encoded, 'little')
         return await self.readexactly(message_len)
     
     def message_awailable(self) -> bool:
-        message_size_len = self._message_protocol_settings._message_size_len
+        message_size_len = self._message_protocol_settings.message_size_len
         if self._smart_buffer.size() < message_size_len:
             return False
 
@@ -977,7 +979,7 @@ class TcpStreamReaderProtocol(OriginalStreamReaderProtocol, StreamReaderProtocol
         
 #         return result
     
-#     def stop_ar(self, timeout: Optional[Union[int, float]] = 0):
+#     def stop_aw(self, timeout: Optional[Union[int, float]] = 0):
 #         """_summary_
 
 #         Args:
@@ -998,7 +1000,7 @@ class TcpStreamReaderProtocol(OriginalStreamReaderProtocol, StreamReaderProtocol
 #             await future
 
     
-#     async def ar_drain_enough(self):
+#     async def aw_drain_enough(self):
 #         await self.autonomous_writer_drain_enough()
 
 
@@ -1102,7 +1104,7 @@ class TcpStreamWriter(OriginalStreamWriter, StreamWriterAbstract):
         
         return result
     
-    def stop_ar(self, timeout: Optional[Union[int, float]] = 0):
+    async def stop_aw(self, timeout: Optional[Union[int, float]] = 0):
         """_summary_
 
         Args:
@@ -1111,24 +1113,24 @@ class TcpStreamWriter(OriginalStreamWriter, StreamWriterAbstract):
         Returns:
             _type_: _description_
         """
-        return self.stop_autonomous_writer(timeout)
+        return await self.stop_autonomous_writer(timeout)
     
     async def autonomous_writer_drain_enough(self, lower_water_size: Optional[int] = None):
         if lower_water_size is None:
             lower_water_size = self.socket_write_fixed_buffer_size.value * 3
             # print(f'lower_water_size: {lower_water_size}')
-            # lower_water_size = CpuInfo().l3_cache_size
+            # lower_water_size = cpu_info().l3_cache_size
         
         if lower_water_size <= self._output_to_client.size():
             future: Future = self._loop.create_future()
             self._autonomous_writer_drain_enough_futures.append((lower_water_size, future))
             await future
     
-    async def ar_drain_enough(self):
+    async def aw_drain_enough(self):
         await self.autonomous_writer_drain_enough()
     
     def optimized_write_message(self, data):
-        self.optimized_write(len(data).to_bytes(self._protocol._message_protocol_settings._message_size_len, 'little') + data)
+        self.optimized_write(len(data).to_bytes(self._protocol._message_protocol_settings.message_size_len, 'little') + data)
     
     def owrite_message(self, data):
         self.optimized_write_message(data)
@@ -1136,3 +1138,19 @@ class TcpStreamWriter(OriginalStreamWriter, StreamWriterAbstract):
     async def send_message(self, data):
         self.optimized_write_message(data)
         await self.fdrain()
+    
+    @asynccontextmanager
+    async def autonomous_writer(self):
+        self.start_autonomous_writer()
+        try:
+            yield
+        finally:
+            await self.stop_autonomous_writer()
+    
+    aw = autonomous_writer
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc, tb):
+        self.close()

@@ -17,11 +17,14 @@
 
 # import pip
 # from pip._internal import main as pip_main
+
+from cengal.os.execute import prepare_py_params
+from cengal.cross_version.console_print.universal import cross_print
+
 import platform
 import sys
 import os.path
 from contextlib import contextmanager
-from cengal.cross_version.console_print.universal import cross_print
 
 """
 Module Docstring
@@ -32,7 +35,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -43,7 +46,7 @@ __status__ = "Development"
 PLATFORM_NAME = platform.python_implementation()  # can be 'PyPy', 'CPython', etc.
 PYTHON_VERSION = platform.python_version_tuple()  # tuple() of str(); for example: ('3', '5', '1')
 PYTHON_VERSION_INT = sys.version_info  # sys.version_info == (major=3, minor=2, micro=5, releaselevel='final', serial=0)
-#   Usage: sys.version_info[0] == 3
+#   Usage: sys.version_info >= (3, 7)
 
 
 # On Python < 3.4 you should install enum backport module before you will be able to use it. So:
@@ -132,14 +135,7 @@ def _filtered_file_list_traversal(root_dir, filtering_type, extentions_set=None,
 
 
 def pip_install(name_or_path):
-    path_to_interpreter = sys.executable
-    if 'nt' == os.name:
-        path_to_interpreter_template = '"{}"'
-        path_to_interpreter = path_to_interpreter_template.format(path_to_interpreter)
-
-    command_line_template = '{path_to_interpreter} -m pip install --upgrade {package_name_or_path}'
-    command_line = command_line_template.format(path_to_interpreter=path_to_interpreter, package_name_or_path=name_or_path)
-    os.system(command_line)
+    os.system(prepare_py_params(['-m', 'pip', 'install', '--upgrade', name_or_path]))
 
 
 def install(name_or_path, type_of_installation):

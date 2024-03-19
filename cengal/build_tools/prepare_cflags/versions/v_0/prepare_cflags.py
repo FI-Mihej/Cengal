@@ -16,7 +16,24 @@
 # limitations under the License.
 
 
-__all__ = ['prepare_cflags', 'append_cflags', 'concat_cflags', 'prepare_compile_time_env']
+__all__ = [
+    'append_cflags', 
+    'concat_cflags', 
+    'wrap_definition_text', 
+    'wrap_definition_text_raw', 
+    'prepare_definition_value', 
+    'prepare_definition_value_raw', 
+    'convert_value_to_flag', 
+    'convert_value_to_text', 
+    'prepare_definition', 
+    'list_to_dict', 
+    'dict_of_tuples_to_dict', 
+    'adjust_definition_names', 
+    'prepare_cflags', 
+    'prepare_cflags_dict', 
+    'prepare_compile_time_env', 
+    'prepare_compile_time_flags',
+    ]
 
 
 """
@@ -28,7 +45,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -48,7 +65,8 @@ except ImportError:
     uname_machine: str = uname().machine
 
 from cengal.hardware.info.cpu import cpu_info
-from cengal.build_tools.current_compiler import compiler_type, compiler_name
+from cengal.os.execute import escape_text, escape_param
+from cengal.build_tools.current_compiler import compiler_type, compiler_name, compiler_string
 from cengal.system import (
     PYTHON_IMPLEMENTATION,
     PYTHON_VERSION,
@@ -63,7 +81,15 @@ from cengal.system import (
     IS_RUNNING_IN_PYODIDE,
     IS_BUILDING_FOR_PYODIDE,
     IS_INSIDE_OR_FOR_WEB_BROWSER,
+    CENGAL_VERSION_STR,
+    CENGAL_VERSION_MAJOR_STR,
+    CENGAL_VERSION_MINOR_STR,
+    CENGAL_VERSION_MICRO_STR,
+    CENGAL_VERSION_MAJOR,
+    CENGAL_VERSION_MINOR,
+    CENGAL_VERSION_MICRO,
 )
+from typing import Set, Sequence, Optional, Sequence, List
 
 
 def append_cflags(cflags_list: list):
@@ -72,7 +98,7 @@ def append_cflags(cflags_list: list):
     else:
         compiler_flags_env_var_name = 'CFLAGS'
 
-    environ[compiler_flags_env_var_name] = f'{environ.get(compiler_flags_env_var_name, str())} {" ".join(cflags_list)}'
+    environ[compiler_flags_env_var_name] = ' '.join((environ.get(compiler_flags_env_var_name, str()), " ".join(cflags_list)))
 
 
 def concat_cflags(cflags: str):
@@ -81,184 +107,289 @@ def concat_cflags(cflags: str):
     else:
         compiler_flags_env_var_name = 'CFLAGS'
 
-    environ[compiler_flags_env_var_name] = f'{environ.get(compiler_flags_env_var_name, str())} {cflags}'
+    environ[compiler_flags_env_var_name] = ' '.join((environ.get(compiler_flags_env_var_name, str()), cflags))
 
 
-def prepare_cflags(additional_cflags: Dict[str, Tuple[bool, Union[str, int]]]):
+def wrap_definition_text(text: str) -> str:
     if 'msvc' == compiler_type:
-        macros_string_template: str = '/D{macro_name}="{macro_value}"'
-        macros_flag_template: str = '/D{macro_name}={macro_value}'
+        return escape_param(f'\\"{text}\\"')
     else:
-        macros_string_template: str = '-D{macro_name}=\\"{macro_value}\\"'
-        macros_flag_template: str = '-D{macro_name}={macro_value}'
-    
-    macro_flags_list = [
-        # Cython
-        macros_string_template.format(macro_name='UNAME_SYSNAME', macro_value=uname_sysname),  # see: https://en.wikipedia.org/wiki/Uname
-        macros_string_template.format(macro_name='UNAME_MACHINE', macro_value=uname_machine),  # see: https://en.wikipedia.org/wiki/Uname
-        macros_string_template.format(macro_name='CPU_ARCH', macro_value=cpu_info().arch),  # 'X86_32', 'X86_64', 'ARM_8', 'ARM_7', 'PPC_32', 'PPC_64', 'SPARC_32', 'SPARC_64', 'S390X', 'MIPS_32', 'MIPS_64', 'RISCV_32', 'RISCV_64'
-        macros_string_template.format(macro_name='CPU_ARCH_RAW_STRING', macro_value=cpu_info().arch_string_raw),
-        macros_string_template.format(macro_name='CPU_BITS', macro_value=cpu_info().bits),  # '32', '64'
-        macros_string_template.format(macro_name='IS_X86', macro_value=int(cpu_info().is_x86)),  # 'True', 'False'
-        macros_string_template.format(macro_name='IS_ARM', macro_value=int(cpu_info().is_arm)),  # 'True', 'False'
-        macros_string_template.format(macro_name='COMPILER_TYPE', macro_value=compiler_type),  # 'gcc', 'msvc', 'clang', 'icc', 'llvm', 'intel', 'arm', 'mingw', 'unknown'
-        macros_string_template.format(macro_name='COMPILER_NAME', macro_value=compiler_name),  # 'x86_64-linux-gnu-gcc_-pthread'
-        macros_string_template.format(macro_name='PYTHON_IMPLEMENTATION', macro_value=PYTHON_IMPLEMENTATION),  # 'CPython', 'PyPy', 'IronPython', 'Jython'
-        macros_string_template.format(macro_name='PYTHON_VERSION_STR', macro_value=PYTHON_VERSION_STR),  # '3.5.1', ...
-        macros_string_template.format(macro_name='PYTHON_VERSION_MAJOR', macro_value=PYTHON_VERSION_INT.major),  # '3', ...
-        macros_string_template.format(macro_name='PYTHON_VERSION_MINOR', macro_value=PYTHON_VERSION_INT.minor),  # '5', ...
-        macros_string_template.format(macro_name='PYTHON_VERSION_MICRO', macro_value=PYTHON_VERSION_INT.micro),  # '1', ...
-        macros_string_template.format(macro_name='IS_RUNNING_IN_PYCHARM', macro_value=IS_RUNNING_IN_PYCHARM),  # 'True', 'False'
-        macros_string_template.format(macro_name='RAW_OS_PLATFORM', macro_value=RAW_OS_PLATFORM),  # 'emscripten', 'wasi', 'darwin', 'win32', 'cygwin', 'linux', 'linux2', 'linux3', 'darwin', 'freebsd8', 'aix', aix5', 'aix7', ...
-        macros_string_template.format(macro_name='OS_API_TYPE', macro_value=OS_API_TYPE),  # 'posix', 'nt', 'java'. Android and iOS will return 'posix'.
-        macros_string_template.format(macro_name='OS_TYPE', macro_value=OS_TYPE),  # 'Linux', 'Windows', 'Darwin'
-        macros_string_template.format(macro_name='IS_RUNNING_IN_EMSCRIPTEN', macro_value=IS_RUNNING_IN_EMSCRIPTEN),  # 'True', 'False'
-        macros_string_template.format(macro_name='IS_RUNNING_IN_WASI', macro_value=IS_RUNNING_IN_WASI),  # 'True', 'False'
-        macros_string_template.format(macro_name='IS_RUNNING_IN_PYODIDE', macro_value=IS_RUNNING_IN_PYODIDE),  # 'True', 'False'
-        macros_string_template.format(macro_name='IS_BUILDING_FOR_PYODIDE', macro_value=IS_BUILDING_FOR_PYODIDE),  # 'True', 'False'
-        macros_string_template.format(macro_name='IS_INSIDE_OR_FOR_WEB_BROWSER', macro_value=IS_INSIDE_OR_FOR_WEB_BROWSER),  # 'True', 'False'
+        return f'\\"{escape_param(text)}\\"'
 
-        # C preprocessor
-        macros_flag_template.format(macro_name='C__PYTHON_VERSION_MAJOR', macro_value=PYTHON_VERSION_INT.major),  # '3', ...
-        macros_flag_template.format(macro_name='C__PYTHON_VERSION_MINOR', macro_value=PYTHON_VERSION_INT.minor),  # '5', ...
-        macros_flag_template.format(macro_name='C__PYTHON_VERSION_MICRO', macro_value=PYTHON_VERSION_INT.micro),  # '1', ...
-    ]
-    for key, data in additional_cflags.items():
-        is_flag, value = data
-        if is_flag:
-            macro_flags_list.append(macros_flag_template.format(macro_name=key, macro_value=value))
+
+def wrap_definition_text_raw(text: str) -> str:
+    return f'"{text}"'
+
+
+def prepare_definition_value(value: Union[None, bool, int, str]) -> str:
+    if isinstance(value, bool):
+        value = str(value)
+    
+    if value is None:
+        return None
+    elif isinstance(value, int):
+        return value
+    elif isinstance(value, str):
+        return wrap_definition_text(value)
+    else:
+        return wrap_definition_text(f'{value}')
+
+
+def prepare_definition_value_raw(value: Union[None, bool, int, str]) -> str:
+    if isinstance(value, bool):
+        value = str(value)
+    
+    if value is None:
+        return None
+    elif isinstance(value, int):
+        return value
+    elif isinstance(value, str):
+        return wrap_definition_text_raw(value)
+    else:
+        return wrap_definition_text_raw(f'{value}')
+
+
+def wrap_definition_pair(name: str, value: Any) -> str:
+    if 'msvc' == compiler_type:
+        return f'/D{name}={value}' if value is not None else f'/D{name}'
+    else:
+        return f'-D{name}={value}' if value is not None else f'-D{name}'
+
+
+def convert_value_to_flag(value: Union[None, bool, int, str]) -> int:
+    if value is None:
+        return None
+    
+    try:
+        return int(value)
+    except:
+        return 1
+
+
+def convert_value_to_text(value: Union[None, bool, int, str]) -> str:
+    return f'{value}'
+
+
+def prepare_definition(name: str, value: Optional[Union[bool, int, str]] = None) -> str:
+    return wrap_definition_pair(name, prepare_definition_value(value))
+
+
+def list_to_dict(additional_cflags: Optional[Sequence[str]] = None) -> Dict[str, Union[None, bool, int, str]]:
+    additional_cflags = dict() if additional_cflags is None else additional_cflags
+    if not isinstance(additional_cflags, dict):
+        additional_cflags = {name: None for name in additional_cflags}
+    
+    return additional_cflags
+
+
+def dict_of_tuples_to_dict(additional_cflags: Optional[Dict[str, Tuple[bool, Union[None, bool, str, int]]]] = None) -> Dict[str, Union[None, bool, int, str]]:
+    additional_cflags = dict() if additional_cflags is None else additional_cflags
+    adjusted_additional_cflags: Dict[str, Union[None, bool, int, str]] = dict()
+    for name, value_info in additional_cflags.items():
+        if isinstance(value_info, tuple):
+            is_flag, value = value_info
+            value = convert_value_to_flag(value) if is_flag else convert_value_to_text(value)
         else:
-            macro_flags_list.append(macros_string_template.format(macro_name=key, macro_value=value))
-
+            value = value_info
+        
+        adjusted_additional_cflags[name] = value
     
-    # C preprocessor
-    if 32 == cpu_info().bits:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__32_bit_CPU', macro_value=1))
-    
-    if 64 == cpu_info().bits:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__64_bit_CPU', macro_value=1))
-
-    if cpu_info().is_x86:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__IS_X86', macro_value=1))
-    
-    if cpu_info().is_arm:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__IS_ARM', macro_value=1))
-
-    if 'X86_32' == cpu_info().arch:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__X86_32', macro_value=1))
-    elif 'X86_64' == cpu_info().arch:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__X86_64', macro_value=1))
-    elif 'ARM_8' == cpu_info().arch:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__ARM_8', macro_value=1))
-    elif 'ARM_7' == cpu_info().arch:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__ARM_7', macro_value=1))
-    elif 'PPC_32' == cpu_info().arch:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__PPC_32', macro_value=1))
-    elif 'PPC_64' == cpu_info().arch:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__PPC_64', macro_value=1))
-    elif 'SPARC_32' == cpu_info().arch:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__SPARC_32', macro_value=1))
-    elif 'SPARC_64' == cpu_info().arch:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__SPARC_64', macro_value=1))
-    elif 'S390X' == cpu_info().arch:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__S390X', macro_value=1))
-    elif 'MIPS_32' == cpu_info().arch:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__MIPS_32', macro_value=1))
-    elif 'MIPS_64' == cpu_info().arch:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__MIPS_64', macro_value=1))
-    elif 'RISCV_32' == cpu_info().arch:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__RISCV_32', macro_value=1))
-    elif 'RISCV_64' == cpu_info().arch:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__RISCV_64', macro_value=1))
-    
-    if 'CPython' == PYTHON_IMPLEMENTATION:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__CPython', macro_value=1))
-    elif 'PyPy' == PYTHON_IMPLEMENTATION:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__PyPy', macro_value=1))
-    elif 'IronPython' == PYTHON_IMPLEMENTATION:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__IronPython', macro_value=1))
-    elif 'Jython' == PYTHON_IMPLEMENTATION:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__Jython', macro_value=1))
-    
-    if 'gcc' == compiler_type:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__gcc', macro_value=1))
-    elif 'msvc' == compiler_type:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__msvc', macro_value=1))
-    elif 'clang' == compiler_type:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__clang', macro_value=1))
-    elif 'icc' == compiler_type:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__icc', macro_value=1))
-    elif 'llvm' == compiler_type:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__llvm', macro_value=1))
-    elif 'intel' == compiler_type:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__intel', macro_value=1))
-    elif 'arm' == compiler_type:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__arm', macro_value=1))
-    elif 'mingw' == compiler_type:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__mingw', macro_value=1))
-    elif 'unknown' == compiler_type:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__unknown', macro_value=1))
-    
-    if 'Linux' == OS_TYPE:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__Linux', macro_value=1))
-    elif 'Windows' == OS_TYPE:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__Windows', macro_value=1))
-    elif 'Darwin' == OS_TYPE:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__Darwin', macro_value=1))
-    
-    if 'posix' == OS_API_TYPE:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__posix', macro_value=1))
-    elif 'nt' == OS_API_TYPE:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__nt', macro_value=1))
-    elif 'java' == OS_API_TYPE:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__java', macro_value=1))
-    
-    if IS_RUNNING_IN_EMSCRIPTEN:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__IS_RUNNING_IN_EMSCRIPTEN', macro_value=1))
-    
-    if IS_RUNNING_IN_WASI:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__IS_RUNNING_IN_WASI', macro_value=1))
-    
-    if IS_RUNNING_IN_PYODIDE:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__IS_RUNNING_IN_PYODIDE', macro_value=1))
-    
-    if IS_BUILDING_FOR_PYODIDE:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__IS_BUILDING_FOR_PYODIDE', macro_value=1))
-    
-    if IS_INSIDE_OR_FOR_WEB_BROWSER:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__IS_INSIDE_OR_FOR_WEB_BROWSER', macro_value=1))
-    
-    if IS_RUNNING_IN_PYCHARM:
-        macro_flags_list.append(macros_flag_template.format(macro_name='C__IS_RUNNING_IN_PYCHARM', macro_value=1))
-    
-    append_cflags(macro_flags_list)
+    return adjusted_additional_cflags
 
 
-def prepare_compile_time_env(additional_cflags: Dict[str, Tuple[bool, Union[str, int]]]):
+def adjust_definition_names(definitions: Dict[str, Union[None, bool, int, str]], flag_name_prefix: str = None, definition_name_prefix: str = None) -> Dict[str, Union[None, bool, int, str]]:
+    flag_name_prefix = str() if flag_name_prefix is None else flag_name_prefix
+    definition_name_prefix = str() if definition_name_prefix is None else definition_name_prefix
+    adjusted_definitions: Dict[str, Union[None, bool, int, str]] = dict()
+    for name, value in definitions.items():
+        if value is None:
+            name = f'{flag_name_prefix}{name}'
+        else:
+            name = f'{definition_name_prefix}{name}'
+        
+        adjusted_definitions[name] = value
+    
+    return adjusted_definitions
+
+
+def prepare_cflags(additional_cflags: Optional[Union[Sequence[str], Dict[str, Union[Union[None, bool, int, str], Tuple[bool, Union[None, bool, str, int]]]]]] = None) -> List[Union[None, int, str]]:
+    adjusted_additional_cflags: Dict[str, Union[None, bool, int, str]] = dict_of_tuples_to_dict(list_to_dict(additional_cflags))
+    definitions: Dict[str, Union[None, bool, int, str]] = prepare_compile_time_env(list_to_dict(prepare_compile_time_flags()))
+    definitions = adjust_definition_names(definitions, 'CF_', 'CD_')  # CF is Cengal Flag; CD is Cengal Definition
+    definitions.update(adjusted_additional_cflags)
+    params: List[Union[None, int, str]] = [prepare_definition(name, value) for name, value in definitions.items()]
+    
+    # from pprint import pprint
+    # print('<<< PREPARE_CFLAGS: >>>')
+    # pprint(params)
+    append_cflags(params)
+    return params
+
+
+def prepare_cflags_dict(additional_cflags: Optional[Union[Sequence[str], Dict[str, Union[Union[None, bool, int, str], Tuple[bool, Union[None, bool, str, int]]]]]] = None) -> Dict[str, Union[None, bool, int, str]]:
+    adjusted_additional_cflags: Dict[str, Union[None, bool, int, str]] = dict_of_tuples_to_dict(list_to_dict(additional_cflags))
+    definitions: Dict[str, Union[None, bool, int, str]] = prepare_compile_time_env(list_to_dict(prepare_compile_time_flags()))
+    definitions = adjust_definition_names(definitions, 'CF_', 'CD_')  # CF is Cengal Flag; CD is Cengal Definition
+    definitions.update(adjusted_additional_cflags)
+    result: Dict[str, Union[None, bool, int, str]] = {name: prepare_definition_value_raw(value) for name, value in definitions.items()}
+    
+    # from pprint import pprint
+    # print('<<< PREPARE_CFLAGS_DICT: >>>')
+    # pprint(result)
+    return result
+
+
+def prepare_compile_time_env(additional_cflags: Optional[Union[Sequence[str], Dict[str, Union[Union[None, bool, int, str], Tuple[bool, Union[None, bool, str, int]]]]]] = None):
     result = {
         'UNAME_SYSNAME': uname_sysname,  # see: https://en.wikipedia.org/wiki/Uname
         'UNAME_MACHINE': uname_machine,  # see: https://en.wikipedia.org/wiki/Uname
         'CPU_ARCH': cpu_info().arch,  # 'X86_32', 'X86_64', 'ARM_8', 'ARM_7', 'PPC_32', 'PPC_64', 'SPARC_32', 'SPARC_64', 'S390X', 'MIPS_32', 'MIPS_64', 'RISCV_32', 'RISCV_64'
         'CPU_ARCH_RAW_STRING': cpu_info().arch_string_raw,
         'CPU_BITS': cpu_info().bits,  # '32', '64'
-        'IS_X86': int(cpu_info().is_x86),  # 'True', 'False'
-        'IS_ARM': int(cpu_info().is_arm),  # 'True', 'False'
+        'IS_X86_BOOL': cpu_info().is_x86,  # 'True', 'False'
+        'IS_ARM_BOOL': cpu_info().is_arm,  # 'True', 'False'
+        'IS_X86': int(cpu_info().is_x86),  # '1', '0'
+        'IS_ARM': int(cpu_info().is_arm),  # '1', '0'
         'COMPILER_TYPE': compiler_type,  # 'gcc', 'msvc', 'clang', 'icc', 'llvm', 'intel', 'arm', 'mingw', 'unknown'
-        'COMPILER_NAME': compiler_name,  # 'x86_64-linux-gnu-gcc_-pthread'
+        'COMPILER_NAME': compiler_name,  # 'x86_64-linux-gnu-gcc'
+        'COMPILER_STRING': compiler_string,  # 'x86_64-linux-gnu-gcc -pthread'
         'PYTHON_IMPLEMENTATION': PYTHON_IMPLEMENTATION,  # 'CPython', 'PyPy', 'IronPython', 'Jython'
         'PYTHON_VERSION_STR': PYTHON_VERSION_STR,  # '3.5.1', ...
+        'PYTHON_VERSION_MAJOR_STR': str(PYTHON_VERSION_INT.major),  # '3', ...
+        'PYTHON_VERSION_MINOR_STR': str(PYTHON_VERSION_INT.minor),  # '5', ...
+        'PYTHON_VERSION_MICRO_STR': str(PYTHON_VERSION_INT.micro),  # '1', ...
         'PYTHON_VERSION_MAJOR': PYTHON_VERSION_INT.major,  # '3', ...
         'PYTHON_VERSION_MINOR': PYTHON_VERSION_INT.minor,  # '5', ...
         'PYTHON_VERSION_MICRO': PYTHON_VERSION_INT.micro,  # '1', ...
-        'IS_RUNNING_IN_PYCHARM': IS_RUNNING_IN_PYCHARM,  # 'True', 'False'
+        'IS_RUNNING_IN_PYCHARM_BOOL': IS_RUNNING_IN_PYCHARM,  # 'True', 'False'
+        'IS_RUNNING_IN_PYCHARM': int(IS_RUNNING_IN_PYCHARM),  # '1', '0'
         'RAW_OS_PLATFORM': RAW_OS_PLATFORM,  # 'emscripten', 'wasi', 'darwin', 'win32', 'cygwin', 'linux', 'linux2', 'linux3', 'darwin', 'freebsd8', 'aix', aix5', 'aix7', ...
         'OS_API_TYPE': OS_API_TYPE,  # 'posix', 'nt', 'java'. Android and iOS will return 'posix'.
         'OS_TYPE': OS_TYPE,  # 'Linux', 'Windows', 'Darwin'
-        'IS_RUNNING_IN_EMSCRIPTEN': IS_RUNNING_IN_EMSCRIPTEN,  # 'True', 'False'
-        'IS_RUNNING_IN_WASI': IS_RUNNING_IN_WASI,  # 'True', 'False'
-        'IS_RUNNING_IN_PYODIDE': IS_RUNNING_IN_PYODIDE,  # 'True', 'False'
-        'IS_BUILDING_FOR_PYODIDE': IS_BUILDING_FOR_PYODIDE,  # 'True', 'False'
-        'IS_INSIDE_OR_FOR_WEB_BROWSER': IS_INSIDE_OR_FOR_WEB_BROWSER,  # 'True', 'False'
+        'IS_RUNNING_IN_EMSCRIPTEN_BOOL': IS_RUNNING_IN_EMSCRIPTEN,  # 'True', 'False'
+        'IS_RUNNING_IN_WASI_BOOL': IS_RUNNING_IN_WASI,  # 'True', 'False'
+        'IS_RUNNING_IN_PYODIDE_BOOL': IS_RUNNING_IN_PYODIDE,  # 'True', 'False'
+        'IS_BUILDING_FOR_PYODIDE_BOOL': IS_BUILDING_FOR_PYODIDE,  # 'True', 'False'
+        'IS_INSIDE_OR_FOR_WEB_BROWSER_BOOL': IS_INSIDE_OR_FOR_WEB_BROWSER,  # 'True', 'False'
+        'IS_RUNNING_IN_EMSCRIPTEN': int(IS_RUNNING_IN_EMSCRIPTEN),  # '1', '0'
+        'IS_RUNNING_IN_WASI': int(IS_RUNNING_IN_WASI),  # '1', '0'
+        'IS_RUNNING_IN_PYODIDE': int(IS_RUNNING_IN_PYODIDE),  # '1', '0'
+        'IS_BUILDING_FOR_PYODIDE': int(IS_BUILDING_FOR_PYODIDE),  # '1', '0'
+        'IS_INSIDE_OR_FOR_WEB_BROWSER': int(IS_INSIDE_OR_FOR_WEB_BROWSER),  # '1', '0'
+        'CENGAL_VERSION_STR': CENGAL_VERSION_STR,
+        'CENGAL_VERSION_MAJOR_STR': CENGAL_VERSION_MAJOR_STR,
+        'CENGAL_VERSION_MINOR_STR': CENGAL_VERSION_MINOR_STR,
+        'CENGAL_VERSION_MICRO_STR': CENGAL_VERSION_MICRO_STR,
+        'CENGAL_VERSION_MAJOR': CENGAL_VERSION_MAJOR,
+        'CENGAL_VERSION_MINOR': CENGAL_VERSION_MINOR,
+        'CENGAL_VERSION_MICRO': CENGAL_VERSION_MICRO,
     }
-    result.update(additional_cflags)
+    result.update(dict_of_tuples_to_dict(list_to_dict(additional_cflags)))
     return result
+
+
+def prepare_compile_time_flags(additional_cflags: Sequence[str] = None):
+    additional_cflags = [] if additional_cflags is None else additional_cflags
+    macro_flags_list: Set = set()
+
+    if 32 == cpu_info().bits:
+        macro_flags_list.add('32_bit_CPU')
+    
+    if 64 == cpu_info().bits:
+        macro_flags_list.add('64_bit_CPU')
+
+    if cpu_info().is_x86:
+        macro_flags_list.add('IS_X86')
+    
+    if cpu_info().is_arm:
+        macro_flags_list.add('IS_ARM')
+
+    if 'X86_32' == cpu_info().arch:
+        macro_flags_list.add('X86_32')
+    elif 'X86_64' == cpu_info().arch:
+        macro_flags_list.add('X86_64')
+    elif 'ARM_8' == cpu_info().arch:
+        macro_flags_list.add('ARM_8')
+    elif 'ARM_7' == cpu_info().arch:
+        macro_flags_list.add('ARM_7')
+    elif 'PPC_32' == cpu_info().arch:
+        macro_flags_list.add('PPC_32')
+    elif 'PPC_64' == cpu_info().arch:
+        macro_flags_list.add('PPC_64')
+    elif 'SPARC_32' == cpu_info().arch:
+        macro_flags_list.add('SPARC_32')
+    elif 'SPARC_64' == cpu_info().arch:
+        macro_flags_list.add('SPARC_64')
+    elif 'S390X' == cpu_info().arch:
+        macro_flags_list.add('S390X')
+    elif 'MIPS_32' == cpu_info().arch:
+        macro_flags_list.add('MIPS_32')
+    elif 'MIPS_64' == cpu_info().arch:
+        macro_flags_list.add('MIPS_64')
+    elif 'RISCV_32' == cpu_info().arch:
+        macro_flags_list.add('RISCV_32')
+    elif 'RISCV_64' == cpu_info().arch:
+        macro_flags_list.add('RISCV_64')
+    
+    if 'CPython' == PYTHON_IMPLEMENTATION:
+        macro_flags_list.add('CPython')
+    elif 'PyPy' == PYTHON_IMPLEMENTATION:
+        macro_flags_list.add('PyPy')
+    elif 'IronPython' == PYTHON_IMPLEMENTATION:
+        macro_flags_list.add('IronPython')
+    elif 'Jython' == PYTHON_IMPLEMENTATION:
+        macro_flags_list.add('Jython')
+    
+    if 'gcc' == compiler_type:
+        macro_flags_list.add('gcc')
+    elif 'msvc' == compiler_type:
+        macro_flags_list.add('msvc')
+    elif 'clang' == compiler_type:
+        macro_flags_list.add('clang')
+    elif 'icc' == compiler_type:
+        macro_flags_list.add('icc')
+    elif 'llvm' == compiler_type:
+        macro_flags_list.add('llvm')
+    elif 'intel' == compiler_type:
+        macro_flags_list.add('intel')
+    elif 'arm' == compiler_type:
+        macro_flags_list.add('arm')
+    elif 'mingw' == compiler_type:
+        macro_flags_list.add('mingw')
+    elif 'unknown' == compiler_type:
+        macro_flags_list.add('unknown_compiler')
+    
+    if 'Linux' == OS_TYPE:
+        macro_flags_list.add('Linux')
+    elif 'Windows' == OS_TYPE:
+        macro_flags_list.add('Windows')
+    elif 'Darwin' == OS_TYPE:
+        macro_flags_list.add('Darwin')
+    
+    if 'posix' == OS_API_TYPE:
+        macro_flags_list.add('posix')
+    elif 'nt' == OS_API_TYPE:
+        macro_flags_list.add('nt')
+    elif 'java' == OS_API_TYPE:
+        macro_flags_list.add('java')
+    
+    if IS_RUNNING_IN_EMSCRIPTEN:
+        macro_flags_list.add('IS_RUNNING_IN_EMSCRIPTEN')
+    
+    if IS_RUNNING_IN_WASI:
+        macro_flags_list.add('IS_RUNNING_IN_WASI')
+    
+    if IS_RUNNING_IN_PYODIDE:
+        macro_flags_list.add('IS_RUNNING_IN_PYODIDE')
+    
+    if IS_BUILDING_FOR_PYODIDE:
+        macro_flags_list.add('IS_BUILDING_FOR_PYODIDE')
+    
+    if IS_INSIDE_OR_FOR_WEB_BROWSER:
+        macro_flags_list.add('IS_INSIDE_OR_FOR_WEB_BROWSER')
+    
+    if IS_RUNNING_IN_PYCHARM:
+        macro_flags_list.add('IS_RUNNING_IN_PYCHARM')
+
+    macro_flags_list.update(additional_cflags)
+    return macro_flags_list

@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -49,16 +49,31 @@ Docstrings: http://www.python.org/dev/peps/pep-0257/
 
 
 
+#!/usr/bin/env python
+# coding=utf-8
+
+
+
+
+"""
+Module Docstring
+Docstrings: http://www.python.org/dev/peps/pep-0257/
+"""
+
+
+
+
+
 import asyncio
 # from efficient_streams import *
 from cengal.parallel_execution.asyncio.efficient_streams import *
 from time import perf_counter
-from cengal.hardware.info.cpu.versions.v_1 import CpuInfo
+from cengal.hardware.info.cpu import cpu_info
 from cengal.io.used_ports import *
 
 
-# asyncio.selector_events._SelectorTransport.max_size = CpuInfo().l2_cache_size_per_virtual_core
-# asyncio.selector_events._DEFAULT_LIMIT = CpuInfo().l2_cache_size_per_virtual_core
+# asyncio.selector_events._SelectorTransport.max_size = cpu_info().l2_cache_size_per_virtual_core
+# asyncio.selector_events._DEFAULT_LIMIT = cpu_info().l2_cache_size_per_virtual_core
 
 
 print('STARTED.')
@@ -87,7 +102,7 @@ async def tcp_echo_client(message):
     port = purify_ports(used_ports().port(Protocol.tcp, used_ports().tables[Table.user], {PortStatus.no})())
     # reader, writer = await asyncio.open_connection(
     #     '127.0.0.1', port)
-    reader, writer = await StreamManager().open_connection(
+    reader, writer = await TcpStreamManager().open_connection(
         '127.0.0.1', port)
 
     print(f'Send: {message!r}')

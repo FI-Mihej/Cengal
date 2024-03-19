@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -773,7 +773,7 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
             raise Exception('Expected Client with keyword "{}" is already registered!'.format(
                 expected_client_info.connection_settings.keyword))
 
-        expected_client_info.id = self._expected_clients_id_gen.get_new_ID()
+        expected_client_info.id = self._expected_clients_id_gen()
 
         if self.unexpected_clients_are_allowed:
             if expected_client_info.connection_settings.keyword in self._keywords_of_unexpected_clients:
@@ -989,7 +989,7 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
         if self.use_nodelay_inet and (conn.family in INET_TYPE_CONNECTIONS):
             conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
-        new_client_id = self._connections_id_gen.get_new_ID()
+        new_client_id = self._connections_id_gen()
 
         client_info = Connection(new_client_id, (conn, address), self)
         self._connections[new_client_id] = client_info
@@ -1113,13 +1113,13 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
         keyword = None
         keyword_is_ok = False
         while not keyword_is_ok:
-            keyword = self.prefix_for_unknown_client_keywords + self._unknown_clients_keyword_gen.get_new_ID().encode()
+            keyword = self.prefix_for_unknown_client_keywords + self._unknown_clients_keyword_gen().encode()
             if keyword not in self._keywords_for_expected_clients:
                 keyword_is_ok = True
         connection_settings = ConnectionSettings(direction_role=ConnectionDirectionRole.client,
                                                  socket_address=client_info.addr.result, keyword=keyword)
         expected_client_info = Client(connection_settings)
-        expected_client_info.id = self._expected_clients_id_gen.get_new_ID()
+        expected_client_info.id = self._expected_clients_id_gen()
 
         expected_client_info.connection_id = client_info.id
         expected_client_info._Client__connection = client_info
@@ -1286,7 +1286,7 @@ class ASockIOCore(ASockIOCoreMemoryManagement):
 
     def _add_unexpected_client(self, connection_id, keyword):
         connection_settings = ConnectionSettings(direction_role=ConnectionDirectionRole.client, keyword=keyword)
-        unexpected_client_info = Client(connection_settings, self._unexpected_clients_id_gen.get_new_ID(),
+        unexpected_client_info = Client(connection_settings, self._unexpected_clients_id_gen(),
                                         connection_id)
 
         self._unexpected_clients[unexpected_client_info.id] = unexpected_client_info

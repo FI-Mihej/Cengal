@@ -17,6 +17,7 @@
 
 import copy
 import gc
+from cengal.code_flow_control.gc import DisableGC
 from contextlib import contextmanager
 from cengal.code_flow_control.smart_values.versions.v_2 import ValueExistence
 from cengal.parallel_execution.coroutines.coro_standard_services.lazy_print.versions.v_0.lazy_print import lprint
@@ -25,7 +26,7 @@ from cengal.time_management.repeat_for_a_time import Tracer, ClockType
 from cengal.math.numbers import RationalNumber
 from cengal.introspection.inspect import is_async
 from cengal.introspection.inspect import func_name, entity_properties
-from typing import Union, Callable, Awaitable
+from typing import Union, Callable, Awaitable, List, Optional
 
 """
 Module Docstring
@@ -36,7 +37,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -216,18 +217,22 @@ class PrecisePerformanceTestTracer(Tracer):
         super().__init__(run_time, clock_type)
         self.suppress_exceptions = suppress_exceptions
         self.turn_off_gc = turn_off_gc
+        self.gc_was_enabled = None
 
     def __enter__(self):
         self._relevant_start_time = self._start_time = self._relevant_stop_time = self._end_time = self._clock()
         self._relevant_number_of_iterations_at_start = 0
         if self.turn_off_gc:
+            self.gc_was_enabled = gc.isenabled()
             gc.disable()
+        
         return range(self._last_tracked_number_of_iterations)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._relevant_stop_time = self._end_time = self._clock()
-        if self.turn_off_gc:
+        if self.turn_off_gc and self.gc_was_enabled:
             gc.enable()
+        
         if self.suppress_exceptions:
             return True
 
@@ -333,6 +338,7 @@ def measure_func_performance(func: Callable,
     tr = PrecisePerformanceTestTracer(run_time, clock_type, suppress_exceptions, turn_off_gc)
     try:
         if turn_off_gc:
+            gc_was_enabled = gc.isenabled()
             gc.disable()
         
         while tr.iter():
@@ -342,7 +348,7 @@ def measure_func_performance(func: Callable,
             for i in fast_iter:
                 func()
     finally:
-        if turn_off_gc:
+        if turn_off_gc and gc_was_enabled:
             gc.enable()
 
     if do_print:
@@ -368,6 +374,7 @@ async def measure_afunc_performance(afunc: Awaitable,
     tr = PrecisePerformanceTestTracer(run_time, clock_type, suppress_exceptions, turn_off_gc)
     try:
         if turn_off_gc:
+            gc_was_enabled = gc.isenabled()
             gc.disable()
         
         while tr.iter():
@@ -377,7 +384,7 @@ async def measure_afunc_performance(afunc: Awaitable,
             for i in fast_iter:
                 await afunc
     finally:
-        if turn_off_gc:
+        if turn_off_gc and gc_was_enabled:
             gc.enable()
 
     if do_print:
@@ -390,3 +397,109 @@ async def measure_afunc_performance(afunc: Awaitable,
             print(f'\t It was used {tr.time_spent} seconds to make {tr.iterations_made} iterations. Performance: {tr.iter_per_time_unit} iterations/seconds')
         else:
             do_print(afunc, run_time, name, clock_type, tr)
+
+
+def measure_func_isolated_performance(func: Callable, 
+                    run_time: float,
+                    name: str=None, 
+                    do_print: Union[bool, Callable] = False, 
+                    clock_type: ClockType=ClockType.perf_counter,
+                    suppress_exceptions: bool=False,
+                    turn_off_gc: bool=False
+                   ):
+    """Measure functions best/top/isolated performance. Hopefully isolated from an interference with other threads executed on the same CPU core
+
+    Args:
+        func (Callable): _description_
+        run_time (float): _description_
+        name (str, optional): _description_. Defaults to None.
+        do_print (Union[bool, Callable], optional): _description_. Defaults to False.
+        clock_type (ClockType, optional): _description_. Defaults to ClockType.perf_counter.
+        suppress_exceptions (bool, optional): _description_. Defaults to False.
+        turn_off_gc (bool, optional): _description_. Defaults to False.
+    """    
+    tr = PrecisePerformanceTestTracer(run_time, clock_type, suppress_exceptions, turn_off_gc)
+    measurements: List[float] = list()
+    try:
+        if turn_off_gc:
+            gc_was_enabled = gc.isenabled()
+            gc.disable()
+        
+        while tr.iter():
+            func()
+
+        with tr as fast_iter:
+            for i in fast_iter:
+                start_time = perf_counter()
+                func()
+                measurements.append(perf_counter() - start_time)
+    finally:
+        if turn_off_gc and gc_was_enabled:
+            gc.enable()
+
+    if do_print:
+        best_measurement: float = min(measurements)
+        best_performance: Optional[float] = (1 / best_measurement) if best_measurement else None
+        if isinstance(do_print, bool):
+            if name is not None:
+                print(f'>>> "{name}": {func_name(func)}()')
+            else:
+                print(f'>>> {func_name(func)}()')
+
+            print(f'\t It was used {tr.time_spent} seconds to make {tr.iterations_made} iterations. Performance: {tr.iter_per_time_unit} iterations/seconds')
+            print(f'\t Isolated run time: {best_measurement} seconds; Isolated performance: {best_performance} iterations/seconds')
+        else:
+            do_print(func, run_time, name, clock_type, tr, best_measurement, best_performance)
+
+
+async def measure_afunc_isolated_performance(afunc: Awaitable, 
+                    run_time: float,
+                    name: str=None, 
+                    do_print: Union[bool, Callable] = False, 
+                    clock_type: ClockType=ClockType.perf_counter,
+                    suppress_exceptions: bool=False,
+                    turn_off_gc: bool=False
+                   ):
+    """Measure functions best/top/isolated performance. Hopefully isolated from an interference with other threads executed on the same CPU core
+
+    Args:
+        afunc (Awaitable): _description_
+        run_time (float): _description_
+        name (str, optional): _description_. Defaults to None.
+        do_print (Union[bool, Callable], optional): _description_. Defaults to False.
+        clock_type (ClockType, optional): _description_. Defaults to ClockType.perf_counter.
+        suppress_exceptions (bool, optional): _description_. Defaults to False.
+        turn_off_gc (bool, optional): _description_. Defaults to False.
+    """    
+    tr = PrecisePerformanceTestTracer(run_time, clock_type, suppress_exceptions, turn_off_gc)
+    measurements: List[float] = list()
+    try:
+        if turn_off_gc:
+            gc_was_enabled = gc.isenabled()
+            gc.disable()
+        
+        while tr.iter():
+            await afunc
+
+        with tr as fast_iter:
+            for i in fast_iter:
+                start_time = perf_counter()
+                await afunc
+                measurements.append(perf_counter() - start_time)
+    finally:
+        if turn_off_gc and gc_was_enabled:
+            gc.enable()
+
+    if do_print:
+        best_measurement: float = min(measurements)
+        best_performance: Optional[float] = (1 / best_measurement) if best_measurement else None
+        if isinstance(do_print, bool):
+            if name is not None:
+                print(f'>>> "{name}": {func_name(afunc)}()')
+            else:
+                print(f'>>> {func_name(afunc)}()')
+
+            print(f'\t It was used {tr.time_spent} seconds to make {tr.iterations_made} iterations. Performance: {tr.iter_per_time_unit} iterations/seconds')
+            print(f'\t Isolated run time: {best_measurement} seconds; Isolated performance: {best_performance} iterations/seconds')
+        else:
+            do_print(afunc, run_time, name, clock_type, tr, best_measurement, best_performance)

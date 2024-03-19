@@ -25,7 +25,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -49,7 +49,7 @@ import setuptools
 # import platform
 
 
-setuptools._install_setup_requires({'setup_requires': ['Cython>=0.29.34', 'py-cpuinfo', 'charset-normalizer; python_version < "3.13"']})
+setuptools._install_setup_requires({'setup_requires': ['Cython>=0.29.34', 'py-cpuinfo', 'charset-normalizer; python_version < "3.13"', 'typing_extensions']})
 
 
 from cengal_setup_scripts.install_required_packages.install_packages import install_bundled, get_pypi_requirements_list, get_remote_requirements_list

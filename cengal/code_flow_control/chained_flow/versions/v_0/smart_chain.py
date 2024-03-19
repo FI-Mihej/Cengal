@@ -33,7 +33,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -307,8 +307,8 @@ class IsOK_ContextHolder:
 @contextmanager
 def is_ok(context_holder, block_id, block_info=None, block_results_criteria=None, ignore_block_result_criteria=None):
     if block_id is None:
-        block_id = (context_holder._reserve_block_id_generator.counter,
-                    context_holder._reserve_block_id_generator.get_new_ID())
+        new_id = context_holder._reserve_block_id_generator()
+        block_id = (new_id, new_id)
 
     if context_holder._closeable and context_holder._closed:
         raise IsOK_Closed(context_holder, block_id, block_info)

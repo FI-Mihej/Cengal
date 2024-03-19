@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import ctypes
 import ctypes.wintypes as wintypes
 from ctypes import windll
@@ -30,7 +31,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -74,6 +75,22 @@ TRUE = wintypes.BOOL(1)
 
 WIN_UNICODE_PATH_PREFIX = '\\\\?\\'
 WUPP = WIN_UNICODE_PATH_PREFIX
+
+
+CreateFileW = None
+if 'nt' == os.name:
+    from cengal.ctypes_tools.libraries import kernel32
+    from cengal.ctypes_tools.tools import cwfunc_def
+
+    CreateFileW = cwfunc_def(kernel32, 'CreateFileW', (
+            wintypes.LPWSTR,  # _In_ - LPCTSTR lpFileName
+            wintypes.DWORD,  # _In_ - DWORD dwDesiredAccess
+            wintypes.DWORD,  # _In_ - DWORD dwShareMode
+            LPSECURITY_ATTRIBUTES,  # _In_opt_ - LPSECURITY_ATTRIBUTES lpSecurityAttributes
+            wintypes.DWORD,  # _In_ - DWORD dwCreationDisposition
+            wintypes.DWORD,  # _In_ - DWORD dwFlagsAndAttributes
+            wintypes.HANDLE,  # _In_opt_ - HANDLE hTemplateFile
+        ), wintypes.HANDLE)
 
 
 def copy(src_name, dst_name):
@@ -121,18 +138,7 @@ def create_file(filename, access, mode, security_attributes, creation, flags, te
     """See: CreateFile function
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx
     """
-    create_file_spec = windll.kernel32.CreateFileW
-    create_file_spec.argtypes = [
-        wintypes.LPWSTR,  # _In_ - LPCTSTR lpFileName
-        wintypes.DWORD,  # _In_ - DWORD dwDesiredAccess
-        wintypes.DWORD,  # _In_ - DWORD dwShareMode
-        LPSECURITY_ATTRIBUTES,  # _In_opt_ - LPSECURITY_ATTRIBUTES lpSecurityAttributes
-        wintypes.DWORD,  # _In_ - DWORD dwCreationDisposition
-        wintypes.DWORD,  # _In_ - DWORD dwFlagsAndAttributes
-        wintypes.HANDLE]  # _In_opt_ - HANDLE hTemplateFile
-    create_file_spec.restype = wintypes.HANDLE
-
-    return wintypes.HANDLE(create_file_spec(filename,
+    return wintypes.HANDLE(CreateFileW(filename,
                                          access,
                                          mode,
                                          security_attributes,

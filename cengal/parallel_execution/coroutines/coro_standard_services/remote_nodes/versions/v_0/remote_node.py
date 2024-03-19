@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -51,7 +51,7 @@ from cengal.parallel_execution.asyncio.efficient_streams import StreamManagerIOC
 from cengal.code_flow_control.smart_values import ValueExistence
 from cengal.io.named_connections.named_connections_manager import NamedConnectionsManager
 from cengal.code_flow_control.args_manager import number_of_provided_args
-from cengal.data_manipulation.serialization import Serializer, Serializers, best_serializer
+from cengal.data_manipulation.serialization import Serializer, Serializers, best_serializer_for_standard_data
 from cengal.code_flow_control.args_manager import find_arg_position_and_value, UnknownArgumentError
 from cengal.data_generation.id_generator import IDGenerator, GeneratorType
 from cengal.system import PLATFORM_NAME, PYTHON_VERSION

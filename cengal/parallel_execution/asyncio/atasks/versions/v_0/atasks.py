@@ -24,7 +24,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -33,19 +33,19 @@ __status__ = "Development"
 __all__ = ['create_task_awaitable', 'create_task']
 
 
-import sys
 import asyncio
+from cengal.system import PYTHON_VERSION_INT
 
 
 def create_task_awaitable(asyncio_awaitable) -> asyncio.Task:
-    if 7 <= sys.version_info[1] and 2 <= sys.version_info[0]:
+    if (3, 7) <= PYTHON_VERSION_INT:
         return asyncio.create_task(asyncio_awaitable)
     else:
         return asyncio.get_event_loop().create_task(asyncio_awaitable)
 
 
 def create_task(asyncio_coroutine, *args, **kwargs) -> asyncio.Task:
-    if 7 <= sys.version_info[1] and 2 <= sys.version_info[0]:
+    if (3, 7) <= PYTHON_VERSION_INT:
         return asyncio.create_task(asyncio_coroutine(*args, **kwargs))
     else:
         return asyncio.get_event_loop().create_task(asyncio_coroutine(*args, **kwargs))

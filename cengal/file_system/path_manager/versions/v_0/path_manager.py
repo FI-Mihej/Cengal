@@ -34,7 +34,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -61,7 +61,7 @@ def relative_to_src(depth: Optional[int] = 1) -> RelativePath:
     return RelativePath(current_src_dir(depth))
 
 
-def path_relative_to_src(relative_path: str, depth: Optional[int] = 1):
+def path_relative_to_src(relative_path: str, depth: Optional[int] = 1) -> str:
     """
 
     :param relative_path:
@@ -77,7 +77,7 @@ def relative_to_cwd() -> RelativePath:
     return RelativePath(os.getcwd())
 
 
-def path_relative_to_cwd(relative_path: str):
+def path_relative_to_cwd(relative_path: str) -> str:
     return RelativePath(os.getcwd())(relative_path)
 
 

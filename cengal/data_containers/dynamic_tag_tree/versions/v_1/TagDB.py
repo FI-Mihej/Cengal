@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -194,7 +194,7 @@ class TagDB(EntityStatsMixin):
         if self.get_itemID_from_item_and_tags(binTags, binItem) is not None:
             return None
 
-        itemID = self.itemsID.get_new_ID()
+        itemID = self.itemsID()
         self.itemsSet[itemID] = binItem
 
         itemHash = binItem.__hash__()
@@ -316,7 +316,7 @@ class TagDB(EntityStatsMixin):
                         del self.tagWithItems[tagHash]
                     # self.tagWithItems[tagHash] = IDsSet
 
-        self.itemsID.remove_ID(itemID)
+        self.itemsID.remove_id(itemID)
 
     def remove_item(self, binTags, binItem):
         # will return ItemId for deleted item or None object if Item is not exist

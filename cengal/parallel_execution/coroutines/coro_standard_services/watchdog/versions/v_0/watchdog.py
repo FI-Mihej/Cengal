@@ -24,7 +24,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -56,7 +56,7 @@ class HungedCoroInfo:
 
 
 class Watchdog(TypedService[None]):
-    def __init__(self, loop: CoroScheduler):
+    def __init__(self, loop: CoroSchedulerType):
         super().__init__(loop)
         self.handler_set: bool = False
         self.previous_handler = None
@@ -83,7 +83,7 @@ class Watchdog(TypedService[None]):
                 self.watchdog_thread_in_work = False
     
     def check_idle_coro(self):
-        loop: CoroScheduler = self._loop
+        loop: CoroSchedulerType = self._loop
         if get_current_coro_scheduler() is not loop:
             return
         
@@ -136,7 +136,7 @@ class Watchdog(TypedService[None]):
         if self.hunged_coro is None:
             return
         
-        loop: CoroScheduler = self._loop
+        loop: CoroSchedulerType = self._loop
         if get_current_coro_scheduler() is not loop:
             return
         

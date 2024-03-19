@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -35,7 +35,7 @@ __status__ = "Development"
 
 
 from cengal.introspection.inspect import CodeParamsWithValues, intro_func_params_with_values, intro_func_all_params_with_values, intro_func_all_params_with_values_as_ordered_dict, code_params_with_values_to_code, entity_repr, entity_owner_repr, entity_class, entity_repr_owner_based, intro_func_repr
-from cengal.parallel_execution.coroutines.coro_scheduler import full_func_info_to_dict, CoroScheduler, current_interface
+from cengal.parallel_execution.coroutines.coro_scheduler import full_func_info_to_dict, CoroScheduler, CoroSchedulerType, current_interface
 from pprint import pprint
 import inspect
 

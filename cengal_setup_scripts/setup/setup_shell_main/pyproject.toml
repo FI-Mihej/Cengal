@@ -1,3 +1,11 @@
 [build-system]
 # Minimum requirements for the build system to execute.
-requires = ["setuptools", "wheel", "debugpy", "Cython>=0.29.34", "py-cpuinfo", "charset-normalizer; python_version < '3.13'"]  # PEP 508 specifications.
+requires = [
+    "setuptools",
+    "wheel",
+    "debugpy",
+    "Cython>=0.29.34",
+    "py-cpuinfo",
+    "charset-normalizer; python_version < '3.13'",
+    "typing_extensions"
+]  # PEP 508 specifications.

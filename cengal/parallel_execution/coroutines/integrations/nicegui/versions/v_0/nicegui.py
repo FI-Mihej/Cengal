@@ -24,7 +24,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -1273,7 +1273,7 @@ async def init_cs(is_fast_loop: bool = True, main_coro: AnyWorker = None, app_ar
 # Async on_destroy handling is currently (08 Feb 2023) broken in NiceGUI: 
 #     they should await for handlers instead of current tasks creation approach
 def destroy_cs():
-    cs: CoroScheduler = get_available_coro_scheduler()
+    cs: CoroSchedulerType = get_available_coro_scheduler()
     cs_destroy_timeouted: bool = False
     if cs and (not cs._destroyed):
         async def coro(i: Interface):

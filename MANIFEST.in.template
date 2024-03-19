@@ -1,2 +1,2 @@
 include NOTICE
-py.typed
+include cengal/py.typed

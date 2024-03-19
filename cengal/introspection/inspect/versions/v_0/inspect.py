@@ -21,10 +21,13 @@ from typing import Any, Callable, Awaitable, Dict, Generator, List, Optional, Tu
 from types import ModuleType, CodeType, FrameType
 import traceback
 import inspect
+from inspect import getattr_static as inspect__getattr_static
 import sys
-from cengal.code_flow_control.python_bytecode_manipulator import CodeParamNames, code_param_names, get_code, code_name
+from cengal.code_flow_control.python_bytecode_manipulator import CodeParamNames, code_param_names, has_code, get_code, code_name
 from cengal.text_processing.brackets_processing import Bracket, BracketPair, replace_text_with_brackets, find_text_in_brackets
 from collections import OrderedDict
+from importlib import import_module
+
 
 """
 Module Docstring
@@ -35,7 +38,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -243,6 +246,21 @@ def entity_owning_module_importable_str(entity) -> str:
     return module_importable_str
 
 
+def entity_module_importable_str_and_owning_names_path(entity) -> Tuple[str, List[str]]:
+    _, module_importable_str, _, owning_path = entity_owning_module_info_and_owning_path(entity)
+    owning_path = owning_path[:-1]
+    owning_names_path = [entity_name(owner) for owner in owning_path]
+    return module_importable_str, owning_names_path
+
+
+def entity_by_name_module_importable_str_and_owning_names_path(entity_name: str, module_importable_str: str, owning_names_path: List[str]) -> Any:
+    owner = import_module(module_importable_str)
+    for owner_name in reversed(owning_names_path):
+        owner = getattr(owner, owner_name)
+
+    return getattr(owner, entity_name)
+
+
 module_repr_limited_bracket_pair: BracketPair = BracketPair([Bracket(" from '")], [Bracket("'>")])
 
 
@@ -407,15 +425,25 @@ def code_params_to_signature_items_gen(code_params: CodeParamNames) -> Generator
             yield arg
 
 
-def code_params_with_values_to_signature(params_with_values: CodeParamsWithValues, verbose: bool = False) -> str:
-    return ', '.join(code_params_with_values_to_signature_items_gen(params_with_values, verbose))
+def code_params_with_values_to_signature(params_with_values: CodeParamsWithValues, verbose: bool = False, formatted: bool = False) -> str:
+    if formatted:
+        delimiter = ',\n\t'
+    else:
+        delimiter = ', '
+    
+    return delimiter.join(code_params_with_values_to_signature_items_gen(params_with_values, verbose))
 
 
-def code_params_to_signature(param_names: CodeParamNames) -> str:
-    return ', '.join(code_params_to_signature_items_gen(param_names))
+def code_params_to_signature(param_names: CodeParamNames, formatted: bool = False) -> str:
+    if formatted:
+        delimiter = ',\n\t'
+    else:
+        delimiter = ', '
+    
+    return delimiter.join(code_params_to_signature_items_gen(param_names))
 
 
-def entity_repr_limited(entity):
+def entity_repr_limited(entity, formatted: bool = False):
     if isinstance(entity, FrameType):
         entity = entity.f_code
     
@@ -426,27 +454,38 @@ def entity_repr_limited(entity):
     
     func_name = code_name(code)
     param_names = code_param_names(code)
-    function_params_str = code_params_to_signature(param_names)
+    function_params_str = code_params_to_signature(param_names, formatted)
     return f'{func_name}({function_params_str})'
 
 
-def entity_repr_limited_try_qualname(entity):
-    if isinstance(entity, FrameType):
-        entity = entity.f_code
-    
-    if isinstance(entity, CodeType):
-        code = entity
-        func_name = code_name(code)
+def entity_repr_limited_try_qualname(entity, formatted: bool = False):
+    if has_code(entity):
+        if isinstance(entity, FrameType):
+            entity = entity.f_code
+        
+        if isinstance(entity, CodeType):
+            code = entity
+            func_name = code_name(code)
+        else:
+            code = get_code(entity)
+            func_name = func_qualname(entity)
+        
+        param_names = code_param_names(code)
+        function_params_str = code_params_to_signature(param_names, formatted)
+        return f'{func_name}({function_params_str})'
     else:
-        code = get_code(entity)
-        func_name = func_qualname(entity)
-    
-    param_names = code_param_names(code)
-    function_params_str = code_params_to_signature(param_names)
-    return f'{func_name}({function_params_str})'
+        entity_type_name = type(entity).__name__
+        entity_properties_with_values = entity_properties_values(entity)
+        if formatted:
+            delimiter = ',\n\t'
+        else:
+            delimiter = ', '
+        
+        entity_properties_str = delimiter.join([f'{key}={value}' for key, value in entity_properties_with_values.items()])
+        return f'{entity_type_name}({entity_properties_str})'
 
 
-def entity_repr_owner_based(entity):
+def entity_repr_owner_based(entity, formatted: bool = False):
     if isinstance(entity, FrameType):
         entity = entity.f_code
     
@@ -462,12 +501,12 @@ def entity_repr_owner_based(entity):
         _entity_repr_limited = entity_repr_limited
     
     if owner_repr:
-        return f'{owner_repr}.{_entity_repr_limited(entity)}'
+        return f'{owner_repr}.{_entity_repr_limited(entity, formatted)}'
     else:
-        return _entity_repr_limited(entity)
+        return _entity_repr_limited(entity, formatted)
 
 
-def entity_repr(entity):
+def entity_repr(entity, formatted: bool = False):
     if isinstance(entity, FrameType):
         entity = entity.f_code
     
@@ -478,9 +517,9 @@ def entity_repr(entity):
         owner_repr = normalized_owner_repr(module)
     
     if owner_repr:
-        return f'{owner_repr}.{entity_repr_limited_try_qualname(entity)}'
+        return f'{owner_repr}.{entity_repr_limited_try_qualname(entity, formatted)}'
     else:
-        return entity_repr_limited_try_qualname(entity)
+        return entity_repr_limited_try_qualname(entity, formatted)
 
 
 def entity_properties(entity) -> Set[str]:
@@ -517,6 +556,14 @@ def entity_properties(entity) -> Set[str]:
     return entity_items - entity_type_items
 
 
+def entity_properties_values(entity) -> Dict[str, Any]:
+    result = dict()
+    for property_name in sorted(entity_properties(entity)):
+        result[property_name] = getattr(entity, property_name)
+    
+    return result
+
+
 def class_properties(entity: Type) -> Set[str]:
     """
     Example:
@@ -540,6 +587,14 @@ def class_properties(entity: Type) -> Set[str]:
     return (entity_items - entity_type_items) - base_members
 
 
+def class_properties_values(entity) -> Dict[str, Any]:
+    result = dict()
+    for property_name in sorted(class_properties(entity)):
+        result[property_name] = getattr(entity, property_name)
+    
+    return result
+
+
 def class_properties_including_overrided(entity: Type) -> Set[str]:
     """
     Example:
@@ -553,6 +608,14 @@ def class_properties_including_overrided(entity: Type) -> Set[str]:
     entity_type_items = set(dir(type(entity)))
     entity_items = set(entity.__dict__.keys())
     return entity_items - entity_type_items
+
+
+def class_properties_values_including_overrided(entity) -> Dict[str, Any]:
+    result = dict()
+    for property_name in sorted(class_properties_including_overrided(entity)):
+        result[property_name] = getattr(entity, property_name)
+    
+    return result
 
 
 def intro_frame_repr_limited(frame_instance, verbose: bool = False):
@@ -642,7 +705,11 @@ def is_descriptor(entity):
     return hasattr(entity, '__get__') or hasattr(entity, '__set__') or hasattr(entity, '__delete__')
 
 
-def is_filled_descriptor(owning_object, entity):
+def is_setable_data_descriptor(entity):
+    return hasattr(entity, '__get__') and hasattr(entity, '__set__')
+
+
+def is_filled_descriptor(owning_object, entity) -> bool:
     """
         class _foo:
         __slots__ = ['foo', 'bar']
@@ -668,7 +735,7 @@ def is_filled_descriptor(owning_object, entity):
     return True
 
 
-def filled_slots_names(owning_object):
+def filled_slots_names(owning_object) -> Optional[List[str]]:
     try:
         slots_names = owning_object.__slots__
     except AttributeError:
@@ -683,7 +750,7 @@ def filled_slots_names(owning_object):
     return result
 
 
-def filled_slots(owning_object):
+def filled_slots(owning_object) -> Optional[List[Any]]:
     try:
         slots_names = owning_object.__slots__
     except AttributeError:
@@ -698,7 +765,7 @@ def filled_slots(owning_object):
     return result
 
 
-def filled_slots_with_names(owning_object):
+def filled_slots_with_names(owning_object) -> Optional[List[Tuple[str, Any]]]:
     try:
         slots_names = owning_object.__slots__
     except AttributeError:
@@ -711,6 +778,32 @@ def filled_slots_with_names(owning_object):
             result.append((slot_name, slot))
     
     return result
+
+
+def filled_slots_with_names_gen(owning_object) -> Generator[Tuple[str, Any], Any, Any]:
+    try:
+        slots_names = owning_object.__slots__
+        for slot_name in slots_names:
+            slot = inspect__getattr_static(owning_object, slot_name)
+            try:
+                slot.__get__(owning_object)
+                yield (slot_name, slot)
+            except AttributeError:
+                pass
+    except AttributeError:
+        pass
+
+
+def filled_slot_names_with_values_gen(owning_object) -> Generator[Tuple[str, Any], Any, Any]:
+    try:
+        slots_names = owning_object.__slots__
+        for slot_name in slots_names:
+            try:
+                yield (slot_name, getattr(owning_object, slot_name))
+            except AttributeError:
+                pass
+    except AttributeError:
+        pass
 
 
 def current_entity_name(depth: Optional[int] = 1):

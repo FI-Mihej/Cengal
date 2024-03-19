@@ -29,7 +29,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -675,7 +675,7 @@ class SchedulerPerformanceFormatter:
             i(Yield)
             # stop = perf_counter()
             # delta_time = stop - start
-            loop: CoroScheduler = i._loop
+            loop: CoroSchedulerType = i._loop
             delta_time = loop.loop_iteration_delta_time
             self.fac(self.external_items_key, delta_time)
             self.fac(self.internal_items_key, delta_time)
@@ -1110,7 +1110,7 @@ def coro_scheduler_admin__view(i: Interface, on_close: Optional[AnyWorker] = Non
 
 
 def scheduler_stats_aggregator_provider(i: Interface, fac_key: str = 'coro_scheduler_stats'):
-    cs: CoroScheduler = i._loop
+    cs: CoroSchedulerType = i._loop
     fac = FastAggregatorClient()
     while True:
         stats_level: EntityStatsMixin.StatsLevel = EntityStatsMixin.StatsLevel.info
@@ -1121,7 +1121,7 @@ def scheduler_stats_aggregator_provider(i: Interface, fac_key: str = 'coro_sched
         i(Sleep, 0.5)
 
 
-def cs_init(cs: CoroScheduler):
+def cs_init(cs: CoroSchedulerType):
     cs.set_coro_time_measurement(True)
     cs.set_coro_history_gathering(True)
     cs.set_loop_iteration_time_measurement(True)

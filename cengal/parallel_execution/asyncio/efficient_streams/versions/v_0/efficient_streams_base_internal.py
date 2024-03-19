@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -44,8 +44,8 @@ SERVER_ANSWER__KEYWORD_ACCEPTED = b'OK'
 
 
 # DEFAULT_LIMIT = 2 ** 24  # 64 KiB
-# DEFAULT_LIMIT = CpuInfo().l2_cache_size_per_virtual_core
-# DEFAULT_LIMIT = CpuInfo().l3_cache_size
+# DEFAULT_LIMIT = cpu_info().l2_cache_size_per_virtual_core
+# DEFAULT_LIMIT = cpu_info().l3_cache_size
 DEFAULT_LIMIT = 10 * 1024**2
 
 
