@@ -30,8 +30,9 @@ jobs:
 
       - name: Prepare Setup Light
         run: |
-          prepare__setup_light.sh
-
+          chmod +x ./prepare__setup_light.sh
+          ./prepare__setup_light.sh
+        
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.17.0
         env:
@@ -73,7 +74,8 @@ jobs:
 
       - name: Prepare Setup Light
         run: |
-          prepare__setup_shell.sh
+          chmod +x ./prepare__setup_shell.sh
+          ./prepare__setup_shell.sh
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.17.0
