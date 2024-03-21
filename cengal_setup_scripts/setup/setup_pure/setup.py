@@ -51,6 +51,7 @@ setup_requires = [
     "Cython>=0.29.34",
     "py-cpuinfo",
     "typing_extensions",
+    'PyBindGen',
 ]
 
 
@@ -166,7 +167,11 @@ setuptools.setup(
         'cengal__build_tools__gather_docs': [
             'pdoc',
         ],
+        'cengal__build_tools__build_extensions': [
+            'PyBindGen',
+        ],
         'full': [
+            'PyBindGen',
             'typing_extensions',
             'pdoc',
             "psutil; platform_python_implementation != 'PyPy' or platform_system != 'Windows'",
@@ -185,6 +190,7 @@ setuptools.setup(
             "aiohttp",
         ], 
         'all': [
+            'PyBindGen',
             'typing_extensions',
             'pdoc',
             "psutil; platform_python_implementation != 'PyPy' or platform_system != 'Windows'",

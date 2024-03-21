@@ -68,6 +68,7 @@ setup_requires = [
     "Cython>=0.29.34",
     "patch-ng; python_version >= '3.12' or (platform_python_implementation == 'PyPy' and platform_system == 'Windows')",
     "typing_extensions",
+    "PyBindGen",
 ]
 pypi_requirements_list = get_pypi_requirements_list()
 if 'patch-ng' in pypi_requirements_list:

@@ -70,6 +70,7 @@ setup_requires = [
     "Cython>=0.29.34",
     "patch-ng; python_version >= '3.12' or (platform_python_implementation == 'PyPy' and platform_system == 'Windows')",
     "typing_extensions",
+    "PyBindGen",
 ]
 pypi_requirements_list = get_pypi_requirements_list()
 if 'patch-ng' in pypi_requirements_list:
@@ -214,7 +215,11 @@ setuptools.setup(
         'cengal__build_tools__gather_docs': [
             'pdoc',
         ],
+        'cengal__build_tools__build_extensions': [
+            'PyBindGen',
+        ],
         'full': [
+            'PyBindGen',
             'typing_extensions',
             'pdoc',
             "psutil; platform_python_implementation != 'PyPy' or platform_system != 'Windows'",
@@ -233,6 +238,7 @@ setuptools.setup(
             "aiohttp",
         ], 
         'all': [
+            'PyBindGen',
             'typing_extensions',
             'pdoc',
             "psutil; platform_python_implementation != 'PyPy' or platform_system != 'Windows'",
