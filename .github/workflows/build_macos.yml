@@ -40,20 +40,29 @@ jobs:
         run: |
           nimble install nimpy -y
 
-      - name: Install Go
-        run: |
-          brew install go
-          echo "export PATH=$PATH:$HOME/go/bin" >> $GITHUB_ENV
-          go version
+      # - name: Install Go
+      #   run: |
+      #     brew install go
+      #     go version
 
-      - name: Install basic Go dependencies
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.22.1'
+
+      - name: Install basic Go dependencies - 0
         run: |
           python -m pip install pybindgen
+
+      - name: Install basic Go dependencies - 1
+        run: |
           go install golang.org/x/tools/cmd/goimports@latest
           go install github.com/go-python/gopy@latest
+          echo "$HOME/go/bin" >> $GITHUB_PATH
 
       - name: Test gopy installation
         run: |
+          where gopy
           gopy version
 
       - name: Install cibuildwheel
