@@ -62,7 +62,7 @@ jobs:
 
       - name: Test gopy installation
         run: |
-          where gopy
+          which gopy
           gopy version
 
       - name: Install cibuildwheel
