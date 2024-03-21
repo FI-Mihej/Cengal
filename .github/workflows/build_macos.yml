@@ -27,9 +27,7 @@ jobs:
 
       - name: Install Nim
         run: |
-          curl -sL https://nim-lang.org/choosenim/init.sh -o init.sh
-          sh init.sh -y
-          echo "export PATH=$HOME/.nimble/bin:$PATH" >> $GITHUB_ENV
+          brew install nim
           nim --version
 
       - name: Install Go
