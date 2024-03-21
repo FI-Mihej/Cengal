@@ -80,8 +80,12 @@ jobs:
           mkdir ./wheelhouse_temp/
           python -m pip wheel . -w ./wheelhouse_temp/
           ls -la ./wheelhouse_temp/
-          auditwheel repair ./wheelhouse_temp/cengal-*-cp310-cp310-linux_x86_64.whl -w ./wheelhouse/
+          delocate-listdeps ./wheelhouse_temp/cengal_light-*-cp310-cp310-macosx_13_0_x86_64.whl
+          delocate-listdeps --all ./wheelhouse_temp/cengal_light-*-cp310-cp310-macosx_13_0_x86_64.whl
+          delocate-listdeps --depending ./wheelhouse_temp/cengal_light-*-cp310-cp310-macosx_13_0_x86_64.whl
+          delocate-wheel -w ./wheelhouse/ -v ./wheelhouse_temp/cengal_light-*-cp310-cp310-macosx_13_0_x86_64.whl
           ls -la ./wheelhouse/
+          delocate-listdeps --all ./wheelhouse/cengal_light-*-cp310-cp310-macosx_13_0_x86_64.whl
         
       # - name: Build wheels
       #   uses: pypa/cibuildwheel@v2.17.0
