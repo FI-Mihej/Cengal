@@ -25,21 +25,31 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+
       - name: Install Nim
         run: |
           brew install nim
           nim --version
+
+      - name: Install basic Nim dependencies
+        run: |
+          nimble install nimpy
 
       - name: Install Go
         run: |
           brew install go
           go version
 
-      - name: Install basic dependencies
+      - name: Install basic Go dependencies
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install --upgrade setuptools
-          python -m pip install --upgrade wheel
+          python -m pip install pybindgen
+          go install golang.org/x/tools/cmd/goimports@latest
+          go install github.com/go-python/gopy@latest
 
       - name: Install cibuildwheel
         run: python -m pip install cibuildwheel
