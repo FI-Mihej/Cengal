@@ -38,7 +38,7 @@ jobs:
 
       - name: Install basic Nim dependencies
         run: |
-          nimble install nimpy
+          nimble install nimpy -y
 
       - name: Install Go
         run: |
