@@ -1,4 +1,4 @@
-name: Build
+name: Build Cengal Shell
 
 on:
   push:
@@ -7,16 +7,14 @@ on:
     branches: [ master ]
 
 jobs:
-
-  build_wheels_shell__macos__cpython:
-    name: Build wheels on ${{ matrix.os }}
+  build_wheels_shell__macos_x64__cpython:
+    name: Build Cengal Shell wheels on ${{ matrix.os }} for CPython ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         # macos-13 is an intel runner, macos-14 is apple silicon
-        # os: [ubuntu-latest, windows-latest, macos-13, macos-14]
-        os: [macos-13, macos-14]
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        os: [macos-13]
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13.0-alpha.5']
 
     steps:
       - uses: actions/checkout@v4
@@ -31,36 +29,6 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install --upgrade setuptools
           python -m pip install --upgrade wheel
-          python -m pip install --upgrade delocate
-
-      - name: Install Nim
-        run: |
-          brew install nim
-          nim --version
-
-      - name: Install basic Nim dependencies
-        run: |
-          nimble install nimpy -y
-
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: '1.22.1'
-
-      - name: Install basic Go dependencies - 0
-        run: |
-          python -m pip install pybindgen
-
-      - name: Install basic Go dependencies - 1
-        run: |
-          go install golang.org/x/tools/cmd/goimports@latest
-          go install github.com/go-python/gopy@latest
-          echo "$HOME/go/bin" >> $GITHUB_PATH
-
-      - name: Test gopy installation
-        run: |
-          which gopy
-          gopy version
 
       - name: Prepare Setup Shell
         run: |
@@ -72,6 +40,7 @@ jobs:
         run: |
           python -m pip install -r ./requirements.txt
           mkdir ./wheelhouse_temp/
+          export ARCHFLAGS="-arch x86_64"
           python -m pip wheel . -w ./wheelhouse_temp/
           ls -la ./wheelhouse_temp/
           rename_wheel__github_actions__macos__cpython.sh ${{ matrix.python-version }} ${{ matrix.os }}
@@ -80,18 +49,17 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}-${{ matrix.python-version }}-${{ github.run_number }}-${{ github.run_attempt }}
           path: ./wheelhouse/*.whl
 
-  build_wheels_shell__macos__pypy:
-    name: Build wheels on ${{ matrix.os }}
+  build_wheels_shell__macos_arm64__cpython:
+    name: Build Cengal Shell wheels on ${{ matrix.os }} for CPython ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         # macos-13 is an intel runner, macos-14 is apple silicon
-        # os: [ubuntu-latest, windows-latest, macos-13, macos-14]
-        os: [macos-13, macos-14]
-        python-version: ['pypy-3.9', 'pypy-3.10']
+        os: [macos-14]
+        python-version: ['3.10', '3.11', '3.12', '3.13.0-alpha.5']
 
     steps:
       - uses: actions/checkout@v4
@@ -106,36 +74,51 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install --upgrade setuptools
           python -m pip install --upgrade wheel
-          python -m pip install --upgrade delocate
 
-      - name: Install Nim
+      - name: Prepare Setup Shell
         run: |
-          brew install nim
-          nim --version
-
-      - name: Install basic Nim dependencies
+          chmod +x ./prepare__setup_shell.sh
+          ./prepare__setup_shell.sh
+          chmod +x ./rename_wheel__github_actions__macos__cpython.sh
+        
+      - name: Build wheels
         run: |
-          nimble install nimpy -y
+          python -m pip install -r ./requirements.txt
+          mkdir ./wheelhouse_temp/
+          export ARCHFLAGS="-arch arm64"
+          python -m pip wheel . -w ./wheelhouse_temp/
+          ls -la ./wheelhouse_temp/
+          rename_wheel__github_actions__macos__cpython.sh ${{ matrix.python-version }} ${{ matrix.os }}
+          cp -R ./wheelhouse_temp/cengal-*.whl ./wheelhouse/
+          ls -la ./wheelhouse/
 
-      - name: Set up Go
-        uses: actions/setup-go@v3
+      - uses: actions/upload-artifact@v4
         with:
-          go-version: '1.22.1'
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}-${{ matrix.python-version }}-${{ github.run_number }}-${{ github.run_attempt }}
+          path: ./wheelhouse/*.whl
 
-      - name: Install basic Go dependencies - 0
-        run: |
-          python -m pip install pybindgen
+  build_wheels_shell__macos_x64__pypy:
+    name: Build Cengal Shell wheels on ${{ matrix.os }} for PyPy ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        os: [macos-13]
+        python-version: ['pypy-3.8', 'pypy-3.9', 'pypy-3.10']
 
-      - name: Install basic Go dependencies - 1
-        run: |
-          go install golang.org/x/tools/cmd/goimports@latest
-          go install github.com/go-python/gopy@latest
-          echo "$HOME/go/bin" >> $GITHUB_PATH
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
 
-      - name: Test gopy installation
+      - name: Install basic Python dependencies
         run: |
-          which gopy
-          gopy version
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
 
       - name: Prepare Setup Shell
         run: |
@@ -147,6 +130,7 @@ jobs:
         run: |
           python -m pip install -r ./requirements.txt
           mkdir ./wheelhouse_temp/
+          export ARCHFLAGS="-arch x86_64"
           python -m pip wheel . -w ./wheelhouse_temp/
           ls -la ./wheelhouse_temp/
           rename_wheel__github_actions__macos__pypy.sh ${{ matrix.python-version }} ${{ matrix.os }}
@@ -155,5 +139,50 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}-${{ matrix.python-version }}-${{ github.run_number }}-${{ github.run_attempt }}
+          path: ./wheelhouse/*.whl
+
+  build_wheels_shell__macos_arm64__pypy:
+    name: Build Cengal Shell wheels on ${{ matrix.os }} for PyPy ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        os: [macos-14]
+        python-version: ['pypy-3.8', 'pypy-3.9', 'pypy-3.10']
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+
+      - name: Prepare Setup Shell
+        run: |
+          chmod +x ./prepare__setup_shell.sh
+          ./prepare__setup_shell.sh
+          chmod +x ./rename_wheel__github_actions__macos__pypy.sh
+        
+      - name: Build wheels
+        run: |
+          python -m pip install -r ./requirements.txt
+          mkdir ./wheelhouse_temp/
+          export ARCHFLAGS="-arch arm64"
+          python -m pip wheel . -w ./wheelhouse_temp/
+          ls -la ./wheelhouse_temp/
+          rename_wheel__github_actions__macos__pypy.sh ${{ matrix.python-version }} ${{ matrix.os }}
+          cp -R ./wheelhouse_temp/cengal-*.whl ./wheelhouse/
+          ls -la ./wheelhouse/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}-${{ matrix.python-version }}-${{ github.run_number }}-${{ github.run_attempt }}
           path: ./wheelhouse/*.whl
