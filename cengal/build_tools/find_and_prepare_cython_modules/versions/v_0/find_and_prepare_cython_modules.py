@@ -153,7 +153,7 @@ def find_package_data(package_src_relative_path: str, good_packages: List[str], 
                     package_data.add(get_relative_path_part(file_full_path, package_full_path))
                     manifest_included_files.add(get_relative_path_part(file_full_path, root_path))
         
-        pyx_files = filtered_file_list(package_full_path, FilteringType.including, {'.pyx'}, remove_empty_items=True)
+        pyx_files = filtered_file_list(package_full_path, FilteringType.including, {'.pyx'})
         for dirpath, dirnames, filenames in pyx_files:
             dirpath_rel = RelativePath(dirpath)
             for filename in filenames:
