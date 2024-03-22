@@ -118,6 +118,13 @@ jobs:
         run: |
           find /Users/runner/hostedtoolcache/PyPy/ -name 'libpypy3-c*.dylib'
 
+      - name: Create symlink for libpython3.10.dylib to PyPy's libpypy3-c.dylib
+        run: |
+          sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.8.16/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.10.dylib
+
+      - name: Set LD_LIBRARY_PATH
+        run: echo "LD_LIBRARY_PATH=/usr/local/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
+
       - name: Set LD_LIBRARY_PATH for Python
         run: |
           PYTHON_LIB=$(python -c "import sysconfig; print(sysconfig.get_config_var('LIBDIR'))")

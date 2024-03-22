@@ -307,6 +307,17 @@ def change_current_dir(new_current_dir):
         os.chdir(cur_dir)
 
 
+@contextmanager
+def secure_current_dir():
+    cur_dir = os.getcwd()
+    try:
+        yield
+    except:
+        raise
+    finally:
+        os.chdir(cur_dir)
+
+
 def get_dir_hash(full_dir_path, hash_format_string=None):
     hash_format_string = hash_format_string or '{} {}'
     result_list = filtered_file_list_traversal(full_dir_path, FilteringType.off)

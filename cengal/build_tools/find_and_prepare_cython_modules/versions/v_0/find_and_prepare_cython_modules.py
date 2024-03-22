@@ -41,7 +41,8 @@ from setuptools._distutils.dist import Distribution
 
 from cengal.file_system.path_manager import path_relative_to_src, RelativePath, get_relative_path_part, sep
 from cengal.file_system.directory_manager import current_src_dir
-from cengal.file_system.directory_manager import filtered_file_list, FilteringType, filtered_file_list_traversal, file_list_traversal, FilteringEntity, change_current_dir
+from cengal.file_system.directory_manager import filtered_file_list, FilteringType, filtered_file_list_traversal, file_list_traversal, FilteringEntity, \
+    change_current_dir, secure_current_dir
 from cengal.build_tools.prepare_cflags import prepare_cflags, concat_cflags, prepare_compile_time_env, prepare_cflags_dict
 from cengal.introspection.inspect import get_exception, entity_repr_limited_try_qualname, pifrl, pdi, class_properties_values_including_overrided
 from cengal.system import OS_TYPE, TEMPLATE_MODULE_NAME
@@ -260,176 +261,177 @@ def find_and_prepare_cython_modules(package_src_relative_path: str, additional_c
     print(f'<<find_and_prepare_cython_modules>>: {getcwd()=}')
 
     try:
-        depth = depth or 0
-        depth += 1
-        root_rel = RelativePath(current_src_dir(depth)) if root_rel is None else root_rel
-        root_path = root_rel('')
-        package_src_rel = RelativePath(root_rel(package_src_relative_path))
-        package_src_path = package_src_rel('')
+        with secure_current_dir():
+            depth = depth or 0
+            depth += 1
+            root_rel = RelativePath(current_src_dir(depth)) if root_rel is None else root_rel
+            root_path = root_rel('')
+            package_src_rel = RelativePath(root_rel(package_src_relative_path))
+            package_src_path = package_src_rel('')
 
-        travers_result = filtered_file_list_traversal(package_src_path, FilteringType.off, None, remove_empty_items=True, use_spinner=False)
-        for dir_path, dirs, files in travers_result:
-            if '__pycache__' in dirs:
-                pycache_path = RelativePath(dir_path)('__pycache__')
-                try:
-                    rmtree(pycache_path)
-                except OSError as e:
-                    print(get_exception())
+            travers_result = filtered_file_list_traversal(package_src_path, FilteringType.off, None, remove_empty_items=True, use_spinner=False)
+            for dir_path, dirs, files in travers_result:
+                if '__pycache__' in dirs:
+                    pycache_path = RelativePath(dir_path)('__pycache__')
+                    try:
+                        rmtree(pycache_path)
+                    except OSError as e:
+                        print(get_exception())
 
 
-        def filter(filtering_entity: FilteringEntity, data):
-            if FilteringEntity.dirpath == filtering_entity:
+            def filter(filtering_entity: FilteringEntity, data):
+                if FilteringEntity.dirpath == filtering_entity:
+                    # Ignore package_src/_template_module
+                    dirpath, dirnames, filenames = data
+                    rel_path = get_relative_path_part(dirpath, package_src_path)
+                    rel_path = rel_path.strip()
+                    if rel_path:
+                        rel_path_parts = rel_path.split(sep)
+                        if rel_path_parts and TEMPLATE_MODULE_NAME == rel_path_parts[0]:
+                            return False
+                    
+                    return True
+                elif FilteringEntity.dirname == filtering_entity:
+                    return True
+                elif FilteringEntity.filename == filtering_entity:
+                    dirpath, filename = data
+                    if BUILD_CONFIG_FILENAME == filename:
+                        return True
+                    
+                    file_name, file_extension = splitext(filename)
+                    if file_extension in all_ext:
+                        return True
+                    
+                    return False
+                elif FilteringEntity.aggregated == filtering_entity:
+                    return data
+                else:
+                    raise NotImplementedError()
+                
+            travers_result = file_list_traversal(package_src_path, filter, remove_empty_dirpaths=True)
+            # travers_result = filtered_file_list_traversal(package_src_path, FilteringType.including, {'.pyx', '.c', '.lib', '.dll', '.so'}, remove_empty_items=True, use_spinner=False)
+            
+            result = list()
+            for dir_path, dirs, files in travers_result:
                 # Ignore package_src/_template_module
-                dirpath, dirnames, filenames = data
-                rel_path = get_relative_path_part(dirpath, package_src_path)
+                rel_path = get_relative_path_part(dir_path, package_src_path)
                 rel_path = rel_path.strip()
                 if rel_path:
                     rel_path_parts = rel_path.split(sep)
                     if rel_path_parts and TEMPLATE_MODULE_NAME == rel_path_parts[0]:
-                        return False
-                
-                return True
-            elif FilteringEntity.dirname == filtering_entity:
-                return True
-            elif FilteringEntity.filename == filtering_entity:
-                dirpath, filename = data
-                if BUILD_CONFIG_FILENAME == filename:
-                    return True
-                
-                file_name, file_extension = splitext(filename)
-                if file_extension in all_ext:
-                    return True
-                
-                return False
-            elif FilteringEntity.aggregated == filtering_entity:
-                return data
-            else:
-                raise NotImplementedError()
-            
-        travers_result = file_list_traversal(package_src_path, filter, remove_empty_dirpaths=True)
-        # travers_result = filtered_file_list_traversal(package_src_path, FilteringType.including, {'.pyx', '.c', '.lib', '.dll', '.so'}, remove_empty_items=True, use_spinner=False)
-        
-        result = list()
-        for dir_path, dirs, files in travers_result:
-            # Ignore package_src/_template_module
-            rel_path = get_relative_path_part(dir_path, package_src_path)
-            rel_path = rel_path.strip()
-            if rel_path:
-                rel_path_parts = rel_path.split(sep)
-                if rel_path_parts and TEMPLATE_MODULE_NAME == rel_path_parts[0]:
-                    continue
+                        continue
 
-            dir_path_obj = RelativePath(dir_path)
-            extensions = dict()
-            for file in files:
-                filename, file_extension = splitext(file)
-                if file_extension not in extensions:
-                    extensions[file_extension] = set()
+                dir_path_obj = RelativePath(dir_path)
+                extensions = dict()
+                for file in files:
+                    filename, file_extension = splitext(file)
+                    if file_extension not in extensions:
+                        extensions[file_extension] = set()
+                    
+                    extensions[file_extension].add(file)
                 
-                extensions[file_extension].add(file)
-            
-            is_exctension: bool = False
-            build_config: dict = None
-            if BUILD_CONFIG_FILENAME in files:
-                build_config_module_name, _ = splitext(BUILD_CONFIG_FILENAME)
-                build_config_full_path: str = dir_path_obj(build_config_module_name)
-                name = get_relative_path_part(build_config_full_path, root_rel(''))
-                name_parts = name.split(sep)
-                module_full_name = '.'.join([name_part for name_part in name_parts if name_part])
-                build_config_module = importlib.import_module(module_full_name)
-                build_config = build_config_module.build_config()
-                is_exctension = True
+                is_exctension: bool = False
+                build_config: dict = None
+                if BUILD_CONFIG_FILENAME in files:
+                    build_config_module_name, _ = splitext(BUILD_CONFIG_FILENAME)
+                    build_config_full_path: str = dir_path_obj(build_config_module_name)
+                    name = get_relative_path_part(build_config_full_path, root_rel(''))
+                    name_parts = name.split(sep)
+                    module_full_name = '.'.join([name_part for name_part in name_parts if name_part])
+                    build_config_module = importlib.import_module(module_full_name)
+                    build_config = build_config_module.build_config()
+                    is_exctension = True
 
-            sub_result = list()
-            if (cython_file_ext in extensions) or (build_config is not None):
-                for file_extension, files in extensions.items():
-                    for file in files:
-                        if file_extension.lower() in (compilable_ext | headers_ext):
-                            is_exctension = True
-                            sub_result.append(path_join('.', get_relative_path_part(dir_path_obj(file), root_path)))
-                        
-                        if file_extension.lower() in codegen_files_ext:
-                            filename, _ = splitext(file)
-                            if filename.endswith('__cython') or filename.endswith('__compiled') or filename.endswith('__python'):
+                sub_result = list()
+                if (cython_file_ext in extensions) or (build_config is not None):
+                    for file_extension, files in extensions.items():
+                        for file in files:
+                            if file_extension.lower() in (compilable_ext | headers_ext):
+                                is_exctension = True
+                                sub_result.append(path_join('.', get_relative_path_part(dir_path_obj(file), root_path)))
+                            
+                            if file_extension.lower() in codegen_files_ext:
+                                filename, _ = splitext(file)
+                                if filename.endswith('__cython') or filename.endswith('__compiled') or filename.endswith('__python'):
+                                    try:
+                                        remove(dir_path_obj(file))
+                                    except OSError as e:
+                                        print(get_exception())
+                                else:
+                                    is_exctension = True
+                                    sub_result.append(path_join('.', get_relative_path_part(dir_path_obj(file), root_path)))
+                            
+                            if file_extension.lower() in libs_ext:
                                 try:
                                     remove(dir_path_obj(file))
                                 except OSError as e:
                                     print(get_exception())
-                            else:
-                                is_exctension = True
-                                sub_result.append(path_join('.', get_relative_path_part(dir_path_obj(file), root_path)))
-                        
-                        if file_extension.lower() in libs_ext:
-                            try:
-                                remove(dir_path_obj(file))
-                            except OSError as e:
-                                print(get_exception())
-            
-            if is_exctension:
-                name = get_relative_path_part(dir_path_obj(''), root_rel(''))
-                name_parts = name.split(sep)
-                if build_config is None:
-                    if 1 == len(sub_result) and sub_result[0].endswith(cython_file_ext):
-                        name_parts.append(get_file_name_without_extension(sub_result[0]))
-                    else:
-                        name_parts.append('cython_module')
-                    
-                    name = '.'.join([name_part for name_part in name_parts if name_part])
-                    extension: CythonExtension = CythonExtension(
-                        name, 
-                        sources=list(set(sub_result)),
-                        language="c",
-                        # cython_compile_time_env=prepare_cflags_dict(additional_cflags),
-                        define_macros=prepare_cflags_dict(additional_cflags),
-                    )
-                else:
-                    if isinstance(build_config, (dict, tuple)):
-                        extension_type = CythonExtension
-                        if isinstance(build_config, tuple):
-                            extension_type, build_config = build_config
-                            extension_type = extension_type if extension_type is not None else CythonExtension
-                        
-                        if 'Windows' == OS_TYPE:
-                            # CythonExtension :raises setuptools.errors.PlatformError: if 'runtime_library_dirs' is specified on Windows. (since v63)
-                            build_config.pop('runtime_library_dirs', None)
-                        
-                        name_parts.append(build_config['name'])
-                        name = '.'.join([name_part for name_part in name_parts if name_part])
-                        build_config.pop('name', None)
-
-                        cython_compile_time_env=prepare_cflags_dict(additional_cflags)
-                        if 'cython_compile_time_env' in build_config:
-                            cython_compile_time_env.update(build_config['cython_compile_time_env'])
-                            build_config.pop('cython_compile_time_env', None)
-
-                        define_macros=prepare_cflags_dict(additional_cflags)
-                        if 'define_macros' in build_config:
-                            define_macros.update(build_config['define_macros'])
-                            build_config.pop('define_macros', None)
-                        
-                        sources = extend_file_names_to_root_relative_paths(root_path, dir_path_obj, build_config.pop('sources', list()))
-                        sources.extend(sub_result)
-                        
-                        extension: CythonExtension = extension_type(
-                            name, 
-                            sources=list(set(sources)),
-                            # cython_compile_time_env=cython_compile_time_env,
-                            define_macros=define_macros,
-                            **build_config
-                        )
-                    elif isinstance(build_config, CengalBuildExtension):
-                        build_config.path = dir_path_obj(BUILD_CONFIG_FILENAME)
-                        build_config.module_import_str = module_full_name
-                        build_config.files.extend(sub_result)
-                        extension = build_config
-                    else:
-                        raise RuntimeError(f'Unknown build_config type: {type(build_config)}')
                 
-                result.append(extension)
-            else:
-                result.extend(sub_result)
-        
-        return result
+                if is_exctension:
+                    name = get_relative_path_part(dir_path_obj(''), root_rel(''))
+                    name_parts = name.split(sep)
+                    if build_config is None:
+                        if 1 == len(sub_result) and sub_result[0].endswith(cython_file_ext):
+                            name_parts.append(get_file_name_without_extension(sub_result[0]))
+                        else:
+                            name_parts.append('cython_module')
+                        
+                        name = '.'.join([name_part for name_part in name_parts if name_part])
+                        extension: CythonExtension = CythonExtension(
+                            name, 
+                            sources=list(set(sub_result)),
+                            language="c",
+                            # cython_compile_time_env=prepare_cflags_dict(additional_cflags),
+                            define_macros=prepare_cflags_dict(additional_cflags),
+                        )
+                    else:
+                        if isinstance(build_config, (dict, tuple)):
+                            extension_type = CythonExtension
+                            if isinstance(build_config, tuple):
+                                extension_type, build_config = build_config
+                                extension_type = extension_type if extension_type is not None else CythonExtension
+                            
+                            if 'Windows' == OS_TYPE:
+                                # CythonExtension :raises setuptools.errors.PlatformError: if 'runtime_library_dirs' is specified on Windows. (since v63)
+                                build_config.pop('runtime_library_dirs', None)
+                            
+                            name_parts.append(build_config['name'])
+                            name = '.'.join([name_part for name_part in name_parts if name_part])
+                            build_config.pop('name', None)
+
+                            cython_compile_time_env=prepare_cflags_dict(additional_cflags)
+                            if 'cython_compile_time_env' in build_config:
+                                cython_compile_time_env.update(build_config['cython_compile_time_env'])
+                                build_config.pop('cython_compile_time_env', None)
+
+                            define_macros=prepare_cflags_dict(additional_cflags)
+                            if 'define_macros' in build_config:
+                                define_macros.update(build_config['define_macros'])
+                                build_config.pop('define_macros', None)
+                            
+                            sources = extend_file_names_to_root_relative_paths(root_path, dir_path_obj, build_config.pop('sources', list()))
+                            sources.extend(sub_result)
+                            
+                            extension: CythonExtension = extension_type(
+                                name, 
+                                sources=list(set(sources)),
+                                # cython_compile_time_env=cython_compile_time_env,
+                                define_macros=define_macros,
+                                **build_config
+                            )
+                        elif isinstance(build_config, CengalBuildExtension):
+                            build_config.path = dir_path_obj(BUILD_CONFIG_FILENAME)
+                            build_config.module_import_str = module_full_name
+                            build_config.files.extend(sub_result)
+                            extension = build_config
+                        else:
+                            raise RuntimeError(f'Unknown build_config type: {type(build_config)}')
+                    
+                    result.append(extension)
+                else:
+                    result.extend(sub_result)
+            
+            return result
     finally:
         print(f'<<find_and_prepare_cython_modules finally>>: {getcwd()=}')
 
@@ -451,14 +453,16 @@ class sdist(sdist_orig):
     def run(self):
         print(f'<<sdist run>>: {getcwd()=}')
         try:
-            if self.build_config.package_build_is_in_debug_mode in environ:
-                import debugpy
-                debugpy.breakpoint()
+            with secure_current_dir():
+                if self.build_config.package_build_is_in_debug_mode in environ:
+                    import debugpy
+                    debugpy.breakpoint()
+                
+                print("sdist command is currently being run")
+                environ[self.build_config.package_build_is_in_sdist_mode] = 'True'
+                packages_data_dict, manifest_included_files = self.build_config.find_package_data()
+                generate_manifest_included_files(manifest_included_files, self.build_config.root_rel)
             
-            print("sdist command is currently being run")
-            environ[self.build_config.package_build_is_in_sdist_mode] = 'True'
-            packages_data_dict, manifest_included_files = self.build_config.find_package_data()
-            generate_manifest_included_files(manifest_included_files, self.build_config.root_rel)
             super().run()
         finally:
             print(f'<<sdist run finally>>: {getcwd()=}')
@@ -472,22 +476,23 @@ class build(build_orig):
     def finalize_options(self):
         print(f'<<build finalize_options>>: {getcwd()=}')
         try:
-            setuptools_extensions = [ext for ext in self.distribution.ext_modules if isinstance(ext, SetuptoolsExtension)]
-            cython_extensions = [ext for ext in self.distribution.ext_modules if isinstance(ext, CythonExtension)]
-            cengal_extensions = (ext for ext in self.distribution.ext_modules if (isinstance(ext, CengalBuildExtension) and (not ext.store_as_data)))
-            cengal_result_extensions = [ext() for ext in cengal_extensions]
-            setuptools_extensions.extend([ext for ext in cengal_result_extensions if isinstance(ext, SetuptoolsExtension)])
-            cython_extensions.extend([ext for ext in cengal_result_extensions if isinstance(ext, CythonExtension)])
-            cengal_extensions_store_as_data = (ext for ext in self.distribution.ext_modules if (isinstance(ext, CengalBuildExtension) and ext.store_as_data))
+            with secure_current_dir():
+                setuptools_extensions = [ext for ext in self.distribution.ext_modules if isinstance(ext, SetuptoolsExtension)]
+                cython_extensions = [ext for ext in self.distribution.ext_modules if isinstance(ext, CythonExtension)]
+                cengal_extensions = (ext for ext in self.distribution.ext_modules if (isinstance(ext, CengalBuildExtension) and (not ext.store_as_data)))
+                cengal_result_extensions = [ext() for ext in cengal_extensions]
+                setuptools_extensions.extend([ext for ext in cengal_result_extensions if isinstance(ext, SetuptoolsExtension)])
+                cython_extensions.extend([ext for ext in cengal_result_extensions if isinstance(ext, CythonExtension)])
+                cengal_extensions_store_as_data = (ext for ext in self.distribution.ext_modules if (isinstance(ext, CengalBuildExtension) and ext.store_as_data))
 
-            if self.build_config.package_build_is_in_debug_mode in environ:
-                import debugpy
-                debugpy.breakpoint()
+                if self.build_config.package_build_is_in_debug_mode in environ:
+                    import debugpy
+                    debugpy.breakpoint()
             
             super().finalize_options()
             print(f'<<build finalize_options super()>>: {getcwd()=}')
 
-            with change_current_dir(self.build_config.root_rel('')):
+            with secure_current_dir():
                 print(f'<<build finalize_options change_current_dir>>: {getcwd()=}')
                 package_data = self.distribution.package_data or dict()
                 
