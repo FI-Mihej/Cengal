@@ -168,8 +168,9 @@ class CengalGoBuildExtension(CengalBuildExtension):
         self.out_dir: str = None
         self.flags: Optional[List[str]] = flags or list()
         self.definitions: Optional[Union[Sequence[str], Dict[str, Union[Union[None, bool, int, str], Tuple[bool, Union[None, bool, str, int]]]]]] = definitions or dict()
-        self.result_definitions: Optional[Dict[str, Union[None, bool, int, float, str]]] = prepare_compile_time_env(list_to_dict(prepare_compile_time_flags()))
-        self.result_definitions = adjust_definition_names(self.result_definitions, 'CF_', 'CD_')  # CF is Cengal Flag; CD is Cengal Definition
+        result_flags = adjust_definition_names(list_to_dict(prepare_compile_time_flags()), 'CF_', 'CD_')  # CF is Cengal Flag; CD is Cengal Definition
+        self.result_definitions: Optional[Dict[str, Union[None, bool, int, float, str]]] = adjust_definition_names(prepare_compile_time_env(), 'CF_', 'CD_')  # CF is Cengal Flag; CD is Cengal Definition
+        self.result_definitions.update(result_flags)
         self.result_definitions.update(dict_of_tuples_to_dict(list_to_dict(definitions)))
         self.result_definitions.update(list_to_dict(flags))
         self.additional_build_params: Optional[List[str]] = additional_build_params

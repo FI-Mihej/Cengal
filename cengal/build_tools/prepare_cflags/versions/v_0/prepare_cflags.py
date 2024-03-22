@@ -214,8 +214,9 @@ def adjust_definition_names(definitions: Dict[str, Union[None, bool, int, str]],
 
 def prepare_cflags(additional_cflags: Optional[Union[Sequence[str], Dict[str, Union[Union[None, bool, int, str], Tuple[bool, Union[None, bool, str, int]]]]]] = None) -> List[Union[None, int, str]]:
     adjusted_additional_cflags: Dict[str, Union[None, bool, int, str]] = dict_of_tuples_to_dict(list_to_dict(additional_cflags))
-    definitions: Dict[str, Union[None, bool, int, str]] = prepare_compile_time_env(list_to_dict(prepare_compile_time_flags()))
-    definitions = adjust_definition_names(definitions, 'CF_', 'CD_')  # CF is Cengal Flag; CD is Cengal Definition
+    flags: Dict[str, None] = adjust_definition_names(list_to_dict(prepare_compile_time_flags()), 'CF_', 'CD_')  # CF is Cengal Flag; CD is Cengal Definition
+    definitions: Dict[str, Union[None, bool, int, str]] = adjust_definition_names(prepare_compile_time_env(), 'CF_', 'CD_')  # CF is Cengal Flag; CD is Cengal Definition
+    definitions.update(flags)
     definitions.update(adjusted_additional_cflags)
     params: List[Union[None, int, str]] = [prepare_definition(name, value) for name, value in definitions.items()]
     
@@ -228,8 +229,9 @@ def prepare_cflags(additional_cflags: Optional[Union[Sequence[str], Dict[str, Un
 
 def prepare_cflags_dict(additional_cflags: Optional[Union[Sequence[str], Dict[str, Union[Union[None, bool, int, str], Tuple[bool, Union[None, bool, str, int]]]]]] = None) -> Dict[str, Union[None, bool, int, str]]:
     adjusted_additional_cflags: Dict[str, Union[None, bool, int, str]] = dict_of_tuples_to_dict(list_to_dict(additional_cflags))
-    definitions: Dict[str, Union[None, bool, int, str]] = prepare_compile_time_env(list_to_dict(prepare_compile_time_flags()))
-    definitions = adjust_definition_names(definitions, 'CF_', 'CD_')  # CF is Cengal Flag; CD is Cengal Definition
+    flags: Dict[str, None] = adjust_definition_names(list_to_dict(prepare_compile_time_flags()), 'CF_', 'CD_')  # CF is Cengal Flag; CD is Cengal Definition
+    definitions: Dict[str, Union[None, bool, int, str]] = adjust_definition_names(prepare_compile_time_env(), 'CF_', 'CD_')  # CF is Cengal Flag; CD is Cengal Definition
+    definitions.update(flags)
     definitions.update(adjusted_additional_cflags)
     result: Dict[str, Union[None, bool, int, str]] = {name: prepare_definition_value_raw(value) for name, value in definitions.items()}
     
