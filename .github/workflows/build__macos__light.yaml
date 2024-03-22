@@ -1,4 +1,4 @@
-name: Build
+name: Build Cengal Light
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build_wheels_light__macos_x64__cpython:
-    name: Build wheels on ${{ matrix.os }}
+    name: Build Cengal Light wheels on ${{ matrix.os }} for CPython ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -84,7 +84,7 @@ jobs:
           path: ./wheelhouse/*.whl
 
   build_wheels_light__macos_arm64__cpython:
-    name: Build wheels on ${{ matrix.os }}
+    name: Build Cengal Light wheels on ${{ matrix.os }} for CPython ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -160,7 +160,7 @@ jobs:
           path: ./wheelhouse/*.whl
 
   build_wheels_light__macos_x64__pypy:
-    name: Build wheels on ${{ matrix.os }}
+    name: Build Cengal Light wheels on ${{ matrix.os }} for PyPy ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -262,7 +262,7 @@ jobs:
           path: ./wheelhouse/*.whl
 
   build_wheels_light__macos_arm64__pypy:
-    name: Build wheels on ${{ matrix.os }}
+    name: Build Cengal Light wheels on ${{ matrix.os }} for PyPy ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
