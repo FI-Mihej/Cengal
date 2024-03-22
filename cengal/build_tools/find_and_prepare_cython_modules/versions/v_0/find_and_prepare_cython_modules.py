@@ -493,13 +493,14 @@ class build(build_orig):
             from Cython.Build import cythonize
             result_ext_modules = list()
             try:
+                cwd_before_cythonize = getcwd()
                 result_ext_modules.extend(remove_header_files(
                     cythonize(process_macros(cython_extensions),
                     compiler_directives={'language_level': '3'},
                     compile_time_env = prepare_cflags_dict(self.build_config.additional_cflags),
                     )))
             except:
-                print(f'{getcwd()=}')
+                print(f'DEBUG: {cwd_before_cythonize=} | {getcwd()=}')
                 for extension in cython_extensions:
                     pprint(class_properties_values_including_overrided(extension))
                 
