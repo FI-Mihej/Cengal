@@ -43,7 +43,7 @@ jobs:
           export ARCHFLAGS="-arch x86_64"
           python -m pip wheel . -w ./wheelhouse_temp/
           ls -la ./wheelhouse_temp/
-          rename_wheel__github_actions__macos__cpython.sh ${{ matrix.python-version }} ${{ matrix.os }}
+          ./rename_wheel__github_actions__macos__cpython.sh ${{ matrix.python-version }} ${{ matrix.os }}
           cp -R ./wheelhouse_temp/cengal-*.whl ./wheelhouse/
           ls -la ./wheelhouse/
 
@@ -88,7 +88,7 @@ jobs:
           export ARCHFLAGS="-arch arm64"
           python -m pip wheel . -w ./wheelhouse_temp/
           ls -la ./wheelhouse_temp/
-          rename_wheel__github_actions__macos__cpython.sh ${{ matrix.python-version }} ${{ matrix.os }}
+          ./rename_wheel__github_actions__macos__cpython.sh ${{ matrix.python-version }} ${{ matrix.os }}
           cp -R ./wheelhouse_temp/cengal-*.whl ./wheelhouse/
           ls -la ./wheelhouse/
 
@@ -133,7 +133,7 @@ jobs:
           export ARCHFLAGS="-arch x86_64"
           python -m pip wheel . -w ./wheelhouse_temp/
           ls -la ./wheelhouse_temp/
-          rename_wheel__github_actions__macos__pypy.sh ${{ matrix.python-version }} ${{ matrix.os }}
+          ./rename_wheel__github_actions__macos__pypy.sh ${{ matrix.python-version }} ${{ matrix.os }}
           cp -R ./wheelhouse_temp/cengal-*.whl ./wheelhouse/
           ls -la ./wheelhouse/
 
@@ -178,7 +178,7 @@ jobs:
           export ARCHFLAGS="-arch arm64"
           python -m pip wheel . -w ./wheelhouse_temp/
           ls -la ./wheelhouse_temp/
-          rename_wheel__github_actions__macos__pypy.sh ${{ matrix.python-version }} ${{ matrix.os }}
+          ./rename_wheel__github_actions__macos__pypy.sh ${{ matrix.python-version }} ${{ matrix.os }}
           cp -R ./wheelhouse_temp/cengal-*.whl ./wheelhouse/
           ls -la ./wheelhouse/
 
