@@ -154,12 +154,13 @@ def find_package_data(package_src_relative_path: str, good_packages: List[str], 
                     manifest_included_files.add(get_relative_path_part(file_full_path, root_path))
         
         pyx_files = filtered_file_list(package_full_path, FilteringType.including, {'.pyx'})
-        for dirpath, dirnames, filenames in pyx_files:
-            dirpath_rel = RelativePath(dirpath)
-            for filename in filenames:
-                file_full_path = dirpath_rel(filename)
-                package_data.add(get_relative_path_part(file_full_path, package_full_path))
-                manifest_included_files.add(get_relative_path_part(file_full_path, root_path))
+        if pyx_files:
+            for dirpath, dirnames, filenames in pyx_files:
+                dirpath_rel = RelativePath(dirpath)
+                for filename in filenames:
+                    file_full_path = dirpath_rel(filename)
+                    package_data.add(get_relative_path_part(file_full_path, package_full_path))
+                    manifest_included_files.add(get_relative_path_part(file_full_path, root_path))
         
         if package_data:
             packages_data_dict[package_name] = list(package_data)
