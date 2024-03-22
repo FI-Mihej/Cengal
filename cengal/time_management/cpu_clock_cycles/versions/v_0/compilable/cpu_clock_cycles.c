@@ -46,9 +46,11 @@ extern unsigned long long c_cpu_clock_cycles()
 
 #elif defined(CF_IS_ARM)
 
-extern u64 c_cpu_clock_cycles()
+#include <stdint.h>
+
+extern uint64_t c_cpu_clock_cycles()
 {
-    u64 result;
+    uint64_t result;
     asm volatile(
         "mrs %0, cntvct_el0"
         : "=r" (result)

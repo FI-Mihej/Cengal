@@ -35,11 +35,13 @@ __status__ = "Development"
 
 
 IF CD_IS_ARM == 1:
-    cdef extern from "cpu_clock_cycles.h":
-        u64 c_cpu_clock_cycles() nogil
+    from libc.stdint cimport uint64_t
 
-    cpdef u64 cpu_clock_cycles():
-        cdef u64 result = c_cpu_clock_cycles()
+    cdef extern from "cpu_clock_cycles.h":
+        uint64_t c_cpu_clock_cycles() nogil
+
+    cpdef uint64_t cpu_clock_cycles():
+        cdef uint64_t result = c_cpu_clock_cycles()
         return result
 
 ELSE:

@@ -45,6 +45,7 @@ from cengal.file_system.directory_manager import filtered_file_list, FilteringTy
     change_current_dir, secure_current_dir
 from cengal.build_tools.prepare_cflags import prepare_cflags, concat_cflags, prepare_compile_time_env, prepare_cflags_dict
 from cengal.introspection.inspect import get_exception, entity_repr_limited_try_qualname, pifrl, pdi, class_properties_values_including_overrided
+from cengal.hardware.info.cpu import cpu_info
 from cengal.system import OS_TYPE, TEMPLATE_MODULE_NAME
 from shutil import rmtree
 from os import remove, getcwd
@@ -511,6 +512,18 @@ class build(build_orig):
                     raise
                 
                 result_ext_modules.extend(setuptools_extensions)
+                for ext in result_ext_modules:
+                    if not hasattr(ext, 'extra_compile_args'):
+                        ext.extra_compile_args = list()
+                    
+                    if ext.extra_compile_args is None:
+                        ext.extra_compile_args = list()
+                    
+                    if 'Darwin' == OS_TYPE:
+                        if cpu_info().is_x86:
+                            ext.extra_compile_args += ['-arch', 'x86_64']
+                        elif cpu_info().is_arm:
+                            ext.extra_compile_args += ['-arch', 'arm64']
                 
                 self.distribution.package_data = package_data
                 self.distribution.ext_modules = result_ext_modules
@@ -554,7 +567,7 @@ class build_ext(build_ext_orig):
                 package_data[ext.package].extend(files)
 
             from Cython.Build import cythonize
-            result_ext_modules = list()
+            result_ext_modules: SetuptoolsExtension = list()
             result_ext_modules.extend(remove_header_files(
                 cythonize(process_macros(cython_extensions),
                 compiler_directives={'language_level': '3'},
