@@ -114,6 +114,10 @@ jobs:
       - name: List Header Files
         run: ls -l $(pypy3 -c "import sysconfig; print(sysconfig.get_path('include'))")
 
+      - name: Find PyPy's libpython
+        run: |
+          find /Users/runner/hostedtoolcache/PyPy/ -name 'libpypy3-c*.dylib'
+
       - name: Set LD_LIBRARY_PATH for Python
         run: |
           PYTHON_LIB=$(python -c "import sysconfig; print(sysconfig.get_config_var('LIBDIR'))")
