@@ -69,7 +69,7 @@ from setuptools.discovery import find_package_path
 import subprocess
 from cengal.build_tools.build_extensions import *
 from pprint import pprint
-from typing import List, Dict, Optional, Iterable, Callable, Sequence, Tuple, Union, Type
+from typing import List, Dict, Optional, Iterable, Callable, Sequence, Tuple, Union, Type, Set
 
 
 _PYTHON_VERSION = platform.python_version_tuple()
@@ -136,27 +136,35 @@ def find_package_data(package_src_relative_path: str, good_packages: List[str], 
     print(f'{package_src_path=}')
 
     packages_data_dict: Dict[str, List[str]] = dict()
-    manifest_included_files: List[str] = list()
+    manifest_included_files: Set[str] = set()
     for package_name in good_packages:
         package_path = find_package_path(package_name, dict(), '')
         package_full_path: str = root_rel(package_path)
         package_full_path_rel: RelativePath = RelativePath(package_full_path)
+        package_data: Set[str] = set()
         possible_data_dir: str = package_full_path_rel('data')
         if exists(possible_data_dir) and isdir(possible_data_dir):
             possible_data_dir_rel = RelativePath(possible_data_dir)
             travers_result = file_list_traversal(possible_data_dir, find_package_data_filter, remove_empty_dirpaths=False)
-            package_data = list()
             for dirpath, dirnames, filenames in travers_result:
                 dirpath_rel = RelativePath(dirpath)
                 for filename in filenames:
                     file_full_path = dirpath_rel(filename)
-                    package_data.append(get_relative_path_part(file_full_path, package_full_path))
-                    manifest_included_files.append(get_relative_path_part(file_full_path, root_path))
-            
-            if package_data:
-                packages_data_dict[package_name] = package_data
+                    package_data.add(get_relative_path_part(file_full_path, package_full_path))
+                    manifest_included_files.add(get_relative_path_part(file_full_path, root_path))
+        
+        pyx_files = filtered_file_list(package_full_path, FilteringType.including, {'.pyx'}, remove_empty_items=True)
+        for dirpath, dirnames, filenames in pyx_files:
+            dirpath_rel = RelativePath(dirpath)
+            for filename in filenames:
+                file_full_path = dirpath_rel(filename)
+                package_data.add(get_relative_path_part(file_full_path, package_full_path))
+                manifest_included_files.add(get_relative_path_part(file_full_path, root_path))
+        
+        if package_data:
+            packages_data_dict[package_name] = list(package_data)
 
-    return packages_data_dict, manifest_included_files
+    return packages_data_dict, list(manifest_included_files)
 
 
 def generate_manifest_included_files(manifest_included_files: List[str], root_rel: RelativePath):
