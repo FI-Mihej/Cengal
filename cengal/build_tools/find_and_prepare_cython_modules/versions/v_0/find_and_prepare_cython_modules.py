@@ -43,10 +43,10 @@ from cengal.file_system.path_manager import path_relative_to_src, RelativePath, 
 from cengal.file_system.directory_manager import current_src_dir
 from cengal.file_system.directory_manager import filtered_file_list, FilteringType, filtered_file_list_traversal, file_list_traversal, FilteringEntity
 from cengal.build_tools.prepare_cflags import prepare_cflags, concat_cflags, prepare_compile_time_env, prepare_cflags_dict
-from cengal.introspection.inspect import get_exception, entity_repr_limited_try_qualname, pifrl, pdi
+from cengal.introspection.inspect import get_exception, entity_repr_limited_try_qualname, pifrl, pdi, class_properties_values_including_overrided
 from cengal.system import OS_TYPE, TEMPLATE_MODULE_NAME
 from shutil import rmtree
-from os import remove
+from os import remove, getcwd
 from os.path import splitext, normpath, join as path_join, basename, split
 from setuptools import Extension as SetuptoolsExtension
 from Cython.Distutils import Extension as CythonExtension
@@ -461,6 +461,7 @@ class build(build_orig):
         super().__init__(dist)
 
     def finalize_options(self):
+        print(f'<<finalize_options>>: {getcwd()=}')
         setuptools_extensions = [ext for ext in self.distribution.ext_modules if isinstance(ext, SetuptoolsExtension)]
         cython_extensions = [ext for ext in self.distribution.ext_modules if isinstance(ext, CythonExtension)]
         cengal_extensions = (ext for ext in self.distribution.ext_modules if (isinstance(ext, CengalBuildExtension) and (not ext.store_as_data)))
@@ -474,6 +475,7 @@ class build(build_orig):
             debugpy.breakpoint()
         
         super().finalize_options()
+        print(f'<<finalize_options super()>>: {getcwd()=}')
 
         package_data = self.distribution.package_data or dict()
         
@@ -490,11 +492,18 @@ class build(build_orig):
 
             from Cython.Build import cythonize
             result_ext_modules = list()
-            result_ext_modules.extend(remove_header_files(
-                cythonize(process_macros(cython_extensions),
-                compiler_directives={'language_level': '3'},
-                compile_time_env = prepare_cflags_dict(self.build_config.additional_cflags),
-                )))
+            try:
+                result_ext_modules.extend(remove_header_files(
+                    cythonize(process_macros(cython_extensions),
+                    compiler_directives={'language_level': '3'},
+                    compile_time_env = prepare_cflags_dict(self.build_config.additional_cflags),
+                    )))
+            except:
+                print(f'{getcwd()=}')
+                for extension in cython_extensions:
+                    pprint(class_properties_values_including_overrided(extension))
+                
+                raise
             
             result_ext_modules.extend(setuptools_extensions)
             
