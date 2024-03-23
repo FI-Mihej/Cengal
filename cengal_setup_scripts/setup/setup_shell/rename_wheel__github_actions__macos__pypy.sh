@@ -5,18 +5,39 @@ if [ "$#" -ne 2 ]; then
     exit 1
 fi
 
-declare -A PYTHON_SHORT_VERSIONS
-PYTHON_SHORT_VERSIONS["pypy-3.10"]="pp310"
-PYTHON_SHORT_VERSIONS["pypy-3.9"]="pp39"
-
-declare -A PLATFORM_TAG_VERSIONS
-PLATFORM_TAG_VERSIONS["macos-13"]="macosx_13_0_universal2"
-PLATFORM_TAG_VERSIONS["macos-14"]="macosx_14_0_universal2"
-
 PYTHON_VER="$1"
-PYTHON_SHORT_VER=${PYTHON_SHORT_VERSIONS[$PYTHON_VER]}
 PLATFORM_TAG="$2"
-PLATFORM_TAG_STR=${PLATFORM_TAG_VERSIONS[$PLATFORM_TAG]}
+
+# Determine the short Python version string
+case "$PYTHON_VER" in
+    "pypy-3.8")
+        PYTHON_SHORT_VER="pp38"
+        ;;
+    "pypy-3.9")
+        PYTHON_SHORT_VER="pp39"
+        ;;
+    "pypy-3.10")
+        PYTHON_SHORT_VER="pp310"
+        ;;
+    *)
+        echo "Unsupported Python version"
+        exit 1
+        ;;
+esac
+
+# Determine the platform tag string
+case "$PLATFORM_TAG" in
+    "macos-13")
+        PLATFORM_TAG_STR="macosx_13_0_universal2"
+        ;;
+    "macos-14")
+        PLATFORM_TAG_STR="macosx_14_0_universal2"
+        ;;
+    *)
+        echo "Unsupported platform tag"
+        exit 1
+        ;;
+esac
 
 WHEELHOUSE_DIR="wheelhouse_temp"
 
