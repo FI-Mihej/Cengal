@@ -83,6 +83,37 @@ if 'patch-ng' in pypi_requirements_list:
 
 
 # packages_data_dict, manifest_included_files = find_package_data()
+import platform
+if ('PyPy'.lower() == platform.python_implementation().lower()) and ('Darwin'.lower() == platform.system().lower()):
+    supported_extras = [
+        'setuprequires',
+        'entities__asm_functions', 
+        'hardware__info__cpu__versions__v_0', 
+        'hardware__info__cpu__versions__v_1', 
+        'cengal__time_management__relative_time__relativedelta', 
+        'cengal__web_tools__help_tools', 
+        'cengal__user_interface__console__chooser', 
+        'cengal__user_interface__console__colorama_helpers', 
+        'cengal__parallel_execution__coroutines', 
+        'cengal__parallel_execution__coroutines__coro_standard_services__db', 
+        'cengal__parallel_execution__coroutines__coro_standard_services__lmdb', 
+        'cengal__parallel_execution__coroutines__coro_standard_services__log', 
+        'cengal__parallel_execution__coroutines__coro_standard_services__loop_yield', 
+        'cengal__parallel_execution__coroutines__coro_standard_services__read_write_locker', 
+        'cengal__parallel_execution__coroutines__coro_standard_services__tkinter', 
+        'cengal__parallel_execution__coroutines__coro_tools__loop_administration__admin_tk', 
+        'cengal__data_manipulation__serialization', 
+        'cengal__user_interface__gui__tkinter', 
+        'cengal__text_processing__encoding_detection', 
+        'cengal__build_tools__packages__create', 
+        'cengal__build_tools__gather_docs', 
+        'cengal__build_tools__build_extensions', 
+    ]
+    supported_extras_str = ','.join(supported_extras)
+    install_requires = (pypi_requirements_list + [f'cengal_light[{supported_extras_str}]=={__version__}',])
+else:
+    install_requires = (pypi_requirements_list + [f'cengal_light[full]=={__version__}',])
+
 setuptools.setup(
     name='cengal',
     version=__version__,
