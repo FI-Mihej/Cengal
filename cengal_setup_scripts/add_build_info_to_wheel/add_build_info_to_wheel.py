@@ -83,7 +83,8 @@ def update_wheels():
                 python_interpreter = 'PyPy'
             
             python_version_str_raw = wheel_name_parts[2][2:]  # '38' for '3.8' version or '310' for '3.10' version
-            python_version_str = '' if is_cpython else 'pypy-' + '.'.join([python_version_str_raw[0], python_version_str_raw[1:]])
+            python_version_str_prefix = '' if is_cpython else 'pypy-'
+            python_version_str = python_version_str_prefix + '.'.join([python_version_str_raw[0], python_version_str_raw[1:]])
             target_abi = wheel_name_parts[3]
             target_os_and_arghitecture = wheel_name_parts[4]  # 'macosx_14_0_arm64' or 'macosx_13_0_x86_64'
             is_x86_64 = target_os_and_arghitecture.endswith('x86_64')
