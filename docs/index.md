@@ -1,8 +1,8 @@
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/cengal-light)
 
-![PyPI - Version](https://img.shields.io/pypi/v/cengal-light) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cengal-light) ![PyPI - Implementation](https://img.shields.io/pypi/implementation/cengal-light) ![PyPI - Format](https://img.shields.io/pypi/format/cengal-light)
+![PyPI - Version](https://img.shields.io/pypi/v/cengal-light) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cengal-light) ![PyPI - Implementation](https://img.shields.io/pypi/implementation/cengal-light) ![PyPI - Format](https://img.shields.io/pypi/format/cengal-light) ![Static Badge](https://img.shields.io/badge/Architecture-x86__64_%7C_ARM__64-blue)
 
-![Static Badge](https://img.shields.io/badge/wheels-Linux_%7C_Windows-blue) ![Static Badge](https://img.shields.io/badge/OS-Linux_%7C_Windows_%7C_macOS-blue)
+![Static Badge](https://img.shields.io/badge/wheels-Linux_%7C_Windows_%7C_macOS-blue) ![Static Badge](https://img.shields.io/badge/OS-Linux_%7C_Windows_%7C_macOS-blue)
 
 ![GitHub tag (with filter)](https://img.shields.io/github/v/tag/FI-Mihej/Cengal) ![PyPI - Status](https://img.shields.io/pypi/status/cengal) ![GitHub License](https://img.shields.io/github/license/FI-Mihej/Cengal)
 

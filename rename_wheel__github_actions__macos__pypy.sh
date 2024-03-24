@@ -10,20 +10,14 @@ PLATFORM_TAG="$2"
 
 # Determine the short Python version string
 case "$PYTHON_VER" in
-    "3.8")
-        PYTHON_SHORT_VER="cp38"
+    "pypy-3.8")
+        PYTHON_SHORT_VER="pp38"
         ;;
-    "3.9")
-        PYTHON_SHORT_VER="cp39"
+    "pypy-3.9")
+        PYTHON_SHORT_VER="pp39"
         ;;
-    "3.10")
-        PYTHON_SHORT_VER="cp310"
-        ;;
-    "3.11")
-        PYTHON_SHORT_VER="cp311"
-        ;;
-    "3.12")
-        PYTHON_SHORT_VER="cp312"
+    "pypy-3.10")
+        PYTHON_SHORT_VER="pp310"
         ;;
     *)
         echo "Unsupported Python version"
@@ -34,10 +28,10 @@ esac
 # Determine the platform tag string
 case "$PLATFORM_TAG" in
     "macos-13")
-        PLATFORM_TAG_STR="macosx_13_0_universal2"
+        PLATFORM_TAG_STR="macosx_13_0_x86_64"
         ;;
     "macos-14")
-        PLATFORM_TAG_STR="macosx_14_0_universal2"
+        PLATFORM_TAG_STR="macosx_14_0_arm64"
         ;;
     *)
         echo "Unsupported platform tag"

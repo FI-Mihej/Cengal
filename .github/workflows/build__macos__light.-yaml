@@ -62,6 +62,8 @@ jobs:
 
       - name: Prepare Setup Light
         run: |
+          chmod +x ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
+          chmod +x ./rename_wheel__github_actions__macos__cpython_bin.sh
           chmod +x ./prepare__setup_light.sh
           ./prepare__setup_light.sh
         
@@ -71,6 +73,7 @@ jobs:
           mkdir ./wheelhouse_temp/
           export ARCHFLAGS="-arch x86_64"
           python -m pip wheel . -w ./wheelhouse_temp/ -v -v -v
+          ./rename_wheel__github_actions__macos__cpython_bin.sh ${{ matrix.python-version }} ${{ matrix.os }}
           ls -la ./wheelhouse_temp/
           delocate-listdeps ./wheelhouse_temp/cengal_light-*.whl
           delocate-listdeps --all ./wheelhouse_temp/cengal_light-*.whl
@@ -78,6 +81,7 @@ jobs:
           delocate-wheel -w ./wheelhouse/ -v ./wheelhouse_temp/cengal_light-*.whl
           ls -la ./wheelhouse/
           delocate-listdeps --all ./wheelhouse/cengal_light-*.whl
+          python ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
 
       - uses: actions/upload-artifact@v4
         with:
@@ -139,6 +143,8 @@ jobs:
 
       - name: Prepare Setup Light
         run: |
+          chmod +x ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
+          chmod +x ./rename_wheel__github_actions__macos__cpython_bin.sh
           chmod +x ./prepare__setup_light.sh
           ./prepare__setup_light.sh
         
@@ -148,6 +154,7 @@ jobs:
           mkdir ./wheelhouse_temp/
           export ARCHFLAGS="-arch arm64"
           python -m pip wheel . -w ./wheelhouse_temp/ -v -v -v
+          ./rename_wheel__github_actions__macos__cpython_bin.sh ${{ matrix.python-version }} ${{ matrix.os }}
           ls -la ./wheelhouse_temp/
           delocate-listdeps ./wheelhouse_temp/cengal_light-*.whl
           delocate-listdeps --all ./wheelhouse_temp/cengal_light-*.whl
@@ -155,6 +162,7 @@ jobs:
           delocate-wheel -w ./wheelhouse/ -v ./wheelhouse_temp/cengal_light-*.whl
           ls -la ./wheelhouse/
           delocate-listdeps --all ./wheelhouse/cengal_light-*.whl
+          python ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
 
       - uses: actions/upload-artifact@v4
         with:
@@ -189,6 +197,12 @@ jobs:
       - name: Find PyPy's libpython
         run: |
           find /Users/runner/hostedtoolcache/PyPy/ -name 'libpypy3-c*.dylib'
+
+      # - name: Create symlink for libpython3.X.dylib (3.7.13) to PyPy's libpypy3-c.dylib
+      #   run: |
+      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.8.dylib
+      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.9.dylib
+      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.10.dylib
 
       - name: Create symlink for libpython3.X.dylib to PyPy's libpypy3-c.dylib
         run: |
@@ -242,6 +256,7 @@ jobs:
 
       - name: Prepare Setup Light
         run: |
+          chmod +x ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
           chmod +x ./prepare__setup_light.sh
           ./prepare__setup_light.sh
         
@@ -258,6 +273,7 @@ jobs:
           delocate-wheel -w ./wheelhouse/ -v ./wheelhouse_temp/cengal_light-*.whl
           ls -la ./wheelhouse/
           delocate-listdeps --all ./wheelhouse/cengal_light-*.whl
+          python ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
 
       - uses: actions/upload-artifact@v4
         with:
@@ -275,6 +291,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      
+      # - name: Set up Python pypy-3.7
+      #   uses: actions/setup-python@v2
+      #   with:
+      #     python-version: pypy-3.7
       
       - name: Set up Python pypy-3.8
         uses: actions/setup-python@v2
@@ -297,6 +318,12 @@ jobs:
       - name: Find PyPy's libpython
         run: |
           find /Users/runner/hostedtoolcache/PyPy/ -name 'libpypy3-c*.dylib'
+
+      # - name: Create symlink for libpython3.X.dylib (3.7.13) to PyPy's libpypy3-c.dylib
+      #   run: |
+      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.8.dylib
+      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.9.dylib
+      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.10.dylib
 
       - name: Create symlink for libpython3.X.dylib to PyPy's libpypy3-c.dylib
         run: |
@@ -351,6 +378,7 @@ jobs:
 
       - name: Prepare Setup Light
         run: |
+          chmod +x ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
           chmod +x ./prepare__setup_light.sh
           ./prepare__setup_light.sh
         
@@ -367,6 +395,7 @@ jobs:
           delocate-wheel -w ./wheelhouse/ -v ./wheelhouse_temp/cengal_light-*.whl
           ls -la ./wheelhouse/
           delocate-listdeps --all ./wheelhouse/cengal_light-*.whl
+          python ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
 
       - uses: actions/upload-artifact@v4
         with:
