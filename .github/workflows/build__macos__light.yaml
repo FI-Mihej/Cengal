@@ -199,17 +199,17 @@ jobs:
         run: |
           find /Users/runner/hostedtoolcache/PyPy/ -name 'libpypy3-c*.dylib'
 
-      - name: Create symlink for libpython3.X.dylib (3.7.13) to PyPy's libpypy3-c.dylib
-        run: |
-          sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.8.dylib
-          sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.9.dylib
-          sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.10.dylib
-
-      # - name: Create symlink for libpython3.X.dylib to PyPy's libpypy3-c.dylib
+      # - name: Create symlink for libpython3.X.dylib (3.7.13) to PyPy's libpypy3-c.dylib
       #   run: |
-      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.8.16/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.8.dylib
-      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.8.16/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.9.dylib
-      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.8.16/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.10.dylib
+      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.8.dylib
+      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.9.dylib
+      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.10.dylib
+
+      - name: Create symlink for libpython3.X.dylib to PyPy's libpypy3-c.dylib
+        run: |
+          sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.8.16/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.8.dylib
+          sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.8.16/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.9.dylib
+          sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.8.16/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.10.dylib
 
       - name: Set LD_LIBRARY_PATH
         run: echo "LD_LIBRARY_PATH=/usr/local/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
@@ -294,15 +294,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Set up Python pypy-3.7
-        uses: actions/setup-python@v2
-        with:
-          python-version: pypy-3.7
-      
-      # - name: Set up Python pypy-3.8
+      # - name: Set up Python pypy-3.7
       #   uses: actions/setup-python@v2
       #   with:
-      #     python-version: pypy-3.8
+      #     python-version: pypy-3.7
+      
+      - name: Set up Python pypy-3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: pypy-3.8
       
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
@@ -321,18 +321,18 @@ jobs:
         run: |
           find /Users/runner/hostedtoolcache/PyPy/ -name 'libpypy3-c*.dylib'
 
-      - name: Create symlink for libpython3.X.dylib (3.7.13) to PyPy's libpypy3-c.dylib
-        run: |
-          sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.8.dylib
-          sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.9.dylib
-          sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.10.dylib
-
-      # - name: Create symlink for libpython3.X.dylib to PyPy's libpypy3-c.dylib
+      # - name: Create symlink for libpython3.X.dylib (3.7.13) to PyPy's libpypy3-c.dylib
       #   run: |
-      #     sudo mkdir -p /usr/local/lib
-      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.8.16/arm64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.8.dylib
-      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.8.16/arm64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.9.dylib
-      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.8.16/arm64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.10.dylib
+      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.8.dylib
+      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.9.dylib
+      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.10.dylib
+
+      - name: Create symlink for libpython3.X.dylib to PyPy's libpypy3-c.dylib
+        run: |
+          sudo mkdir -p /usr/local/lib
+          sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.8.16/arm64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.8.dylib
+          sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.8.16/arm64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.9.dylib
+          sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.8.16/arm64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.10.dylib
 
       - name: Set LD_LIBRARY_PATH
         run: echo "LD_LIBRARY_PATH=/usr/local/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
