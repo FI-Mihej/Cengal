@@ -11,7 +11,7 @@ def sha256_checksum(filename):
         readable_hash = hashlib.sha256(bytes).hexdigest()
     return readable_hash
 
-def update_wheel(package_name, python_interpreter, python_version, python_abi, target_os, target_architecture, target_os_and_arghitecture, wheel_path: Path):
+def update_wheel(package_name, target_python_version, python_interpreter, python_version, python_abi, target_os, target_architecture, target_os_and_arghitecture, wheel_path: Path):
     wheel_path_str = str(wheel_path)
     print(f"Updating wheel: {wheel_path_str}")
     curdir = Path.cwd()
@@ -29,7 +29,7 @@ def update_wheel(package_name, python_interpreter, python_version, python_abi, t
         # Add BUILD_INFO.txt
         dist_info_dirs = list(unpacked_dir.glob(f'{package_name}-*.dist-info'))
         if not dist_info_dirs:
-            print(f"No dist-info directory found for {package_name}", file=sys.stderr)
+            print(f"\tNo dist-info directory found for {package_name}", file=sys.stderr)
             return
 
         build_info_path = dist_info_dirs[0] / 'BUILD_INFO.txt'
@@ -49,22 +49,22 @@ def update_wheel(package_name, python_interpreter, python_version, python_abi, t
             record_file.write(f"{relative_path},sha256={hash},{size}\n")
         
         # Update 'Tag' in WHEEL file
-        wheel_path = dist_info_dirs[0] / 'WHEEL'
-        with open(wheel_path, 'r') as f:
+        sdist_wheel_path = dist_info_dirs[0] / 'WHEEL'
+        with open(sdist_wheel_path, 'r') as f:
             lines = f.readlines()
         
-        with open(wheel_path, 'w') as f:
+        with open(sdist_wheel_path, 'w') as f:
             for line in lines:
                 if line.startswith('Tag:'):
-                    f.write(f"Tag: {python_version}-{python_abi}-{target_os_and_arghitecture}\n")
+                    f.write(f"Tag: {target_python_version}-{python_abi}-{target_os_and_arghitecture}\n")
                 else:
                     f.write(line)
         
         # Find existing record and update WHEEL file hash in RECORD file
-        wheel_path_str = str(wheel_path)
-        hash = sha256_checksum(wheel_path_str)
-        size = wheel_path.stat().st_size
-        relative_path = str(wheel_path.relative_to(unpacked_dir))
+        sdist_wheel_path_str = str(sdist_wheel_path)
+        hash = sha256_checksum(sdist_wheel_path_str)
+        size = sdist_wheel_path.stat().st_size
+        relative_path = str(sdist_wheel_path.relative_to(unpacked_dir))
         with open(record_path, 'r') as f:
             lines = f.readlines()
         
@@ -80,6 +80,7 @@ def update_wheel(package_name, python_interpreter, python_version, python_abi, t
             f.write(new_content)
 
         # Repackage the wheel
+        print(f"\tRepackaging wheel: {wheel_path_str}")
         os.remove(wheel_path_str)
         with zipfile.ZipFile(wheel_path_str, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as zipf:
             for file in unpacked_dir.rglob('*'):
@@ -109,6 +110,7 @@ def update_wheels():
             package_name = wheel_name_parts[0]
             is_binary = 'cengal_light' == package_name
             package_version = wheel_name_parts[1]
+            target_python_version = wheel_name_parts[2]
             is_cpython = wheel_name_parts[2].startswith('cp')
             if is_cpython:
                 python_interpreter = 'CPython'
@@ -122,17 +124,19 @@ def update_wheels():
             target_os_and_arghitecture = wheel_name_parts[4]  # 'macosx_14_0_arm64' or 'macosx_13_0_x86_64'
             if target_os_and_arghitecture.endswith('x86_64'):
                 target_architecture = 'x86_64'
+                target_os = target_os_and_arghitecture[:-(1 + len(target_architecture))]
             elif target_os_and_arghitecture.endswith('amd64'):
                 target_architecture = 'amd64'
+                target_os = target_os_and_arghitecture[:-(1 + len(target_architecture))]
             elif target_os_and_arghitecture.endswith('arm64'):
                 target_architecture = 'arm64'
+                target_os = target_os_and_arghitecture[:-(1 + len(target_architecture))]
             else:
                 print(f"Wheel {wheel_path} ignored because it has unknown architecture: {target_os_and_arghitecture}", file=sys.stderr)
-                continue
+                target_architecture = str()
+                target_os = target_os_and_arghitecture
             
-            target_architecture_suffix = f'_{target_architecture}'
-            target_os = target_os_and_arghitecture[:-len(target_architecture_suffix)]
-            update_wheel(package_name, python_interpreter, python_version_str, target_abi, target_os, target_architecture, target_os_and_arghitecture, wheel_path)
+            update_wheel(package_name, target_python_version, python_interpreter, python_version_str, target_abi, target_os, target_architecture, target_os_and_arghitecture, wheel_path)
     finally:
         os.chdir(curdir)
 
