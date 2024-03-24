@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 
 set PACKAGE_NAME=cengal_light
 
-set VS2022_PYTHONS=Python311 Python312
+set VS2022_PYTHONS=Python311 Python312 Python313
 
 if exist "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat" (
     set "VS2022_PATH=C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"

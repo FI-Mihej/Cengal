@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 
 set PACKAGE_NAME=cengal
 
-set VS2022_PYTHONS=Python311 Python312
+set VS2022_PYTHONS=Python311 Python312 Python313
 
 rem Define Python version to wheel tag mapping
 set "tag_Python311=cp311"
