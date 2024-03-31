@@ -22,7 +22,9 @@ unsigned long long c_cpu_clock_cycles();
 
 #elif defined(CF_IS_ARM)
 
-unsigned u64 c_cpu_clock_cycles();
+#include <stdint.h>
+
+uint64_t c_cpu_clock_cycles();
 
 #else
 

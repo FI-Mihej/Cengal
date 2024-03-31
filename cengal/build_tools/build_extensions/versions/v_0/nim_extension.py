@@ -30,7 +30,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.2.0"
+__version__ = "4.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -158,8 +158,9 @@ class CengalNimBuildExtension(CengalBuildExtension):
         self.module_name: str = module_name
         self.flags: Optional[List[str]] = flags or list()
         self.definitions: Optional[Union[Sequence[str], Dict[str, Union[Union[None, bool, int, str], Tuple[bool, Union[None, bool, str, int]]]]]] = definitions or dict()
-        self.result_definitions: Optional[Dict[str, Union[None, bool, int, float, str]]] = prepare_compile_time_env(list_to_dict(prepare_compile_time_flags()))
-        self.result_definitions = adjust_definition_names(self.result_definitions, 'CF_', 'CD_')  # CF is Cengal Flag; CD is Cengal Definition
+        result_flags = adjust_definition_names(list_to_dict(prepare_compile_time_flags()), 'NIMF_', 'NIMD_')  # NIMF is Nim Flag; NIMD is Nim Definition
+        self.result_definitions: Optional[Dict[str, Union[None, bool, int, float, str]]] = adjust_definition_names(prepare_compile_time_env(), 'NIMF_', 'NIMD_')  # NIMF is Nim Flag; NIMD is Nim Definition
+        self.result_definitions.update(result_flags)
         self.result_definitions.update(dict_of_tuples_to_dict(list_to_dict(definitions)))
         self.result_definitions.update(list_to_dict(flags))
         self.additional_compilation_params: Optional[List[str]] = additional_compilation_params
@@ -167,47 +168,55 @@ class CengalNimBuildExtension(CengalBuildExtension):
         super().__init__(kwargs)
     
     def __call__(self):
-        out_file_name: str = f'{self.module_name}.pyd' if 'Windows' == OS_TYPE else f'{self.module_name}.so'
-        print()
-        print('==================================================')
-        print(f'<<< NIM COMPILATION: {self.module_name} -> {out_file_name} >>>')
-        print('=======================')
-        params = ['nim', 'c', '--forceBuild:on', '--app:lib', f'--out:{out_file_name}', '--threads:on']
-        params_v = ['nim', 'c', '--forceBuild:on', '--app:lib', f'--out:{out_file_name}', '--threads:on']
-        for name, value in self.result_definitions.items():
-            params.append(prepare_definition(name, value))
-            params_v.append(prepare_definition_v(name, value))
+        try:
+            out_file_name: str = f'{self.module_name}.pyd' if 'Windows' == OS_TYPE else f'{self.module_name}.so'
+            print()
+            print('==================================================')
+            print(f'<<< NIM COMPILATION: {self.module_name} -> {out_file_name} >>>')
+            print('=======================')
+            params = ['nim', 'c', '--forceBuild:on', '--app:lib', f'--out:{out_file_name}', '--threads:on']
+            params_v = ['nim', 'c', '--forceBuild:on', '--app:lib', f'--out:{out_file_name}', '--threads:on']
+            for name, value in self.result_definitions.items():
+                params.append(prepare_definition(name, value))
+                params_v.append(prepare_definition_v(name, value))
 
-        if self.additional_compilation_params:
-            params.extend(self.additional_compilation_params)
-            params_v.extend(self.additional_compilation_params)
-        
-        if 'Windows' == OS_TYPE:
-            params.extend(['--tlsEmulation:off', '--passL:-static', self.module_name])
-            params_v.extend(['--tlsEmulation:off', '--passL:-static', self.module_name])
-        else:
-            params.extend([self.module_name,])
-            params_v.extend([self.module_name,])
+            if self.additional_compilation_params:
+                params.extend(self.additional_compilation_params)
+                params_v.extend(self.additional_compilation_params)
             
-        with change_current_dir(self.dir_path):
-            self._ensure_gitignore()
-            self._generate_definitions_module()
-            print('> NIM compiler command line:')
-            print(prepare_command(params_v[0], params_v[1:]))
-            print('> NIM compiler params:')
-            pprint(params)
-            result = subprocess.run(params, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-        
-        successed: bool = find_text(result.stdout, '[SuccessX]') is not None
-        print(f'{successed=}')
-        result_str = result.stdout
-        print('> NIM compiler output:')
-        print(result_str)
-        print('> Exported files:')
-        exported_files_list = [out_file_name,]
-        print(exported_files_list)
-        print('==================================================')
-        return exported_files_list if successed else None
+            if 'Windows' == OS_TYPE:
+                params.extend(['--tlsEmulation:off', '--passL:-static', self.module_name])
+                params_v.extend(['--tlsEmulation:off', '--passL:-static', self.module_name])
+            else:
+                params.extend([self.module_name,])
+                params_v.extend([self.module_name,])
+                
+            with change_current_dir(self.dir_path):
+                self._ensure_gitignore()
+                self._generate_definitions_module()
+                print('> NIM compiler command line:')
+                print(prepare_command(params_v[0], params_v[1:]))
+                print('> NIM compiler params:')
+                pprint(params)
+                result = subprocess.run(params, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            
+            successed: bool = find_text(result.stdout, '[SuccessX]') is not None
+            print(f'{successed=}')
+            result_str = result.stdout
+            print('> NIM compiler output:')
+            print(result_str)
+            print('> Exported files:')
+            exported_files_list = [out_file_name,]
+            print(exported_files_list)
+            print('==================================================')
+            return exported_files_list if successed else None
+        except:
+            print('==================================================')
+            print('!!! NIM COMPILATION EXCEPTION !!!')
+            print('==================================================')
+            print(get_exception())
+            print('==================================================')
+            return None
     
     def _ensure_gitignore(self):
         gitignore_path = self.dir_path_rel('.gitignore')

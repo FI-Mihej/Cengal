@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.2.0"
+__version__ = "4.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -92,5 +92,11 @@ class MyApp(wx.App):
         # code to execute periodically goes here
         print('Timer event!', self.param1, self.param2)
 
-app = MyApp('parameter1', 'parameter2')
-app.MainLoop()
+
+def main():
+    app = MyApp('parameter1', 'parameter2')
+    app.MainLoop()
+
+
+if __name__ == '__main__':
+    main()

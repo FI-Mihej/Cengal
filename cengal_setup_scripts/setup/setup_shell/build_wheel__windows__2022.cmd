@@ -3,11 +3,12 @@ setlocal enabledelayedexpansion
 
 set PACKAGE_NAME=cengal
 
-set VS2022_PYTHONS=Python311 Python312
+set VS2022_PYTHONS=Python311 Python312 Python313
 
 rem Define Python version to wheel tag mapping
 set "tag_Python311=cp311"
 set "tag_Python312=cp312"
+set "tag_Python313=cp313"
 
 if exist "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat" (
     set "VS2022_PATH=C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"

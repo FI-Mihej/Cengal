@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.2.0"
+__version__ = "4.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -195,10 +195,6 @@ class PyPiModules(ModulesLists):
             'distex',
         }
 
-        self.osx_allowed = {
-            'pyobjc'
-        }
-
         self.emscripten_forbidden = {
             'virtualenv',
             'rocksdb',
@@ -220,6 +216,9 @@ class PyPiModules(ModulesLists):
         if ('PyPy'.lower() == PLATFORM_NAME.lower()) and (PYTHON_VERSION_INT[:3] < (3, 4, 0)):
             self.universal.insert(0, 'lzmaffi')  # for pypy3 and Python2 only: it is backport from python34 which is
             #   default in Ubuntu 14.04
+        
+        if 'PyPy'.lower() != PLATFORM_NAME.lower():
+            self.osx_allowed.add('pyobjc')  # 2024.03.23: PyObjC is not supported on PyPy
 
         if (PYTHON_VERSION_INT[:3] < (3, 5, 0)):
             self.universal.insert(0, 'typing')  # for pypy3 and Python2 only: it is backport from python35

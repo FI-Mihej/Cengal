@@ -28,7 +28,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.2.0"
+__version__ = "4.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -84,17 +84,22 @@ class AppDirPathBase:
     def base_dir_id_to_path(self, base_dir_id: BaseDirID) -> str:
         raise NotImplementedError
 
-    def __call__(self, dir_type: AppDirectoryType, app_name_or_path: DirNameOrPath, with_structure: bool = True, ensure_dir: bool = True) -> str:
+    def __call__(self, dir_type: AppDirectoryType, app_name_or_path: Optional[DirNameOrPath] = None, with_structure: bool = True, ensure_dir: bool = True) -> str:
+        if app_name_or_path is not None:
+            app_name_or_path = str(app_name_or_path)
+        
         if AppDirectoryType.user_profile_data == dir_type:
-            app_name_or_path = '.' + os.path.join(*norm_dir_name_or_path(app_name_or_path))
+            if app_name_or_path is not None:
+                app_name_or_path = '.' + os.path.join(*norm_dir_name_or_path(app_name_or_path))
 
         mapping: DirTypeMappingItem = self.dir_type_mapping(dir_type)
         base_dir_path = self.base_dir_id_to_path(mapping[0])
         result_list = [base_dir_path]
         result_list.extend(norm_dir_name_or_path(mapping[1]))
-        result_list.extend(norm_dir_name_or_path(app_name_or_path))
-        if with_structure:
-            result_list.extend(norm_dir_name_or_path(mapping[2]))
+        if app_name_or_path is not None:
+            result_list.extend(norm_dir_name_or_path(app_name_or_path))
+            if with_structure:
+                result_list.extend(norm_dir_name_or_path(mapping[2]))
         
         result_path = os.path.normpath(os.path.join(*result_list))
         if ensure_dir:
@@ -102,5 +107,5 @@ class AppDirPathBase:
         
         return result_path
 
-    def cached(self, dir_type: AppDirectoryType, app_name_or_path: DirNameOrPath, with_structure: bool = True, ensure_dir: bool = True) -> str:
+    def cached(self, dir_type: AppDirectoryType, app_name_or_path: Optional[DirNameOrPath] = None, with_structure: bool = True, ensure_dir: bool = True) -> str:
         return self._cached(dir_type, app_name_or_path, with_structure, ensure_dir)

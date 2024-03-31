@@ -5,9 +5,9 @@ PACKAGE_NAME="cengal"
 IMAGES=("manylinux2014_x86_64" "musllinux_1_1_x86_64" "musllinux_1_2_x86_64")
 
 declare -A DOCKER_IMAGES
-DOCKER_IMAGES["manylinux2014_x86_64"]="cp310-cp310 cp311-cp311 cp312-cp312 cp38-cp38 cp39-cp39 pp310-pypy310_pp73 pp38-pypy38_pp73 pp39-pypy39_pp73"
+DOCKER_IMAGES["manylinux2014_x86_64"]="cp310-cp310 cp311-cp311 cp312-cp312 cp313-cp313 cp38-cp38 cp39-cp39 pp310-pypy310_pp73 pp38-pypy38_pp73 pp39-pypy39_pp73"
 DOCKER_IMAGES["musllinux_1_1_x86_64"]="cp310-cp310 cp38-cp38 cp39-cp39"
-DOCKER_IMAGES["musllinux_1_2_x86_64"]="cp311-cp311 cp312-cp312"
+DOCKER_IMAGES["musllinux_1_2_x86_64"]="cp311-cp311 cp312-cp312 cp313-cp313"
 
 declare -A PLATFORM_TAGS
 PLATFORM_TAGS["manylinux2014_x86_64"]="manylinux_2_17_x86_64.manylinux2014_x86_64"
@@ -18,6 +18,7 @@ declare -A PYTHON_SHORT_VERSIONS
 PYTHON_SHORT_VERSIONS["cp310-cp310"]="cp310"
 PYTHON_SHORT_VERSIONS["cp311-cp311"]="cp311"
 PYTHON_SHORT_VERSIONS["cp312-cp312"]="cp312"
+PYTHON_SHORT_VERSIONS["cp313-cp313"]="cp313"
 PYTHON_SHORT_VERSIONS["cp38-cp38"]="cp38"
 PYTHON_SHORT_VERSIONS["cp39-cp39"]="cp39"
 PYTHON_SHORT_VERSIONS["pp310-pypy310_pp73"]="pp310"

@@ -1,0 +1,200 @@
+name: Build Cengal Shell
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build_wheels_shell__macos_x64__cpython:
+    name: Build Cengal Shell wheels on ${{ matrix.os }} for CPython ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        os: [macos-13]
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+
+      - name: Prepare Setup Shell
+        run: |
+          chmod +x ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
+          chmod +x ./rename_wheel__github_actions__macos__cpython.sh
+          chmod +x ./prepare__setup_shell.sh
+          ./prepare__setup_shell.sh
+        
+      - name: Build wheels
+        run: |
+          python -m pip install -r ./requirements.txt
+          mkdir ./wheelhouse_temp/
+          export ARCHFLAGS="-arch x86_64"
+          python -m pip wheel . -w ./wheelhouse_temp/ -v -v -v
+          ./rename_wheel__github_actions__macos__cpython.sh ${{ matrix.python-version }} ${{ matrix.os }}
+          ls -la ./wheelhouse_temp/
+          mkdir ./wheelhouse/
+          cp -R ./wheelhouse_temp/cengal-*.whl ./wheelhouse/
+          ls -la ./wheelhouse/
+          python ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-cengal-shell-${{ matrix.os }}-Py_${{ matrix.python-version }}-${{ strategy.job-index }}-${{ github.run_number }}-${{ github.run_attempt }}
+          path: ./wheelhouse/*.whl
+
+  build_wheels_shell__macos_arm64__cpython:
+    name: Build Cengal Shell wheels on ${{ matrix.os }} for CPython ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        os: [macos-14]
+        python-version: ['3.10', '3.11', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+
+      - name: Prepare Setup Shell
+        run: |
+          chmod +x ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
+          chmod +x ./rename_wheel__github_actions__macos__cpython.sh
+          chmod +x ./prepare__setup_shell.sh
+          ./prepare__setup_shell.sh
+        
+      - name: Build wheels
+        run: |
+          python -m pip install -r ./requirements.txt
+          mkdir ./wheelhouse_temp/
+          export ARCHFLAGS="-arch arm64"
+          python -m pip wheel . -w ./wheelhouse_temp/ -v -v -v
+          ./rename_wheel__github_actions__macos__cpython.sh ${{ matrix.python-version }} ${{ matrix.os }}
+          ls -la ./wheelhouse_temp/
+          mkdir ./wheelhouse/
+          cp -R ./wheelhouse_temp/cengal-*.whl ./wheelhouse/
+          ls -la ./wheelhouse/
+          python ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-cengal-shell-${{ matrix.os }}-Py_${{ matrix.python-version }}-${{ strategy.job-index }}-${{ github.run_number }}-${{ github.run_attempt }}
+          path: ./wheelhouse/*.whl
+
+  build_wheels_shell__macos_x64__pypy:
+    name: Build Cengal Shell wheels on ${{ matrix.os }} for PyPy ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        os: [macos-13]
+        python-version: ['pypy-3.8', 'pypy-3.9', 'pypy-3.10']
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+
+      - name: Prepare Setup Shell
+        run: |
+          chmod +x ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
+          chmod +x ./rename_wheel__github_actions__macos__pypy.sh
+          chmod +x ./prepare__setup_shell.sh
+          ./prepare__setup_shell.sh
+        
+      - name: Build wheels
+        run: |
+          python -m pip install -r ./requirements.txt
+          mkdir ./wheelhouse_temp/
+          export ARCHFLAGS="-arch x86_64"
+          python -m pip wheel . -w ./wheelhouse_temp/ -v -v -v
+          ./rename_wheel__github_actions__macos__pypy.sh ${{ matrix.python-version }} ${{ matrix.os }}
+          ls -la ./wheelhouse_temp/
+          mkdir ./wheelhouse/
+          cp -R ./wheelhouse_temp/cengal-*.whl ./wheelhouse/
+          ls -la ./wheelhouse/
+          python ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-cengal-shell-${{ matrix.os }}-Py_${{ matrix.python-version }}-${{ strategy.job-index }}-${{ github.run_number }}-${{ github.run_attempt }}
+          path: ./wheelhouse/*.whl
+
+  build_wheels_shell__macos_arm64__pypy:
+    name: Build Cengal Shell wheels on ${{ matrix.os }} for PyPy ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        os: [macos-14]
+        python-version: ['pypy-3.8', 'pypy-3.9', 'pypy-3.10']
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+
+      - name: Prepare Setup Shell
+        run: |
+          chmod +x ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
+          chmod +x ./rename_wheel__github_actions__macos__pypy.sh
+          chmod +x ./prepare__setup_shell.sh
+          ./prepare__setup_shell.sh
+        
+      - name: Build wheels
+        run: |
+          python -m pip install -r ./requirements.txt
+          mkdir ./wheelhouse_temp/
+          export ARCHFLAGS="-arch arm64"
+          python -m pip wheel . -w ./wheelhouse_temp/ -v -v -v
+          ./rename_wheel__github_actions__macos__pypy.sh ${{ matrix.python-version }} ${{ matrix.os }}
+          ls -la ./wheelhouse_temp/
+          mkdir ./wheelhouse/
+          cp -R ./wheelhouse_temp/cengal-*.whl ./wheelhouse/
+          ls -la ./wheelhouse/
+          python ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-cengal-shell-${{ matrix.os }}-Py_${{ matrix.python-version }}-${{ strategy.job-index }}-${{ github.run_number }}-${{ github.run_attempt }}
+          path: ./wheelhouse/*.whl

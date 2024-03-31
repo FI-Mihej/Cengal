@@ -1,0 +1,405 @@
+name: Build Cengal Light
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build_wheels_light__macos_x64__cpython:
+    name: Build Cengal Light wheels on ${{ matrix.os }} for CPython ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        os: [macos-13]
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13.0-alpha.5']
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install --upgrade delocate
+
+      - name: Install Nim
+        run: |
+          brew install nim
+          nim --version
+
+      - name: Install basic Nim dependencies
+        run: |
+          nimble install nimpy -y
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.22.1'
+
+      # - name: Install basic Go dependencies - 0
+      #   run: |
+      #     python -m pip install pybindgen
+
+      - name: Install basic Go dependencies - 1
+        run: |
+          go install golang.org/x/tools/cmd/goimports@latest
+          go install github.com/go-python/gopy@latest
+          echo "$HOME/go/bin" >> $GITHUB_PATH
+
+      - name: Test gopy installation
+        run: |
+          which gopy
+          gopy version
+
+      - name: Prepare Setup Light
+        run: |
+          chmod +x ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
+          chmod +x ./rename_wheel__github_actions__macos__cpython_bin.sh
+          chmod +x ./prepare__setup_light.sh
+          ./prepare__setup_light.sh
+        
+      - name: Build wheels
+        run: |
+          python -m pip install -r ./requirements.txt
+          mkdir ./wheelhouse_temp/
+          export ARCHFLAGS="-arch x86_64"
+          python -m pip wheel . -w ./wheelhouse_temp/ -v -v -v
+          ./rename_wheel__github_actions__macos__cpython_bin.sh ${{ matrix.python-version }} ${{ matrix.os }}
+          ls -la ./wheelhouse_temp/
+          delocate-listdeps ./wheelhouse_temp/cengal_light-*.whl
+          delocate-listdeps --all ./wheelhouse_temp/cengal_light-*.whl
+          delocate-listdeps --depending ./wheelhouse_temp/cengal_light-*.whl
+          delocate-wheel -w ./wheelhouse/ -v ./wheelhouse_temp/cengal_light-*.whl
+          ls -la ./wheelhouse/
+          delocate-listdeps --all ./wheelhouse/cengal_light-*.whl
+          python ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-cengal-light-${{ matrix.os }}-Py_${{ matrix.python-version }}-${{ strategy.job-index }}-${{ github.run_number }}-${{ github.run_attempt }}
+          path: ./wheelhouse/*.whl
+
+  build_wheels_light__macos_arm64__cpython:
+    name: Build Cengal Light wheels on ${{ matrix.os }} for CPython ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        os: [macos-14]
+        python-version: ['3.10', '3.11', '3.12', '3.13.0-alpha.5']
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install --upgrade delocate
+
+      - name: Install Nim
+        run: |
+          brew install nim
+          nim --version
+
+      - name: Install basic Nim dependencies
+        run: |
+          nimble install nimpy -y
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.22.1'
+
+      # - name: Install basic Go dependencies - 0
+      #   run: |
+      #     python -m pip install pybindgen
+
+      - name: Install basic Go dependencies - 1
+        run: |
+          go install golang.org/x/tools/cmd/goimports@latest
+          go install github.com/go-python/gopy@latest
+          echo "$HOME/go/bin" >> $GITHUB_PATH
+
+      - name: Test gopy installation
+        run: |
+          which gopy
+          gopy version
+
+      - name: Prepare Setup Light
+        run: |
+          chmod +x ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
+          chmod +x ./rename_wheel__github_actions__macos__cpython_bin.sh
+          chmod +x ./prepare__setup_light.sh
+          ./prepare__setup_light.sh
+        
+      - name: Build wheels
+        run: |
+          python -m pip install -r ./requirements.txt
+          mkdir ./wheelhouse_temp/
+          export ARCHFLAGS="-arch arm64"
+          python -m pip wheel . -w ./wheelhouse_temp/ -v -v -v
+          ./rename_wheel__github_actions__macos__cpython_bin.sh ${{ matrix.python-version }} ${{ matrix.os }}
+          ls -la ./wheelhouse_temp/
+          delocate-listdeps ./wheelhouse_temp/cengal_light-*.whl
+          delocate-listdeps --all ./wheelhouse_temp/cengal_light-*.whl
+          delocate-listdeps --depending ./wheelhouse_temp/cengal_light-*.whl
+          delocate-wheel -w ./wheelhouse/ -v ./wheelhouse_temp/cengal_light-*.whl
+          ls -la ./wheelhouse/
+          delocate-listdeps --all ./wheelhouse/cengal_light-*.whl
+          python ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-cengal-light-${{ matrix.os }}-Py_${{ matrix.python-version }}-${{ strategy.job-index }}-${{ github.run_number }}-${{ github.run_attempt }}
+          path: ./wheelhouse/*.whl
+
+  build_wheels_light__macos_x64__pypy:
+    name: Build Cengal Light wheels on ${{ matrix.os }} for PyPy ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        os: [macos-13]
+        python-version: ['pypy-3.8', 'pypy-3.9', 'pypy-3.10']
+        # python-version: ['pypy-3.9']
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Check PyPy Version
+        run: |
+          pypy3 --version
+          pypy3 -m sysconfig | grep -E "INCLUDEPY|LIBPL"
+
+      - name: List Header Files
+        run: ls -l $(pypy3 -c "import sysconfig; print(sysconfig.get_path('include'))")
+
+      - name: Find PyPy's libpython
+        run: |
+          find /Users/runner/hostedtoolcache/PyPy/ -name 'libpypy3-c*.dylib'
+
+      # - name: Create symlink for libpython3.X.dylib (3.7.13) to PyPy's libpypy3-c.dylib
+      #   run: |
+      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.8.dylib
+      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.9.dylib
+      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.10.dylib
+
+      - name: Create symlink for libpython3.X.dylib to PyPy's libpypy3-c.dylib
+        run: |
+          sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.8.16/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.8.dylib
+          sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.8.16/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.9.dylib
+          sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.8.16/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.10.dylib
+
+      - name: Set LD_LIBRARY_PATH
+        run: echo "LD_LIBRARY_PATH=/usr/local/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
+
+      - name: Set LD_LIBRARY_PATH for Python
+        run: |
+          PYTHON_LIB=$(python -c "import sysconfig; print(sysconfig.get_config_var('LIBDIR'))")
+          echo "LD_LIBRARY_PATH=$PYTHON_LIB" >> $GITHUB_ENV
+
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install --upgrade delocate
+
+      - name: Install Nim
+        run: |
+          brew install nim
+          nim --version
+
+      - name: Install basic Nim dependencies
+        run: |
+          nimble install nimpy -y
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.22.1'
+
+      # - name: Install basic Go dependencies - 0
+      #   run: |
+      #     python -m pip install pybindgen
+
+      - name: Install basic Go dependencies - 1
+        run: |
+          go install golang.org/x/tools/cmd/goimports@latest
+          go install github.com/go-python/gopy@latest
+          echo "$HOME/go/bin" >> $GITHUB_PATH
+
+      - name: Test gopy installation
+        run: |
+          which gopy
+          gopy version
+
+      - name: Prepare Setup Light
+        run: |
+          chmod +x ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
+          chmod +x ./prepare__setup_light.sh
+          ./prepare__setup_light.sh
+        
+      - name: Build wheels
+        run: |
+          python -m pip install -r ./requirements.txt
+          mkdir ./wheelhouse_temp/
+          export ARCHFLAGS="-arch x86_64"
+          python -m pip wheel . -w ./wheelhouse_temp/ -v -v -v
+          ls -la ./wheelhouse_temp/
+          delocate-listdeps ./wheelhouse_temp/cengal_light-*.whl
+          delocate-listdeps --all ./wheelhouse_temp/cengal_light-*.whl
+          delocate-listdeps --depending ./wheelhouse_temp/cengal_light-*.whl
+          delocate-wheel -w ./wheelhouse/ -v ./wheelhouse_temp/cengal_light-*.whl
+          ls -la ./wheelhouse/
+          delocate-listdeps --all ./wheelhouse/cengal_light-*.whl
+          python ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-cengal-light-${{ matrix.os }}-Py_${{ matrix.python-version }}-${{ strategy.job-index }}-${{ github.run_number }}-${{ github.run_attempt }}
+          path: ./wheelhouse/*.whl
+
+  build_wheels_light__macos_arm64__pypy:
+    name: Build Cengal Light wheels on ${{ matrix.os }} for PyPy ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        os: [macos-14]
+        python-version: ['pypy-3.8', 'pypy-3.9', 'pypy-3.10']
+        # python-version: ['pypy-3.9']
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      # - name: Set up Python pypy-3.7
+      #   uses: actions/setup-python@v2
+      #   with:
+      #     python-version: pypy-3.7
+      
+      - name: Set up Python pypy-3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: pypy-3.8
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Check PyPy Version
+        run: |
+          pypy3 --version
+          pypy3 -m sysconfig | grep -E "INCLUDEPY|LIBPL"
+
+      - name: List Header Files
+        run: ls -l $(pypy3 -c "import sysconfig; print(sysconfig.get_path('include'))")
+
+      - name: Find PyPy's libpython
+        run: |
+          find /Users/runner/hostedtoolcache/PyPy/ -name 'libpypy3-c*.dylib'
+
+      # - name: Create symlink for libpython3.X.dylib (3.7.13) to PyPy's libpypy3-c.dylib
+      #   run: |
+      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.8.dylib
+      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.9.dylib
+      #     sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.7.13/x64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.10.dylib
+
+      - name: Create symlink for libpython3.X.dylib to PyPy's libpypy3-c.dylib
+        run: |
+          sudo mkdir -p /usr/local/lib
+          sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.8.16/arm64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.8.dylib
+          sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.8.16/arm64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.9.dylib
+          sudo ln -s /Users/runner/hostedtoolcache/PyPy/3.8.16/arm64/bin/libpypy3-c.dylib /usr/local/lib/libpython3.10.dylib
+
+      - name: Set LD_LIBRARY_PATH
+        run: echo "LD_LIBRARY_PATH=/usr/local/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
+
+      - name: Set LD_LIBRARY_PATH for Python
+        run: |
+          PYTHON_LIB=$(python -c "import sysconfig; print(sysconfig.get_config_var('LIBDIR'))")
+          echo "LD_LIBRARY_PATH=$PYTHON_LIB" >> $GITHUB_ENV
+
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install --upgrade delocate
+
+      - name: Install Nim
+        run: |
+          brew install nim
+          nim --version
+
+      - name: Install basic Nim dependencies
+        run: |
+          nimble install nimpy -y
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.22.1'
+
+      # - name: Install basic Go dependencies - 0
+      #   run: |
+      #     python -m pip install pybindgen
+
+      - name: Install basic Go dependencies - 1
+        run: |
+          go install golang.org/x/tools/cmd/goimports@latest
+          go install github.com/go-python/gopy@latest
+          echo "$HOME/go/bin" >> $GITHUB_PATH
+
+      - name: Test gopy installation
+        run: |
+          which gopy
+          gopy version
+
+      - name: Prepare Setup Light
+        run: |
+          chmod +x ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
+          chmod +x ./prepare__setup_light.sh
+          ./prepare__setup_light.sh
+        
+      - name: Build wheels
+        run: |
+          python -m pip install -r ./requirements.txt
+          mkdir ./wheelhouse_temp/
+          export ARCHFLAGS="-arch arm64"
+          python -m pip wheel . -w ./wheelhouse_temp/ -v -v -v
+          ls -la ./wheelhouse_temp/
+          delocate-listdeps ./wheelhouse_temp/cengal_light-*.whl
+          delocate-listdeps --all ./wheelhouse_temp/cengal_light-*.whl
+          delocate-listdeps --depending ./wheelhouse_temp/cengal_light-*.whl
+          delocate-wheel -w ./wheelhouse/ -v ./wheelhouse_temp/cengal_light-*.whl
+          ls -la ./wheelhouse/
+          delocate-listdeps --all ./wheelhouse/cengal_light-*.whl
+          python ./cengal_setup_scripts/add_build_info_to_wheel/add_build_info_to_wheel.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-cengal-light-${{ matrix.os }}-Py_${{ matrix.python-version }}-${{ strategy.job-index }}-${{ github.run_number }}-${{ github.run_attempt }}
+          path: ./wheelhouse/*.whl

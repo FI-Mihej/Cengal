@@ -30,7 +30,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.2.0"
+__version__ = "4.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -168,8 +168,9 @@ class CengalGoBuildExtension(CengalBuildExtension):
         self.out_dir: str = None
         self.flags: Optional[List[str]] = flags or list()
         self.definitions: Optional[Union[Sequence[str], Dict[str, Union[Union[None, bool, int, str], Tuple[bool, Union[None, bool, str, int]]]]]] = definitions or dict()
-        self.result_definitions: Optional[Dict[str, Union[None, bool, int, float, str]]] = prepare_compile_time_env(list_to_dict(prepare_compile_time_flags()))
-        self.result_definitions = adjust_definition_names(self.result_definitions, 'CF_', 'CD_')  # CF is Cengal Flag; CD is Cengal Definition
+        result_flags = adjust_definition_names(list_to_dict(prepare_compile_time_flags()), 'GOF_', 'GOD_')  # GOF is Go Flag; GOD is Go Definition
+        self.result_definitions: Optional[Dict[str, Union[None, bool, int, float, str]]] = adjust_definition_names(prepare_compile_time_env(), 'GOF_', 'GOD_')  # GOF is Go Flag; GOD is Go Definition
+        self.result_definitions.update(result_flags)
         self.result_definitions.update(dict_of_tuples_to_dict(list_to_dict(definitions)))
         self.result_definitions.update(list_to_dict(flags))
         self.additional_build_params: Optional[List[str]] = additional_build_params
@@ -187,59 +188,66 @@ class CengalGoBuildExtension(CengalBuildExtension):
             return'/'.join(namespace_parts[:-1])
     
     def __call__(self):
-        # self.src_dir: str = self._src_dir if os.path.isabs(self._src_dir) else RelativePath(self.dir_path)(self._src_dir)
-        self.src_dir: str = self._src_dir
-        self.out_dir: str = RelativePath(self.dir_path)(self.out_dir_name)
-        print()
-        print('==================================================')
-        print(f'<<< GO COMPILATION: {self.module_name_str} >>>')
-        print('=======================')
-        with change_current_dir(self.dir_path):
-            params = ['go', 'mod', 'init', self.module_name_str]
-            result = subprocess.run(params, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-            print(result.stdout)
+        try:
+            # self.src_dir: str = self._src_dir if os.path.isabs(self._src_dir) else RelativePath(self.dir_path)(self._src_dir)
+            self.src_dir: str = self._src_dir
+            self.out_dir: str = RelativePath(self.dir_path)(self.out_dir_name)
+            print()
+            print('==================================================')
+            print(f'<<< GO COMPILATION: {self.module_name_str} >>>')
+            print('=======================')
+            with change_current_dir(self.dir_path):
+                params = ['go', 'mod', 'init', self.module_name_str]
+                result = subprocess.run(params, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                print(result.stdout)
 
-        env = os.environ.copy()
-        additional_env = dict()
-        additional_env['LD_LIBRARY_PATH'] = f"{env.get('LD_LIBRARY_PATH', '')}{os.pathsep}."
-        env.update(additional_env)
-        params = ['gopy', 'build', f'-output={self.out_dir_name}', f'-vm={sys.executable}']
-        if self.additional_build_params:
-            params.extend(self.additional_build_params)
-        
-        params.append(self.src_dir)
-        params.append(f'./{file_name(self.definitions_module_name)}')
-        if self.additional_go_packages:
-            params.extend(self.additional_go_packages)
+            env = os.environ.copy()
+            additional_env = dict()
+            additional_env['LD_LIBRARY_PATH'] = f"{env.get('LD_LIBRARY_PATH', '')}{os.pathsep}."
+            env.update(additional_env)
+            params = ['gopy', 'build', f'-output={self.out_dir_name}', f'-vm={sys.executable}']
+            if self.additional_build_params:
+                params.extend(self.additional_build_params)
             
-        compiler_output: str = str()
-        with change_current_dir(self.dir_path):
-            self._ensure_gitignore()
-            self._generate_definitions_module()
-            print('> Go compiler command line:')
-            print(prepare_command(params[0], params[1:]))
-            print('> Go compiler params:')
-            pprint(params)
-            print('> Additional environmental variables:')
-            pprint(additional_env)
-            result = subprocess.run(params, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-            compiler_output = result.stdout
+            params.append(self.src_dir)
+            params.append(f'./{file_name(self.definitions_module_name)}')
+            if self.additional_go_packages:
+                params.extend(self.additional_go_packages)
+                
+            compiler_output: str = str()
+            with change_current_dir(self.dir_path):
+                self._ensure_gitignore()
+                self._generate_definitions_module()
+                print('> Go compiler command line:')
+                print(prepare_command(params[0], params[1:]))
+                print('> Go compiler params:')
+                pprint(params)
+                print('> Additional environmental variables:')
+                pprint(additional_env)
+                result = subprocess.run(params, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                compiler_output = result.stdout
 
-        successed: bool = find_text(compiler_output, 'cmd had error:') is None
-        print(f'{successed=}')
-        print('> Go compiler output:')
-        print(compiler_output)
-        exported_files_list = self._exported_files_list()
-        adjusted_exported_files_list = list()
-        for file_path in exported_files_list:
-            adjusted_exported_files_list.append(get_relative_path_part(file_path, self.dir_path))
-        
-        print('> Exported files:')
-        print(adjusted_exported_files_list)
-        print('==================================================')
-        # raise RuntimeError
-        return adjusted_exported_files_list if successed else None
-
+            successed: bool = find_text(compiler_output, 'cmd had error:') is None
+            print(f'{successed=}')
+            print('> Go compiler output:')
+            print(compiler_output)
+            exported_files_list = self._exported_files_list()
+            adjusted_exported_files_list = list()
+            for file_path in exported_files_list:
+                adjusted_exported_files_list.append(get_relative_path_part(file_path, self.dir_path))
+            
+            print('> Exported files:')
+            print(adjusted_exported_files_list)
+            print('==================================================')
+            # raise RuntimeError
+            return adjusted_exported_files_list if successed else None
+        except:
+            print('==================================================')
+            print('!!! GO COMPILATION EXCEPTION !!!')
+            print('==================================================')
+            print(get_exception())
+            print('==================================================')
+            return None
     
     def _exported_files_list(self) -> List[str]:
         def filter(data_type: FilteringEntity, data):

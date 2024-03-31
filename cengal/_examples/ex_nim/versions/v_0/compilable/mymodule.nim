@@ -10,14 +10,14 @@ let upperString = mystrutils.toUpper(myString)
 proc greet(name: string): string {.exportpy.} =
   echo upperString  # This will print: "HELLO, WORLDd!"
 
-  when defined(CF_Linux):
-    echo "mymodule: CF_Linux"
+  when defined(NIMF_Linux):
+    echo "mymodule: NIMF_Linux"
   else:
-    echo "mymodule: not CF_Linux"
+    echo "mymodule: not NIMF_Linux"
 
-  when defined(CF_IS_ARM):
-    echo "mymodule: CF_IS_ARM"
+  when defined(NIMF_IS_ARM):
+    echo "mymodule: NIMF_IS_ARM"
   else:
-    echo "mymodule: not CF_IS_ARM"
+    echo "mymodule: not NIMF_IS_ARM"
 
-  return "Hello, " & name & "!" & toUpper("me") & CD_OS_TYPE
+  return "Hello, " & name & "!" & toUpper("me") & NIMD_OS_TYPE

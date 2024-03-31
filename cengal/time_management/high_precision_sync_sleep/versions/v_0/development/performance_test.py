@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.2.0"
+__version__ = "4.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -55,7 +55,8 @@ def func_perf_test(func: Callable, *args, **kwargs):
 
 
 def main():
-    func_perf_test(hps_sleep, 0.00001)
+    print(hps_sleep(0.1))
+    # func_perf_test(hps_sleep, 0.00001)
     # func_perf_test(hps_sleep, 0)
     # func_perf_test(sleep, 0.00001)
     # func_perf_test(sleep, 0)

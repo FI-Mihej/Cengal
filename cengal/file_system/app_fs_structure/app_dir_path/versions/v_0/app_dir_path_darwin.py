@@ -29,7 +29,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.2.0"
+__version__ = "4.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -69,13 +69,13 @@ class FileManagerSearchPathDomainMask(Enum):
 
 
 dir_type_mapping: Dict[AppDirectoryType, Tuple[Tuple[FileManagerSearchPathDomainMask, FileManagerSearchPathDirectory], Optional[DirNameOrPath], Optional[DirNameOrPath]]] = {
-    AppDirectoryType.local_data: ((FileManagerSearchPathDomainMask.userDomainMask, FileManagerSearchPathDirectory.applicationSupportDirectory), None, ('local_low', 'data')),
-    AppDirectoryType.local_static_data: ((FileManagerSearchPathDomainMask.userDomainMask, FileManagerSearchPathDirectory.applicationSupportDirectory), None, ('local_low', 'static_data')),
-    AppDirectoryType.local_cache: ((FileManagerSearchPathDomainMask.userDomainMask, FileManagerSearchPathDirectory.cachesDirectory), None, ('local_low', 'cache')),
-    AppDirectoryType.local_config: ((FileManagerSearchPathDomainMask.userDomainMask, FileManagerSearchPathDirectory.applicationSupportDirectory), None, ('local_low', 'config')),
-    AppDirectoryType.local_log: ((FileManagerSearchPathDomainMask.userDomainMask, FileManagerSearchPathDirectory.applicationSupportDirectory), None, ('local_low', 'log')),
-    AppDirectoryType.local_temp: ((FileManagerSearchPathDomainMask.userDomainMask, FileManagerSearchPathDirectory.cachesDirectory), None, ('local_low', 'temp')),
-    AppDirectoryType.local_runtime: ((FileManagerSearchPathDomainMask.userDomainMask, FileManagerSearchPathDirectory.applicationSupportDirectory), None, ('local_low', 'runtime')),
+    AppDirectoryType.local_data: ((FileManagerSearchPathDomainMask.userDomainMask, FileManagerSearchPathDirectory.applicationSupportDirectory), None, ('local', 'data')),
+    AppDirectoryType.local_static_data: ((FileManagerSearchPathDomainMask.userDomainMask, FileManagerSearchPathDirectory.applicationSupportDirectory), None, ('local', 'static_data')),
+    AppDirectoryType.local_cache: ((FileManagerSearchPathDomainMask.userDomainMask, FileManagerSearchPathDirectory.cachesDirectory), None, ('local', 'cache')),
+    AppDirectoryType.local_config: ((FileManagerSearchPathDomainMask.userDomainMask, FileManagerSearchPathDirectory.applicationSupportDirectory), None, ('local', 'config')),
+    AppDirectoryType.local_log: ((FileManagerSearchPathDomainMask.userDomainMask, FileManagerSearchPathDirectory.applicationSupportDirectory), None, ('local', 'log')),
+    AppDirectoryType.local_temp: ((FileManagerSearchPathDomainMask.userDomainMask, FileManagerSearchPathDirectory.cachesDirectory), None, ('local', 'temp')),
+    AppDirectoryType.local_runtime: ((FileManagerSearchPathDomainMask.userDomainMask, FileManagerSearchPathDirectory.applicationSupportDirectory), None, ('local', 'runtime')),
 
     AppDirectoryType.local_low_data: ((FileManagerSearchPathDomainMask.userDomainMask, FileManagerSearchPathDirectory.applicationSupportDirectory), None, ('local_low', 'data')),
     AppDirectoryType.local_low_static_data: ((FileManagerSearchPathDomainMask.userDomainMask, FileManagerSearchPathDirectory.applicationSupportDirectory), None, ('local_low', 'static_data')),
@@ -95,10 +95,10 @@ dir_type_mapping: Dict[AppDirectoryType, Tuple[Tuple[FileManagerSearchPathDomain
 
     AppDirectoryType.program_data: ((FileManagerSearchPathDomainMask.localDomainMask, FileManagerSearchPathDirectory.applicationSupportDirectory), None, 'data'),
     AppDirectoryType.program_static_data: ((FileManagerSearchPathDomainMask.localDomainMask, FileManagerSearchPathDirectory.applicationSupportDirectory), None, 'static_data'),
-    AppDirectoryType.program_cache: ((FileManagerSearchPathDomainMask.localDomainMask, FileManagerSearchPathDirectory.cachesDirectory), None, None),
+    AppDirectoryType.program_cache: ('/Library/Caches', None, 'cache'),
     AppDirectoryType.program_config: ((FileManagerSearchPathDomainMask.localDomainMask, FileManagerSearchPathDirectory.applicationSupportDirectory), None, 'config'),
     AppDirectoryType.program_log: ((FileManagerSearchPathDomainMask.localDomainMask, FileManagerSearchPathDirectory.applicationSupportDirectory), None, 'log'),
-    AppDirectoryType.program_temp: ((FileManagerSearchPathDomainMask.localDomainMask, FileManagerSearchPathDirectory.cachesDirectory), None, 'temp'),
+    AppDirectoryType.program_temp: ('/tmp', None, 'temp'),
     AppDirectoryType.program_runtime: ((FileManagerSearchPathDomainMask.localDomainMask, FileManagerSearchPathDirectory.applicationSupportDirectory), None, 'runtime'),
 
     AppDirectoryType.program_files: ((FileManagerSearchPathDomainMask.localDomainMask, FileManagerSearchPathDirectory.allApplicationsDirectory), None, None),
@@ -118,6 +118,9 @@ class AppDirPath(AppDirPathBase):
         return dir_type_mapping[dir_type]
     
     def base_dir_id_to_path(self, base_dir_id: BaseDirID) -> str:
+        if isinstance(base_dir_id, str):
+            return base_dir_id
+        
         domain_mask, directory = base_dir_id
         result_path = NSSearchPathForDirectoriesInDomains(directory, domain_mask, True)[0]
         return result_path

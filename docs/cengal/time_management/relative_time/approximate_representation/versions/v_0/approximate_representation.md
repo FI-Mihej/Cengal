@@ -47,7 +47,7 @@ cengal<wbr>.time_management<wbr>.relative_time<wbr>.approximate_representation<w
 </span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.1.1&quot;</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.2.0&quot;</span>
 </span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -546,7 +546,7 @@ cengal<wbr>.time_management<wbr>.relative_time<wbr>.approximate_representation<w
                     <div class="attr variable">
             <span class="name">DIV_ATTRIBUTES</span>        =
 <input id="DIV_ATTRIBUTES-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-            <label class="view-value-button pdoc-button" for="DIV_ATTRIBUTES-view-value"></label><span class="default_value">{&lt;<a href="#TimeAttributes.minutes">TimeAttributes.minutes</a>: 3&gt;, &lt;<a href="#TimeAttributes.hours">TimeAttributes.hours</a>: 4&gt;, &lt;<a href="#TimeAttributes.days">TimeAttributes.days</a>: 5&gt;, &lt;<a href="#TimeAttributes.millennia">TimeAttributes.millennia</a>: 11&gt;, &lt;<a href="#TimeAttributes.decades">TimeAttributes.decades</a>: 9&gt;, &lt;<a href="#TimeAttributes.weeks">TimeAttributes.weeks</a>: 6&gt;, &lt;<a href="#TimeAttributes.centuries">TimeAttributes.centuries</a>: 10&gt;, &lt;<a href="#TimeAttributes.months">TimeAttributes.months</a>: 7&gt;, &lt;<a href="#TimeAttributes.years">TimeAttributes.years</a>: 8&gt;}</span>
+            <label class="view-value-button pdoc-button" for="DIV_ATTRIBUTES-view-value"></label><span class="default_value">{&lt;<a href="#TimeAttributes.days">TimeAttributes.days</a>: 5&gt;, &lt;<a href="#TimeAttributes.decades">TimeAttributes.decades</a>: 9&gt;, &lt;<a href="#TimeAttributes.minutes">TimeAttributes.minutes</a>: 3&gt;, &lt;<a href="#TimeAttributes.centuries">TimeAttributes.centuries</a>: 10&gt;, &lt;<a href="#TimeAttributes.hours">TimeAttributes.hours</a>: 4&gt;, &lt;<a href="#TimeAttributes.millennia">TimeAttributes.millennia</a>: 11&gt;, &lt;<a href="#TimeAttributes.years">TimeAttributes.years</a>: 8&gt;, &lt;<a href="#TimeAttributes.weeks">TimeAttributes.weeks</a>: 6&gt;, &lt;<a href="#TimeAttributes.months">TimeAttributes.months</a>: 7&gt;}</span>
 
         
     </div>
@@ -608,7 +608,7 @@ cengal<wbr>.time_management<wbr>.relative_time<wbr>.approximate_representation<w
                 <section id="MUL_ATTRIBUTES">
                     <div class="attr variable">
             <span class="name">MUL_ATTRIBUTES</span>        =
-<span class="default_value">{&lt;<a href="#TimeAttributes.microseconds">TimeAttributes.microseconds</a>: 0&gt;, &lt;<a href="#TimeAttributes.milliseconds">TimeAttributes.milliseconds</a>: 1&gt;}</span>
+<span class="default_value">{&lt;<a href="#TimeAttributes.milliseconds">TimeAttributes.milliseconds</a>: 1&gt;, &lt;<a href="#TimeAttributes.microseconds">TimeAttributes.microseconds</a>: 0&gt;}</span>
 
         
     </div>
@@ -645,7 +645,7 @@ cengal<wbr>.time_management<wbr>.relative_time<wbr>.approximate_representation<w
                     <div class="attr variable">
             <span class="name">DEFAULT_ATTRIBUTES</span>        =
 <input id="DEFAULT_ATTRIBUTES-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-            <label class="view-value-button pdoc-button" for="DEFAULT_ATTRIBUTES-view-value"></label><span class="default_value">{&lt;<a href="#TimeAttributes.seconds">TimeAttributes.seconds</a>: 2&gt;, &lt;<a href="#TimeAttributes.minutes">TimeAttributes.minutes</a>: 3&gt;, &lt;<a href="#TimeAttributes.hours">TimeAttributes.hours</a>: 4&gt;, &lt;<a href="#TimeAttributes.days">TimeAttributes.days</a>: 5&gt;, &lt;<a href="#TimeAttributes.microseconds">TimeAttributes.microseconds</a>: 0&gt;, &lt;<a href="#TimeAttributes.months">TimeAttributes.months</a>: 7&gt;, &lt;<a href="#TimeAttributes.years">TimeAttributes.years</a>: 8&gt;}</span>
+            <label class="view-value-button pdoc-button" for="DEFAULT_ATTRIBUTES-view-value"></label><span class="default_value">{&lt;<a href="#TimeAttributes.seconds">TimeAttributes.seconds</a>: 2&gt;, &lt;<a href="#TimeAttributes.days">TimeAttributes.days</a>: 5&gt;, &lt;<a href="#TimeAttributes.microseconds">TimeAttributes.microseconds</a>: 0&gt;, &lt;<a href="#TimeAttributes.minutes">TimeAttributes.minutes</a>: 3&gt;, &lt;<a href="#TimeAttributes.hours">TimeAttributes.hours</a>: 4&gt;, &lt;<a href="#TimeAttributes.years">TimeAttributes.years</a>: 8&gt;, &lt;<a href="#TimeAttributes.months">TimeAttributes.months</a>: 7&gt;}</span>
 
         
     </div>

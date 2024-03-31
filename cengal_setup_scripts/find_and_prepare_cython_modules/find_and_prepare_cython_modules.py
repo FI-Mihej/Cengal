@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.2.0"
+__version__ = "4.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -82,7 +82,7 @@ class BuildConfig(BuildConfig_orig):
         super().__init__()
         self.package_build_is_in_debug_mode: str = 'CENGAL_BUILD_IS_IN_DEBUG_MODE'
         self.package_build_is_in_sdist_mode: str = 'CENGAL_BUILD_IS_IN_SDIST_MODE'
-        self.additional_cflags: Dict[str, Tuple[bool, Union[str, int]]] = {
+        self.additional_pyx_flags: Dict[str, Tuple[bool, Union[str, int]]] = {
             'CENGAL_IS_IN_BUILD_MODE': CENGAL_IS_IN_BUILD_MODE,
         }
         self.find_package_data: Callable = find_package_data

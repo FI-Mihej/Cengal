@@ -114,6 +114,7 @@ Cengal introduces a novel approach to interprocess shared memory, currently at t
 
 Supported data types (current stage):
 
+* shared Numpy arrays
 * `list`: Unlike `multiprocessing.shared_memory.ShareableList`, Cengal's shared lists are both `mutable` and `resizable` between different processes. They support various container types (lists, tuples, dicts) as items and implement all standard `list` methods. Plus, they offer superior performance compared to `multiprocessing.shared_memory.ShareableList`.
 * `dict`: Currently immutable.
 * `tuple`
@@ -127,7 +128,19 @@ Supported data types (current stage):
 
 ### Examples
 
-[shared_memory_example.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/hardware/memory/shared_memory/versions/v_0/development/shared_memory_example.py)
+General example:
+
+* [shared_memory_example.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/hardware/memory/shared_memory/versions/v_0/development/shared_memory_example.py)
+
+Messages transmit:
+
+* [shmem_sender.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/hardware/memory/shared_memory/versions/v_0/development/shmem_sender.py)
+* [shmem_receiver.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/hardware/memory/shared_memory/versions/v_0/development/shmem_receiver.py)
+
+Shared Numpy Array:
+
+* [numpy_array_shmem_main.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/hardware/memory/shared_memory/versions/v_0/development/numpy_array_shmem_main.py)
+* [numpy_array_shmem_worker.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/hardware/memory/shared_memory/versions/v_0/development/numpy_array_shmem_worker.py)
 
 and smaller:
 

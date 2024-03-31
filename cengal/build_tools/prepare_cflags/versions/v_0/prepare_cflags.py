@@ -30,7 +30,10 @@ __all__ = [
     'dict_of_tuples_to_dict', 
     'adjust_definition_names', 
     'prepare_cflags', 
+    'prepare_given_cflags', 
     'prepare_cflags_dict', 
+    'prepare_given_cflags_dict', 
+    'prepare_pyx_flags_dict', 
     'prepare_compile_time_env', 
     'prepare_compile_time_flags',
     ]
@@ -45,7 +48,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.2.0"
+__version__ = "4.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -121,6 +124,10 @@ def wrap_definition_text_raw(text: str) -> str:
     return f'"{text}"'
 
 
+def wrap_pyx_definition_text_raw(text: str) -> str:
+    return f'{text}'
+
+
 def prepare_definition_value(value: Union[None, bool, int, str]) -> str:
     if isinstance(value, bool):
         value = str(value)
@@ -147,6 +154,20 @@ def prepare_definition_value_raw(value: Union[None, bool, int, str]) -> str:
         return wrap_definition_text_raw(value)
     else:
         return wrap_definition_text_raw(f'{value}')
+
+
+def prepare_pyx_definition_value_raw(value: Union[None, bool, int, str]) -> str:
+    if isinstance(value, bool):
+        value = str(value)
+    
+    if value is None:
+        return None
+    elif isinstance(value, int):
+        return value
+    elif isinstance(value, str):
+        return wrap_pyx_definition_text_raw(value)
+    else:
+        return wrap_pyx_definition_text_raw(f'{value}')
 
 
 def wrap_definition_pair(name: str, value: Any) -> str:
@@ -214,8 +235,9 @@ def adjust_definition_names(definitions: Dict[str, Union[None, bool, int, str]],
 
 def prepare_cflags(additional_cflags: Optional[Union[Sequence[str], Dict[str, Union[Union[None, bool, int, str], Tuple[bool, Union[None, bool, str, int]]]]]] = None) -> List[Union[None, int, str]]:
     adjusted_additional_cflags: Dict[str, Union[None, bool, int, str]] = dict_of_tuples_to_dict(list_to_dict(additional_cflags))
-    definitions: Dict[str, Union[None, bool, int, str]] = prepare_compile_time_env(list_to_dict(prepare_compile_time_flags()))
-    definitions = adjust_definition_names(definitions, 'CF_', 'CD_')  # CF is Cengal Flag; CD is Cengal Definition
+    flags: Dict[str, None] = adjust_definition_names(list_to_dict(prepare_compile_time_flags()), 'CF_', 'CD_')  # CF is Cengal Flag; CD is Cengal Definition
+    definitions: Dict[str, Union[None, bool, int, str]] = adjust_definition_names(prepare_compile_time_env(), 'CF_', 'CD_')  # CF is Cengal Flag; CD is Cengal Definition
+    definitions.update(flags)
     definitions.update(adjusted_additional_cflags)
     params: List[Union[None, int, str]] = [prepare_definition(name, value) for name, value in definitions.items()]
     
@@ -226,12 +248,48 @@ def prepare_cflags(additional_cflags: Optional[Union[Sequence[str], Dict[str, Un
     return params
 
 
+def prepare_given_cflags(additional_cflags: Optional[Union[Sequence[str], Dict[str, Union[Union[None, bool, int, str], Tuple[bool, Union[None, bool, str, int]]]]]] = None) -> List[Union[None, int, str]]:
+    adjusted_additional_cflags: Dict[str, Union[None, bool, int, str]] = dict_of_tuples_to_dict(list_to_dict(additional_cflags))
+    params: List[Union[None, int, str]] = [prepare_definition(name, value) for name, value in adjusted_additional_cflags.items()]
+    
+    # from pprint import pprint
+    # print('<<< PREPARE_CFLAGS: >>>')
+    # pprint(params)
+    append_cflags(params)
+    return params
+
+
 def prepare_cflags_dict(additional_cflags: Optional[Union[Sequence[str], Dict[str, Union[Union[None, bool, int, str], Tuple[bool, Union[None, bool, str, int]]]]]] = None) -> Dict[str, Union[None, bool, int, str]]:
     adjusted_additional_cflags: Dict[str, Union[None, bool, int, str]] = dict_of_tuples_to_dict(list_to_dict(additional_cflags))
-    definitions: Dict[str, Union[None, bool, int, str]] = prepare_compile_time_env(list_to_dict(prepare_compile_time_flags()))
-    definitions = adjust_definition_names(definitions, 'CF_', 'CD_')  # CF is Cengal Flag; CD is Cengal Definition
+    flags: Dict[str, None] = adjust_definition_names(list_to_dict(prepare_compile_time_flags()), 'CF_', 'CD_')  # CF is Cengal Flag; CD is Cengal Definition
+    definitions: Dict[str, Union[None, bool, int, str]] = adjust_definition_names(prepare_compile_time_env(), 'CF_', 'CD_')  # CF is Cengal Flag; CD is Cengal Definition
+    definitions.update(flags)
     definitions.update(adjusted_additional_cflags)
     result: Dict[str, Union[None, bool, int, str]] = {name: prepare_definition_value_raw(value) for name, value in definitions.items()}
+    
+    # from pprint import pprint
+    # print('<<< PREPARE_CFLAGS_DICT: >>>')
+    # pprint(result)
+    return result
+
+
+def prepare_given_cflags_dict(additional_cflags: Optional[Union[Sequence[str], Dict[str, Union[Union[None, bool, int, str], Tuple[bool, Union[None, bool, str, int]]]]]] = None) -> Dict[str, Union[None, bool, int, str]]:
+    adjusted_additional_cflags: Dict[str, Union[None, bool, int, str]] = dict_of_tuples_to_dict(list_to_dict(additional_cflags))
+    result: Dict[str, Union[None, bool, int, str]] = {name: prepare_definition_value_raw(value) for name, value in adjusted_additional_cflags.items()}
+    
+    # from pprint import pprint
+    # print('<<< PREPARE_CFLAGS_DICT: >>>')
+    # pprint(result)
+    return result
+
+
+def prepare_pyx_flags_dict(additional_pyx_flags: Optional[Union[Sequence[str], Dict[str, Union[Union[None, bool, int, str], Tuple[bool, Union[None, bool, str, int]]]]]] = None) -> Dict[str, Union[None, bool, int, str]]:
+    adjusted_additional_cflags: Dict[str, Union[None, bool, int, str]] = dict_of_tuples_to_dict(list_to_dict(additional_pyx_flags))
+    flags: Dict[str, None] = adjust_definition_names(list_to_dict(prepare_compile_time_flags()), 'PYXF_', 'PYXD_')  # PYXF is Cython Flag; PYXD is Cython Definition
+    definitions: Dict[str, Union[None, bool, int, str]] = adjust_definition_names(prepare_compile_time_env(), 'PYXF_', 'PYXD_')  # PYXF is Cython Flag; PYXD is Cython Definition
+    definitions.update(flags)
+    definitions.update(adjusted_additional_cflags)
+    result: Dict[str, Union[None, bool, int, str]] = {name: prepare_pyx_definition_value_raw(value) for name, value in definitions.items()}
     
     # from pprint import pprint
     # print('<<< PREPARE_CFLAGS_DICT: >>>')

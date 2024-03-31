@@ -30,7 +30,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.2.0"
+__version__ = "4.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -135,6 +135,15 @@ bs = block_size
 class SharedMemoryError(Exception):
     pass
 
+
+class FreeMemoryChunkNotFoundError(SharedMemoryError):
+    pass
+
+
+class ObjBufferIsSmallerThanRequestedNumpyArrayError(SharedMemoryError):
+    pass
+
+
 class WrongObjectTypeError(SharedMemoryError):
     pass
 
@@ -168,6 +177,12 @@ class TBase:
         raise NotImplementedError
     
     def destroy(self, shared_memory: 'SharedMemory', offset: Offset):
+        raise NotImplementedError
+    
+    def buffer(self, shared_memory: 'SharedMemory', offset: Offset) -> memoryview:
+        raise NotImplementedError
+    
+    def buffer_2(self, shared_memory: 'SharedMemory', offset: Offset) -> Tuple[int, int]:
         raise NotImplementedError
 
 
@@ -274,7 +289,8 @@ class BytesOffsets(IntEnum):
 class TBytes:
     def map_to_shared_memory(self, shared_memory: 'SharedMemory', obj: bytes) -> Tuple[bytes, Offset, Size]:
         data_size = len(obj)
-        offset, real_size = shared_memory.malloc(ObjectType.tbytes, bs * len(BytesOffsets) + bs * data_size)
+        # offset, real_size = shared_memory.malloc(ObjectType.tbytes, bs * len(BytesOffsets) + bs * data_size)
+        offset, real_size = shared_memory.malloc(ObjectType.tbytes, bs * len(BytesOffsets) + data_size)
         write_uint64(shared_memory.base_address, offset + bs * len(BaseObjOffsets) + bs * BytesOffsets.data_size, data_size)
         data_offset = offset + bs * len(BaseObjOffsets) + bs * BytesOffsets.data
         shared_memory._shared_memory.buf[data_offset:data_offset + data_size] = obj
@@ -285,12 +301,75 @@ class TBytes:
             raise WrongObjectTypeError
 
         data_size = read_uint64(shared_memory.base_address, offset + bs * len(BaseObjOffsets) + bs * BytesOffsets.data_size)
-        data_offset = offset + bs * len(BaseObjOffsets) + bs * BytesOffsets.data
-        obj = bytes(shared_memory._shared_memory.buf[data_offset:data_offset + data_size])
-        return obj
+        if data_size:
+            data_offset = offset + bs * len(BaseObjOffsets) + bs * BytesOffsets.data
+            obj = bytes(shared_memory._shared_memory.buf[data_offset:data_offset + data_size])
+            return obj
+        else:
+            return bytes()
     
     def destroy(self, shared_memory: 'SharedMemory', offset: Offset):
         shared_memory.free(offset)
+    
+    def buffer(self, shared_memory: 'SharedMemory', offset: Offset) -> memoryview:
+        if ObjectType.tbytes != read_uint64(shared_memory.base_address, offset + bs * BaseObjOffsets.obj_type):
+            raise WrongObjectTypeError
+
+        data_size = read_uint64(shared_memory.base_address, offset + bs * len(BaseObjOffsets) + bs * BytesOffsets.data_size)
+        data_offset = offset + bs * len(BaseObjOffsets) + bs * BytesOffsets.data
+        return shared_memory._shared_memory.buf[data_offset:data_offset + data_size]
+    
+    def buffer_2(self, shared_memory: 'SharedMemory', offset: Offset) -> Tuple[int, int]:
+        if ObjectType.tbytes != read_uint64(shared_memory.base_address, offset + bs * BaseObjOffsets.obj_type):
+            raise WrongObjectTypeError
+
+        data_size = read_uint64(shared_memory.base_address, offset + bs * len(BaseObjOffsets) + bs * BytesOffsets.data_size)
+        data_offset = offset + bs * len(BaseObjOffsets) + bs * BytesOffsets.data
+        return data_offset, data_size
+
+
+# class TBytes:
+#     def map_to_shared_memory(self, shared_memory: 'SharedMemory', obj: bytes) -> Tuple[bytes, Offset, Size]:
+#         data_size = len(obj)
+#         if 0 == data_size:
+#             allocated_data_size = 1
+#         else:
+#             allocated_data_size = data_size
+        
+#         # offset, real_size = shared_memory.malloc(ObjectType.tbytes, bs * (len(BytesOffsets) - 1) + bs * allocated_data_size)
+#         offset, real_size = shared_memory.malloc(ObjectType.tbytes, bs * (len(BytesOffsets) - 1) + allocated_data_size)
+#         shared_memory.print_mem(offset, 100, f'TBytes.map_to_shared_memory 0: offset: {offset}, real_size: {real_size}')
+#         write_uint64(shared_memory.base_address, offset + bs * len(BaseObjOffsets) + bs * BytesOffsets.data_size, data_size)
+#         shared_memory.print_mem(offset, 100, f'TBytes.map_to_shared_memory 1: offset: {offset}, real_size: {real_size}')
+#         data_offset = offset + bs * len(BaseObjOffsets) + bs * BytesOffsets.data
+#         if data_size:
+#             try:
+#                 shared_memory._shared_memory.buf[data_offset:data_offset + data_size] = obj
+#             except ValueError:
+#                 print(len(shared_memory._shared_memory.buf[data_offset:data_offset + data_size]), shared_memory._shared_memory.buf[data_offset:data_offset + data_size])
+#                 print(len(obj), obj)
+#                 raise
+            
+#             shared_memory.print_mem(offset, 100, f'TBytes.map_to_shared_memory 2: offset: {offset}, real_size: {real_size}, data_size: {data_size}, data_offset: {data_offset}')
+        
+#         return obj, offset, real_size
+    
+#     def init_from_shared_memory(self, shared_memory: 'SharedMemory', offset: Offset) -> bytes:
+#         if ObjectType.tbytes != read_uint64(shared_memory.base_address, offset + bs * BaseObjOffsets.obj_type):
+#             raise WrongObjectTypeError
+
+#         data_size = read_uint64(shared_memory.base_address, offset + bs * len(BaseObjOffsets) + bs * BytesOffsets.data_size)
+#         data_offset = offset + bs * len(BaseObjOffsets) + bs * BytesOffsets.data
+#         shared_memory.print_mem(offset, 100, f'TBytes.init_from_shared_memory 0: offset: {offset}, data_size: {data_size}, data_offset: {data_offset}')
+#         if data_size:
+#             obj = bytes(shared_memory._shared_memory.buf[data_offset:data_offset + data_size])
+#         else:
+#             obj = b''
+        
+#         return obj
+    
+#     def destroy(self, shared_memory: 'SharedMemory', offset: Offset):
+#         shared_memory.free(offset)
 
 
 # ======================================================================================================================
@@ -306,7 +385,8 @@ class TBytearray:
     def map_to_shared_memory(self, shared_memory: 'SharedMemory', obj: bytearray) -> Tuple[bytearray, Offset, Size]:
         data = bytes(obj)
         data_size = len(data)
-        offset, real_size = shared_memory.malloc(ObjectType.tbytearray, bs * len(BytearrayOffsets) + bs * data_size)
+        # offset, real_size = shared_memory.malloc(ObjectType.tbytearray, bs * len(BytearrayOffsets) + bs * data_size)
+        offset, real_size = shared_memory.malloc(ObjectType.tbytearray, bs * len(BytearrayOffsets) + data_size)
         write_uint64(shared_memory.base_address, offset + bs * len(BaseObjOffsets) + bs * BytearrayOffsets.data_size, data_size)
         data_offset = offset + bs * len(BaseObjOffsets) + bs * BytearrayOffsets.data
         shared_memory._shared_memory.buf[data_offset:data_offset + data_size] = data
@@ -317,12 +397,31 @@ class TBytearray:
             raise WrongObjectTypeError
 
         data_size = read_uint64(shared_memory.base_address, offset + bs * len(BaseObjOffsets) + bs * BytearrayOffsets.data_size)
-        data_offset = offset + bs * len(BaseObjOffsets) + bs * BytearrayOffsets.data
-        data = bytes(shared_memory._shared_memory.buf[data_offset:data_offset + data_size])
-        return bytearray(data)
+        if data_size:
+            data_offset = offset + bs * len(BaseObjOffsets) + bs * BytearrayOffsets.data
+            data = bytes(shared_memory._shared_memory.buf[data_offset:data_offset + data_size])
+            return bytearray(data)
+        else:
+            return bytearray(bytes())
     
     def destroy(self, shared_memory: 'SharedMemory', offset: Offset):
         shared_memory.free(offset)
+    
+    def buffer(self, shared_memory: 'SharedMemory', offset: Offset) -> memoryview:
+        if ObjectType.tbytearray != read_uint64(shared_memory.base_address, offset + bs * BaseObjOffsets.obj_type):
+            raise WrongObjectTypeError
+
+        data_size = read_uint64(shared_memory.base_address, offset + bs * len(BaseObjOffsets) + bs * BytearrayOffsets.data_size)
+        data_offset = offset + bs * len(BaseObjOffsets) + bs * BytearrayOffsets.data
+        return shared_memory._shared_memory.buf[data_offset:data_offset + data_size]
+    
+    def buffer_2(self, shared_memory: 'SharedMemory', offset: Offset) -> Tuple[int, int]:
+        if ObjectType.tbytearray != read_uint64(shared_memory.base_address, offset + bs * BaseObjOffsets.obj_type):
+            raise WrongObjectTypeError
+
+        data_size = read_uint64(shared_memory.base_address, offset + bs * len(BaseObjOffsets) + bs * BytearrayOffsets.data_size)
+        data_offset = offset + bs * len(BaseObjOffsets) + bs * BytearrayOffsets.data
+        return data_offset, data_size
 
 
 # ======================================================================================================================
@@ -338,7 +437,8 @@ class TStr:
     def map_to_shared_memory(self, shared_memory: 'SharedMemory', obj: str) -> Tuple[str, Offset, Size]:
         data = str.encode(obj)
         data_size = len(data)
-        offset, real_size = shared_memory.malloc(ObjectType.tstr, bs * len(StrOffsets) + bs * data_size)
+        # offset, real_size = shared_memory.malloc(ObjectType.tstr, bs * len(StrOffsets) + bs * data_size)
+        offset, real_size = shared_memory.malloc(ObjectType.tstr, bs * len(StrOffsets) + data_size)
         write_uint64(shared_memory.base_address, offset + bs * len(BaseObjOffsets) + bs * StrOffsets.data_size, data_size)
         data_offset = offset + bs * len(BaseObjOffsets) + bs * StrOffsets.data
         shared_memory._shared_memory.buf[data_offset:data_offset + data_size] = data
@@ -349,12 +449,31 @@ class TStr:
             raise WrongObjectTypeError
 
         data_size = read_uint64(shared_memory.base_address, offset + bs * len(BaseObjOffsets) + bs * StrOffsets.data_size)
-        data_offset = offset + bs * len(BaseObjOffsets) + bs * StrOffsets.data
-        data = bytes(shared_memory._shared_memory.buf[data_offset:data_offset + data_size])
-        return data.decode()
+        if data_size:
+            data_offset = offset + bs * len(BaseObjOffsets) + bs * StrOffsets.data
+            data = bytes(shared_memory._shared_memory.buf[data_offset:data_offset + data_size])
+            return data.decode()
+        else:
+            return str()
     
     def destroy(self, shared_memory: 'SharedMemory', offset: Offset):
         shared_memory.free(offset)
+    
+    def buffer(self, shared_memory: 'SharedMemory', offset: Offset) -> memoryview:
+        if ObjectType.tstr != read_uint64(shared_memory.base_address, offset + bs * BaseObjOffsets.obj_type):
+            raise WrongObjectTypeError
+
+        data_size = read_uint64(shared_memory.base_address, offset + bs * len(BaseObjOffsets) + bs * StrOffsets.data_size)
+        data_offset = offset + bs * len(BaseObjOffsets) + bs * StrOffsets.data
+        return shared_memory._shared_memory.buf[data_offset:data_offset + data_size]
+    
+    def buffer_2(self, shared_memory: 'SharedMemory', offset: Offset) -> Tuple[int, int]:
+        if ObjectType.tstr != read_uint64(shared_memory.base_address, offset + bs * BaseObjOffsets.obj_type):
+            raise WrongObjectTypeError
+
+        data_size = read_uint64(shared_memory.base_address, offset + bs * len(BaseObjOffsets) + bs * StrOffsets.data_size)
+        data_offset = offset + bs * len(BaseObjOffsets) + bs * StrOffsets.data
+        return data_offset, data_size
 
 
 # ======================================================================================================================
@@ -1815,6 +1934,7 @@ class SharedMemory:
             write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_ready, 1)
 
         # print(bytes(self._shared_memory.buf[0:120]))
+        self.get_data_end_offset()
     
     def read_mem(self, offset: Offset, size: Size) -> List[int]:
         result = list()
@@ -1929,7 +2049,11 @@ class SharedMemory:
         return read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.data_size)
     
     def get_data_end_offset(self) -> Offset:
-        return read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.data_end_offset)
+        result = read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.data_end_offset)
+        if result != len(self._shared_memory.buf):
+            print(result, len(self._shared_memory.buf))
+        
+        return result
 
     # def read_uint64(self, offset: Offset) -> int:
     #     return read_uint64(self.base_address, offset)
@@ -2123,8 +2247,12 @@ class SharedMemory:
             if size % bs:
                 print('WRONG SIZE')
             
-            last_found_obj_size = size + bs * len(BaseObjOffsets)
+            last_found_obj_size = bs * len(BaseObjOffsets) + size
             next_block_offset = last_found_obj_offset + last_found_obj_size
+            if next_block_offset > self.get_data_end_offset():
+                print(f'{next_block_offset=}, {self.get_data_end_offset()=}, {len(self._shared_memory.buf)=}')
+                return False, adjusted_size, None, None, next_block_offset
+
             if obj_type is not ObjectType.tfree_memory:
                 return False, adjusted_size, None, None, next_block_offset
 
@@ -2188,7 +2316,7 @@ class SharedMemory:
                     start_offset = next_block_offset
 
             if not found:
-                return None, None
+                raise FreeMemoryChunkNotFoundError(obj_type, size, loop_allowed, zero_mem)
             
             self.combine_free_memory_blocks(free_mem_block_offset, adjusted_size, last_free_block_offset, last_free_block_new_size, next_block_offset)
             obj_size = adjusted_size - bs * len(BaseObjOffsets)
@@ -2272,6 +2400,7 @@ class SharedMemory:
         return mapped_obj, offset, size
 
     def get_obj(self, offset: int) -> Any:
+        # print(f'get_obj: {offset=}')
         obj_type = ObjectType(read_uint64(self.base_address, offset))
         if obj_type is ObjectType.tfree_memory:
             # self.print_mem(offset - 32, 96, 'get_obj [offset - 32: offset + 64]. {}')
@@ -2279,6 +2408,26 @@ class SharedMemory:
         
         codec = codec_by_type[obj_type]
         return codec.init_from_shared_memory(self, offset)
+
+    def get_obj_buffer(self, offset: int) -> memoryview:
+        # print(f'get_obj: {offset=}')
+        obj_type = ObjectType(read_uint64(self.base_address, offset))
+        if obj_type is ObjectType.tfree_memory:
+            # self.print_mem(offset - 32, 96, 'get_obj [offset - 32: offset + 64]. {}')
+            raise RuntimeError
+        
+        codec = codec_by_type[obj_type]
+        return codec.buffer(self, offset)
+
+    def get_obj_buffer_2(self, offset: int) -> Tuple[int, int]:
+        # print(f'get_obj: {offset=}')
+        obj_type = ObjectType(read_uint64(self.base_address, offset))
+        if obj_type is ObjectType.tfree_memory:
+            # self.print_mem(offset - 32, 96, 'get_obj [offset - 32: offset + 64]. {}')
+            raise RuntimeError
+        
+        codec = codec_by_type[obj_type]
+        return codec.buffer_2(self, offset)
 
     def destroy_obj(self, offset: int):
         obj_type = ObjectType(read_uint64(self.base_address, offset))
@@ -2304,31 +2453,41 @@ class SharedMemory:
     def write_message(self, obj: Any):
         # self.update_free_memory_search_start()
         message_offset, message_real_size = self.malloc(ObjectType.tmessage, bs * len(MessageOffsets))
-        mapped_obj, offset, size = self.put_obj(obj)
-        # self.commit_free_memory_search_start()
-        last_message_offset: Offset = self.get_last_message_offset()
-        if last_message_offset:
-            write_uint64(self.base_address, last_message_offset + bs * len(BaseObjOffsets) + bs * MessageOffsets.next_message_offset, message_offset)
+        try:
+            mapped_obj, offset, size = self.put_obj(obj)
+            # self.commit_free_memory_search_start()
+            last_message_offset: Offset = self.get_last_message_offset()
+            if last_message_offset:
+                write_uint64(self.base_address, last_message_offset + bs * len(BaseObjOffsets) + bs * MessageOffsets.next_message_offset, message_offset)
+            else:
+                self.set_first_message_offset(message_offset)
+            
             write_uint64(self.base_address, message_offset + bs * len(BaseObjOffsets) + bs * MessageOffsets.previous_message_offset, last_message_offset)
-        else:
-            self.set_first_message_offset(message_offset)
-        
-        write_uint64(self.base_address, message_offset + bs * len(BaseObjOffsets) + bs * MessageOffsets.item_offset, offset)
-        self.set_last_message_offset(message_offset)
+            write_uint64(self.base_address, message_offset + bs * len(BaseObjOffsets) + bs * MessageOffsets.next_message_offset, 0)
+            write_uint64(self.base_address, message_offset + bs * len(BaseObjOffsets) + bs * MessageOffsets.item_offset, offset)
+            self.set_last_message_offset(message_offset)
+        except:
+            self.free(message_offset)
+            raise
+
         return mapped_obj, offset, message_offset
-    
 
     def put_message(self, obj: Any):
         mapped_obj, offset, message_offset = self.write_message(obj)
         return mapped_obj
-
+    
+    def put_message_2(self, obj: Any):
+        mapped_obj, offset, message_offset = self.write_message(obj)
+        return mapped_obj, offset
 
     def has_messages(self) -> bool:
         return self.get_last_message_offset() != 0
 
     def read_message_info(self, queue_type: QueueType = QueueType.fifo) -> Tuple[Any, Optional[Offset], Optional[Offset]]:
+        # print(0)
         if QueueType.fifo == queue_type:
             message_offset = self.get_first_message_offset()
+            # print(f'0.0| {message_offset=}')
             if not message_offset:
                 return None, None, None
             
@@ -2340,6 +2499,7 @@ class SharedMemory:
                 self.set_last_message_offset(0)
         else:
             message_offset = self.get_last_message_offset()
+            # print(f'0.1| {message_offset=}')
             if not message_offset:
                 return None, None, None
             
@@ -2350,11 +2510,15 @@ class SharedMemory:
             else:
                 self.set_first_message_offset(0)
         
+        # print(1)
         obj_offset = read_uint64(self.base_address, message_offset + bs * len(BaseObjOffsets) + bs * MessageOffsets.item_offset)
+        # print(2)
         if not obj_offset:
             return None, None, message_offset
 
+        # print(3)
         obj = self.get_obj(obj_offset)
+        # print(4)
         return obj, obj_offset, message_offset
 
     def destroy_message(self, message_offset: Offset):
@@ -2375,6 +2539,13 @@ class SharedMemory:
             return obj
         else:
             raise NoMessagesInQueueError
+    
+    def read_message_2(self, queue_type: QueueType = QueueType.fifo) -> Tuple[Any, int]:
+        obj, obj_offset, message_offset = self.read_message_info(queue_type)
+        if message_offset:
+            return obj, obj_offset
+        else:
+            raise NoMessagesInQueueError
 
     def take_message(self, queue_type: QueueType = QueueType.fifo) -> Any:
         obj, obj_offset, message_offset = self.read_message_info(queue_type)
@@ -2384,6 +2555,15 @@ class SharedMemory:
             raise NoMessagesInQueueError
         
         return obj
+
+    def take_message_2(self, queue_type: QueueType = QueueType.fifo) -> Tuple[Any, int]:
+        obj, obj_offset, message_offset = self.read_message_info(queue_type)
+        if message_offset:
+            self.destroy_message(message_offset)
+        else:
+            raise NoMessagesInQueueError
+        
+        return obj, obj_offset
     
     def get_message(self, default = None, queue_type: QueueType = QueueType.fifo) -> Any:
         obj, obj_offset, message_offset = self.read_message_info(queue_type)
@@ -2391,6 +2571,13 @@ class SharedMemory:
             return obj
         else:
             return default
+    
+    def get_message_2(self, default = None, queue_type: QueueType = QueueType.fifo) -> Tuple[Any, Optional[int]]:
+        obj, obj_offset, message_offset = self.read_message_info(queue_type)
+        if message_offset:
+            return obj, obj_offset
+        else:
+            return default, None
 
     def pop_message(self, default = None, queue_type: QueueType = QueueType.fifo) -> Any:
         obj, obj_offset, message_offset = self.read_message_info(queue_type)
@@ -2400,6 +2587,16 @@ class SharedMemory:
             obj = default
         
         return obj
+
+    def pop_message_2(self, default = None, queue_type: QueueType = QueueType.fifo) -> Tuple[Any, Optional[int]]:
+        obj, obj_offset, message_offset = self.read_message_info(queue_type)
+        if message_offset:
+            self.destroy_message(message_offset)
+        else:
+            obj = default
+            obj_offset = None
+        
+        return obj, obj_offset
 
     # ----------------------------
 
@@ -2528,18 +2725,49 @@ class SharedMemory:
 
 
 @contextmanager
-def get_in_line(shared_memor: SharedMemory):
-    shared_memor.get_in_line()
+def get_in_line(shared_memory: SharedMemory):
+    shared_memory.get_in_line()
     try:
         yield
     finally:
-        shared_memor.release()
+        shared_memory.release()
 
 
 @contextmanager
-def wait_my_turn(shared_memor: SharedMemory, time_limit: Optional[RationalNumber] = None, periodic_sleep_time: Optional[RationalNumber] = 0.000000001):
-    shared_memor.wait_my_turn(time_limit, periodic_sleep_time)
+def wait_my_turn(shared_memory: SharedMemory, time_limit: Optional[RationalNumber] = None, periodic_sleep_time: Optional[RationalNumber] = 0.000000001):
+    shared_memory.wait_my_turn(time_limit, periodic_sleep_time)
     try:
         yield
     finally:
-        shared_memor.release()
+        shared_memory.release()
+
+
+def numpy_array_memory_size(np_shape, np_dtype):
+    num_elements = np.prod(np_shape)
+    element_size = np.dtype(np_dtype).itemsize
+    memory_size_bytes = num_elements * element_size
+    return memory_size_bytes
+
+
+def numpy_array_made_from_pointer_memory_size(np_shape, ctypes_type):
+    num_elements = np.prod(np_shape)
+    element_size = ctypes.sizeof(ctypes_type)
+    memory_size_bytes = num_elements * element_size
+    return memory_size_bytes
+
+
+def make_numpy_array_from_obj_offset(shared_memory: SharedMemory, offset: int, np_shape, ctypes_type = None) -> Any:
+    if ctypes_type is None:
+        ctypes_type = ctypes.c_uint8
+    
+    data_offset, data_size = shared_memory.get_obj_buffer_2(offset)
+    num_elements = np.prod(np_shape)
+    np_array_size = num_elements * ctypes.sizeof(ctypes_type)
+    if data_size < np_array_size:
+        raise ObjBufferIsSmallerThanRequestedNumpyArrayError(data_size, np_array_size)
+    
+    data_address = shared_memory.base_address + data_offset
+    void_ptr = ctypes.c_void_p(data_address)
+    # actual_ptr = ctypes.cast(void_ptr, ctypes.POINTER(ctypes_type * num_elements))
+    actual_ptr = ctypes.cast(void_ptr, ctypes.POINTER(ctypes_type))
+    return np.ctypeslib.as_array(actual_ptr, shape=np_shape)

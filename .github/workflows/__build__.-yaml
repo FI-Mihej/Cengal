@@ -1,0 +1,479 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build_wheels_light__macos__cpython:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        # os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+        os: [macos-13, macos-14]
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install --upgrade delocate
+
+      - name: Install Nim
+        run: |
+          brew install nim
+          nim --version
+
+      - name: Install basic Nim dependencies
+        run: |
+          nimble install nimpy -y
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.22.1'
+
+      # - name: Install basic Go dependencies - 0
+      #   run: |
+      #     python -m pip install pybindgen
+
+      - name: Install basic Go dependencies - 1
+        run: |
+          go install golang.org/x/tools/cmd/goimports@latest
+          go install github.com/go-python/gopy@latest
+          echo "$HOME/go/bin" >> $GITHUB_PATH
+
+      - name: Test gopy installation
+        run: |
+          which gopy
+          gopy version
+
+      - name: Prepare Setup Light
+        run: |
+          chmod +x ./prepare__setup_light.sh
+          ./prepare__setup_light.sh
+        
+      - name: Build wheels
+        run: |
+          python -m pip install -r ./requirements.txt
+          mkdir ./wheelhouse_temp/
+          python -m pip wheel . -w ./wheelhouse_temp/
+          ls -la ./wheelhouse_temp/
+          delocate-listdeps ./wheelhouse_temp/cengal_light-*.whl
+          delocate-listdeps --all ./wheelhouse_temp/cengal_light-*.whl
+          delocate-listdeps --depending ./wheelhouse_temp/cengal_light-*.whl
+          delocate-wheel -w ./wheelhouse/ -v ./wheelhouse_temp/cengal_light-*.whl
+          ls -la ./wheelhouse/
+          delocate-listdeps --all ./wheelhouse/cengal_light-*.whl
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./wheelhouse/*.whl
+
+  build_wheels_shell__macos__cpython:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        # os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+        os: [macos-13, macos-14]
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install --upgrade delocate
+
+      - name: Install Nim
+        run: |
+          brew install nim
+          nim --version
+
+      - name: Install basic Nim dependencies
+        run: |
+          nimble install nimpy -y
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.22.1'
+
+      # - name: Install basic Go dependencies - 0
+      #   run: |
+      #     python -m pip install pybindgen
+
+      - name: Install basic Go dependencies - 1
+        run: |
+          go install golang.org/x/tools/cmd/goimports@latest
+          go install github.com/go-python/gopy@latest
+          echo "$HOME/go/bin" >> $GITHUB_PATH
+
+      - name: Test gopy installation
+        run: |
+          which gopy
+          gopy version
+
+      - name: Prepare Setup Shell
+        run: |
+          chmod +x ./prepare__setup_shell.sh
+          ./prepare__setup_shell.sh
+          chmod +x ./rename_wheel__github_actions__macos__cpython.sh
+        
+      - name: Build wheels
+        run: |
+          python -m pip install -r ./requirements.txt
+          mkdir ./wheelhouse_temp/
+          python -m pip wheel . -w ./wheelhouse_temp/
+          ls -la ./wheelhouse_temp/
+          rename_wheel__github_actions__macos__cpython.sh ${{ matrix.python-version }} ${{ matrix.os }}
+          cp -R ./wheelhouse_temp/cengal-*.whl ./wheelhouse/
+          ls -la ./wheelhouse/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./wheelhouse/*.whl
+
+  build_wheels_light__macos__pypy:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        # os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+        os: [macos-13, macos-14]
+        python-version: ['pypy-3.9', 'pypy-3.10']
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install --upgrade delocate
+
+      - name: Install Nim
+        run: |
+          brew install nim
+          nim --version
+
+      - name: Install basic Nim dependencies
+        run: |
+          nimble install nimpy -y
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.22.1'
+
+      # - name: Install basic Go dependencies - 0
+      #   run: |
+      #     python -m pip install pybindgen
+
+      - name: Install basic Go dependencies - 1
+        run: |
+          go install golang.org/x/tools/cmd/goimports@latest
+          go install github.com/go-python/gopy@latest
+          echo "$HOME/go/bin" >> $GITHUB_PATH
+
+      - name: Test gopy installation
+        run: |
+          which gopy
+          gopy version
+
+      - name: Prepare Setup Light
+        run: |
+          chmod +x ./prepare__setup_light.sh
+          ./prepare__setup_light.sh
+        
+      - name: Build wheels
+        run: |
+          python -m pip install -r ./requirements.txt
+          mkdir ./wheelhouse_temp/
+          python -m pip wheel . -w ./wheelhouse_temp/
+          ls -la ./wheelhouse_temp/
+          delocate-listdeps ./wheelhouse_temp/cengal_light-*.whl
+          delocate-listdeps --all ./wheelhouse_temp/cengal_light-*.whl
+          delocate-listdeps --depending ./wheelhouse_temp/cengal_light-*.whl
+          delocate-wheel -w ./wheelhouse/ -v ./wheelhouse_temp/cengal_light-*.whl
+          ls -la ./wheelhouse/
+          delocate-listdeps --all ./wheelhouse/cengal_light-*.whl
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./wheelhouse/*.whl
+
+  build_wheels_shell__macos__pypy:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        # os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+        os: [macos-13, macos-14]
+        python-version: ['pypy-3.9', 'pypy-3.10']
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install --upgrade delocate
+
+      - name: Install Nim
+        run: |
+          brew install nim
+          nim --version
+
+      - name: Install basic Nim dependencies
+        run: |
+          nimble install nimpy -y
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.22.1'
+
+      # - name: Install basic Go dependencies - 0
+      #   run: |
+      #     python -m pip install pybindgen
+
+      - name: Install basic Go dependencies - 1
+        run: |
+          go install golang.org/x/tools/cmd/goimports@latest
+          go install github.com/go-python/gopy@latest
+          echo "$HOME/go/bin" >> $GITHUB_PATH
+
+      - name: Test gopy installation
+        run: |
+          which gopy
+          gopy version
+
+      - name: Prepare Setup Shell
+        run: |
+          chmod +x ./prepare__setup_shell.sh
+          ./prepare__setup_shell.sh
+          chmod +x ./rename_wheel__github_actions__macos__pypy.sh
+        
+      - name: Build wheels
+        run: |
+          python -m pip install -r ./requirements.txt
+          mkdir ./wheelhouse_temp/
+          python -m pip wheel . -w ./wheelhouse_temp/
+          ls -la ./wheelhouse_temp/
+          rename_wheel__github_actions__macos__pypy.sh ${{ matrix.python-version }} ${{ matrix.os }}
+          cp -R ./wheelhouse_temp/cengal-*.whl ./wheelhouse/
+          ls -la ./wheelhouse/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./wheelhouse/*.whl
+
+
+# name: Build
+
+# on:
+#   push:
+#     branches: [ master ]
+#   pull_request:
+#     branches: [ master ]
+
+# jobs:
+#   build_wheels_light:
+#     name: Build wheels on ${{ matrix.os }}
+#     runs-on: ${{ matrix.os }}
+#     strategy:
+#       matrix:
+#         # macos-13 is an intel runner, macos-14 is apple silicon
+#         # os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+#         # os: [macos-13, macos-14]
+#         os: [macos-13]
+
+#     steps:
+#       - uses: actions/checkout@v4
+      
+#       - name: Set up Python
+#         uses: actions/setup-python@v2
+#         with:
+#           python-version: '3.10'
+
+#       - name: Install basic Python dependencies
+#         run: |
+#           python -m pip install --upgrade pip
+#           python -m pip install --upgrade setuptools
+#           python -m pip install --upgrade wheel
+#           python -m pip install --upgrade delocate
+
+#       - name: Install Nim
+#         run: |
+#           brew install nim
+#           nim --version
+
+#       - name: Install basic Nim dependencies
+#         run: |
+#           nimble install nimpy -y
+
+#       # - name: Install Go
+#       #   run: |
+#       #     brew install go
+#       #     go version
+
+#       - name: Set up Go
+#         uses: actions/setup-go@v3
+#         with:
+#           go-version: '1.22.1'
+
+#       - name: Install basic Go dependencies - 0
+#         run: |
+#           python -m pip install pybindgen
+
+#       - name: Install basic Go dependencies - 1
+#         run: |
+#           go install golang.org/x/tools/cmd/goimports@latest
+#           go install github.com/go-python/gopy@latest
+#           echo "$HOME/go/bin" >> $GITHUB_PATH
+
+#       - name: Test gopy installation
+#         run: |
+#           which gopy
+#           gopy version
+
+#       - name: Install cibuildwheel
+#         run: python -m pip install cibuildwheel
+
+#       - name: Prepare Setup Light
+#         run: |
+#           chmod +x ./prepare__setup_light.sh
+#           ./prepare__setup_light.sh
+        
+#       - name: Build wheels
+#         run: |
+#           python -m pip install -r ./requirements.txt
+#           mkdir ./wheelhouse_temp/
+#           python -m pip wheel . -w ./wheelhouse_temp/
+#           ls -la ./wheelhouse_temp/
+#           delocate-listdeps ./wheelhouse_temp/cengal_light-*-cp310-cp310-macosx_13_0_x86_64.whl
+#           delocate-listdeps --all ./wheelhouse_temp/cengal_light-*-cp310-cp310-macosx_13_0_x86_64.whl
+#           delocate-listdeps --depending ./wheelhouse_temp/cengal_light-*-cp310-cp310-macosx_13_0_x86_64.whl
+#           delocate-wheel -w ./wheelhouse/ -v ./wheelhouse_temp/cengal_light-*-cp310-cp310-macosx_13_0_x86_64.whl
+#           ls -la ./wheelhouse/
+#           delocate-listdeps --all ./wheelhouse/cengal_light-*-cp310-cp310-macosx_13_0_x86_64.whl
+        
+#       # - name: Build wheels
+#       #   uses: pypa/cibuildwheel@v2.17.0
+#       #   env:
+#       #     CIBW_BUILD: "cp310-macosx_* cp311-macosx_*"
+#       #   # env:
+#       #   #   CIBW_SOME_OPTION: value
+#       #   #    ...
+#       #   # with:
+#       #   #   package-dir: .
+#       #   #   output-dir: wheelhouse
+#       #   #   config-file: "{package}/pyproject.toml"
+
+#       - uses: actions/upload-artifact@v4
+#         with:
+#           name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+#           path: ./wheelhouse/*.whl
+
+#   # build_wheels_shell:
+#   #   needs: build_wheels_light
+#   #   name: Build wheels on ${{ matrix.os }}
+#   #   runs-on: ${{ matrix.os }}
+#   #   strategy:
+#   #     matrix:
+#   #       # macos-13 is an intel runner, macos-14 is apple silicon
+#   #       # os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+#   #       os: [macos-13, macos-14]
+
+#   #   steps:
+#   #     - uses: actions/checkout@v4
+      
+#   #     - name: Set up Python
+#   #       uses: actions/setup-python@v2
+#   #       with:
+#   #         python-version: '3.x'
+      
+#   #     - name: Install Nim
+#   #       run: |
+#   #         wget https://nim-lang.org/download/nim-2.0.2-linux_x64.tar.xz
+#   #         tar -xf nim-2.0.2-linux_x64.tar.xz
+#   #         echo "$PWD/nim-2.0.2/bin" >> $GITHUB_PATH
+
+#   #     - name: Install Go
+#   #       uses: actions/setup-go@v3
+#   #       with:
+#   #         go-version: '1.22.1' # Set this to your desired Go version
+
+#   #     - name: Install basic dependencies
+#   #       run: |
+#   #         python -m pip install --upgrade pip
+#   #         python -m pip install --upgrade setuptools
+#   #         python -m pip install --upgrade wheel
+
+#   #     - name: Install cibuildwheel
+#   #       run: python -m pip install cibuildwheel
+
+#   #     - name: Prepare Setup Light
+#   #       run: |
+#   #         chmod +x ./prepare__setup_shell.sh
+#   #         ./prepare__setup_shell.sh
+
+#   #     - name: Build wheels
+#   #       uses: pypa/cibuildwheel@v2.17.0
+#   #       env:
+#   #         CIBW_BUILD: "cp310-macosx_* cp311-macosx_*"
+#   #       # env:
+#   #       #   CIBW_SOME_OPTION: value
+#   #       #    ...
+#   #       # with:
+#   #       #   package-dir: .
+#   #       #   output-dir: wheelhouse
+#   #       #   config-file: "{package}/pyproject.toml"
+
+#   #     - uses: actions/upload-artifact@v4
+#   #       with:
+#   #         name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+#   #         path: ./wheelhouse/*.whl

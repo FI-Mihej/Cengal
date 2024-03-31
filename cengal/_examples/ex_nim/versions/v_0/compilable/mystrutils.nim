@@ -11,15 +11,15 @@ const apiEndpointDoc2 {.strdefine: package.apiEndpointDoc2}: string = "https://a
 
 # This is our module's exported function
 proc toUpper*(inputString: string): string =
-  when defined(CF_Linux):
-    echo "mystrutils: CF_Linux"
+  when defined(NIMF_Linux):
+    echo "mystrutils: NIMF_Linux"
   else:
-    echo "mystrutils: not CF_Linux"
+    echo "mystrutils: not NIMF_Linux"
 
-  when defined(CF_IS_ARM):
-    echo "mystrutils: CF_IS_ARM"
+  when defined(NIMF_IS_ARM):
+    echo "mystrutils: NIMF_IS_ARM"
   else:
-    echo "mystrutils: not CF_IS_ARM"
+    echo "mystrutils: not NIMF_IS_ARM"
 
   echo "API Endpoint: ", apiEndpointDoc
   echo "API Endpoint: URL: https://api.production.com; Path: \\usr\\bin"

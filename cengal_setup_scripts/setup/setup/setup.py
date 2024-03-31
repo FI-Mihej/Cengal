@@ -25,7 +25,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.2.0"
+__version__ = "4.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -68,6 +68,7 @@ setup_requires = [
     "Cython>=0.29.34",
     "patch-ng; python_version >= '3.12' or (platform_python_implementation == 'PyPy' and platform_system == 'Windows')",
     "typing_extensions",
+    # "PyBindGen",
 ]
 pypi_requirements_list = get_pypi_requirements_list()
 if 'patch-ng' in pypi_requirements_list:
@@ -79,10 +80,10 @@ remote_requirements_list = get_remote_requirements_list()
 
 from cengal.system import CENGAL_IS_IN_BUILD_MODE
 from cengal.build_tools.current_compiler import compiler_type
-from cengal.build_tools.prepare_cflags import prepare_cflags, concat_cflags, prepare_compile_time_env
+from cengal.build_tools.prepare_cflags import prepare_given_cflags, prepare_cflags, concat_cflags, prepare_compile_time_env
 
 
-prepare_cflags({
+prepare_given_cflags({
     'CENGAL_IS_IN_BUILD_MODE': (False, CENGAL_IS_IN_BUILD_MODE),
     'CENGAL_BUILD_IS_IN_DEBUG_MODE': (False, 'CENGAL_BUILD_IS_IN_DEBUG_MODE' in environ),
 })

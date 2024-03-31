@@ -5,9 +5,9 @@ PACKAGE_NAME="cengal_light"
 IMAGES=("manylinux2014_x86_64" "musllinux_1_1_x86_64" "musllinux_1_2_x86_64")
 
 declare -A DOCKER_IMAGES
-DOCKER_IMAGES["manylinux2014_x86_64"]="cp310-cp310 cp311-cp311 cp312-cp312 cp38-cp38 cp39-cp39 pp310-pypy310_pp73 pp38-pypy38_pp73 pp39-pypy39_pp73"
+DOCKER_IMAGES["manylinux2014_x86_64"]="cp310-cp310 cp311-cp311 cp312-cp312 cp313-cp313 cp38-cp38 cp39-cp39 pp310-pypy310_pp73 pp38-pypy38_pp73 pp39-pypy39_pp73"
 DOCKER_IMAGES["musllinux_1_1_x86_64"]="cp310-cp310 cp38-cp38 cp39-cp39"
-DOCKER_IMAGES["musllinux_1_2_x86_64"]="cp311-cp311 cp312-cp312"
+DOCKER_IMAGES["musllinux_1_2_x86_64"]="cp311-cp311 cp312-cp312 cp313-cp313"
 
 read -p "Enter PyPI username: " PYPI_USERNAME
 read -s -p "Enter PyPI password: " PYPI_PASSWORD

@@ -28,7 +28,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.2.0"
+__version__ = "4.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -96,17 +96,22 @@ dir_type_mapping: Dict[AppDirectoryType, Tuple[GUID, Optional[DirNameOrPath], Op
 }
 
 
-def app_dir_path(dir_type: AppDirectoryType, app_name_or_path: DirNameOrPath, with_structure: bool = True, ensure_dir: bool = True) -> str:
+def app_dir_path(dir_type: AppDirectoryType, app_name_or_path: Optional[DirNameOrPath] = None, with_structure: bool = True, ensure_dir: bool = True) -> str:
+    if app_name_or_path is not None:
+        app_name_or_path = str(app_name_or_path)
+    
     if AppDirectoryType.user_profile_data == dir_type:
-        app_name_or_path = '.' + norm_dir_name_or_path(app_name_or_path)
+        if app_name_or_path is not None:
+            app_name_or_path = '.' + norm_dir_name_or_path(app_name_or_path)
 
     mapping: Tuple[GUID, Optional[DirNameOrPath], Optional[DirNameOrPath]] = dir_type_mapping[dir_type]
     base_dir_path = SHGetKnownFolderPath(mapping[0])
     result_list = [base_dir_path]
     result_list.extend(norm_dir_name_or_path(mapping[1]))
-    result_list.append(norm_dir_name_or_path(app_name_or_path))
-    if with_structure:
-        result_list.extend(norm_dir_name_or_path(mapping[2]))
+    if app_name_or_path is not None:
+        result_list.append(norm_dir_name_or_path(app_name_or_path))
+        if with_structure:
+            result_list.extend(norm_dir_name_or_path(mapping[2]))
     
     result_path = os.path.normpath(os.path.join(*result_list))
     if ensure_dir:
@@ -116,7 +121,7 @@ def app_dir_path(dir_type: AppDirectoryType, app_name_or_path: DirNameOrPath, wi
 
 
 @lru_cache(maxsize=len(AppDirectoryType) * 2 * 10, typed=True)
-def app_dir_path_cached(dir_type: AppDirectoryType, app_name_or_path: DirNameOrPath, with_structure: bool = True, ensure_dir: bool = True):
+def app_dir_path_cached(dir_type: AppDirectoryType, app_name_or_path: Optional[DirNameOrPath] = None, with_structure: bool = True, ensure_dir: bool = True):
     return app_dir_path(dir_type, app_name_or_path, with_structure, ensure_dir)
 
 

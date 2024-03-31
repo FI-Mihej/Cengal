@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.2.0"
+__version__ = "4.3.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -34,12 +34,14 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-IF CD_IS_ARM == 1:
-    cdef extern from "cpu_clock_cycles.h":
-        u64 c_cpu_clock_cycles() nogil
+IF PYXD_IS_ARM == 1:
+    from libc.stdint cimport uint64_t
 
-    cpdef u64 cpu_clock_cycles():
-        cdef u64 result = c_cpu_clock_cycles()
+    cdef extern from "cpu_clock_cycles.h":
+        uint64_t c_cpu_clock_cycles() nogil
+
+    cpdef uint64_t cpu_clock_cycles():
+        cdef uint64_t result = c_cpu_clock_cycles()
         return result
 
 ELSE:
