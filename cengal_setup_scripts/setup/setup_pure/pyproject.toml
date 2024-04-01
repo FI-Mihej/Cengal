@@ -8,5 +8,5 @@ requires = [
     "py-cpuinfo", 
     "charset-normalizer; python_version < '3.13'", 
     "typing_extensions",
-    # "PyBindGen"
+    "PyBindGen",
 ]  # PEP 508 specifications.

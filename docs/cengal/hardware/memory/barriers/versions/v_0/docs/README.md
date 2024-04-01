@@ -47,7 +47,7 @@ from cengal_memory_barriers import full_memory_barrier, mm_pause
 | mm_clflush(...)              | +                  |                    | +             |               |            |                                         |
 | iso_volatile_store16(...)    |                    |                    |               | +             |            |                                         |
 | py_emscripten_atomic_fence() |                    |                    |               |               | +          |                                         |
-| clear_cache(...)             | +                  | +                  |               |               |            |                                         |
+| clear_cache(...)             | +/- (Linux only)   | +/- (Linux only)   |               |               |            |                                         |
 | py_atomic_thread_fence(...)  | +                  | +                  |               |               | +          | +                                       |
 | py_atomic_thread_fence__*()  | +                  | +                  |               |               | +          | +                                       |
 

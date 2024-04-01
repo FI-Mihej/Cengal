@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.0"
+__version__ = "4.3.1"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -170,8 +170,8 @@ ELIF (PYXD_UNAME_SYSNAME in ("Linux", "Darwin")) and (PYXD_UNAME_MACHINE in ("x8
         void __sync_synchronize()
 
 
-    cdef extern from "stdlib.h" nogil:
-        void __clear_cache(char* beg, char* end)
+    # cdef extern from "stdlib.h" nogil:
+    #     void __clear_cache(char* beg, char* end)
 
 
     cpdef void mm_mfence():
@@ -202,9 +202,9 @@ ELIF (PYXD_UNAME_SYSNAME in ("Linux", "Darwin")) and (PYXD_UNAME_MACHINE in ("x8
         __sync_synchronize()
 
 
-    # An alternative to mm_clflush() in GCC and Clang compilers
-    cpdef void clear_cache(int beg, int end):
-        __clear_cache(<char*>beg, <char*>end)
+    # # An alternative to mm_clflush() in GCC and Clang compilers
+    # cpdef void clear_cache(int beg, int end):
+    #     __clear_cache(<char*>beg, <char*>end)
 
 
     full_memory_barrier = mm_mfence
@@ -253,13 +253,13 @@ ELIF PYXD_UNAME_SYSNAME in ("Linux", "Darwin") and PYXD_UNAME_MACHINE.startswith
         __sync_synchronize()
 
 
-    cdef extern from "stdlib.h" nogil:
-        void __clear_cache(char* beg, char* end)
+    # cdef extern from "stdlib.h" nogil:
+    #     void __clear_cache(char* beg, char* end)
 
 
-    # An alternative to mm_clflush() for ARM in GCC and Clang compilers
-    cpdef void clear_cache(int beg, int end):
-        __clear_cache(<char*>beg, <char*>end)
+    # # An alternative to mm_clflush() for ARM in GCC and Clang compilers
+    # cpdef void clear_cache(int beg, int end):
+    #     __clear_cache(<char*>beg, <char*>end)
 
 
     full_memory_barrier = sync_synchronize

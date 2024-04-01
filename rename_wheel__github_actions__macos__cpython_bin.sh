@@ -69,7 +69,7 @@ WHEELHOUSE_DIR="wheelhouse_temp"
 shopt -s nullglob
 for file in "$WHEELHOUSE_DIR"/cengal_light-*-${PYTHON_SHORT_VER}-${PLATFORM_TAG_ORIGINAL_STR}.whl; do
     if [ -f "$file" ]; then
-        version=$(echo "$file" | sed 's|.*/cengal_light-\(.*\)-${PYTHON_SHORT_VER}-${PLATFORM_TAG_ORIGINAL_STR}.whl|\1|')
+        version=$(echo "$file" | sed 's|.*/cengal_light-\(.*\)-'"${PYTHON_SHORT_VER}"'-'"${PLATFORM_TAG_ORIGINAL_STR}"'.whl|\1|')
         new_filename="$WHEELHOUSE_DIR/cengal_light-${version}-${PYTHON_SHORT_VER}-${PLATFORM_TAG_STR}.whl"
 
         echo "Renaming $file to $new_filename"

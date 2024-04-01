@@ -52,7 +52,15 @@ for IMAGE_NAME in "${IMAGES[@]}"; do
         echo ""
         echo " << Building $PYTHON_SHORT_VER wheel for Python $PYTHON_VER inside $IMAGE_NAME >>"
 
+        # Check if the image is musllinux_1_1_x86_64 and set Rust installation command
+        if [ "$IMAGE_NAME" = "musllinux_1_1_x86_64" ]; then
+            INSTALL_RUST_CMD="curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y; source \$HOME/.cargo/env;"
+        else
+            INSTALL_RUST_CMD=""
+        fi
+
         docker run -i -v `pwd`:/io quay.io/pypa/$IMAGE_NAME /bin/bash -c "
+            $INSTALL_RUST_CMD
             /opt/python/$PYTHON_VER/bin/pip install --upgrade pip;
             /opt/python/$PYTHON_VER/bin/pip install --upgrade setuptools;
             /opt/python/$PYTHON_VER/bin/pip install --upgrade wheel;

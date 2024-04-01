@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.0"
+__version__ = "4.3.1"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -448,14 +448,23 @@ class sdist(sdist_orig):
         super().__init__(dist)
 
     def run(self):
+        # print('<<< sdist command is currently being run >>>')
         with secure_current_dir():
             if self.build_config.package_build_is_in_debug_mode in environ:
                 import debugpy
                 debugpy.breakpoint()
             
-            print("sdist command is currently being run")
+            # print("sdist command is currently being run")
             environ[self.build_config.package_build_is_in_sdist_mode] = 'True'
             packages_data_dict, manifest_included_files = self.build_config.find_package_data()
+            # from pprint import pprint
+            # print()
+            # print('<<< packages_data_dict: >>>')
+            # pprint(packages_data_dict)
+            # print()
+            # print('<<< manifest_included_files: >>>')
+            # pprint(manifest_included_files)
+            # print()
             generate_manifest_included_files(manifest_included_files, self.build_config.root_rel)
         
         super().run()
@@ -467,72 +476,101 @@ class build(build_orig):
         super().__init__(dist)
 
     def finalize_options(self):
-        with secure_current_dir():
-            setuptools_extensions = [ext for ext in self.distribution.ext_modules if isinstance(ext, SetuptoolsExtension)]
-            cython_extensions = [ext for ext in self.distribution.ext_modules if isinstance(ext, CythonExtension)]
-            cengal_extensions = (ext for ext in self.distribution.ext_modules if (isinstance(ext, CengalBuildExtension) and (not ext.store_as_data)))
-            cengal_result_extensions = [ext() for ext in cengal_extensions]
-            setuptools_extensions.extend([ext for ext in cengal_result_extensions if isinstance(ext, SetuptoolsExtension)])
-            cython_extensions.extend([ext for ext in cengal_result_extensions if isinstance(ext, CythonExtension)])
-            cengal_extensions_store_as_data = (ext for ext in self.distribution.ext_modules if (isinstance(ext, CengalBuildExtension) and ext.store_as_data))
+        # print('<<< build.finalize_options is currently being run >>>')
+        try:
+            with secure_current_dir():
+                setuptools_extensions = [ext for ext in self.distribution.ext_modules if isinstance(ext, SetuptoolsExtension)]
+                cython_extensions = [ext for ext in self.distribution.ext_modules if isinstance(ext, CythonExtension)]
+                cengal_extensions = (ext for ext in self.distribution.ext_modules if (isinstance(ext, CengalBuildExtension) and (not ext.store_as_data)))
+                cengal_result_extensions = [ext() for ext in cengal_extensions]
+                setuptools_extensions.extend([ext for ext in cengal_result_extensions if isinstance(ext, SetuptoolsExtension)])
+                cython_extensions.extend([ext for ext in cengal_result_extensions if isinstance(ext, CythonExtension)])
+                cengal_extensions_store_as_data = (ext for ext in self.distribution.ext_modules if (isinstance(ext, CengalBuildExtension) and ext.store_as_data))
 
-            if self.build_config.package_build_is_in_debug_mode in environ:
-                import debugpy
-                debugpy.breakpoint()
-        
-        super().finalize_options()
-
-        with secure_current_dir():
-            package_data = self.distribution.package_data or dict()
+                if self.build_config.package_build_is_in_debug_mode in environ:
+                    import debugpy
+                    debugpy.breakpoint()
             
-            if self.build_config.package_build_is_in_sdist_mode not in environ:
-                for ext in cengal_extensions_store_as_data:
-                    files = ext()
-                    if files is None:
-                        continue
+            super().finalize_options()
 
-                    if ext.package not in package_data:
-                        package_data[ext.package] = list()
-                    
-                    package_data[ext.package].extend(files)
+            with secure_current_dir():
+                package_data = self.distribution.package_data or dict()
+                
+                if self.build_config.package_build_is_in_sdist_mode in environ:
+                    for ext in cengal_extensions_store_as_data:
+                        files = ext.sdist()
+                        if files is None:
+                            continue
 
-                from Cython.Build import cythonize
-                result_ext_modules = list()
-                try:
-                    cwd_before_cythonize = getcwd()
-                    pyx_flags_dict = prepare_pyx_flags_dict(self.build_config.additional_pyx_flags)
-                    result_ext_modules.extend(remove_header_files(
-                        cythonize(process_macros(cython_extensions),
-                        compiler_directives={'language_level': '3'},
-                        compile_time_env = pyx_flags_dict,
-                        )))
-                except:
-                    print(f'DEBUG: {cwd_before_cythonize=} | {getcwd()=}')
-                    for extension in cython_extensions:
-                        pprint(class_properties_values_including_overrided(extension))
+                        if ext.package not in package_data:
+                            package_data[ext.package] = list()
+                        
+                        package_data[ext.package].extend(files)
                     
-                    raise
-                
-                result_ext_modules.extend(setuptools_extensions)
-                for ext in result_ext_modules:
-                    if not hasattr(ext, 'extra_compile_args'):
-                        ext.extra_compile_args = list()
+                    result_ext_modules = list()
+                    result_ext_modules.extend(cython_extensions)
+                    result_ext_modules.extend(setuptools_extensions)
+                    self.distribution.package_data = package_data
+                    self.distribution.ext_modules = result_ext_modules
+                    # from pprint import pprint
+                    # print()
+                    # print('<<< self.distribution.package_data: >>>')
+                    # pprint(self.distribution.package_data)
+                    # print()
+                    # print('<<< self.distribution.ext_modules: >>>')
+                    # pprint(self.distribution.ext_modules)
+                    # print()
+                else:
+                    for ext in cengal_extensions_store_as_data:
+                        files = ext()
+                        if files is None:
+                            continue
+
+                        if ext.package not in package_data:
+                            package_data[ext.package] = list()
+                        
+                        package_data[ext.package].extend(files)
+
+                    from Cython.Build import cythonize
+                    result_ext_modules = list()
+                    try:
+                        cwd_before_cythonize = getcwd()
+                        pyx_flags_dict = prepare_pyx_flags_dict(self.build_config.additional_pyx_flags)
+                        result_ext_modules.extend(remove_header_files(
+                            cythonize(process_macros(cython_extensions),
+                            compiler_directives={'language_level': '3'},
+                            compile_time_env = pyx_flags_dict,
+                            )))
+                    except:
+                        print(f'DEBUG: {cwd_before_cythonize=} | {getcwd()=}')
+                        for extension in cython_extensions:
+                            pprint(class_properties_values_including_overrided(extension))
+                        
+                        raise
                     
-                    if ext.extra_compile_args is None:
-                        ext.extra_compile_args = list()
+                    result_ext_modules.extend(setuptools_extensions)
+                    for ext in result_ext_modules:
+                        if not hasattr(ext, 'extra_compile_args'):
+                            ext.extra_compile_args = list()
+                        
+                        if ext.extra_compile_args is None:
+                            ext.extra_compile_args = list()
+                        
+                        if 'Darwin' == OS_TYPE:
+                            if cpu_info().is_x86:
+                                ext.extra_compile_args += ['-arch', 'x86_64']
+                            elif cpu_info().is_arm:
+                                ext.extra_compile_args += ['-arch', 'arm64']
                     
-                    if 'Darwin' == OS_TYPE:
-                        if cpu_info().is_x86:
-                            ext.extra_compile_args += ['-arch', 'x86_64']
-                        elif cpu_info().is_arm:
-                            ext.extra_compile_args += ['-arch', 'arm64']
-                
-                self.distribution.package_data = package_data
-                self.distribution.ext_modules = result_ext_modules
+                    self.distribution.package_data = package_data
+                    self.distribution.ext_modules = result_ext_modules
 
                 if self.build_config.package_build_is_in_debug_mode in environ:
                     debugpy.breakpoint()
                     print()
+        finally:
+            # print('<<< build.finalize_options is done >>>')
+            pass
 
 
 class build_ext(build_ext_orig):

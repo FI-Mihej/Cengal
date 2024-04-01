@@ -30,7 +30,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.0"
+__version__ = "4.3.1"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -45,7 +45,7 @@ from setuptools._distutils.dist import Distribution
 
 from cengal.file_system.path_manager import path_relative_to_src, RelativePath, get_relative_path_part, sep
 from cengal.file_system.directory_manager import current_src_dir, change_current_dir, ensure_dir
-from cengal.file_system.directory_manager import filtered_file_list, FilteringType, filtered_file_list_traversal, file_list_traversal, FilteringEntity
+from cengal.file_system.directory_manager import filtered_file_list, FilteringType, filtered_file_list_traversal, file_list_traversal, file_list_traversal_ex, FilteringEntity
 from cengal.file_system.file_manager import current_src_file_dir, file_exists, full_ext, file_name, last_ext
 from cengal.build_tools.prepare_cflags import prepare_cflags, concat_cflags, prepare_compile_time_env, adjust_definition_names, \
     dict_of_tuples_to_dict, list_to_dict
@@ -196,10 +196,22 @@ class CengalGoBuildExtension(CengalBuildExtension):
             print('==================================================')
             print(f'<<< GO COMPILATION: {self.module_name_str} >>>')
             print('=======================')
-            with change_current_dir(self.dir_path):
-                params = ['go', 'mod', 'init', self.module_name_str]
-                result = subprocess.run(params, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-                print(result.stdout)
+            go_module_setup_files = [
+                'go.mod', 
+                'go.sum', 
+            ]
+            adjusted_exported_files_list = list()
+            need_to_init_go_module = False
+            for file_name in go_module_setup_files:
+                if not file_exists(path_join(self.dir_path, file_name)):
+                    need_to_init_go_module = True
+                    break
+            
+            if need_to_init_go_module:
+                with change_current_dir(self.dir_path):
+                    params = ['go', 'mod', 'init', self.module_name_str]
+                    result = subprocess.run(params, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                    print(result.stdout)
 
             env = os.environ.copy()
             additional_env = dict()
@@ -249,6 +261,64 @@ class CengalGoBuildExtension(CengalBuildExtension):
             print('==================================================')
             return None
     
+    def sdist(self) -> Optional[List[str]]:
+        src_dir_path: str = RelativePath(self.dir_path)(self._src_dir)
+        def filter(entity: FilteringEntity, data: Any):
+            if FilteringEntity.filename == entity:
+                dirpath, filename = data
+                if filename in {
+                    '__init__.py', 
+                    '__x__build_config.py', 
+                    '__build_config.py', 
+                }:
+                    return False
+                
+                if last_ext(filename) in {'so', 'dylib', 'pyd', 'dll', 'py', 'pyw', 'gitignore', 'pyc'}:
+                    return False
+
+                return True
+            elif FilteringEntity.dirname == entity:
+                dirpath, dirname = data
+                if dirname in {
+                    '__pycache__', 
+                    }:
+                    return False
+
+                return True
+            elif FilteringEntity.dirpath == entity:
+                dirpath, dirnames, filenames = data
+                dirpath_basename = basename(dirpath)
+                if dirpath_basename in {
+                    '__pycache__', 
+                    }:
+                    return False
+                
+                return True
+            elif FilteringEntity.aggregated == entity:
+                result_full_file_names: List[str] = list()
+                for dirpath, new_dirnames, new_filenames in data:
+                    for file_name in new_filenames:
+                        result_full_file_names.append(path_join(dirpath, file_name))
+                
+                return result_full_file_names
+            else:
+                raise NotImplementedError
+
+        result_full_file_names: List[str] = file_list_traversal_ex(src_dir_path, filter, True)
+        go_module_setup_files = [
+            'go.mod', 
+            'go.sum', 
+        ]
+        adjusted_exported_files_list = list()
+        for file_name in go_module_setup_files:
+            if file_exists(path_join(self.dir_path, file_name)):
+                adjusted_exported_files_list.append(file_name)
+        
+        for file_path in result_full_file_names:
+            adjusted_exported_files_list.append(get_relative_path_part(file_path, self.dir_path))
+        
+        return adjusted_exported_files_list
+    
     def _exported_files_list(self) -> List[str]:
         def filter(data_type: FilteringEntity, data):
             if FilteringEntity.dirpath == data_type:
@@ -291,19 +361,19 @@ class CengalGoBuildExtension(CengalBuildExtension):
                 if out_dir_name_ignorable not in content:
                     f.write(f'{out_dir_name_ignorable}\n')
 
-                if 'go.mod' not in content:
-                    f.write(f'go.mod\n')
+                # if 'go.mod' not in content:
+                #     f.write(f'go.mod\n')
 
-                if 'go.sum' not in content:
-                    f.write(f'go.sum\n')
+                # if 'go.sum' not in content:
+                #     f.write(f'go.sum\n')
         else:
             with open(gitignore_path, 'xt') as f:
                 f.write(f'{self.definitions_module_name}/\n')
                 out_dir_name = basename(self.out_dir)
                 out_dir_name_ignorable = f'{out_dir_name}/'
                 f.write(f'{out_dir_name_ignorable}\n')
-                f.write(f'go.mod\n')
-                f.write(f'go.sum\n')
+                # f.write(f'go.mod\n')
+                # f.write(f'go.sum\n')
     
     def _generate_definitions_module(self):
         file_content_template: str = """// {config_file_name}

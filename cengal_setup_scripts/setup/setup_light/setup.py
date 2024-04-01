@@ -25,7 +25,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.0"
+__version__ = "4.3.1"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -49,7 +49,7 @@ import setuptools
 # import platform
 
 
-setuptools._install_setup_requires({'setup_requires': ['Cython>=0.29.34', 'py-cpuinfo', 'charset-normalizer; python_version < "3.13"']})
+setuptools._install_setup_requires({'setup_requires': ['Cython>=0.29.34', 'py-cpuinfo', 'charset-normalizer; python_version < "3.13"', 'PyBindGen']})
 
 
 from cengal_setup_scripts.install_required_packages.install_packages import install_bundled, get_pypi_requirements_list, get_remote_requirements_list
@@ -70,7 +70,7 @@ setup_requires = [
     "Cython>=0.29.34",
     "patch-ng; python_version >= '3.12' or (platform_python_implementation == 'PyPy' and platform_system == 'Windows')",
     "typing_extensions",
-    # "PyBindGen",
+    "PyBindGen",
 ]
 pypi_requirements_list = get_pypi_requirements_list()
 if 'patch-ng' in pypi_requirements_list:
@@ -193,7 +193,7 @@ setuptools.setup(
             "msgpack-python; python_version < '3.8' and platform_python_implementation == 'CPython'",
             "msgpack; python_version >= '3.8' and platform_python_implementation == 'CPython'",
             "msgpack-pypy; platform_python_implementation == 'PyPy'",
-            "msgspec; python_version < '3.13'",
+            "msgspec; python_version < '3.13' and platform_python_implementation != 'PyPy'",
         ],
         'cengal__user_interface__gui__tkinter': [
             'typing_extensions',
@@ -206,7 +206,7 @@ setuptools.setup(
         ],
         'cengal__file_system__app_fs_structure__app_dir_path': [
             'typing_extensions',
-            "pyobjc; platform_system == 'Darwin' and platform_python_implementation != 'PyPy",
+            "pyobjc; platform_system == 'Darwin' and platform_python_implementation != 'PyPy'",
         ],
         'cengal__build_tools__packages__create': [
             'typing_extensions',
@@ -216,14 +216,14 @@ setuptools.setup(
         'cengal__build_tools__gather_docs': [
             'pdoc',
         ],
-        # 'cengal__build_tools__build_extensions': [
-        #     'PyBindGen',
-        # ],
+        'cengal__build_tools__build_extensions': [
+            'PyBindGen',
+        ],
         'full': [
             # 'PyBindGen',
             'typing_extensions',
-            "msgspec; python_version < '3.13'",
-            "pyobjc; platform_system == 'Darwin' and platform_python_implementation != 'PyPy",
+            "msgspec; python_version < '3.13' and platform_python_implementation != 'PyPy'",
+            "pyobjc; platform_system == 'Darwin' and platform_python_implementation != 'PyPy'",
             'pdoc',
             "psutil; platform_python_implementation != 'PyPy' or platform_system != 'Windows'",
             "orjson; platform_python_implementation != 'PyPy'",
@@ -243,8 +243,8 @@ setuptools.setup(
         'all': [
             # 'PyBindGen',
             'typing_extensions',
-            "msgspec; python_version < '3.13'",
-            "pyobjc; platform_system == 'Darwin' and platform_python_implementation != 'PyPy",
+            "msgspec; python_version < '3.13' and platform_python_implementation != 'PyPy'",
+            "pyobjc; platform_system == 'Darwin' and platform_python_implementation != 'PyPy'",
             'pdoc',
             "psutil; platform_python_implementation != 'PyPy' or platform_system != 'Windows'",
             "orjson; platform_python_implementation != 'PyPy'",

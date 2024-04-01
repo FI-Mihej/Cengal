@@ -30,7 +30,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.0"
+__version__ = "4.3.1"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -45,8 +45,8 @@ from setuptools._distutils.dist import Distribution
 
 from cengal.file_system.path_manager import path_relative_to_src, RelativePath, get_relative_path_part, sep
 from cengal.file_system.directory_manager import current_src_dir, change_current_dir
-from cengal.file_system.directory_manager import filtered_file_list, FilteringType, filtered_file_list_traversal, file_list_traversal, FilteringEntity
-from cengal.file_system.file_manager import current_src_file_dir, file_exists
+from cengal.file_system.directory_manager import filtered_file_list, FilteringType, filtered_file_list_traversal, file_list_traversal, file_list_traversal_ex, FilteringEntity
+from cengal.file_system.file_manager import current_src_file_dir, file_exists, full_ext, file_name, last_ext
 from cengal.build_tools.prepare_cflags import prepare_cflags, concat_cflags, prepare_compile_time_env, adjust_definition_names, \
     dict_of_tuples_to_dict, list_to_dict
 from cengal.introspection.inspect import get_exception, entity_repr_limited_try_qualname, pifrl, pdi
@@ -217,6 +217,55 @@ class CengalNimBuildExtension(CengalBuildExtension):
             print(get_exception())
             print('==================================================')
             return None
+    
+    def sdist(self) -> Optional[List[str]]:
+        def filter(entity: FilteringEntity, data: Any):
+            if FilteringEntity.filename == entity:
+                dirpath, filename = data
+                if filename in {
+                    '__init__.py', 
+                    '__x__build_config.py', 
+                    '__build_config.py', 
+                }:
+                    return False
+                
+                if last_ext(filename) in {'so', 'dylib', 'pyd', 'dll', 'py', 'pyw', 'gitignore', 'pyc'}:
+                    return False
+
+                return True
+            elif FilteringEntity.dirname == entity:
+                dirpath, dirname = data
+                if dirname in {
+                    '__pycache__', 
+                    }:
+                    return False
+
+                return True
+            elif FilteringEntity.dirpath == entity:
+                dirpath, dirnames, filenames = data
+                dirpath_basename = basename(dirpath)
+                if dirpath_basename in {
+                    '__pycache__', 
+                    }:
+                    return False
+                
+                return True
+            elif FilteringEntity.aggregated == entity:
+                result_full_file_names: List[str] = list()
+                for dirpath, new_dirnames, new_filenames in data:
+                    for file_name in new_filenames:
+                        result_full_file_names.append(path_join(dirpath, file_name))
+                
+                return result_full_file_names
+            else:
+                raise NotImplementedError
+        
+        result_full_file_names: List[str] = file_list_traversal_ex(self.dir_path, filter, True)
+        adjusted_exported_files_list = list()
+        for file_path in result_full_file_names:
+            adjusted_exported_files_list.append(get_relative_path_part(file_path, self.dir_path))
+        
+        return adjusted_exported_files_list
     
     def _ensure_gitignore(self):
         gitignore_path = self.dir_path_rel('.gitignore')

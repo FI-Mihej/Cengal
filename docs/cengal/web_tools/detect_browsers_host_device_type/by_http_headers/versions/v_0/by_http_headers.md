@@ -46,7 +46,7 @@ cengal<wbr>.web_tools<wbr>.detect_browsers_host_device_type<wbr>.by_http_headers
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.2.0&quot;</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.1&quot;</span>
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -190,7 +190,7 @@ cengal<wbr>.web_tools<wbr>.detect_browsers_host_device_type<wbr>.by_http_headers
                 <section id="UAProf">
                     <div class="attr variable">
             <span class="name">UAProf</span>        =
-<span class="default_value">{&#39;x-wap-profile&#39;, &#39;wap-profile&#39;, &#39;19-profile&#39;}</span>
+<span class="default_value">{&#39;19-profile&#39;, &#39;x-wap-profile&#39;, &#39;wap-profile&#39;}</span>
 
         
     </div>
@@ -204,7 +204,7 @@ cengal<wbr>.web_tools<wbr>.detect_browsers_host_device_type<wbr>.by_http_headers
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">is_wap_browser</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">headers</span><span class="p">:</span> <span class="n">Mapping</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
+        <span class="name">is_wap_browser</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">headers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
                 <label class="view-source-button" for="is_wap_browser-view-source"><span>View Source</span></label>
 
@@ -340,7 +340,7 @@ cengal<wbr>.web_tools<wbr>.detect_browsers_host_device_type<wbr>.by_http_headers
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">browser_view_state</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">headers</span><span class="p">:</span> <span class="n">Mapping</span></span><span class="return-annotation">) -> <span class="n"><a href="#BrowserViewState">BrowserViewState</a></span>:</span></span>
+        <span class="name">browser_view_state</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">headers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span></span><span class="return-annotation">) -> <span class="n"><a href="#BrowserViewState">BrowserViewState</a></span>:</span></span>
 
                 <label class="view-source-button" for="browser_view_state-view-source"><span>View Source</span></label>
 
@@ -541,7 +541,7 @@ cengal<wbr>.web_tools<wbr>.detect_browsers_host_device_type<wbr>.by_http_headers
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">client_device_platform</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">headers</span><span class="p">:</span> <span class="n">Mapping</span></span><span class="return-annotation">) -> <span class="n"><a href="#ClientDevicePlatform">ClientDevicePlatform</a></span>:</span></span>
+        <span class="name">client_device_platform</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">headers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span></span><span class="return-annotation">) -> <span class="n"><a href="#ClientDevicePlatform">ClientDevicePlatform</a></span>:</span></span>
 
                 <label class="view-source-button" for="client_device_platform-view-source"><span>View Source</span></label>
 
@@ -560,7 +560,7 @@ cengal<wbr>.web_tools<wbr>.detect_browsers_host_device_type<wbr>.by_http_headers
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">client_device_platform_version</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">headers</span><span class="p">:</span> <span class="n">Mapping</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
+        <span class="name">client_device_platform_version</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">headers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="client_device_platform_version-view-source"><span>View Source</span></label>
 
@@ -579,7 +579,7 @@ cengal<wbr>.web_tools<wbr>.detect_browsers_host_device_type<wbr>.by_http_headers
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">client_device_model</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">headers</span><span class="p">:</span> <span class="n">Mapping</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
+        <span class="name">client_device_model</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">headers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="client_device_model-view-source"><span>View Source</span></label>
 
@@ -598,7 +598,7 @@ cengal<wbr>.web_tools<wbr>.detect_browsers_host_device_type<wbr>.by_http_headers
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">client_device_arch</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">headers</span><span class="p">:</span> <span class="n">Mapping</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
+        <span class="name">client_device_arch</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">headers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="client_device_arch-view-source"><span>View Source</span></label>
 
@@ -734,7 +734,7 @@ cengal<wbr>.web_tools<wbr>.detect_browsers_host_device_type<wbr>.by_http_headers
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">mobile_device_type_by_user_agent</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">headers</span><span class="p">:</span> <span class="n">Mapping</span></span><span class="return-annotation">) -> <span class="n"><a href="#MobileDeviceType">MobileDeviceType</a></span>:</span></span>
+        <span class="name">mobile_device_type_by_user_agent</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">headers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span></span><span class="return-annotation">) -> <span class="n"><a href="#MobileDeviceType">MobileDeviceType</a></span>:</span></span>
 
                 <label class="view-source-button" for="mobile_device_type_by_user_agent-view-source"><span>View Source</span></label>
 
@@ -889,7 +889,7 @@ cengal<wbr>.web_tools<wbr>.detect_browsers_host_device_type<wbr>.by_http_headers
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">client_device_type</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">headers</span><span class="p">:</span> <span class="n">Mapping</span></span><span class="return-annotation">) -> <span class="n"><a href="#ClientDeviceType">ClientDeviceType</a></span>:</span></span>
+        <span class="name">client_device_type</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">headers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span></span><span class="return-annotation">) -> <span class="n"><a href="#ClientDeviceType">ClientDeviceType</a></span>:</span></span>
 
                 <label class="view-source-button" for="client_device_type-view-source"><span>View Source</span></label>
 
@@ -1057,7 +1057,7 @@ cengal<wbr>.web_tools<wbr>.detect_browsers_host_device_type<wbr>.by_http_headers
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">client_view_type</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">headers</span><span class="p">:</span> <span class="n">Mapping</span></span><span class="return-annotation">) -> <span class="n"><a href="#ClientViewType">ClientViewType</a></span>:</span></span>
+        <span class="name">client_view_type</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">headers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span></span><span class="return-annotation">) -> <span class="n"><a href="#ClientViewType">ClientViewType</a></span>:</span></span>
 
                 <label class="view-source-button" for="client_view_type-view-source"><span>View Source</span></label>
 

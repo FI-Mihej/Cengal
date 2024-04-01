@@ -33,7 +33,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.0"
+__version__ = "4.3.1"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -92,8 +92,11 @@ class CengalBuildExtension:
         self._module_import_str = None
         self._files = list()
 
-    def __call__(self):
+    def __call__(self) -> Optional[List[str]]:
         return self.base_class(**self.kwargs) if self.base_class is not None else None
+    
+    def sdist() -> Optional[List[str]]:
+        raise NotImplementedError
     
     @property
     def path(self) -> str:

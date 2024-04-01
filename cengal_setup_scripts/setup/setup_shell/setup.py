@@ -25,7 +25,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.0"
+__version__ = "4.3.1"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -49,7 +49,7 @@ import setuptools
 # import platform
 
 
-setuptools._install_setup_requires({'setup_requires': ['Cython>=0.29.34', 'py-cpuinfo', 'charset-normalizer; python_version < "3.13"', 'typing_extensions']})
+setuptools._install_setup_requires({'setup_requires': ['Cython>=0.29.34', 'py-cpuinfo', 'charset-normalizer; python_version < "3.13"', 'typing_extensions', 'PyBindGen']})
 
 
 from cengal_setup_scripts.install_required_packages.install_packages import install_bundled, get_pypi_requirements_list, get_remote_requirements_list
@@ -83,36 +83,42 @@ if 'patch-ng' in pypi_requirements_list:
 
 
 # packages_data_dict, manifest_included_files = find_package_data()
-import platform
-if ('PyPy'.lower() == platform.python_implementation().lower()) and ('Darwin'.lower() == platform.system().lower()):
-    supported_extras = [
-        'setuprequires',
-        'entities__asm_functions', 
-        'hardware__info__cpu__versions__v_0', 
-        'hardware__info__cpu__versions__v_1', 
-        'cengal__time_management__relative_time__relativedelta', 
-        'cengal__web_tools__help_tools', 
-        'cengal__user_interface__console__chooser', 
-        'cengal__user_interface__console__colorama_helpers', 
-        'cengal__parallel_execution__coroutines', 
-        'cengal__parallel_execution__coroutines__coro_standard_services__db', 
-        'cengal__parallel_execution__coroutines__coro_standard_services__lmdb', 
-        'cengal__parallel_execution__coroutines__coro_standard_services__log', 
-        'cengal__parallel_execution__coroutines__coro_standard_services__loop_yield', 
-        'cengal__parallel_execution__coroutines__coro_standard_services__read_write_locker', 
-        'cengal__parallel_execution__coroutines__coro_standard_services__tkinter', 
-        'cengal__parallel_execution__coroutines__coro_tools__loop_administration__admin_tk', 
-        'cengal__data_manipulation__serialization', 
-        'cengal__user_interface__gui__tkinter', 
-        'cengal__text_processing__encoding_detection', 
-        'cengal__build_tools__packages__create', 
-        'cengal__build_tools__gather_docs', 
-        'cengal__build_tools__build_extensions', 
-    ]
-    supported_extras_str = ','.join(supported_extras)
-    install_requires = (pypi_requirements_list + [f'cengal_light[{supported_extras_str}]=={__version__}',])
-else:
-    install_requires = (pypi_requirements_list + [f'cengal_light[full]=={__version__}',])
+
+
+# import platform
+# if ('PyPy'.lower() == platform.python_implementation().lower()) and ('Darwin'.lower() == platform.system().lower()):
+#     supported_extras = [
+#         'setuprequires',
+#         'entities__asm_functions', 
+#         'hardware__info__cpu__versions__v_0', 
+#         'hardware__info__cpu__versions__v_1', 
+#         'cengal__time_management__relative_time__relativedelta', 
+#         'cengal__web_tools__help_tools', 
+#         'cengal__user_interface__console__chooser', 
+#         'cengal__user_interface__console__colorama_helpers', 
+#         'cengal__parallel_execution__coroutines', 
+#         'cengal__parallel_execution__coroutines__coro_standard_services__db', 
+#         'cengal__parallel_execution__coroutines__coro_standard_services__lmdb', 
+#         'cengal__parallel_execution__coroutines__coro_standard_services__log', 
+#         'cengal__parallel_execution__coroutines__coro_standard_services__loop_yield', 
+#         'cengal__parallel_execution__coroutines__coro_standard_services__read_write_locker', 
+#         'cengal__parallel_execution__coroutines__coro_standard_services__tkinter', 
+#         'cengal__parallel_execution__coroutines__coro_tools__loop_administration__admin_tk', 
+#         'cengal__data_manipulation__serialization', 
+#         'cengal__user_interface__gui__tkinter', 
+#         'cengal__text_processing__encoding_detection', 
+#         'cengal__build_tools__packages__create', 
+#         'cengal__build_tools__gather_docs', 
+#         'cengal__build_tools__build_extensions', 
+#     ]
+#     supported_extras_str = ','.join(supported_extras)
+#     install_requires = (pypi_requirements_list + [f'cengal_light[{supported_extras_str}]=={__version__}',])
+# else:
+#     install_requires = (pypi_requirements_list + [f'cengal_light[full]=={__version__}',])
+
+
+install_requires = (pypi_requirements_list + [f'cengal_light[full]=={__version__}',])
+
 
 setuptools.setup(
     name='cengal',
