@@ -1,0 +1,344 @@
+name: Test App Dir Path Finder
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  macos_x64__cpython:
+    name: macos_x64__cpython. Test App Dir Path Finder on ${{ matrix.os }} for CPython ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        os: [macos-13]
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+        
+      - name: Run tests
+        run: |
+          python -m pip install --upgrade pyobjc
+          python -m pip install --upgrade cengal_light[cengal__file_system__app_fs_structure__app_dir_path]
+          python ./cengal/file_system/app_fs_structure/app_dir_path/versions/v_0/development/print_app_dirs.py
+
+  macos_arm64__cpython:
+    name: macos_arm64__cpython. Test App Dir Path Finder on ${{ matrix.os }} for CPython ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        os: [macos-14]
+        python-version: ['3.10', '3.11', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+        
+      - name: Run tests
+        run: |
+          python -m pip install --upgrade pyobjc
+          python -m pip install --upgrade cengal_light[cengal__file_system__app_fs_structure__app_dir_path]
+          python ./cengal/file_system/app_fs_structure/app_dir_path/versions/v_0/development/print_app_dirs.py
+
+  # macos_x64__pypy:
+  #   name: macos_x64__pypy. Test App Dir Path Finder on ${{ matrix.os }} for PyPy ${{ matrix.python-version }}
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       # macos-13 is an intel runner, macos-14 is apple silicon
+  #       os: [macos-13]
+  #       python-version: ['pypy-3.8', 'pypy-3.9', 'pypy-3.10']
+
+  #   steps:
+  #     - uses: actions/checkout@v4
+      
+  #     - name: Set up Python ${{ matrix.python-version }}
+  #       uses: actions/setup-python@v2
+  #       with:
+  #         python-version: ${{ matrix.python-version }}
+
+  #     - name: Install basic Python dependencies
+  #       run: |
+  #         python -m pip install --upgrade pip
+  #         python -m pip install --upgrade setuptools
+  #         python -m pip install --upgrade wheel
+        
+  #     - name: Run tests
+  #       run: |
+  #         python -m pip install --upgrade cengal_light[cengal__file_system__app_fs_structure__app_dir_path]
+  #         python ./cengal/file_system/app_fs_structure/app_dir_path/versions/v_0/development/print_app_dirs.py
+
+  # macos_arm64__pypy:
+  #   name: macos_arm64__pypy. Test App Dir Path Finder on ${{ matrix.os }} for PyPy ${{ matrix.python-version }}
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       # macos-13 is an intel runner, macos-14 is apple silicon
+  #       os: [macos-14]
+  #       python-version: ['pypy-3.8', 'pypy-3.9', 'pypy-3.10']
+
+  #   steps:
+  #     - uses: actions/checkout@v4
+      
+  #     - name: Set up Python ${{ matrix.python-version }}
+  #       uses: actions/setup-python@v2
+  #       with:
+  #         python-version: ${{ matrix.python-version }}
+
+  #     - name: Install basic Python dependencies
+  #       run: |
+  #         python -m pip install --upgrade pip
+  #         python -m pip install --upgrade setuptools
+  #         python -m pip install --upgrade wheel
+        
+  #     - name: Run tests
+  #       run: |
+  #         python -m pip install --upgrade cengal_light[cengal__file_system__app_fs_structure__app_dir_path]
+  #         python ./cengal/file_system/app_fs_structure/app_dir_path/versions/v_0/development/print_app_dirs.py
+
+  windows_2019_x64__cpython:
+    name: windows_2019_x64__cpython. Test App Dir Path Finder on ${{ matrix.os }} for CPython ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # windows-2019 is based on Windows Server 2019
+        # windows-2022 is based on Windows Server 2022, consider using it for more recent support
+        os: [windows-2019]
+        python-version: ['3.8', '3.9', '3.10']
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+        
+      - name: Run tests
+        run: |
+          python -m pip install --upgrade pywin32
+          python -m pip install --upgrade cengal_light[cengal__file_system__app_fs_structure__app_dir_path]
+          python ./cengal/file_system/app_fs_structure/app_dir_path/versions/v_0/development/print_app_dirs.py
+        shell: cmd
+
+  # windows_2019_x64__pypy:
+  #   name: windows_2019_x64__pypy. Test App Dir Path Finder on ${{ matrix.os }} for CPython ${{ matrix.python-version }}
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       # windows-2019 is based on Windows Server 2019
+  #       # windows-2022 is based on Windows Server 2022, consider using it for more recent support
+  #       os: [windows-2019]
+  #       python-version: ['pypy-3.9', 'pypy-3.10']
+
+  #   steps:
+  #     - uses: actions/checkout@v4
+      
+  #     - name: Set up Python ${{ matrix.python-version }}
+  #       uses: actions/setup-python@v2
+  #       with:
+  #         python-version: ${{ matrix.python-version }}
+
+  #     - name: Install basic Python dependencies
+  #       run: |
+  #         python -m pip install --upgrade pip
+  #         python -m pip install --upgrade setuptools
+  #         python -m pip install --upgrade wheel
+        
+  #     - name: Run tests
+  #       run: |
+  #         python -m pip install --upgrade cengal_light[cengal__file_system__app_fs_structure__app_dir_path]
+  #         python ./cengal/file_system/app_fs_structure/app_dir_path/versions/v_0/development/print_app_dirs.py
+  #       shell: cmd
+
+  windows_2022_x64__cpython:
+    name: windows_2022_x64__cpython. Test App Dir Path Finder on ${{ matrix.os }} for CPython ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # windows-2019 is based on Windows Server 2019
+        # windows-2022 is based on Windows Server 2022, consider using it for more recent support
+        os: [windows-2022]
+        python-version: ['3.11', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+        
+      - name: Run tests
+        run: |
+          python -m pip install --upgrade pywin32
+          python -m pip install --upgrade cengal_light[cengal__file_system__app_fs_structure__app_dir_path]
+          python ./cengal/file_system/app_fs_structure/app_dir_path/versions/v_0/development/print_app_dirs.py
+        shell: cmd
+
+  ubuntu_latest_x64__cpython:
+    name: ubuntu_latest_x64__cpython. Test App Dir Path Finder on ${{ matrix.os }} for CPython ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # ubuntu-latest currently uses Ubuntu 22.04
+        # You can specify older versions like ubuntu-20.04 if needed
+        os: [ubuntu-latest]
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+        
+      - name: Run tests
+        run: |
+          python -m pip install --upgrade cengal_light[cengal__file_system__app_fs_structure__app_dir_path]
+          python ./cengal/file_system/app_fs_structure/app_dir_path/versions/v_0/development/print_app_dirs.py
+
+  ubuntu_latest_x64__pypy:
+    name: ubuntu_latest_x64__pypy. Test App Dir Path Finder on ${{ matrix.os }} for CPython ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # ubuntu-latest currently uses Ubuntu 22.04
+        # You can specify older versions like ubuntu-20.04 if needed
+        os: [ubuntu-latest]
+        python-version: ['pypy-3.8', 'pypy-3.9', 'pypy-3.10']
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+        
+      - name: Run tests
+        run: |
+          python -m pip install --upgrade cengal_light[cengal__file_system__app_fs_structure__app_dir_path]
+          python ./cengal/file_system/app_fs_structure/app_dir_path/versions/v_0/development/print_app_dirs.py
+
+  musllinux_1_1_x86_64__cpython:
+    name: musllinux_1_1_x86_64__cpython. Test on Docker ${{ matrix.image }} for CPython ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: "quay.io/pypa/musllinux_1_1_x86_64"
+            package-manager: "apk"
+        python-version: ['3.8', '3.9', '3.10']
+    container: ${{ matrix.image }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: |
+          if [ "${{ matrix.package-manager }}" = "yum" ]; then
+            yum install -y python${{ matrix.python-version }} python${{ matrix.python-version }}-pip
+          elif [ "${{ matrix.package-manager }}" = "apk" ]; then
+            apk add --update python3
+            ln -sf python3 /usr/bin/python
+            python -m ensurepip
+          fi
+          python -m pip install --upgrade pip setuptools wheel
+
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+
+      - name: Run tests
+        run: |
+          python -m pip install --upgrade cengal_light[cengal__file_system__app_fs_structure__app_dir_path]
+          python ./cengal/file_system/app_fs_structure/app_dir_path/versions/v_0/development/print_app_dirs.py
+
+  musllinux_1_2_x86_64__cpython:
+    name: musllinux_1_2_x86_64__cpython. Test on Docker ${{ matrix.image }} for CPython ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: "quay.io/pypa/musllinux_1_2_x86_64"
+            package-manager: "apk"
+        python-version: ['3.11', '3.12']
+    container: ${{ matrix.image }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: |
+          if [ "${{ matrix.package-manager }}" = "yum" ]; then
+            yum install -y python${{ matrix.python-version }} python${{ matrix.python-version }}-pip
+          elif [ "${{ matrix.package-manager }}" = "apk" ]; then
+            apk add --update python3
+            ln -sf python3 /usr/bin/python
+            python -m ensurepip
+          fi
+          python -m pip install --upgrade pip setuptools wheel
+
+      - name: Install basic Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+
+      - name: Run tests
+        run: |
+          python -m pip install --upgrade cengal_light[cengal__file_system__app_fs_structure__app_dir_path]
+          python ./cengal/file_system/app_fs_structure/app_dir_path/versions/v_0/development/print_app_dirs.py

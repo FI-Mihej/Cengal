@@ -39,7 +39,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.1"
+__version__ = "4.3.2"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -71,14 +71,15 @@ def SHGetKnownFolderPath(dir_guid: GUID):
         _type_: _description_
     """
     result_path = None
-    path_ptr = POINTER(c_wchar_p)()
-    try:
-        result = proto_SHGetKnownFolderPath(byref(dir_guid), 0, None, byref(path_ptr))
-        if result != S_OK:
-            raise SHGetKnownFolderPathError(result)
+    path_ptr = c_wchar_p()
+    result = proto_SHGetKnownFolderPath(byref(dir_guid), 0, None, byref(path_ptr))
+    if result != S_OK:
+        raise SHGetKnownFolderPathError(result)
         
+    try:
         result_path = path_ptr.value
     finally:
-        CoTaskMemFree(path_ptr)
+        if path_ptr:
+            CoTaskMemFree(path_ptr)
     
     return result_path

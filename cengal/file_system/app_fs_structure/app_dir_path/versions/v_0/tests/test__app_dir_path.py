@@ -24,7 +24,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.1"
+__version__ = "4.3.2"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -33,10 +33,12 @@ __status__ = "Development"
 
 
 from cengal.file_system.app_fs_structure.app_dir_path import AppDirectoryType, AppDirPath
+from cengal.system import OS_TYPE, PYTHON_IMPLEMENTATION
 from unittest import TestCase, main, skip, skipIf
 
 
 class TestAppDirPath(TestCase):
+    @skipIf(('PyPy' == PYTHON_IMPLEMENTATION) and (OS_TYPE in ('Windows', 'Darwin')), 'PyPy on Windows and Mac OS X is not supported')
     def test_print_all_dirs(self):
         for dir_type in AppDirectoryType:
             adp: AppDirPath = AppDirPath()

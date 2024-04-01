@@ -29,7 +29,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.1"
+__version__ = "4.3.2"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -48,11 +48,12 @@ from .app_directory_types import AppDirectoryType
 from .app_dir_path_base import AppDirPathBase, DirTypeMappingItem, DirTypeMappingItem, BaseDirID, DirNameOrPath, norm_dir_name_or_path
 from typing import Optional, Tuple, Dict
 from functools import lru_cache
-from enum import Enum
-from AppKit import NSSearchPathForDirectoriesInDomains
+from enum import IntEnum
+from Foundation import NSSearchPathForDirectoriesInDomains
+from Foundation import NSDocumentDirectory, NSUserDomainMask
 
 
-class FileManagerSearchPathDirectory(Enum):
+class FileManagerSearchPathDirectory(IntEnum):
     applicationDirectory = 1
     userDirectory = 7
     cachesDirectory = 13
@@ -60,7 +61,7 @@ class FileManagerSearchPathDirectory(Enum):
     allApplicationsDirectory = 100
 
 
-class FileManagerSearchPathDomainMask(Enum):
+class FileManagerSearchPathDomainMask(IntEnum):
     userDomainMask = 1
     localDomainMask = 4
     systemDomainMask = 8
@@ -122,5 +123,9 @@ class AppDirPath(AppDirPathBase):
             return base_dir_id
         
         domain_mask, directory = base_dir_id
-        result_path = NSSearchPathForDirectoriesInDomains(directory, domain_mask, True)[0]
-        return result_path
+        result_path = NSSearchPathForDirectoriesInDomains(directory.value, domain_mask.value, True)
+        if result_path:
+            # Typically, you're interested in the first result
+            return result_path[0]
+        else:
+            raise RuntimeError('NSSearchPathForDirectoriesInDomains returned None for domain_mask: {0}, directory: {1}'.format(domain_mask, directory))

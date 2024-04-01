@@ -25,7 +25,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.1"
+__version__ = "4.3.2"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -193,7 +193,7 @@ setuptools.setup(
             "msgpack-python; python_version < '3.8' and platform_python_implementation == 'CPython'",
             "msgpack; python_version >= '3.8' and platform_python_implementation == 'CPython'",
             "msgpack-pypy; platform_python_implementation == 'PyPy'",
-            "msgspec; python_version < '3.13' and platform_python_implementation != 'PyPy'",
+            "msgspec; python_version < '3.13' and platform_python_implementation == 'CPython'",
         ],
         'cengal__user_interface__gui__tkinter': [
             'typing_extensions',
@@ -206,7 +206,8 @@ setuptools.setup(
         ],
         'cengal__file_system__app_fs_structure__app_dir_path': [
             'typing_extensions',
-            "pyobjc; platform_system == 'Darwin' and platform_python_implementation != 'PyPy'",
+            "pyobjc; platform_system == 'Darwin' and platform_python_implementation == 'CPython'",
+            "pywin32; platform_system == 'Windows' and platform_python_implementation == 'CPython'",
         ],
         'cengal__build_tools__packages__create': [
             'typing_extensions',
@@ -222,8 +223,9 @@ setuptools.setup(
         'full': [
             # 'PyBindGen',
             'typing_extensions',
-            "msgspec; python_version < '3.13' and platform_python_implementation != 'PyPy'",
-            "pyobjc; platform_system == 'Darwin' and platform_python_implementation != 'PyPy'",
+            "msgspec; python_version < '3.13' and platform_python_implementation == 'CPython'",
+            "pyobjc; platform_system == 'Darwin' and platform_python_implementation == 'CPython'",
+            "pywin32; platform_system == 'Windows' and platform_python_implementation == 'CPython'",
             'pdoc',
             "psutil; platform_python_implementation != 'PyPy' or platform_system != 'Windows'",
             "orjson; platform_python_implementation != 'PyPy'",
@@ -243,8 +245,9 @@ setuptools.setup(
         'all': [
             # 'PyBindGen',
             'typing_extensions',
-            "msgspec; python_version < '3.13' and platform_python_implementation != 'PyPy'",
-            "pyobjc; platform_system == 'Darwin' and platform_python_implementation != 'PyPy'",
+            "msgspec; python_version < '3.13' and platform_python_implementation == 'CPython'",
+            "pyobjc; platform_system == 'Darwin' and platform_python_implementation == 'CPython'",
+            "pywin32; platform_system == 'Windows' and platform_python_implementation == 'CPython'",
             'pdoc',
             "psutil; platform_python_implementation != 'PyPy' or platform_system != 'Windows'",
             "orjson; platform_python_implementation != 'PyPy'",

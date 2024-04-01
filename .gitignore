@@ -161,6 +161,9 @@ fabric.properties
 __pycache__/
 *.py[cod]
 *$py.class
+*.exp
+*.lib
+*.obj
 
 # Cython generated .c files
 *__cython.c
