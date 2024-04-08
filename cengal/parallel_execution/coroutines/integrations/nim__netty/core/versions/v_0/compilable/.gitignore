@@ -1,0 +1,9 @@
+mymodule.pyd
+mymodule.so
+mymodule.dll
+mymodule.dylib
+compile_time_py_definitions.nim
+netty_core.pyd
+netty_core.so
+netty_core.dll
+netty_core.dylib

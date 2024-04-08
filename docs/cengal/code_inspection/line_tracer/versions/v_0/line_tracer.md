@@ -45,7 +45,7 @@ cengal<wbr>.code_inspection<wbr>.line_tracer<wbr>.versions<wbr>.v_0<wbr>.line_tr
 </span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.1&quot;</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.3&quot;</span>
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -105,34 +105,69 @@ cengal<wbr>.code_inspection<wbr>.line_tracer<wbr>.versions<wbr>.v_0<wbr>.line_tr
 </span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>        <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">previous_line_num</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
 </span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>        <span class="k">return</span> <span class="n">result</span>
 </span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>    <span class="k">def</span> <span class="nf">trace_next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>    <span class="k">def</span> <span class="nf">trace_self</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
 </span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_allowed</span><span class="p">:</span>
 </span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>            <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 </span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>            <span class="k">return</span> <span class="n">result</span>
 </span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>        
 </span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>        <span class="n">frame</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">line_number</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame_info</span><span class="p">(</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>        <span class="n">next_line_num</span> <span class="o">=</span> <span class="n">line_number</span> <span class="o">+</span> <span class="mi">1</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>        <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_line</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">next_line_num</span><span class="p">)</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>        <span class="n">current_line_num</span> <span class="o">=</span> <span class="n">line_number</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>        <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_line</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">current_line_num</span><span class="p">)</span>
 </span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">print_full_file_name</span><span class="p">:</span>
 </span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 </span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>        
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>        <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">next_line_num</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>        <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">current_line_num</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
 </span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>        <span class="k">return</span> <span class="n">result</span>
 </span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>    <span class="k">def</span> <span class="nf">trace_next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
 </span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_allowed</span><span class="p">:</span>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>            <span class="k">return</span>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>        
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">))</span>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>
-</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>    <span class="k">def</span> <span class="nf">n</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_allowed</span><span class="p">:</span>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>            <span class="k">return</span>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>        
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>        <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&lt;&lt; </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> &gt;&gt;&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">))</span>
-</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">))</span>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>            <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>            <span class="k">return</span> <span class="n">result</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>        
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>        <span class="n">frame</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">line_number</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame_info</span><span class="p">(</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>        <span class="n">next_line_num</span> <span class="o">=</span> <span class="n">line_number</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>        <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_line</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">next_line_num</span><span class="p">)</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">print_full_file_name</span><span class="p">:</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>        
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>        <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">next_line_num</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>        <span class="k">return</span> <span class="n">result</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_allowed</span><span class="p">:</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>            <span class="k">return</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>        
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">))</span>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>    <span class="k">def</span> <span class="nf">n</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_allowed</span><span class="p">:</span>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>            <span class="k">return</span>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>        
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>        <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&lt;&lt; </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> &gt;&gt;&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">))</span>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">))</span>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>
+</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a><span class="n">line_tracer</span> <span class="o">=</span> <span class="n">LineTracer</span><span class="p">()</span>
+</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a><span class="n">line_tracer_full_file_name</span> <span class="o">=</span> <span class="n">LineTracer</span><span class="p">(</span><span class="n">print_full_file_name</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>
+</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>
+</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a><span class="k">def</span> <span class="nf">previous_line_number</span><span class="p">(</span><span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>    <span class="k">return</span> <span class="n">line_tracer</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>
+</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>
+</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a><span class="k">def</span> <span class="nf">current_line_number</span><span class="p">(</span><span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>    <span class="k">return</span> <span class="n">previous_line_number</span><span class="p">(</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>
+</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>
+</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a><span class="k">def</span> <span class="nf">next_line_number</span><span class="p">(</span><span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>    <span class="k">return</span> <span class="n">previous_line_number</span><span class="p">(</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
+</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>
+</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>
+</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a><span class="n">pln</span> <span class="o">=</span> <span class="n">previous_line_number</span>
+</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a><span class="n">cln</span> <span class="o">=</span> <span class="n">current_line_number</span>
+</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a><span class="n">nln</span> <span class="o">=</span> <span class="n">next_line_number</span>
 </span></pre></div>
 
 
@@ -200,34 +235,48 @@ cengal<wbr>.code_inspection<wbr>.line_tracer<wbr>.versions<wbr>.v_0<wbr>.line_tr
 </span><span id="LineTracer-91"><a href="#LineTracer-91"><span class="linenos"> 91</span></a>        <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">previous_line_num</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
 </span><span id="LineTracer-92"><a href="#LineTracer-92"><span class="linenos"> 92</span></a>        <span class="k">return</span> <span class="n">result</span>
 </span><span id="LineTracer-93"><a href="#LineTracer-93"><span class="linenos"> 93</span></a>
-</span><span id="LineTracer-94"><a href="#LineTracer-94"><span class="linenos"> 94</span></a>    <span class="k">def</span> <span class="nf">trace_next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="LineTracer-94"><a href="#LineTracer-94"><span class="linenos"> 94</span></a>    <span class="k">def</span> <span class="nf">trace_self</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
 </span><span id="LineTracer-95"><a href="#LineTracer-95"><span class="linenos"> 95</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_allowed</span><span class="p">:</span>
 </span><span id="LineTracer-96"><a href="#LineTracer-96"><span class="linenos"> 96</span></a>            <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 </span><span id="LineTracer-97"><a href="#LineTracer-97"><span class="linenos"> 97</span></a>            <span class="k">return</span> <span class="n">result</span>
 </span><span id="LineTracer-98"><a href="#LineTracer-98"><span class="linenos"> 98</span></a>        
 </span><span id="LineTracer-99"><a href="#LineTracer-99"><span class="linenos"> 99</span></a>        <span class="n">frame</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">line_number</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame_info</span><span class="p">(</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-</span><span id="LineTracer-100"><a href="#LineTracer-100"><span class="linenos">100</span></a>        <span class="n">next_line_num</span> <span class="o">=</span> <span class="n">line_number</span> <span class="o">+</span> <span class="mi">1</span>
-</span><span id="LineTracer-101"><a href="#LineTracer-101"><span class="linenos">101</span></a>        <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_line</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">next_line_num</span><span class="p">)</span>
+</span><span id="LineTracer-100"><a href="#LineTracer-100"><span class="linenos">100</span></a>        <span class="n">current_line_num</span> <span class="o">=</span> <span class="n">line_number</span>
+</span><span id="LineTracer-101"><a href="#LineTracer-101"><span class="linenos">101</span></a>        <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_line</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">current_line_num</span><span class="p">)</span>
 </span><span id="LineTracer-102"><a href="#LineTracer-102"><span class="linenos">102</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">print_full_file_name</span><span class="p">:</span>
 </span><span id="LineTracer-103"><a href="#LineTracer-103"><span class="linenos">103</span></a>            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 </span><span id="LineTracer-104"><a href="#LineTracer-104"><span class="linenos">104</span></a>        
-</span><span id="LineTracer-105"><a href="#LineTracer-105"><span class="linenos">105</span></a>        <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">next_line_num</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+</span><span id="LineTracer-105"><a href="#LineTracer-105"><span class="linenos">105</span></a>        <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">current_line_num</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
 </span><span id="LineTracer-106"><a href="#LineTracer-106"><span class="linenos">106</span></a>        <span class="k">return</span> <span class="n">result</span>
 </span><span id="LineTracer-107"><a href="#LineTracer-107"><span class="linenos">107</span></a>
-</span><span id="LineTracer-108"><a href="#LineTracer-108"><span class="linenos">108</span></a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="LineTracer-108"><a href="#LineTracer-108"><span class="linenos">108</span></a>    <span class="k">def</span> <span class="nf">trace_next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
 </span><span id="LineTracer-109"><a href="#LineTracer-109"><span class="linenos">109</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_allowed</span><span class="p">:</span>
-</span><span id="LineTracer-110"><a href="#LineTracer-110"><span class="linenos">110</span></a>            <span class="k">return</span>
-</span><span id="LineTracer-111"><a href="#LineTracer-111"><span class="linenos">111</span></a>        
-</span><span id="LineTracer-112"><a href="#LineTracer-112"><span class="linenos">112</span></a>        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">))</span>
-</span><span id="LineTracer-113"><a href="#LineTracer-113"><span class="linenos">113</span></a>
-</span><span id="LineTracer-114"><a href="#LineTracer-114"><span class="linenos">114</span></a>    <span class="k">def</span> <span class="nf">n</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
-</span><span id="LineTracer-115"><a href="#LineTracer-115"><span class="linenos">115</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_allowed</span><span class="p">:</span>
-</span><span id="LineTracer-116"><a href="#LineTracer-116"><span class="linenos">116</span></a>            <span class="k">return</span>
-</span><span id="LineTracer-117"><a href="#LineTracer-117"><span class="linenos">117</span></a>        
-</span><span id="LineTracer-118"><a href="#LineTracer-118"><span class="linenos">118</span></a>        <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
-</span><span id="LineTracer-119"><a href="#LineTracer-119"><span class="linenos">119</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&lt;&lt; </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> &gt;&gt;&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">))</span>
-</span><span id="LineTracer-120"><a href="#LineTracer-120"><span class="linenos">120</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="LineTracer-121"><a href="#LineTracer-121"><span class="linenos">121</span></a>            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">))</span>
+</span><span id="LineTracer-110"><a href="#LineTracer-110"><span class="linenos">110</span></a>            <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="LineTracer-111"><a href="#LineTracer-111"><span class="linenos">111</span></a>            <span class="k">return</span> <span class="n">result</span>
+</span><span id="LineTracer-112"><a href="#LineTracer-112"><span class="linenos">112</span></a>        
+</span><span id="LineTracer-113"><a href="#LineTracer-113"><span class="linenos">113</span></a>        <span class="n">frame</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">line_number</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame_info</span><span class="p">(</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span><span id="LineTracer-114"><a href="#LineTracer-114"><span class="linenos">114</span></a>        <span class="n">next_line_num</span> <span class="o">=</span> <span class="n">line_number</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span id="LineTracer-115"><a href="#LineTracer-115"><span class="linenos">115</span></a>        <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_line</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">next_line_num</span><span class="p">)</span>
+</span><span id="LineTracer-116"><a href="#LineTracer-116"><span class="linenos">116</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">print_full_file_name</span><span class="p">:</span>
+</span><span id="LineTracer-117"><a href="#LineTracer-117"><span class="linenos">117</span></a>            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+</span><span id="LineTracer-118"><a href="#LineTracer-118"><span class="linenos">118</span></a>        
+</span><span id="LineTracer-119"><a href="#LineTracer-119"><span class="linenos">119</span></a>        <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">next_line_num</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+</span><span id="LineTracer-120"><a href="#LineTracer-120"><span class="linenos">120</span></a>        <span class="k">return</span> <span class="n">result</span>
+</span><span id="LineTracer-121"><a href="#LineTracer-121"><span class="linenos">121</span></a>
+</span><span id="LineTracer-122"><a href="#LineTracer-122"><span class="linenos">122</span></a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="LineTracer-123"><a href="#LineTracer-123"><span class="linenos">123</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_allowed</span><span class="p">:</span>
+</span><span id="LineTracer-124"><a href="#LineTracer-124"><span class="linenos">124</span></a>            <span class="k">return</span>
+</span><span id="LineTracer-125"><a href="#LineTracer-125"><span class="linenos">125</span></a>        
+</span><span id="LineTracer-126"><a href="#LineTracer-126"><span class="linenos">126</span></a>        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">))</span>
+</span><span id="LineTracer-127"><a href="#LineTracer-127"><span class="linenos">127</span></a>
+</span><span id="LineTracer-128"><a href="#LineTracer-128"><span class="linenos">128</span></a>    <span class="k">def</span> <span class="nf">n</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="LineTracer-129"><a href="#LineTracer-129"><span class="linenos">129</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_allowed</span><span class="p">:</span>
+</span><span id="LineTracer-130"><a href="#LineTracer-130"><span class="linenos">130</span></a>            <span class="k">return</span>
+</span><span id="LineTracer-131"><a href="#LineTracer-131"><span class="linenos">131</span></a>        
+</span><span id="LineTracer-132"><a href="#LineTracer-132"><span class="linenos">132</span></a>        <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+</span><span id="LineTracer-133"><a href="#LineTracer-133"><span class="linenos">133</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&lt;&lt; </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> &gt;&gt;&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">))</span>
+</span><span id="LineTracer-134"><a href="#LineTracer-134"><span class="linenos">134</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="LineTracer-135"><a href="#LineTracer-135"><span class="linenos">135</span></a>            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">))</span>
 </span></pre></div>
 
 
@@ -306,6 +355,36 @@ cengal<wbr>.code_inspection<wbr>.line_tracer<wbr>.versions<wbr>.v_0<wbr>.line_tr
     
 
                             </div>
+                            <div id="LineTracer.trace_self" class="classattr">
+                                        <input id="LineTracer.trace_self-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">trace_self</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="LineTracer.trace_self-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#LineTracer.trace_self"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="LineTracer.trace_self-94"><a href="#LineTracer.trace_self-94"><span class="linenos"> 94</span></a>    <span class="k">def</span> <span class="nf">trace_self</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="LineTracer.trace_self-95"><a href="#LineTracer.trace_self-95"><span class="linenos"> 95</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_allowed</span><span class="p">:</span>
+</span><span id="LineTracer.trace_self-96"><a href="#LineTracer.trace_self-96"><span class="linenos"> 96</span></a>            <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="LineTracer.trace_self-97"><a href="#LineTracer.trace_self-97"><span class="linenos"> 97</span></a>            <span class="k">return</span> <span class="n">result</span>
+</span><span id="LineTracer.trace_self-98"><a href="#LineTracer.trace_self-98"><span class="linenos"> 98</span></a>        
+</span><span id="LineTracer.trace_self-99"><a href="#LineTracer.trace_self-99"><span class="linenos"> 99</span></a>        <span class="n">frame</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">line_number</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame_info</span><span class="p">(</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span><span id="LineTracer.trace_self-100"><a href="#LineTracer.trace_self-100"><span class="linenos">100</span></a>        <span class="n">current_line_num</span> <span class="o">=</span> <span class="n">line_number</span>
+</span><span id="LineTracer.trace_self-101"><a href="#LineTracer.trace_self-101"><span class="linenos">101</span></a>        <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_line</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">current_line_num</span><span class="p">)</span>
+</span><span id="LineTracer.trace_self-102"><a href="#LineTracer.trace_self-102"><span class="linenos">102</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">print_full_file_name</span><span class="p">:</span>
+</span><span id="LineTracer.trace_self-103"><a href="#LineTracer.trace_self-103"><span class="linenos">103</span></a>            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+</span><span id="LineTracer.trace_self-104"><a href="#LineTracer.trace_self-104"><span class="linenos">104</span></a>        
+</span><span id="LineTracer.trace_self-105"><a href="#LineTracer.trace_self-105"><span class="linenos">105</span></a>        <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">current_line_num</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+</span><span id="LineTracer.trace_self-106"><a href="#LineTracer.trace_self-106"><span class="linenos">106</span></a>        <span class="k">return</span> <span class="n">result</span>
+</span></pre></div>
+
+
+    
+
+                            </div>
                             <div id="LineTracer.trace_next" class="classattr">
                                         <input id="LineTracer.trace_next-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
@@ -317,19 +396,19 @@ cengal<wbr>.code_inspection<wbr>.line_tracer<wbr>.versions<wbr>.v_0<wbr>.line_tr
 
     </div>
     <a class="headerlink" href="#LineTracer.trace_next"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="LineTracer.trace_next-94"><a href="#LineTracer.trace_next-94"><span class="linenos"> 94</span></a>    <span class="k">def</span> <span class="nf">trace_next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
-</span><span id="LineTracer.trace_next-95"><a href="#LineTracer.trace_next-95"><span class="linenos"> 95</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_allowed</span><span class="p">:</span>
-</span><span id="LineTracer.trace_next-96"><a href="#LineTracer.trace_next-96"><span class="linenos"> 96</span></a>            <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="LineTracer.trace_next-97"><a href="#LineTracer.trace_next-97"><span class="linenos"> 97</span></a>            <span class="k">return</span> <span class="n">result</span>
-</span><span id="LineTracer.trace_next-98"><a href="#LineTracer.trace_next-98"><span class="linenos"> 98</span></a>        
-</span><span id="LineTracer.trace_next-99"><a href="#LineTracer.trace_next-99"><span class="linenos"> 99</span></a>        <span class="n">frame</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">line_number</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame_info</span><span class="p">(</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-</span><span id="LineTracer.trace_next-100"><a href="#LineTracer.trace_next-100"><span class="linenos">100</span></a>        <span class="n">next_line_num</span> <span class="o">=</span> <span class="n">line_number</span> <span class="o">+</span> <span class="mi">1</span>
-</span><span id="LineTracer.trace_next-101"><a href="#LineTracer.trace_next-101"><span class="linenos">101</span></a>        <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_line</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">next_line_num</span><span class="p">)</span>
-</span><span id="LineTracer.trace_next-102"><a href="#LineTracer.trace_next-102"><span class="linenos">102</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">print_full_file_name</span><span class="p">:</span>
-</span><span id="LineTracer.trace_next-103"><a href="#LineTracer.trace_next-103"><span class="linenos">103</span></a>            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-</span><span id="LineTracer.trace_next-104"><a href="#LineTracer.trace_next-104"><span class="linenos">104</span></a>        
-</span><span id="LineTracer.trace_next-105"><a href="#LineTracer.trace_next-105"><span class="linenos">105</span></a>        <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">next_line_num</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
-</span><span id="LineTracer.trace_next-106"><a href="#LineTracer.trace_next-106"><span class="linenos">106</span></a>        <span class="k">return</span> <span class="n">result</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="LineTracer.trace_next-108"><a href="#LineTracer.trace_next-108"><span class="linenos">108</span></a>    <span class="k">def</span> <span class="nf">trace_next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="LineTracer.trace_next-109"><a href="#LineTracer.trace_next-109"><span class="linenos">109</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_allowed</span><span class="p">:</span>
+</span><span id="LineTracer.trace_next-110"><a href="#LineTracer.trace_next-110"><span class="linenos">110</span></a>            <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="LineTracer.trace_next-111"><a href="#LineTracer.trace_next-111"><span class="linenos">111</span></a>            <span class="k">return</span> <span class="n">result</span>
+</span><span id="LineTracer.trace_next-112"><a href="#LineTracer.trace_next-112"><span class="linenos">112</span></a>        
+</span><span id="LineTracer.trace_next-113"><a href="#LineTracer.trace_next-113"><span class="linenos">113</span></a>        <span class="n">frame</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">line_number</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame_info</span><span class="p">(</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span><span id="LineTracer.trace_next-114"><a href="#LineTracer.trace_next-114"><span class="linenos">114</span></a>        <span class="n">next_line_num</span> <span class="o">=</span> <span class="n">line_number</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span id="LineTracer.trace_next-115"><a href="#LineTracer.trace_next-115"><span class="linenos">115</span></a>        <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_line</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">next_line_num</span><span class="p">)</span>
+</span><span id="LineTracer.trace_next-116"><a href="#LineTracer.trace_next-116"><span class="linenos">116</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">print_full_file_name</span><span class="p">:</span>
+</span><span id="LineTracer.trace_next-117"><a href="#LineTracer.trace_next-117"><span class="linenos">117</span></a>            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+</span><span id="LineTracer.trace_next-118"><a href="#LineTracer.trace_next-118"><span class="linenos">118</span></a>        
+</span><span id="LineTracer.trace_next-119"><a href="#LineTracer.trace_next-119"><span class="linenos">119</span></a>        <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">next_line_num</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+</span><span id="LineTracer.trace_next-120"><a href="#LineTracer.trace_next-120"><span class="linenos">120</span></a>        <span class="k">return</span> <span class="n">result</span>
 </span></pre></div>
 
 
@@ -347,20 +426,158 @@ cengal<wbr>.code_inspection<wbr>.line_tracer<wbr>.versions<wbr>.v_0<wbr>.line_tr
 
     </div>
     <a class="headerlink" href="#LineTracer.n"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="LineTracer.n-114"><a href="#LineTracer.n-114"><span class="linenos">114</span></a>    <span class="k">def</span> <span class="nf">n</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
-</span><span id="LineTracer.n-115"><a href="#LineTracer.n-115"><span class="linenos">115</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_allowed</span><span class="p">:</span>
-</span><span id="LineTracer.n-116"><a href="#LineTracer.n-116"><span class="linenos">116</span></a>            <span class="k">return</span>
-</span><span id="LineTracer.n-117"><a href="#LineTracer.n-117"><span class="linenos">117</span></a>        
-</span><span id="LineTracer.n-118"><a href="#LineTracer.n-118"><span class="linenos">118</span></a>        <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
-</span><span id="LineTracer.n-119"><a href="#LineTracer.n-119"><span class="linenos">119</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&lt;&lt; </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> &gt;&gt;&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">))</span>
-</span><span id="LineTracer.n-120"><a href="#LineTracer.n-120"><span class="linenos">120</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="LineTracer.n-121"><a href="#LineTracer.n-121"><span class="linenos">121</span></a>            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">))</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="LineTracer.n-128"><a href="#LineTracer.n-128"><span class="linenos">128</span></a>    <span class="k">def</span> <span class="nf">n</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="LineTracer.n-129"><a href="#LineTracer.n-129"><span class="linenos">129</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_allowed</span><span class="p">:</span>
+</span><span id="LineTracer.n-130"><a href="#LineTracer.n-130"><span class="linenos">130</span></a>            <span class="k">return</span>
+</span><span id="LineTracer.n-131"><a href="#LineTracer.n-131"><span class="linenos">131</span></a>        
+</span><span id="LineTracer.n-132"><a href="#LineTracer.n-132"><span class="linenos">132</span></a>        <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+</span><span id="LineTracer.n-133"><a href="#LineTracer.n-133"><span class="linenos">133</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&lt;&lt; </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> &gt;&gt;&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">))</span>
+</span><span id="LineTracer.n-134"><a href="#LineTracer.n-134"><span class="linenos">134</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="LineTracer.n-135"><a href="#LineTracer.n-135"><span class="linenos">135</span></a>            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">))</span>
 </span></pre></div>
 
 
     
 
                             </div>
+                </section>
+                <section id="line_tracer">
+                    <div class="attr variable">
+            <span class="name">line_tracer</span>        =
+<span class="default_value">&lt;<a href="#LineTracer">LineTracer</a> object&gt;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#line_tracer"></a>
+    
+    
+
+                </section>
+                <section id="line_tracer_full_file_name">
+                    <div class="attr variable">
+            <span class="name">line_tracer_full_file_name</span>        =
+<span class="default_value">&lt;<a href="#LineTracer">LineTracer</a> object&gt;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#line_tracer_full_file_name"></a>
+    
+    
+
+                </section>
+                <section id="previous_line_number">
+                            <input id="previous_line_number-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">previous_line_number</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
+
+                <label class="view-source-button" for="previous_line_number-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#previous_line_number"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="previous_line_number-142"><a href="#previous_line_number-142"><span class="linenos">142</span></a><span class="k">def</span> <span class="nf">previous_line_number</span><span class="p">(</span><span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="previous_line_number-143"><a href="#previous_line_number-143"><span class="linenos">143</span></a>    <span class="k">return</span> <span class="n">line_tracer</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
+</span></pre></div>
+
+
+    
+
+                </section>
+                <section id="current_line_number">
+                            <input id="current_line_number-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">current_line_number</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
+
+                <label class="view-source-button" for="current_line_number-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#current_line_number"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="current_line_number-146"><a href="#current_line_number-146"><span class="linenos">146</span></a><span class="k">def</span> <span class="nf">current_line_number</span><span class="p">(</span><span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="current_line_number-147"><a href="#current_line_number-147"><span class="linenos">147</span></a>    <span class="k">return</span> <span class="n">previous_line_number</span><span class="p">(</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+</span></pre></div>
+
+
+    
+
+                </section>
+                <section id="next_line_number">
+                            <input id="next_line_number-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">next_line_number</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
+
+                <label class="view-source-button" for="next_line_number-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#next_line_number"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="next_line_number-150"><a href="#next_line_number-150"><span class="linenos">150</span></a><span class="k">def</span> <span class="nf">next_line_number</span><span class="p">(</span><span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="next_line_number-151"><a href="#next_line_number-151"><span class="linenos">151</span></a>    <span class="k">return</span> <span class="n">previous_line_number</span><span class="p">(</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
+</span></pre></div>
+
+
+    
+
+                </section>
+                <section id="pln">
+                            <input id="pln-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">pln</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
+
+                <label class="view-source-button" for="pln-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#pln"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="pln-142"><a href="#pln-142"><span class="linenos">142</span></a><span class="k">def</span> <span class="nf">previous_line_number</span><span class="p">(</span><span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="pln-143"><a href="#pln-143"><span class="linenos">143</span></a>    <span class="k">return</span> <span class="n">line_tracer</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
+</span></pre></div>
+
+
+    
+
+                </section>
+                <section id="cln">
+                            <input id="cln-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">cln</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
+
+                <label class="view-source-button" for="cln-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#cln"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="cln-146"><a href="#cln-146"><span class="linenos">146</span></a><span class="k">def</span> <span class="nf">current_line_number</span><span class="p">(</span><span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="cln-147"><a href="#cln-147"><span class="linenos">147</span></a>    <span class="k">return</span> <span class="n">previous_line_number</span><span class="p">(</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+</span></pre></div>
+
+
+    
+
+                </section>
+                <section id="nln">
+                            <input id="nln-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">nln</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
+
+                <label class="view-source-button" for="nln-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#nln"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="nln-150"><a href="#nln-150"><span class="linenos">150</span></a><span class="k">def</span> <span class="nf">next_line_number</span><span class="p">(</span><span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="nln-151"><a href="#nln-151"><span class="linenos">151</span></a>    <span class="k">return</span> <span class="n">previous_line_number</span><span class="p">(</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
+</span></pre></div>
+
+
+    
+
                 </section>
     </main>
 

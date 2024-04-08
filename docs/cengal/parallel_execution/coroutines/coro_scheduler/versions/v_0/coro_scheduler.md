@@ -44,7 +44,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 </span><span id="L-26"><a href="#L-26"><span class="linenos">  26</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-27"><a href="#L-27"><span class="linenos">  27</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-28"><a href="#L-28"><span class="linenos">  28</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">  29</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.1&quot;</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">  29</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.3&quot;</span>
 </span><span id="L-30"><a href="#L-30"><span class="linenos">  30</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-31"><a href="#L-31"><span class="linenos">  31</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos">  32</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -87,7 +87,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 </span><span id="L-69"><a href="#L-69"><span class="linenos">  69</span></a><span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">TypeAlias</span><span class="p">,</span> <span class="n">ParamSpec</span><span class="p">,</span> <span class="n">Concatenate</span>
 </span><span id="L-70"><a href="#L-70"><span class="linenos">  70</span></a><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 </span><span id="L-71"><a href="#L-71"><span class="linenos">  71</span></a><span class="kn">import</span> <span class="nn">types</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos">  72</span></a><span class="kn">from</span> <span class="nn">cengal.time_management.load_best_timer</span> <span class="kn">import</span> <span class="n">perf_counter</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos">  72</span></a><span class="kn">from</span> <span class="nn">cengal.time_management.cpu_clock_cycles</span> <span class="kn">import</span> <span class="n">perf_counter</span>
 </span><span id="L-73"><a href="#L-73"><span class="linenos">  73</span></a><span class="kn">import</span> <span class="nn">traceback</span>
 </span><span id="L-74"><a href="#L-74"><span class="linenos">  74</span></a><span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
 </span><span id="L-75"><a href="#L-75"><span class="linenos">  75</span></a><span class="kn">import</span> <span class="nn">logging</span>

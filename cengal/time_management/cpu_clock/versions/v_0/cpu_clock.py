@@ -16,7 +16,7 @@
 # limitations under the License.
 
 
-__all__ = ['cpu_clock', 'CPU_TICKS_PER_SECOND']
+__all__ = ['cpu_clock', 'perf_counter', 'cpu_clock_cycles', 'CPU_TICKS_PER_SECOND']
 
 
 """
@@ -28,7 +28,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.2"
+__version__ = "4.3.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -36,15 +36,27 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-from cengal.time_management.cpu_clock_cycles import cpu_clock_cycles, set_cycles_per_second, cpu_clock
-from cengal.hardware.info.cpu import cpu_info
-from time import perf_counter
+try:
+    from cengal.time_management.cpu_clock_cycles.versions.v_0.compilable.cpu_clock_cycles__cython import cpu_clock_cycles, set_cycles_per_second
+    from cengal.hardware.info.cpu import cpu_info
 
 
-CPU_TICKS_PER_SECOND = cpu_info().hz_advertised[0]
+    CPU_TICKS_PER_SECOND = cpu_info().hz_advertised[0]
 
 
-if 0 == CPU_TICKS_PER_SECOND:
+    if 0 == CPU_TICKS_PER_SECOND:
+        from time import perf_counter
+        cpu_clock = perf_counter
+    else:
+        set_cycles_per_second(CPU_TICKS_PER_SECOND)
+        from cengal.time_management.cpu_clock_cycles.versions.v_0.compilable.cpu_clock_cycles__cython import perf_counter, cpu_clock
+
+except ImportError:
+    from time import perf_counter
+
+    CPU_TICKS_PER_SECOND = 0
+    
     cpu_clock = perf_counter
-else:
-    set_cycles_per_second(CPU_TICKS_PER_SECOND)
+    
+    def cpu_clock_cycles():
+        return 0

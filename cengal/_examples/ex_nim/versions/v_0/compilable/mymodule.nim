@@ -5,9 +5,9 @@ import mystrutils
 
 # Use the exported `toUpper` function
 let myString = "Hello, Worldd!"
-let upperString = mystrutils.toUpper(myString)
 
 proc greet(name: string): string {.exportpy.} =
+  let upperString = mystrutils.toUpper(myString)
   echo upperString  # This will print: "HELLO, WORLDd!"
 
   when defined(NIMF_Linux):

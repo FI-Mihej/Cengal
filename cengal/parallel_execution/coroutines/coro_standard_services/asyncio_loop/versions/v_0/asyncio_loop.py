@@ -31,7 +31,7 @@ from cengal.parallel_execution.coroutines.coro_standard_services.wait_coro impor
 from cengal.parallel_execution.asyncio.run_loop import run_forever, cancel_all_tasks
 from cengal.parallel_execution.asyncio.atasks import create_task_awaitable
 from cengal.file_system.file_manager import path_relative_to_current_dir
-from cengal.time_management.load_best_timer import perf_counter
+from cengal.time_management.cpu_clock_cycles import perf_counter
 from cengal.time_management.sleep_tools import get_usable_min_sleep_interval, get_min_sleep_interval
 from cengal.data_manipulation.serialization import *
 from cengal.introspection.inspect import get_exception
@@ -58,7 +58,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.2"
+__version__ = "4.3.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"

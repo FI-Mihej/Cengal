@@ -8,12 +8,19 @@ omit =
     ./cengal/_template_module/*
     ./cengal/cross_version/console_print/python2/*
     */versions/v_*/tests/*
-    */versions/v_*/compilable
-    */versions/v_*/data
-    */versions/v_*/development
+    */versions/v_*/compilable/*
+    */versions/v_*/data/*
+    */versions/v_*/development/*
     __init__.py
     __x__build_config.py
     __requirements__.py
     ./cengal/io/asock_io/*
     ./cengal/universal_parser/*
     ./cengal/io/net_io/*
+    ./cengal/data_manipulation/remote_objects/versions/v_0_fast_optimized_cython/*
+    ./cengal/data_manipulation/remote_objects/versions/v_0_fast_optimized_numba/*
+    ./cengal/upk_helping_tools/*
+    ./cengal/web_tools/help_tools/*
+    ./cengal/os/help_tools/*
+    ./cengal/help_tools/*
+    ./cengal/cross_version/console_print/*

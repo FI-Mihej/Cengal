@@ -30,7 +30,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.2"
+__version__ = "4.3.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -46,10 +46,10 @@ from setuptools._distutils.dist import Distribution
 from cengal.file_system.path_manager import path_relative_to_src, RelativePath, get_relative_path_part, sep
 from cengal.file_system.directory_manager import current_src_dir, change_current_dir
 from cengal.file_system.directory_manager import filtered_file_list, FilteringType, filtered_file_list_traversal, file_list_traversal, file_list_traversal_ex, FilteringEntity
-from cengal.file_system.file_manager import current_src_file_dir, file_exists, full_ext, file_name, last_ext
+from cengal.file_system.file_manager import current_src_file_dir, file_exists, full_ext, file_name as get_file_name, last_ext
 from cengal.build_tools.prepare_cflags import prepare_cflags, concat_cflags, prepare_compile_time_env, adjust_definition_names, \
     dict_of_tuples_to_dict, list_to_dict
-from cengal.introspection.inspect import get_exception, entity_repr_limited_try_qualname, pifrl, pdi
+from cengal.introspection.inspect import get_exception, exception_to_printable_text, entity_repr_limited_try_qualname, pifrl, pdi
 from cengal.text_processing.text_processing import find_text
 from cengal.system import OS_TYPE, TEMPLATE_MODULE_NAME
 from shutil import rmtree
@@ -154,6 +154,7 @@ class CengalNimBuildExtension(CengalBuildExtension):
                  definitions: Optional[Union[Sequence[str], Dict[str, Union[Union[None, bool, int, str], Tuple[bool, Union[None, bool, str, int]]]]]] = None, 
                  additional_compilation_params: Optional[List[str]] = None, 
                  definitions_module_name: str = 'compile_time_py_definitions.nim', 
+                 nimble_packages: Optional[List[str]] = None,
                  **kwargs) -> None:
         self.module_name: str = module_name
         self.flags: Optional[List[str]] = flags or list()
@@ -165,11 +166,24 @@ class CengalNimBuildExtension(CengalBuildExtension):
         self.result_definitions.update(list_to_dict(flags))
         self.additional_compilation_params: Optional[List[str]] = additional_compilation_params
         self.definitions_module_name: str = definitions_module_name
+        self.nimble_packages: Optional[List[str]] = nimble_packages or list()
         super().__init__(kwargs)
     
     def __call__(self):
         try:
             out_file_name: str = f'{self.module_name}.pyd' if 'Windows' == OS_TYPE else f'{self.module_name}.so'
+            print()
+            print('==================================================')
+            print(f'<<< NIMBLE PACKAGES INSTALLATION: >>>')
+            print('=======================')
+            for package_name in self.nimble_packages:
+                print(f'Installing Nimble package: {package_name}')
+                params = ['nimble', 'install', package_name, ' --accept']
+                result = subprocess.run(params, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                print(result.stdout)
+
+            print('==================================================')
+
             print()
             print('==================================================')
             print(f'<<< NIM COMPILATION: {self.module_name} -> {out_file_name} >>>')
@@ -205,16 +219,19 @@ class CengalNimBuildExtension(CengalBuildExtension):
             result_str = result.stdout
             print('> NIM compiler output:')
             print(result_str)
-            print('> Exported files:')
+
             exported_files_list = [out_file_name,]
-            print(exported_files_list)
+            if successed:
+                print('> Exported files:')
+                print(exported_files_list)
+            
             print('==================================================')
             return exported_files_list if successed else None
         except:
             print('==================================================')
             print('!!! NIM COMPILATION EXCEPTION !!!')
             print('==================================================')
-            print(get_exception())
+            print(exception_to_printable_text(get_exception()))
             print('==================================================')
             return None
     

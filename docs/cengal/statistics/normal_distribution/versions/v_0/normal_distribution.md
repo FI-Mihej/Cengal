@@ -49,7 +49,7 @@ cengal<wbr>.statistics<wbr>.normal_distribution<wbr>.versions<wbr>.v_0<wbr>.norm
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.1&quot;</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.3&quot;</span>
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -58,85 +58,173 @@ cengal<wbr>.statistics<wbr>.normal_distribution<wbr>.versions<wbr>.v_0<wbr>.norm
 </span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>
 </span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>
 </span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="k">def</span> <span class="nf">statistics</span><span class="p">(</span><span class="n">iterable_readings</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Number</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Number</span><span class="p">]]:</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>    <span class="n">readings</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>    <span class="n">data_sum</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>    <span class="k">for</span> <span class="n">reading</span> <span class="ow">in</span> <span class="n">iterable_readings</span><span class="p">:</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>        <span class="n">readings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reading</span><span class="p">)</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>        <span class="n">data_sum</span> <span class="o">+=</span> <span class="n">reading</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Example</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="sd">    </span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="sd">        ```</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="sd">        diff_mean, readings = statistics(iterable_readings)</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="sd">        ```</span>
 </span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>
-</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>    <span class="k">try</span><span class="p">:</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>        <span class="n">diff_mean</span> <span class="o">=</span> <span class="n">data_sum</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">readings</span><span class="p">)</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>    <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
-</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>        <span class="n">diff_mean</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>    
-</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>    <span class="k">return</span> <span class="n">diff_mean</span><span class="p">,</span> <span class="n">readings</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="k">def</span> <span class="nf">variance</span><span class="p">(</span><span class="n">diff_mean</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">readings</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Number</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>    <span class="n">max_deviation</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>    <span class="n">min_deviation</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>    <span class="n">deviation_square_sum</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>    <span class="k">for</span> <span class="n">reading</span> <span class="ow">in</span> <span class="n">readings</span><span class="p">:</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>        <span class="n">deviation</span> <span class="o">=</span> <span class="n">reading</span> <span class="o">-</span> <span class="n">diff_mean</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>        <span class="n">deviation_square_sum</span> <span class="o">+=</span> <span class="n">deviation</span> <span class="o">**</span> <span class="mi">2</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>        <span class="k">if</span> <span class="n">max_deviation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>            <span class="n">max_deviation</span> <span class="o">=</span> <span class="n">deviation</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>        <span class="n">max_deviation</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_deviation</span><span class="p">,</span> <span class="n">deviation</span><span class="p">)</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>        <span class="k">if</span> <span class="n">min_deviation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>            <span class="n">min_deviation</span> <span class="o">=</span> <span class="n">deviation</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>        <span class="n">min_deviation</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">min_deviation</span><span class="p">,</span> <span class="n">deviation</span><span class="p">)</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>    <span class="k">try</span><span class="p">:</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>        <span class="n">variance</span> <span class="o">=</span> <span class="n">deviation_square_sum</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">readings</span><span class="p">)</span>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>    <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>        <span class="n">variance</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>    <span class="k">return</span> <span class="n">diff_mean</span><span class="p">,</span> <span class="n">variance</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>
+</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a><span class="sd">    Args:</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="sd">        iterable_readings (Iterable[Number]): _description_</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>
+</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="sd">    Returns:</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="sd">        Tuple[float, Sequence[Number]]: _description_</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="sd">    &quot;&quot;&quot;</span>    
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>    <span class="n">readings</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>    <span class="n">data_sum</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>    <span class="k">for</span> <span class="n">reading</span> <span class="ow">in</span> <span class="n">iterable_readings</span><span class="p">:</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>        <span class="n">readings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reading</span><span class="p">)</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>        <span class="n">data_sum</span> <span class="o">+=</span> <span class="n">reading</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>        <span class="n">diff_mean</span> <span class="o">=</span> <span class="n">data_sum</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">readings</span><span class="p">)</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>    <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>        <span class="n">diff_mean</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>    
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>    <span class="k">return</span> <span class="n">diff_mean</span><span class="p">,</span> <span class="n">readings</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="k">def</span> <span class="nf">variance</span><span class="p">(</span><span class="n">diff_mean</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">readings</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Number</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Example:</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="sd">        ```</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="sd">        diff_mean, readings = statistics(iterable_readings)</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="sd">        diff_mean, variance, max_deviation, min_deviation = variance(diff_mean, readings)</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="sd">        ```</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="sd">    Alternative example:</span>
 </span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="k">def</span> <span class="nf">standard_deviation</span><span class="p">(</span><span class="n">diff_mean</span><span class="p">,</span> <span class="n">variance</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>    <span class="k">return</span> <span class="n">diff_mean</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">variance</span><span class="p">),</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="sd">        ```</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="sd">        diff_mean, variance, max_deviation, min_deviation = variance(*statistics(iterable_readings))</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="sd">        ```</span>
 </span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="k">def</span> <span class="nf">guess_99_95_68</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">sd</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>    <span class="c1"># See: https://en.wikipedia.org/wiki/68%E2%80%9395%E2%80%9399.7_rule</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>    <span class="n">val_68</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">+</span> <span class="n">sd</span>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>    <span class="n">val_95</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">sd</span>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>    <span class="n">val_99</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">sd</span>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>    <span class="k">return</span> <span class="n">val_99</span><span class="p">,</span> <span class="n">val_95</span><span class="p">,</span> <span class="n">val_68</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="k">def</span> <span class="nf">average</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">):</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>    <span class="n">data_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>    <span class="n">data_sum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>    <span class="k">try</span><span class="p">:</span>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>        <span class="k">return</span> <span class="n">data_sum</span> <span class="o">/</span> <span class="n">data_len</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>    <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>        <span class="k">return</span> <span class="mi">0</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="k">def</span> <span class="nf">count_99_95_68</span><span class="p">(</span><span class="n">iterable_readings</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Number</span><span class="p">],</span> <span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="o">=</span><span class="n">average</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>    <span class="n">diff_mean</span><span class="p">,</span> <span class="n">readings</span> <span class="o">=</span> <span class="n">statistics</span><span class="p">(</span><span class="n">iterable_readings</span><span class="p">)</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span> <span class="o">=</span> <span class="n">variance</span><span class="p">(</span><span class="n">diff_mean</span><span class="p">,</span> <span class="n">readings</span><span class="p">)</span>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>    <span class="n">sorted_readings</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">readings</span><span class="p">)</span>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>    <span class="n">readings_qnt</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sorted_readings</span><span class="p">)</span>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">divider</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">:</span>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>        <span class="n">data_slice</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="n">divider</span><span class="p">]</span>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_slice</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>            <span class="n">data_slice</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>        <span class="k">return</span> <span class="n">data_slice</span>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>    <span class="n">div_68</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">readings_qnt</span> <span class="o">*</span> <span class="mf">0.68</span><span class="p">)</span>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>    <span class="n">val_68</span> <span class="o">=</span> <span class="n">operation</span><span class="p">(</span><span class="n">get_slice</span><span class="p">(</span><span class="n">sorted_readings</span><span class="p">,</span> <span class="n">div_68</span><span class="p">))</span>
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>    <span class="n">div_95</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">readings_qnt</span> <span class="o">*</span> <span class="mf">0.95</span><span class="p">)</span>
-</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>    <span class="n">val_95</span> <span class="o">=</span> <span class="n">operation</span><span class="p">(</span><span class="n">get_slice</span><span class="p">(</span><span class="n">sorted_readings</span><span class="p">,</span> <span class="n">div_95</span><span class="p">))</span>
-</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>
-</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>    <span class="n">div_99</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">readings_qnt</span> <span class="o">*</span> <span class="mf">0.99</span><span class="p">)</span>
-</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>    <span class="n">val_99</span> <span class="o">=</span> <span class="n">operation</span><span class="p">(</span><span class="n">get_slice</span><span class="p">(</span><span class="n">sorted_readings</span><span class="p">,</span> <span class="n">div_99</span><span class="p">))</span>
-</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>
-</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>    <span class="k">return</span> <span class="n">val_99</span><span class="p">,</span> <span class="n">val_95</span><span class="p">,</span> <span class="n">val_68</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="sd">    Args:</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a><span class="sd">        diff_mean (float): _description_</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="sd">        readings (Sequence[Number]): _description_</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="sd">    Returns:</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="sd">        Tuple[float, float, float, float]: _description_</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="sd">    &quot;&quot;&quot;</span>    
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>    <span class="n">max_deviation</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>    <span class="n">min_deviation</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>    <span class="n">deviation_square_sum</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>    <span class="k">for</span> <span class="n">reading</span> <span class="ow">in</span> <span class="n">readings</span><span class="p">:</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>        <span class="n">deviation</span> <span class="o">=</span> <span class="n">reading</span> <span class="o">-</span> <span class="n">diff_mean</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>        <span class="n">deviation_square_sum</span> <span class="o">+=</span> <span class="n">deviation</span> <span class="o">**</span> <span class="mi">2</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>        <span class="k">if</span> <span class="n">max_deviation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>            <span class="n">max_deviation</span> <span class="o">=</span> <span class="n">deviation</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>        <span class="n">max_deviation</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_deviation</span><span class="p">,</span> <span class="n">deviation</span><span class="p">)</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>        <span class="k">if</span> <span class="n">min_deviation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>            <span class="n">min_deviation</span> <span class="o">=</span> <span class="n">deviation</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>        <span class="n">min_deviation</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">min_deviation</span><span class="p">,</span> <span class="n">deviation</span><span class="p">)</span>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>        <span class="n">variance</span> <span class="o">=</span> <span class="n">deviation_square_sum</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">readings</span><span class="p">)</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>    <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>        <span class="n">variance</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>    <span class="k">return</span> <span class="n">diff_mean</span><span class="p">,</span> <span class="n">variance</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="k">def</span> <span class="nf">standard_deviation</span><span class="p">(</span><span class="n">diff_mean</span><span class="p">,</span> <span class="n">variance</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Example:</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="sd">        ```</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="sd">        diff_mean, readings = statistics(iterable_readings)</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a><span class="sd">        diff_mean, variance, max_deviation, min_deviation = variance(diff_mean, readings)</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a><span class="sd">        diff_mean, sd, max_deviation, min_deviation = standard_deviation(diff_mean, variance, max_deviation, min_deviation)</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="sd">        ```</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="sd">    Alternative example:</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a><span class="sd">        ```</span>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a><span class="sd">        diff_mean, sd, max_deviation, min_deviation = standard_deviation(*variance(*statistics(iterable_readings)))</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a><span class="sd">        ```</span>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a><span class="sd">    Args:</span>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a><span class="sd">        diff_mean (_type_): _description_</span>
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a><span class="sd">        variance (_type_): _description_</span>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a><span class="sd">        max_deviation (_type_): _description_</span>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a><span class="sd">        min_deviation (_type_): _description_</span>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a><span class="sd">    Returns:</span>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a><span class="sd">        Tuple[float, float, float, float]: _description_</span>
+</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a><span class="sd">    &quot;&quot;&quot;</span>    
+</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>    <span class="k">return</span> <span class="n">diff_mean</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">variance</span><span class="p">),</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span>
+</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>
+</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>
+</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a><span class="k">def</span> <span class="nf">guess_99_95_68</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">sd</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Example:</span>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>
+</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a><span class="sd">        ```</span>
+</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a><span class="sd">        diff_mean, readings = statistics(iterable_readings)</span>
+</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a><span class="sd">        diff_mean, variance, max_deviation, min_deviation = variance(diff_mean, readings)</span>
+</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a><span class="sd">        diff_mean, sd, max_deviation, min_deviation = standard_deviation(diff_mean, variance, max_deviation, min_deviation)</span>
+</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a><span class="sd">        val_99, val_95, val_68, max_deviation, min_deviation = guess_99_95_68(diff_mean, sd, max_deviation, min_deviation)</span>
+</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a><span class="sd">        ```</span>
+</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>
+</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a><span class="sd">    Alternative example:</span>
+</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>
+</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a><span class="sd">        ```</span>
+</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a><span class="sd">        val_99, val_95, val_68, max_deviation, min_deviation = guess_99_95_68(*standard_deviation(*variance(*statistics(iterable_readings)))</span>
+</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a><span class="sd">        ```</span>
+</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a>
+</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a><span class="sd">    Args:</span>
+</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a><span class="sd">        mean (_type_): _description_</span>
+</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a><span class="sd">        sd (_type_): _description_</span>
+</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a><span class="sd">        max_deviation (_type_): _description_</span>
+</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a><span class="sd">        min_deviation (_type_): _description_</span>
+</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a>
+</span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a><span class="sd">    Returns:</span>
+</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a><span class="sd">        Tuple[float, float, float, float, float]: _description_</span>
+</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a><span class="sd">    &quot;&quot;&quot;</span>    
+</span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a>    <span class="c1"># See: https://en.wikipedia.org/wiki/68%E2%80%9395%E2%80%9399.7_rule</span>
+</span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a>    <span class="n">val_68</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">+</span> <span class="n">sd</span>
+</span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a>    <span class="n">val_95</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">sd</span>
+</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a>    <span class="n">val_99</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">sd</span>
+</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a>    <span class="k">return</span> <span class="n">val_99</span><span class="p">,</span> <span class="n">val_95</span><span class="p">,</span> <span class="n">val_68</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span>
+</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a>
+</span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a>
+</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a><span class="k">def</span> <span class="nf">average</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Number</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Number</span><span class="p">:</span>
+</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a>    <span class="n">data_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a>    <span class="n">data_sum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a>        <span class="k">return</span> <span class="n">data_sum</span> <span class="o">/</span> <span class="n">data_len</span>
+</span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a>    <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+</span><span id="L-179"><a href="#L-179"><span class="linenos">179</span></a>        <span class="k">return</span> <span class="mi">0</span>
+</span><span id="L-180"><a href="#L-180"><span class="linenos">180</span></a>
+</span><span id="L-181"><a href="#L-181"><span class="linenos">181</span></a>
+</span><span id="L-182"><a href="#L-182"><span class="linenos">182</span></a><span class="k">def</span> <span class="nf">count_99_95_68</span><span class="p">(</span><span class="n">iterable_readings</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Number</span><span class="p">],</span> <span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="o">=</span><span class="n">average</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+</span><span id="L-183"><a href="#L-183"><span class="linenos">183</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+</span><span id="L-184"><a href="#L-184"><span class="linenos">184</span></a>
+</span><span id="L-185"><a href="#L-185"><span class="linenos">185</span></a><span class="sd">    Args:</span>
+</span><span id="L-186"><a href="#L-186"><span class="linenos">186</span></a><span class="sd">        iterable_readings (Iterable[Number]): _description_</span>
+</span><span id="L-187"><a href="#L-187"><span class="linenos">187</span></a><span class="sd">        operation (Callable, optional): _description_. Defaults to average. You can use other functions like min, max, median, etc.</span>
+</span><span id="L-188"><a href="#L-188"><span class="linenos">188</span></a>
+</span><span id="L-189"><a href="#L-189"><span class="linenos">189</span></a><span class="sd">    Returns:</span>
+</span><span id="L-190"><a href="#L-190"><span class="linenos">190</span></a><span class="sd">        Tuple[float, float, float, float, float]: _description_</span>
+</span><span id="L-191"><a href="#L-191"><span class="linenos">191</span></a><span class="sd">    &quot;&quot;&quot;</span>    
+</span><span id="L-192"><a href="#L-192"><span class="linenos">192</span></a>    <span class="n">diff_mean</span><span class="p">,</span> <span class="n">readings</span> <span class="o">=</span> <span class="n">statistics</span><span class="p">(</span><span class="n">iterable_readings</span><span class="p">)</span>
+</span><span id="L-193"><a href="#L-193"><span class="linenos">193</span></a>    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span> <span class="o">=</span> <span class="n">variance</span><span class="p">(</span><span class="n">diff_mean</span><span class="p">,</span> <span class="n">readings</span><span class="p">)</span>
+</span><span id="L-194"><a href="#L-194"><span class="linenos">194</span></a>    <span class="n">sorted_readings</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">readings</span><span class="p">)</span>
+</span><span id="L-195"><a href="#L-195"><span class="linenos">195</span></a>    <span class="n">readings_qnt</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sorted_readings</span><span class="p">)</span>
+</span><span id="L-196"><a href="#L-196"><span class="linenos">196</span></a>
+</span><span id="L-197"><a href="#L-197"><span class="linenos">197</span></a>    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">divider</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">:</span>
+</span><span id="L-198"><a href="#L-198"><span class="linenos">198</span></a>        <span class="n">data_slice</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="n">divider</span><span class="p">]</span>
+</span><span id="L-199"><a href="#L-199"><span class="linenos">199</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_slice</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+</span><span id="L-200"><a href="#L-200"><span class="linenos">200</span></a>            <span class="n">data_slice</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</span><span id="L-201"><a href="#L-201"><span class="linenos">201</span></a>        <span class="k">return</span> <span class="n">data_slice</span>
+</span><span id="L-202"><a href="#L-202"><span class="linenos">202</span></a>
+</span><span id="L-203"><a href="#L-203"><span class="linenos">203</span></a>    <span class="n">div_68</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">readings_qnt</span> <span class="o">*</span> <span class="mf">0.68</span><span class="p">)</span>
+</span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a>    <span class="n">val_68</span> <span class="o">=</span> <span class="n">operation</span><span class="p">(</span><span class="n">get_slice</span><span class="p">(</span><span class="n">sorted_readings</span><span class="p">,</span> <span class="n">div_68</span><span class="p">))</span>
+</span><span id="L-205"><a href="#L-205"><span class="linenos">205</span></a>
+</span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a>    <span class="n">div_95</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">readings_qnt</span> <span class="o">*</span> <span class="mf">0.95</span><span class="p">)</span>
+</span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a>    <span class="n">val_95</span> <span class="o">=</span> <span class="n">operation</span><span class="p">(</span><span class="n">get_slice</span><span class="p">(</span><span class="n">sorted_readings</span><span class="p">,</span> <span class="n">div_95</span><span class="p">))</span>
+</span><span id="L-208"><a href="#L-208"><span class="linenos">208</span></a>
+</span><span id="L-209"><a href="#L-209"><span class="linenos">209</span></a>    <span class="n">div_99</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">readings_qnt</span> <span class="o">*</span> <span class="mf">0.99</span><span class="p">)</span>
+</span><span id="L-210"><a href="#L-210"><span class="linenos">210</span></a>    <span class="n">val_99</span> <span class="o">=</span> <span class="n">operation</span><span class="p">(</span><span class="n">get_slice</span><span class="p">(</span><span class="n">sorted_readings</span><span class="p">,</span> <span class="n">div_99</span><span class="p">))</span>
+</span><span id="L-211"><a href="#L-211"><span class="linenos">211</span></a>
+</span><span id="L-212"><a href="#L-212"><span class="linenos">212</span></a>    <span class="k">return</span> <span class="n">val_99</span><span class="p">,</span> <span class="n">val_95</span><span class="p">,</span> <span class="n">val_68</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span>
 </span></pre></div>
 
 
@@ -152,32 +240,50 @@ cengal<wbr>.statistics<wbr>.normal_distribution<wbr>.versions<wbr>.v_0<wbr>.norm
 
     </div>
     <a class="headerlink" href="#count_99_95_68"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="count_99_95_68-104"><a href="#count_99_95_68-104"><span class="linenos">104</span></a><span class="k">def</span> <span class="nf">count_99_95_68</span><span class="p">(</span><span class="n">iterable_readings</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Number</span><span class="p">],</span> <span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="o">=</span><span class="n">average</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-</span><span id="count_99_95_68-105"><a href="#count_99_95_68-105"><span class="linenos">105</span></a>    <span class="n">diff_mean</span><span class="p">,</span> <span class="n">readings</span> <span class="o">=</span> <span class="n">statistics</span><span class="p">(</span><span class="n">iterable_readings</span><span class="p">)</span>
-</span><span id="count_99_95_68-106"><a href="#count_99_95_68-106"><span class="linenos">106</span></a>    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span> <span class="o">=</span> <span class="n">variance</span><span class="p">(</span><span class="n">diff_mean</span><span class="p">,</span> <span class="n">readings</span><span class="p">)</span>
-</span><span id="count_99_95_68-107"><a href="#count_99_95_68-107"><span class="linenos">107</span></a>    <span class="n">sorted_readings</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">readings</span><span class="p">)</span>
-</span><span id="count_99_95_68-108"><a href="#count_99_95_68-108"><span class="linenos">108</span></a>    <span class="n">readings_qnt</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sorted_readings</span><span class="p">)</span>
-</span><span id="count_99_95_68-109"><a href="#count_99_95_68-109"><span class="linenos">109</span></a>
-</span><span id="count_99_95_68-110"><a href="#count_99_95_68-110"><span class="linenos">110</span></a>    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">divider</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">:</span>
-</span><span id="count_99_95_68-111"><a href="#count_99_95_68-111"><span class="linenos">111</span></a>        <span class="n">data_slice</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="n">divider</span><span class="p">]</span>
-</span><span id="count_99_95_68-112"><a href="#count_99_95_68-112"><span class="linenos">112</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_slice</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-</span><span id="count_99_95_68-113"><a href="#count_99_95_68-113"><span class="linenos">113</span></a>            <span class="n">data_slice</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-</span><span id="count_99_95_68-114"><a href="#count_99_95_68-114"><span class="linenos">114</span></a>        <span class="k">return</span> <span class="n">data_slice</span>
-</span><span id="count_99_95_68-115"><a href="#count_99_95_68-115"><span class="linenos">115</span></a>
-</span><span id="count_99_95_68-116"><a href="#count_99_95_68-116"><span class="linenos">116</span></a>    <span class="n">div_68</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">readings_qnt</span> <span class="o">*</span> <span class="mf">0.68</span><span class="p">)</span>
-</span><span id="count_99_95_68-117"><a href="#count_99_95_68-117"><span class="linenos">117</span></a>    <span class="n">val_68</span> <span class="o">=</span> <span class="n">operation</span><span class="p">(</span><span class="n">get_slice</span><span class="p">(</span><span class="n">sorted_readings</span><span class="p">,</span> <span class="n">div_68</span><span class="p">))</span>
-</span><span id="count_99_95_68-118"><a href="#count_99_95_68-118"><span class="linenos">118</span></a>
-</span><span id="count_99_95_68-119"><a href="#count_99_95_68-119"><span class="linenos">119</span></a>    <span class="n">div_95</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">readings_qnt</span> <span class="o">*</span> <span class="mf">0.95</span><span class="p">)</span>
-</span><span id="count_99_95_68-120"><a href="#count_99_95_68-120"><span class="linenos">120</span></a>    <span class="n">val_95</span> <span class="o">=</span> <span class="n">operation</span><span class="p">(</span><span class="n">get_slice</span><span class="p">(</span><span class="n">sorted_readings</span><span class="p">,</span> <span class="n">div_95</span><span class="p">))</span>
-</span><span id="count_99_95_68-121"><a href="#count_99_95_68-121"><span class="linenos">121</span></a>
-</span><span id="count_99_95_68-122"><a href="#count_99_95_68-122"><span class="linenos">122</span></a>    <span class="n">div_99</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">readings_qnt</span> <span class="o">*</span> <span class="mf">0.99</span><span class="p">)</span>
-</span><span id="count_99_95_68-123"><a href="#count_99_95_68-123"><span class="linenos">123</span></a>    <span class="n">val_99</span> <span class="o">=</span> <span class="n">operation</span><span class="p">(</span><span class="n">get_slice</span><span class="p">(</span><span class="n">sorted_readings</span><span class="p">,</span> <span class="n">div_99</span><span class="p">))</span>
-</span><span id="count_99_95_68-124"><a href="#count_99_95_68-124"><span class="linenos">124</span></a>
-</span><span id="count_99_95_68-125"><a href="#count_99_95_68-125"><span class="linenos">125</span></a>    <span class="k">return</span> <span class="n">val_99</span><span class="p">,</span> <span class="n">val_95</span><span class="p">,</span> <span class="n">val_68</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="count_99_95_68-183"><a href="#count_99_95_68-183"><span class="linenos">183</span></a><span class="k">def</span> <span class="nf">count_99_95_68</span><span class="p">(</span><span class="n">iterable_readings</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Number</span><span class="p">],</span> <span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="o">=</span><span class="n">average</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+</span><span id="count_99_95_68-184"><a href="#count_99_95_68-184"><span class="linenos">184</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+</span><span id="count_99_95_68-185"><a href="#count_99_95_68-185"><span class="linenos">185</span></a>
+</span><span id="count_99_95_68-186"><a href="#count_99_95_68-186"><span class="linenos">186</span></a><span class="sd">    Args:</span>
+</span><span id="count_99_95_68-187"><a href="#count_99_95_68-187"><span class="linenos">187</span></a><span class="sd">        iterable_readings (Iterable[Number]): _description_</span>
+</span><span id="count_99_95_68-188"><a href="#count_99_95_68-188"><span class="linenos">188</span></a><span class="sd">        operation (Callable, optional): _description_. Defaults to average. You can use other functions like min, max, median, etc.</span>
+</span><span id="count_99_95_68-189"><a href="#count_99_95_68-189"><span class="linenos">189</span></a>
+</span><span id="count_99_95_68-190"><a href="#count_99_95_68-190"><span class="linenos">190</span></a><span class="sd">    Returns:</span>
+</span><span id="count_99_95_68-191"><a href="#count_99_95_68-191"><span class="linenos">191</span></a><span class="sd">        Tuple[float, float, float, float, float]: _description_</span>
+</span><span id="count_99_95_68-192"><a href="#count_99_95_68-192"><span class="linenos">192</span></a><span class="sd">    &quot;&quot;&quot;</span>    
+</span><span id="count_99_95_68-193"><a href="#count_99_95_68-193"><span class="linenos">193</span></a>    <span class="n">diff_mean</span><span class="p">,</span> <span class="n">readings</span> <span class="o">=</span> <span class="n">statistics</span><span class="p">(</span><span class="n">iterable_readings</span><span class="p">)</span>
+</span><span id="count_99_95_68-194"><a href="#count_99_95_68-194"><span class="linenos">194</span></a>    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span> <span class="o">=</span> <span class="n">variance</span><span class="p">(</span><span class="n">diff_mean</span><span class="p">,</span> <span class="n">readings</span><span class="p">)</span>
+</span><span id="count_99_95_68-195"><a href="#count_99_95_68-195"><span class="linenos">195</span></a>    <span class="n">sorted_readings</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">readings</span><span class="p">)</span>
+</span><span id="count_99_95_68-196"><a href="#count_99_95_68-196"><span class="linenos">196</span></a>    <span class="n">readings_qnt</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sorted_readings</span><span class="p">)</span>
+</span><span id="count_99_95_68-197"><a href="#count_99_95_68-197"><span class="linenos">197</span></a>
+</span><span id="count_99_95_68-198"><a href="#count_99_95_68-198"><span class="linenos">198</span></a>    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">divider</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">:</span>
+</span><span id="count_99_95_68-199"><a href="#count_99_95_68-199"><span class="linenos">199</span></a>        <span class="n">data_slice</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="n">divider</span><span class="p">]</span>
+</span><span id="count_99_95_68-200"><a href="#count_99_95_68-200"><span class="linenos">200</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_slice</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+</span><span id="count_99_95_68-201"><a href="#count_99_95_68-201"><span class="linenos">201</span></a>            <span class="n">data_slice</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</span><span id="count_99_95_68-202"><a href="#count_99_95_68-202"><span class="linenos">202</span></a>        <span class="k">return</span> <span class="n">data_slice</span>
+</span><span id="count_99_95_68-203"><a href="#count_99_95_68-203"><span class="linenos">203</span></a>
+</span><span id="count_99_95_68-204"><a href="#count_99_95_68-204"><span class="linenos">204</span></a>    <span class="n">div_68</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">readings_qnt</span> <span class="o">*</span> <span class="mf">0.68</span><span class="p">)</span>
+</span><span id="count_99_95_68-205"><a href="#count_99_95_68-205"><span class="linenos">205</span></a>    <span class="n">val_68</span> <span class="o">=</span> <span class="n">operation</span><span class="p">(</span><span class="n">get_slice</span><span class="p">(</span><span class="n">sorted_readings</span><span class="p">,</span> <span class="n">div_68</span><span class="p">))</span>
+</span><span id="count_99_95_68-206"><a href="#count_99_95_68-206"><span class="linenos">206</span></a>
+</span><span id="count_99_95_68-207"><a href="#count_99_95_68-207"><span class="linenos">207</span></a>    <span class="n">div_95</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">readings_qnt</span> <span class="o">*</span> <span class="mf">0.95</span><span class="p">)</span>
+</span><span id="count_99_95_68-208"><a href="#count_99_95_68-208"><span class="linenos">208</span></a>    <span class="n">val_95</span> <span class="o">=</span> <span class="n">operation</span><span class="p">(</span><span class="n">get_slice</span><span class="p">(</span><span class="n">sorted_readings</span><span class="p">,</span> <span class="n">div_95</span><span class="p">))</span>
+</span><span id="count_99_95_68-209"><a href="#count_99_95_68-209"><span class="linenos">209</span></a>
+</span><span id="count_99_95_68-210"><a href="#count_99_95_68-210"><span class="linenos">210</span></a>    <span class="n">div_99</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">readings_qnt</span> <span class="o">*</span> <span class="mf">0.99</span><span class="p">)</span>
+</span><span id="count_99_95_68-211"><a href="#count_99_95_68-211"><span class="linenos">211</span></a>    <span class="n">val_99</span> <span class="o">=</span> <span class="n">operation</span><span class="p">(</span><span class="n">get_slice</span><span class="p">(</span><span class="n">sorted_readings</span><span class="p">,</span> <span class="n">div_99</span><span class="p">))</span>
+</span><span id="count_99_95_68-212"><a href="#count_99_95_68-212"><span class="linenos">212</span></a>
+</span><span id="count_99_95_68-213"><a href="#count_99_95_68-213"><span class="linenos">213</span></a>    <span class="k">return</span> <span class="n">val_99</span><span class="p">,</span> <span class="n">val_95</span><span class="p">,</span> <span class="n">val_68</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>_summary_</p>
+
+<p>Args:
+    iterable_readings (Iterable[Number]): _description_
+    operation (Callable, optional): _description_. Defaults to average. You can use other functions like min, max, median, etc.</p>
+
+<p>Returns:
+    Tuple[float, float, float, float, float]: _description_</p>
+</div>
+
 
                 </section>
                 <section id="guess_99_95_68">
@@ -191,16 +297,60 @@ cengal<wbr>.statistics<wbr>.normal_distribution<wbr>.versions<wbr>.v_0<wbr>.norm
 
     </div>
     <a class="headerlink" href="#guess_99_95_68"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="guess_99_95_68-87"><a href="#guess_99_95_68-87"><span class="linenos">87</span></a><span class="k">def</span> <span class="nf">guess_99_95_68</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">sd</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-</span><span id="guess_99_95_68-88"><a href="#guess_99_95_68-88"><span class="linenos">88</span></a>    <span class="c1"># See: https://en.wikipedia.org/wiki/68%E2%80%9395%E2%80%9399.7_rule</span>
-</span><span id="guess_99_95_68-89"><a href="#guess_99_95_68-89"><span class="linenos">89</span></a>    <span class="n">val_68</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">+</span> <span class="n">sd</span>
-</span><span id="guess_99_95_68-90"><a href="#guess_99_95_68-90"><span class="linenos">90</span></a>    <span class="n">val_95</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">sd</span>
-</span><span id="guess_99_95_68-91"><a href="#guess_99_95_68-91"><span class="linenos">91</span></a>    <span class="n">val_99</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">sd</span>
-</span><span id="guess_99_95_68-92"><a href="#guess_99_95_68-92"><span class="linenos">92</span></a>    <span class="k">return</span> <span class="n">val_99</span><span class="p">,</span> <span class="n">val_95</span><span class="p">,</span> <span class="n">val_68</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="guess_99_95_68-142"><a href="#guess_99_95_68-142"><span class="linenos">142</span></a><span class="k">def</span> <span class="nf">guess_99_95_68</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">sd</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+</span><span id="guess_99_95_68-143"><a href="#guess_99_95_68-143"><span class="linenos">143</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Example:</span>
+</span><span id="guess_99_95_68-144"><a href="#guess_99_95_68-144"><span class="linenos">144</span></a>
+</span><span id="guess_99_95_68-145"><a href="#guess_99_95_68-145"><span class="linenos">145</span></a><span class="sd">        ```</span>
+</span><span id="guess_99_95_68-146"><a href="#guess_99_95_68-146"><span class="linenos">146</span></a><span class="sd">        diff_mean, readings = statistics(iterable_readings)</span>
+</span><span id="guess_99_95_68-147"><a href="#guess_99_95_68-147"><span class="linenos">147</span></a><span class="sd">        diff_mean, variance, max_deviation, min_deviation = variance(diff_mean, readings)</span>
+</span><span id="guess_99_95_68-148"><a href="#guess_99_95_68-148"><span class="linenos">148</span></a><span class="sd">        diff_mean, sd, max_deviation, min_deviation = standard_deviation(diff_mean, variance, max_deviation, min_deviation)</span>
+</span><span id="guess_99_95_68-149"><a href="#guess_99_95_68-149"><span class="linenos">149</span></a><span class="sd">        val_99, val_95, val_68, max_deviation, min_deviation = guess_99_95_68(diff_mean, sd, max_deviation, min_deviation)</span>
+</span><span id="guess_99_95_68-150"><a href="#guess_99_95_68-150"><span class="linenos">150</span></a><span class="sd">        ```</span>
+</span><span id="guess_99_95_68-151"><a href="#guess_99_95_68-151"><span class="linenos">151</span></a>
+</span><span id="guess_99_95_68-152"><a href="#guess_99_95_68-152"><span class="linenos">152</span></a><span class="sd">    Alternative example:</span>
+</span><span id="guess_99_95_68-153"><a href="#guess_99_95_68-153"><span class="linenos">153</span></a>
+</span><span id="guess_99_95_68-154"><a href="#guess_99_95_68-154"><span class="linenos">154</span></a><span class="sd">        ```</span>
+</span><span id="guess_99_95_68-155"><a href="#guess_99_95_68-155"><span class="linenos">155</span></a><span class="sd">        val_99, val_95, val_68, max_deviation, min_deviation = guess_99_95_68(*standard_deviation(*variance(*statistics(iterable_readings)))</span>
+</span><span id="guess_99_95_68-156"><a href="#guess_99_95_68-156"><span class="linenos">156</span></a><span class="sd">        ```</span>
+</span><span id="guess_99_95_68-157"><a href="#guess_99_95_68-157"><span class="linenos">157</span></a>
+</span><span id="guess_99_95_68-158"><a href="#guess_99_95_68-158"><span class="linenos">158</span></a><span class="sd">    Args:</span>
+</span><span id="guess_99_95_68-159"><a href="#guess_99_95_68-159"><span class="linenos">159</span></a><span class="sd">        mean (_type_): _description_</span>
+</span><span id="guess_99_95_68-160"><a href="#guess_99_95_68-160"><span class="linenos">160</span></a><span class="sd">        sd (_type_): _description_</span>
+</span><span id="guess_99_95_68-161"><a href="#guess_99_95_68-161"><span class="linenos">161</span></a><span class="sd">        max_deviation (_type_): _description_</span>
+</span><span id="guess_99_95_68-162"><a href="#guess_99_95_68-162"><span class="linenos">162</span></a><span class="sd">        min_deviation (_type_): _description_</span>
+</span><span id="guess_99_95_68-163"><a href="#guess_99_95_68-163"><span class="linenos">163</span></a>
+</span><span id="guess_99_95_68-164"><a href="#guess_99_95_68-164"><span class="linenos">164</span></a><span class="sd">    Returns:</span>
+</span><span id="guess_99_95_68-165"><a href="#guess_99_95_68-165"><span class="linenos">165</span></a><span class="sd">        Tuple[float, float, float, float, float]: _description_</span>
+</span><span id="guess_99_95_68-166"><a href="#guess_99_95_68-166"><span class="linenos">166</span></a><span class="sd">    &quot;&quot;&quot;</span>    
+</span><span id="guess_99_95_68-167"><a href="#guess_99_95_68-167"><span class="linenos">167</span></a>    <span class="c1"># See: https://en.wikipedia.org/wiki/68%E2%80%9395%E2%80%9399.7_rule</span>
+</span><span id="guess_99_95_68-168"><a href="#guess_99_95_68-168"><span class="linenos">168</span></a>    <span class="n">val_68</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">+</span> <span class="n">sd</span>
+</span><span id="guess_99_95_68-169"><a href="#guess_99_95_68-169"><span class="linenos">169</span></a>    <span class="n">val_95</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">sd</span>
+</span><span id="guess_99_95_68-170"><a href="#guess_99_95_68-170"><span class="linenos">170</span></a>    <span class="n">val_99</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">sd</span>
+</span><span id="guess_99_95_68-171"><a href="#guess_99_95_68-171"><span class="linenos">171</span></a>    <span class="k">return</span> <span class="n">val_99</span><span class="p">,</span> <span class="n">val_95</span><span class="p">,</span> <span class="n">val_68</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>Example:
+    <pre><code>diff_mean, readings = statistics(iterable_readings)
+diff_mean, variance, max_deviation, min_deviation = variance(diff_mean, readings)
+diff_mean, sd, max_deviation, min_deviation = standard_deviation(diff_mean, variance, max_deviation, min_deviation)
+val_99, val_95, val_68, max_deviation, min_deviation = guess_99_95_68(diff_mean, sd, max_deviation, min_deviation)
+</code></pre></p>
+
+<p>Alternative example:
+    <pre><code>val_99, val_95, val_68, max_deviation, min_deviation = guess_99_95_68(*standard_deviation(*variance(*statistics(iterable_readings)))
+</code></pre></p>
+
+<p>Args:
+    mean (_type_): _description_
+    sd (_type_): _description_
+    max_deviation (_type_): _description_
+    min_deviation (_type_): _description_</p>
+
+<p>Returns:
+    Tuple[float, float, float, float, float]: _description_</p>
+</div>
+
 
                 </section>
                 <section id="standard_deviation">
@@ -214,12 +364,54 @@ cengal<wbr>.statistics<wbr>.normal_distribution<wbr>.versions<wbr>.v_0<wbr>.norm
 
     </div>
     <a class="headerlink" href="#standard_deviation"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="standard_deviation-83"><a href="#standard_deviation-83"><span class="linenos">83</span></a><span class="k">def</span> <span class="nf">standard_deviation</span><span class="p">(</span><span class="n">diff_mean</span><span class="p">,</span> <span class="n">variance</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-</span><span id="standard_deviation-84"><a href="#standard_deviation-84"><span class="linenos">84</span></a>    <span class="k">return</span> <span class="n">diff_mean</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">variance</span><span class="p">),</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="standard_deviation-115"><a href="#standard_deviation-115"><span class="linenos">115</span></a><span class="k">def</span> <span class="nf">standard_deviation</span><span class="p">(</span><span class="n">diff_mean</span><span class="p">,</span> <span class="n">variance</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+</span><span id="standard_deviation-116"><a href="#standard_deviation-116"><span class="linenos">116</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Example:</span>
+</span><span id="standard_deviation-117"><a href="#standard_deviation-117"><span class="linenos">117</span></a>
+</span><span id="standard_deviation-118"><a href="#standard_deviation-118"><span class="linenos">118</span></a><span class="sd">        ```</span>
+</span><span id="standard_deviation-119"><a href="#standard_deviation-119"><span class="linenos">119</span></a><span class="sd">        diff_mean, readings = statistics(iterable_readings)</span>
+</span><span id="standard_deviation-120"><a href="#standard_deviation-120"><span class="linenos">120</span></a><span class="sd">        diff_mean, variance, max_deviation, min_deviation = variance(diff_mean, readings)</span>
+</span><span id="standard_deviation-121"><a href="#standard_deviation-121"><span class="linenos">121</span></a><span class="sd">        diff_mean, sd, max_deviation, min_deviation = standard_deviation(diff_mean, variance, max_deviation, min_deviation)</span>
+</span><span id="standard_deviation-122"><a href="#standard_deviation-122"><span class="linenos">122</span></a><span class="sd">        ```</span>
+</span><span id="standard_deviation-123"><a href="#standard_deviation-123"><span class="linenos">123</span></a>
+</span><span id="standard_deviation-124"><a href="#standard_deviation-124"><span class="linenos">124</span></a><span class="sd">    Alternative example:</span>
+</span><span id="standard_deviation-125"><a href="#standard_deviation-125"><span class="linenos">125</span></a>
+</span><span id="standard_deviation-126"><a href="#standard_deviation-126"><span class="linenos">126</span></a><span class="sd">        ```</span>
+</span><span id="standard_deviation-127"><a href="#standard_deviation-127"><span class="linenos">127</span></a><span class="sd">        diff_mean, sd, max_deviation, min_deviation = standard_deviation(*variance(*statistics(iterable_readings)))</span>
+</span><span id="standard_deviation-128"><a href="#standard_deviation-128"><span class="linenos">128</span></a><span class="sd">        ```</span>
+</span><span id="standard_deviation-129"><a href="#standard_deviation-129"><span class="linenos">129</span></a>
+</span><span id="standard_deviation-130"><a href="#standard_deviation-130"><span class="linenos">130</span></a><span class="sd">    Args:</span>
+</span><span id="standard_deviation-131"><a href="#standard_deviation-131"><span class="linenos">131</span></a><span class="sd">        diff_mean (_type_): _description_</span>
+</span><span id="standard_deviation-132"><a href="#standard_deviation-132"><span class="linenos">132</span></a><span class="sd">        variance (_type_): _description_</span>
+</span><span id="standard_deviation-133"><a href="#standard_deviation-133"><span class="linenos">133</span></a><span class="sd">        max_deviation (_type_): _description_</span>
+</span><span id="standard_deviation-134"><a href="#standard_deviation-134"><span class="linenos">134</span></a><span class="sd">        min_deviation (_type_): _description_</span>
+</span><span id="standard_deviation-135"><a href="#standard_deviation-135"><span class="linenos">135</span></a>
+</span><span id="standard_deviation-136"><a href="#standard_deviation-136"><span class="linenos">136</span></a><span class="sd">    Returns:</span>
+</span><span id="standard_deviation-137"><a href="#standard_deviation-137"><span class="linenos">137</span></a><span class="sd">        Tuple[float, float, float, float]: _description_</span>
+</span><span id="standard_deviation-138"><a href="#standard_deviation-138"><span class="linenos">138</span></a><span class="sd">    &quot;&quot;&quot;</span>    
+</span><span id="standard_deviation-139"><a href="#standard_deviation-139"><span class="linenos">139</span></a>    <span class="k">return</span> <span class="n">diff_mean</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">variance</span><span class="p">),</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>Example:
+    <pre><code>diff_mean, readings = statistics(iterable_readings)
+diff_mean, variance, max_deviation, min_deviation = variance(diff_mean, readings)
+diff_mean, sd, max_deviation, min_deviation = standard_deviation(diff_mean, variance, max_deviation, min_deviation)
+</code></pre></p>
+
+<p>Alternative example:
+    <pre><code>diff_mean, sd, max_deviation, min_deviation = standard_deviation(*variance(*statistics(iterable_readings)))
+</code></pre></p>
+
+<p>Args:
+    diff_mean (_type_): _description_
+    variance (_type_): _description_
+    max_deviation (_type_): _description_
+    min_deviation (_type_): _description_</p>
+
+<p>Returns:
+    Tuple[float, float, float, float]: _description_</p>
+</div>
+
 
                 </section>
                 <section id="variance">
@@ -233,30 +425,66 @@ cengal<wbr>.statistics<wbr>.normal_distribution<wbr>.versions<wbr>.v_0<wbr>.norm
 
     </div>
     <a class="headerlink" href="#variance"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="variance-61"><a href="#variance-61"><span class="linenos">61</span></a><span class="k">def</span> <span class="nf">variance</span><span class="p">(</span><span class="n">diff_mean</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">readings</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Number</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-</span><span id="variance-62"><a href="#variance-62"><span class="linenos">62</span></a>    <span class="n">max_deviation</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="variance-63"><a href="#variance-63"><span class="linenos">63</span></a>    <span class="n">min_deviation</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="variance-64"><a href="#variance-64"><span class="linenos">64</span></a>    <span class="n">deviation_square_sum</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="variance-65"><a href="#variance-65"><span class="linenos">65</span></a>    <span class="k">for</span> <span class="n">reading</span> <span class="ow">in</span> <span class="n">readings</span><span class="p">:</span>
-</span><span id="variance-66"><a href="#variance-66"><span class="linenos">66</span></a>        <span class="n">deviation</span> <span class="o">=</span> <span class="n">reading</span> <span class="o">-</span> <span class="n">diff_mean</span>
-</span><span id="variance-67"><a href="#variance-67"><span class="linenos">67</span></a>        <span class="n">deviation_square_sum</span> <span class="o">+=</span> <span class="n">deviation</span> <span class="o">**</span> <span class="mi">2</span>
-</span><span id="variance-68"><a href="#variance-68"><span class="linenos">68</span></a>        <span class="k">if</span> <span class="n">max_deviation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="variance-69"><a href="#variance-69"><span class="linenos">69</span></a>            <span class="n">max_deviation</span> <span class="o">=</span> <span class="n">deviation</span>
-</span><span id="variance-70"><a href="#variance-70"><span class="linenos">70</span></a>        <span class="n">max_deviation</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_deviation</span><span class="p">,</span> <span class="n">deviation</span><span class="p">)</span>
-</span><span id="variance-71"><a href="#variance-71"><span class="linenos">71</span></a>        <span class="k">if</span> <span class="n">min_deviation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="variance-72"><a href="#variance-72"><span class="linenos">72</span></a>            <span class="n">min_deviation</span> <span class="o">=</span> <span class="n">deviation</span>
-</span><span id="variance-73"><a href="#variance-73"><span class="linenos">73</span></a>        <span class="n">min_deviation</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">min_deviation</span><span class="p">,</span> <span class="n">deviation</span><span class="p">)</span>
-</span><span id="variance-74"><a href="#variance-74"><span class="linenos">74</span></a>
-</span><span id="variance-75"><a href="#variance-75"><span class="linenos">75</span></a>    <span class="k">try</span><span class="p">:</span>
-</span><span id="variance-76"><a href="#variance-76"><span class="linenos">76</span></a>        <span class="n">variance</span> <span class="o">=</span> <span class="n">deviation_square_sum</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">readings</span><span class="p">)</span>
-</span><span id="variance-77"><a href="#variance-77"><span class="linenos">77</span></a>    <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
-</span><span id="variance-78"><a href="#variance-78"><span class="linenos">78</span></a>        <span class="n">variance</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="variance-79"><a href="#variance-79"><span class="linenos">79</span></a>
-</span><span id="variance-80"><a href="#variance-80"><span class="linenos">80</span></a>    <span class="k">return</span> <span class="n">diff_mean</span><span class="p">,</span> <span class="n">variance</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="variance-73"><a href="#variance-73"><span class="linenos"> 73</span></a><span class="k">def</span> <span class="nf">variance</span><span class="p">(</span><span class="n">diff_mean</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">readings</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Number</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+</span><span id="variance-74"><a href="#variance-74"><span class="linenos"> 74</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Example:</span>
+</span><span id="variance-75"><a href="#variance-75"><span class="linenos"> 75</span></a>
+</span><span id="variance-76"><a href="#variance-76"><span class="linenos"> 76</span></a><span class="sd">        ```</span>
+</span><span id="variance-77"><a href="#variance-77"><span class="linenos"> 77</span></a><span class="sd">        diff_mean, readings = statistics(iterable_readings)</span>
+</span><span id="variance-78"><a href="#variance-78"><span class="linenos"> 78</span></a><span class="sd">        diff_mean, variance, max_deviation, min_deviation = variance(diff_mean, readings)</span>
+</span><span id="variance-79"><a href="#variance-79"><span class="linenos"> 79</span></a><span class="sd">        ```</span>
+</span><span id="variance-80"><a href="#variance-80"><span class="linenos"> 80</span></a>
+</span><span id="variance-81"><a href="#variance-81"><span class="linenos"> 81</span></a><span class="sd">    Alternative example:</span>
+</span><span id="variance-82"><a href="#variance-82"><span class="linenos"> 82</span></a>
+</span><span id="variance-83"><a href="#variance-83"><span class="linenos"> 83</span></a><span class="sd">        ```</span>
+</span><span id="variance-84"><a href="#variance-84"><span class="linenos"> 84</span></a><span class="sd">        diff_mean, variance, max_deviation, min_deviation = variance(*statistics(iterable_readings))</span>
+</span><span id="variance-85"><a href="#variance-85"><span class="linenos"> 85</span></a><span class="sd">        ```</span>
+</span><span id="variance-86"><a href="#variance-86"><span class="linenos"> 86</span></a>
+</span><span id="variance-87"><a href="#variance-87"><span class="linenos"> 87</span></a><span class="sd">    Args:</span>
+</span><span id="variance-88"><a href="#variance-88"><span class="linenos"> 88</span></a><span class="sd">        diff_mean (float): _description_</span>
+</span><span id="variance-89"><a href="#variance-89"><span class="linenos"> 89</span></a><span class="sd">        readings (Sequence[Number]): _description_</span>
+</span><span id="variance-90"><a href="#variance-90"><span class="linenos"> 90</span></a>
+</span><span id="variance-91"><a href="#variance-91"><span class="linenos"> 91</span></a><span class="sd">    Returns:</span>
+</span><span id="variance-92"><a href="#variance-92"><span class="linenos"> 92</span></a><span class="sd">        Tuple[float, float, float, float]: _description_</span>
+</span><span id="variance-93"><a href="#variance-93"><span class="linenos"> 93</span></a><span class="sd">    &quot;&quot;&quot;</span>    
+</span><span id="variance-94"><a href="#variance-94"><span class="linenos"> 94</span></a>    <span class="n">max_deviation</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="variance-95"><a href="#variance-95"><span class="linenos"> 95</span></a>    <span class="n">min_deviation</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="variance-96"><a href="#variance-96"><span class="linenos"> 96</span></a>    <span class="n">deviation_square_sum</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="variance-97"><a href="#variance-97"><span class="linenos"> 97</span></a>    <span class="k">for</span> <span class="n">reading</span> <span class="ow">in</span> <span class="n">readings</span><span class="p">:</span>
+</span><span id="variance-98"><a href="#variance-98"><span class="linenos"> 98</span></a>        <span class="n">deviation</span> <span class="o">=</span> <span class="n">reading</span> <span class="o">-</span> <span class="n">diff_mean</span>
+</span><span id="variance-99"><a href="#variance-99"><span class="linenos"> 99</span></a>        <span class="n">deviation_square_sum</span> <span class="o">+=</span> <span class="n">deviation</span> <span class="o">**</span> <span class="mi">2</span>
+</span><span id="variance-100"><a href="#variance-100"><span class="linenos">100</span></a>        <span class="k">if</span> <span class="n">max_deviation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="variance-101"><a href="#variance-101"><span class="linenos">101</span></a>            <span class="n">max_deviation</span> <span class="o">=</span> <span class="n">deviation</span>
+</span><span id="variance-102"><a href="#variance-102"><span class="linenos">102</span></a>        <span class="n">max_deviation</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_deviation</span><span class="p">,</span> <span class="n">deviation</span><span class="p">)</span>
+</span><span id="variance-103"><a href="#variance-103"><span class="linenos">103</span></a>        <span class="k">if</span> <span class="n">min_deviation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="variance-104"><a href="#variance-104"><span class="linenos">104</span></a>            <span class="n">min_deviation</span> <span class="o">=</span> <span class="n">deviation</span>
+</span><span id="variance-105"><a href="#variance-105"><span class="linenos">105</span></a>        <span class="n">min_deviation</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">min_deviation</span><span class="p">,</span> <span class="n">deviation</span><span class="p">)</span>
+</span><span id="variance-106"><a href="#variance-106"><span class="linenos">106</span></a>
+</span><span id="variance-107"><a href="#variance-107"><span class="linenos">107</span></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="variance-108"><a href="#variance-108"><span class="linenos">108</span></a>        <span class="n">variance</span> <span class="o">=</span> <span class="n">deviation_square_sum</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">readings</span><span class="p">)</span>
+</span><span id="variance-109"><a href="#variance-109"><span class="linenos">109</span></a>    <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+</span><span id="variance-110"><a href="#variance-110"><span class="linenos">110</span></a>        <span class="n">variance</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="variance-111"><a href="#variance-111"><span class="linenos">111</span></a>
+</span><span id="variance-112"><a href="#variance-112"><span class="linenos">112</span></a>    <span class="k">return</span> <span class="n">diff_mean</span><span class="p">,</span> <span class="n">variance</span><span class="p">,</span> <span class="n">max_deviation</span><span class="p">,</span> <span class="n">min_deviation</span>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>Example:
+    <pre><code>diff_mean, readings = statistics(iterable_readings)
+diff_mean, variance, max_deviation, min_deviation = variance(diff_mean, readings)
+</code></pre></p>
+
+<p>Alternative example:
+    <pre><code>diff_mean, variance, max_deviation, min_deviation = variance(*statistics(iterable_readings))
+</code></pre></p>
+
+<p>Args:
+    diff_mean (float): _description_
+    readings (Sequence[Number]): _description_</p>
+
+<p>Returns:
+    Tuple[float, float, float, float]: _description_</p>
+</div>
+
 
                 </section>
                 <section id="statistics">
@@ -271,22 +499,44 @@ cengal<wbr>.statistics<wbr>.normal_distribution<wbr>.versions<wbr>.v_0<wbr>.norm
     </div>
     <a class="headerlink" href="#statistics"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="statistics-46"><a href="#statistics-46"><span class="linenos">46</span></a><span class="k">def</span> <span class="nf">statistics</span><span class="p">(</span><span class="n">iterable_readings</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Number</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Number</span><span class="p">]]:</span>
-</span><span id="statistics-47"><a href="#statistics-47"><span class="linenos">47</span></a>    <span class="n">readings</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
-</span><span id="statistics-48"><a href="#statistics-48"><span class="linenos">48</span></a>    <span class="n">data_sum</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="statistics-49"><a href="#statistics-49"><span class="linenos">49</span></a>    <span class="k">for</span> <span class="n">reading</span> <span class="ow">in</span> <span class="n">iterable_readings</span><span class="p">:</span>
-</span><span id="statistics-50"><a href="#statistics-50"><span class="linenos">50</span></a>        <span class="n">readings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reading</span><span class="p">)</span>
-</span><span id="statistics-51"><a href="#statistics-51"><span class="linenos">51</span></a>        <span class="n">data_sum</span> <span class="o">+=</span> <span class="n">reading</span>
+</span><span id="statistics-47"><a href="#statistics-47"><span class="linenos">47</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Example</span>
+</span><span id="statistics-48"><a href="#statistics-48"><span class="linenos">48</span></a><span class="sd">    </span>
+</span><span id="statistics-49"><a href="#statistics-49"><span class="linenos">49</span></a><span class="sd">        ```</span>
+</span><span id="statistics-50"><a href="#statistics-50"><span class="linenos">50</span></a><span class="sd">        diff_mean, readings = statistics(iterable_readings)</span>
+</span><span id="statistics-51"><a href="#statistics-51"><span class="linenos">51</span></a><span class="sd">        ```</span>
 </span><span id="statistics-52"><a href="#statistics-52"><span class="linenos">52</span></a>
-</span><span id="statistics-53"><a href="#statistics-53"><span class="linenos">53</span></a>    <span class="k">try</span><span class="p">:</span>
-</span><span id="statistics-54"><a href="#statistics-54"><span class="linenos">54</span></a>        <span class="n">diff_mean</span> <span class="o">=</span> <span class="n">data_sum</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">readings</span><span class="p">)</span>
-</span><span id="statistics-55"><a href="#statistics-55"><span class="linenos">55</span></a>    <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
-</span><span id="statistics-56"><a href="#statistics-56"><span class="linenos">56</span></a>        <span class="n">diff_mean</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="statistics-57"><a href="#statistics-57"><span class="linenos">57</span></a>    
-</span><span id="statistics-58"><a href="#statistics-58"><span class="linenos">58</span></a>    <span class="k">return</span> <span class="n">diff_mean</span><span class="p">,</span> <span class="n">readings</span>
+</span><span id="statistics-53"><a href="#statistics-53"><span class="linenos">53</span></a><span class="sd">    Args:</span>
+</span><span id="statistics-54"><a href="#statistics-54"><span class="linenos">54</span></a><span class="sd">        iterable_readings (Iterable[Number]): _description_</span>
+</span><span id="statistics-55"><a href="#statistics-55"><span class="linenos">55</span></a>
+</span><span id="statistics-56"><a href="#statistics-56"><span class="linenos">56</span></a><span class="sd">    Returns:</span>
+</span><span id="statistics-57"><a href="#statistics-57"><span class="linenos">57</span></a><span class="sd">        Tuple[float, Sequence[Number]]: _description_</span>
+</span><span id="statistics-58"><a href="#statistics-58"><span class="linenos">58</span></a><span class="sd">    &quot;&quot;&quot;</span>    
+</span><span id="statistics-59"><a href="#statistics-59"><span class="linenos">59</span></a>    <span class="n">readings</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+</span><span id="statistics-60"><a href="#statistics-60"><span class="linenos">60</span></a>    <span class="n">data_sum</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="statistics-61"><a href="#statistics-61"><span class="linenos">61</span></a>    <span class="k">for</span> <span class="n">reading</span> <span class="ow">in</span> <span class="n">iterable_readings</span><span class="p">:</span>
+</span><span id="statistics-62"><a href="#statistics-62"><span class="linenos">62</span></a>        <span class="n">readings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reading</span><span class="p">)</span>
+</span><span id="statistics-63"><a href="#statistics-63"><span class="linenos">63</span></a>        <span class="n">data_sum</span> <span class="o">+=</span> <span class="n">reading</span>
+</span><span id="statistics-64"><a href="#statistics-64"><span class="linenos">64</span></a>
+</span><span id="statistics-65"><a href="#statistics-65"><span class="linenos">65</span></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="statistics-66"><a href="#statistics-66"><span class="linenos">66</span></a>        <span class="n">diff_mean</span> <span class="o">=</span> <span class="n">data_sum</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">readings</span><span class="p">)</span>
+</span><span id="statistics-67"><a href="#statistics-67"><span class="linenos">67</span></a>    <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+</span><span id="statistics-68"><a href="#statistics-68"><span class="linenos">68</span></a>        <span class="n">diff_mean</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="statistics-69"><a href="#statistics-69"><span class="linenos">69</span></a>    
+</span><span id="statistics-70"><a href="#statistics-70"><span class="linenos">70</span></a>    <span class="k">return</span> <span class="n">diff_mean</span><span class="p">,</span> <span class="n">readings</span>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>Example
+    <pre><code>diff_mean, readings = statistics(iterable_readings)
+</code></pre></p>
+
+<p>Args:
+    iterable_readings (Iterable[Number]): _description_</p>
+
+<p>Returns:
+    Tuple[float, Sequence[Number]]: _description_</p>
+</div>
+
 
                 </section>
                 <section id="average">
@@ -294,19 +544,19 @@ cengal<wbr>.statistics<wbr>.normal_distribution<wbr>.versions<wbr>.v_0<wbr>.norm
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">average</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">data</span><span class="p">:</span> <span class="n">Sequence</span></span><span class="return-annotation">):</span></span>
+        <span class="name">average</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">data</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">complex</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">complex</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="average-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#average"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="average-95"><a href="#average-95"><span class="linenos"> 95</span></a><span class="k">def</span> <span class="nf">average</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">):</span>
-</span><span id="average-96"><a href="#average-96"><span class="linenos"> 96</span></a>    <span class="n">data_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-</span><span id="average-97"><a href="#average-97"><span class="linenos"> 97</span></a>    <span class="n">data_sum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-</span><span id="average-98"><a href="#average-98"><span class="linenos"> 98</span></a>    <span class="k">try</span><span class="p">:</span>
-</span><span id="average-99"><a href="#average-99"><span class="linenos"> 99</span></a>        <span class="k">return</span> <span class="n">data_sum</span> <span class="o">/</span> <span class="n">data_len</span>
-</span><span id="average-100"><a href="#average-100"><span class="linenos">100</span></a>    <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
-</span><span id="average-101"><a href="#average-101"><span class="linenos">101</span></a>        <span class="k">return</span> <span class="mi">0</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="average-174"><a href="#average-174"><span class="linenos">174</span></a><span class="k">def</span> <span class="nf">average</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Number</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Number</span><span class="p">:</span>
+</span><span id="average-175"><a href="#average-175"><span class="linenos">175</span></a>    <span class="n">data_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span><span id="average-176"><a href="#average-176"><span class="linenos">176</span></a>    <span class="n">data_sum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span><span id="average-177"><a href="#average-177"><span class="linenos">177</span></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="average-178"><a href="#average-178"><span class="linenos">178</span></a>        <span class="k">return</span> <span class="n">data_sum</span> <span class="o">/</span> <span class="n">data_len</span>
+</span><span id="average-179"><a href="#average-179"><span class="linenos">179</span></a>    <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+</span><span id="average-180"><a href="#average-180"><span class="linenos">180</span></a>        <span class="k">return</span> <span class="mi">0</span>
 </span></pre></div>
 
 

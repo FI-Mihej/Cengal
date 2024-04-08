@@ -44,7 +44,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 </span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.1&quot;</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.3&quot;</span>
 </span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -685,7 +685,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">register</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">entity_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span>,</span><span class="param">	<span class="n">max_writers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">max_readers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">recursive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">) -> <span class="n"><a href="#RWLockerContextManager">RWLockerContextManager</a></span>:</span></span>
+        <span class="name">register</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">entity_id</span><span class="p">:</span> <span class="n">Hashable</span>,</span><span class="param">	<span class="n">max_writers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">max_readers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">recursive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">) -> <span class="n"><a href="#RWLockerContextManager">RWLockerContextManager</a></span>:</span></span>
 
                 <label class="view-source-button" for="RWLockerRequest.register-view-source"><span>View Source</span></label>
 
@@ -704,7 +704,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">deregister</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">entity_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span>, </span><span class="param"><span class="n">safe</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
+        <span class="name">deregister</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">entity_id</span><span class="p">:</span> <span class="n">Hashable</span>, </span><span class="param"><span class="n">safe</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
                 <label class="view-source-button" for="RWLockerRequest.deregister-view-source"><span>View Source</span></label>
 
@@ -723,7 +723,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">wait_for_write</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">entity_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+        <span class="name">wait_for_write</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">entity_id</span><span class="p">:</span> <span class="n">Hashable</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="RWLockerRequest.wait_for_write-view-source"><span>View Source</span></label>
 
@@ -742,7 +742,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">wait_for_read</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">entity_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+        <span class="name">wait_for_read</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">entity_id</span><span class="p">:</span> <span class="n">Hashable</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="RWLockerRequest.wait_for_read-view-source"><span>View Source</span></label>
 
@@ -933,7 +933,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
                                         <input id="RWLockerEntity.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">RWLockerEntity</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">entity_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span>,</span><span class="param">	<span class="n">max_writers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">max_readers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">recursive</span><span class="p">:</span> <span class="nb">bool</span>,</span><span class="param">	<span class="n">service</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">cengal</span><span class="o">.</span><span class="n">parallel_execution</span><span class="o">.</span><span class="n">coroutines</span><span class="o">.</span><span class="n">coro_scheduler</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">v_0</span><span class="o">.</span><span class="n">coro_scheduler</span><span class="o">.</span><span class="n">Service</span><span class="p">]</span></span>)</span>
+        <span class="name">RWLockerEntity</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">entity_id</span><span class="p">:</span> <span class="n">Hashable</span>,</span><span class="param">	<span class="n">max_writers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">max_readers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">recursive</span><span class="p">:</span> <span class="nb">bool</span>,</span><span class="param">	<span class="n">service</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">cengal</span><span class="o">.</span><span class="n">parallel_execution</span><span class="o">.</span><span class="n">coroutines</span><span class="o">.</span><span class="n">coro_scheduler</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">v_0</span><span class="o">.</span><span class="n">coro_scheduler</span><span class="o">.</span><span class="n">Service</span><span class="p">]</span></span>)</span>
 
                 <label class="view-source-button" for="RWLockerEntity.__init__-view-source"><span>View Source</span></label>
 
@@ -1119,7 +1119,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">check_writers_in_progress_boundaries</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">coro_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
+        <span class="name">check_writers_in_progress_boundaries</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">coro_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
                 <label class="view-source-button" for="RWLockerEntity.check_writers_in_progress_boundaries-view-source"><span>View Source</span></label>
 
@@ -1150,7 +1150,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">increase_writers_in_progress</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">coro_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">):</span></span>
+        <span class="name">increase_writers_in_progress</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">coro_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="RWLockerEntity.increase_writers_in_progress-view-source"><span>View Source</span></label>
 
@@ -1176,7 +1176,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">decrease_writers_in_progress</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">coro_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">):</span></span>
+        <span class="name">decrease_writers_in_progress</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">coro_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="RWLockerEntity.decrease_writers_in_progress-view-source"><span>View Source</span></label>
 
@@ -1201,7 +1201,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">check_readers_in_progress_boundaries</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">coro_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
+        <span class="name">check_readers_in_progress_boundaries</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">coro_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
                 <label class="view-source-button" for="RWLockerEntity.check_readers_in_progress_boundaries-view-source"><span>View Source</span></label>
 
@@ -1232,7 +1232,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">increase_readers_in_progress</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">coro_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">):</span></span>
+        <span class="name">increase_readers_in_progress</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">coro_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="RWLockerEntity.increase_readers_in_progress-view-source"><span>View Source</span></label>
 
@@ -1258,7 +1258,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">decrease_readers_in_progress</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">coro_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">):</span></span>
+        <span class="name">decrease_readers_in_progress</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">coro_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="RWLockerEntity.decrease_readers_in_progress-view-source"><span>View Source</span></label>
 
@@ -1283,7 +1283,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">try_write_lock</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">coro_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">apply</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
+        <span class="name">try_write_lock</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">coro_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">apply</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
                 <label class="view-source-button" for="RWLockerEntity.try_write_lock-view-source"><span>View Source</span></label>
 
@@ -1318,7 +1318,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">try_read_lock</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">coro_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">apply</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
+        <span class="name">try_read_lock</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">coro_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">apply</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
                 <label class="view-source-button" for="RWLockerEntity.try_read_lock-view-source"><span>View Source</span></label>
 
@@ -1817,7 +1817,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
                                         <input id="RWLocker.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">RWLocker</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">loop</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">cengal</span><span class="o">.</span><span class="n">parallel_execution</span><span class="o">.</span><span class="n">coroutines</span><span class="o">.</span><span class="n">coro_scheduler</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">v_0</span><span class="o">.</span><span class="n">coro_scheduler</span><span class="o">.</span><span class="n">CoroSchedulerGreenlet</span><span class="p">,</span> <span class="n">cengal</span><span class="o">.</span><span class="n">parallel_execution</span><span class="o">.</span><span class="n">coroutines</span><span class="o">.</span><span class="n">coro_scheduler</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">v_0</span><span class="o">.</span><span class="n">coro_scheduler</span><span class="o">.</span><span class="n">CoroSchedulerAwaitable</span><span class="p">]</span></span>)</span>
+        <span class="name">RWLocker</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">loop</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">cengal</span><span class="o">.</span><span class="n">parallel_execution</span><span class="o">.</span><span class="n">coroutines</span><span class="o">.</span><span class="n">coro_scheduler</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">v_0</span><span class="o">.</span><span class="n">coro_scheduler</span><span class="o">.</span><span class="n">CoroSchedulerGreenlet</span><span class="p">,</span> <span class="n">cengal</span><span class="o">.</span><span class="n">parallel_execution</span><span class="o">.</span><span class="n">coroutines</span><span class="o">.</span><span class="n">coro_scheduler</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">v_0</span><span class="o">.</span><span class="n">coro_scheduler</span><span class="o">.</span><span class="n">CoroSchedulerAwaitable</span><span class="p">]</span></span>)</span>
 
                 <label class="view-source-button" for="RWLocker.__init__-view-source"><span>View Source</span></label>
 
@@ -1931,7 +1931,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">single_task_registration_or_immediate_processing</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">request</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n"><a href="#RWLockerRequest">RWLockerRequest</a></span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="ne">BaseException</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]]</span>:</span></span>
+        <span class="name">single_task_registration_or_immediate_processing</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">request</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n"><a href="#RWLockerRequest">RWLockerRequest</a></span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="ne">BaseException</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]]</span>:</span></span>
 
                 <label class="view-source-button" for="RWLocker.single_task_registration_or_immediate_processing-view-source"><span>View Source</span></label>
 
@@ -2067,7 +2067,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_locker_entity</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">entity_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span></span><span class="return-annotation">):</span></span>
+        <span class="name">get_locker_entity</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">entity_id</span><span class="p">:</span> <span class="n">Hashable</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="RWLocker.get_locker_entity-view-source"><span>View Source</span></label>
 
@@ -2115,7 +2115,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_rw_lock</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">entity_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span>,</span><span class="param">	<span class="n">max_writers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">max_readers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">recursive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n"><a href="#RWLockerContextManager">RWLockerContextManager</a></span><span class="p">,</span> <span class="n"><a href="#FakeRWLockerContextManager">FakeRWLockerContextManager</a></span><span class="p">]</span>:</span></span>
+        <span class="name">get_rw_lock</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">entity_id</span><span class="p">:</span> <span class="n">Hashable</span>,</span><span class="param">	<span class="n">max_writers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">max_readers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">recursive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n"><a href="#RWLockerContextManager">RWLockerContextManager</a></span><span class="p">,</span> <span class="n"><a href="#FakeRWLockerContextManager">FakeRWLockerContextManager</a></span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="get_rw_lock-view-source"><span>View Source</span></label>
 
@@ -2148,7 +2148,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">grwl</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">entity_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span>,</span><span class="param">	<span class="n">max_writers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">max_readers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">recursive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n"><a href="#RWLockerContextManager">RWLockerContextManager</a></span><span class="p">,</span> <span class="n"><a href="#FakeRWLockerContextManager">FakeRWLockerContextManager</a></span><span class="p">]</span>:</span></span>
+        <span class="name">grwl</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">entity_id</span><span class="p">:</span> <span class="n">Hashable</span>,</span><span class="param">	<span class="n">max_writers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">max_readers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">recursive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n"><a href="#RWLockerContextManager">RWLockerContextManager</a></span><span class="p">,</span> <span class="n"><a href="#FakeRWLockerContextManager">FakeRWLockerContextManager</a></span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="grwl-view-source"><span>View Source</span></label>
 
@@ -2181,7 +2181,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">async def</span>
-        <span class="name">aget_rw_lock</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">entity_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span>,</span><span class="param">	<span class="n">max_writers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">max_readers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">recursive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n"><a href="#RWLockerContextManager">RWLockerContextManager</a></span><span class="p">,</span> <span class="n"><a href="#FakeRWLockerContextManager">FakeRWLockerContextManager</a></span><span class="p">]</span>:</span></span>
+        <span class="name">aget_rw_lock</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">entity_id</span><span class="p">:</span> <span class="n">Hashable</span>,</span><span class="param">	<span class="n">max_writers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">max_readers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">recursive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n"><a href="#RWLockerContextManager">RWLockerContextManager</a></span><span class="p">,</span> <span class="n"><a href="#FakeRWLockerContextManager">FakeRWLockerContextManager</a></span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="aget_rw_lock-view-source"><span>View Source</span></label>
 
@@ -2214,7 +2214,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">async def</span>
-        <span class="name">agrwl</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">entity_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span>,</span><span class="param">	<span class="n">max_writers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">max_readers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">recursive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n"><a href="#RWLockerContextManager">RWLockerContextManager</a></span><span class="p">,</span> <span class="n"><a href="#FakeRWLockerContextManager">FakeRWLockerContextManager</a></span><span class="p">]</span>:</span></span>
+        <span class="name">agrwl</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">entity_id</span><span class="p">:</span> <span class="n">Hashable</span>,</span><span class="param">	<span class="n">max_writers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">max_readers_in_progress</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">recursive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n"><a href="#RWLockerContextManager">RWLockerContextManager</a></span><span class="p">,</span> <span class="n"><a href="#FakeRWLockerContextManager">FakeRWLockerContextManager</a></span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="agrwl-view-source"><span>View Source</span></label>
 

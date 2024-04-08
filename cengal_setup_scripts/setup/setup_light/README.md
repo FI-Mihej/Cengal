@@ -1,10 +1,12 @@
-![PyPI - Downloads](https://img.shields.io/pypi/dm/cengal-light)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/cengal-light?color=darkgreen)
 
-![PyPI - Version](https://img.shields.io/pypi/v/cengal-light) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cengal-light) ![PyPI - Implementation](https://img.shields.io/pypi/implementation/cengal-light) ![PyPI - Format](https://img.shields.io/pypi/format/cengal-light) ![Static Badge](https://img.shields.io/badge/Architecture-x86__64_%7C_ARM__64-blue)
+![PyPI - Version](https://img.shields.io/pypi/v/cengal-light) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cengal-light) ![PyPI - Implementation](https://img.shields.io/pypi/implementation/cengal-light) ![PyPI - Format](https://img.shields.io/pypi/format/cengal-light?color=darkgreen) ![Static Badge](https://img.shields.io/badge/Architecture-x86__64_%7C_ARM__64-blue)
 
 ![Static Badge](https://img.shields.io/badge/wheels-Linux_%7C_Windows_%7C_macOS-blue) ![Static Badge](https://img.shields.io/badge/OS-Linux_%7C_Windows_%7C_macOS-blue)
 
-![GitHub tag (with filter)](https://img.shields.io/github/v/tag/FI-Mihej/Cengal) ![PyPI - Status](https://img.shields.io/pypi/status/cengal) ![GitHub License](https://img.shields.io/github/license/FI-Mihej/Cengal)
+![GitHub tag (with filter)](https://img.shields.io/github/v/tag/FI-Mihej/Cengal) ![PyPI - Status](https://img.shields.io/pypi/status/cengal) ![Static Badge](https://img.shields.io/badge/coverage-38%25-blue) ![Static Badge](https://img.shields.io/badge/covered_lines_of_code-15855-blue)
+
+![GitHub License](https://img.shields.io/github/license/FI-Mihej/Cengal?color=darkgreen)
 
 # cengal_light
 
@@ -16,7 +18,7 @@ In order to install Cengal with all requirements execute either:
 
 # Cengal
 
-Cengal is a versatile Python library designed for a wide range of applications. To enhance performance, certain modules within Cengal have been implemented using Cython and/or C.
+Cengal is a versatile Python library designed for a wide range of applications. To enhance performance, certain modules within Cengal have been implemented using Cython, C/C++, Nim or Go.
 
 ## API Design Approach
 
@@ -237,10 +239,14 @@ Alternatively, developer can load logs in off-line mode using Log Viewer applica
 
 * [pyside6__coro_slot_example_0.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/qt/pyside6/versions/v_0/development/pyside6__coro_slot_example_0.py)
 
-## Async PyTermGUI
+## Async [PyTermGUI](https://github.com/bczsalba/pytermgui)
 
 * [hello_world_app_autoexit.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/pytermgui/versions/v_0/development/hello_world_app_autoexit.py)
 * [hello_world.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/pytermgui/versions/v_0/development/hello_world.py)
+
+## Wrapper for [Netti (reliable UDP connection library for games in Nim)](https://github.com/treeform/netty)
+
+* [ex_nim.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/nim__netty/core/versions/v_0/development/ex_nim.py)
 
 ## Transparent background for your desktop applications (TBA)
 
@@ -397,6 +403,17 @@ SUM:                           770          24509          30650          79612
 
 Counted with [cloc](https://github.com/AlDanial/cloc) util.
 
+## Unittest coverage
+
+At the moment of 2 Apr 2024:
+
+Linux:
+
+```
+Stmts   Miss  Cover
+41576  25826    38%
+```
+
 ## Examples
 
 * Can be found in [examples](https://github.com/FI-Mihej/Cengal/blob/master/examples/) dir
@@ -415,11 +432,29 @@ Counted with [cloc](https://github.com/AlDanial/cloc) util.
 
 # Manual Build
 
-`pip install git+https://github.com/FI-Mihej/Cengal.git`
+Linux, macOS:
+
+```bash
+git clone https://github.com/FI-Mihej/Cengal.git
+cd ./Cengal
+./prepare__setup.sh
+./install_in_dev_mode.sh
+```
+
+Windows:
+
+```bat
+git clone https://github.com/FI-Mihej/Cengal.git
+cd .\Cengal
+.\prepare__setup.cmd
+.\install_in_dev_mode.cmd
+```
 
 Installation process requires compilation. So ensure that:
 * GCC/Clang is installed in your Linux/WSL (`sudo apt-get --yes install build-essential` for Ubuntu. And `./before_install_on_wsl.sh` for Ubuntu under WSL for UI like Tkinter or Qt if you are using some kind of XServer on your host Windows)
 * At least `Visual Studio Community - Build Tools` are installed on your Windows and you are installing Cengal from within its `Developer Command Prompt` for an appropriate target CPU architecture (`x64 Native Tools Command Prompt for VS 2022` for example). Make sure that you have compatible version of Visual Studio for your target CPython interpreter (see `python -VV` command output. For example `Python 3.9.11 (tags/v3.9.11:2de452f, Mar 16 2022, 14:33:45) [MSC v.1929 64 bit (AMD64)]`: this python interpreter requires Visual Studio 2019 version 16.11.2+ according to `1929` word search in [Wikipedia page](https://en.wikipedia.org/wiki/Microsoft_Visual_C%2B%2B))
+* Nim installed (Optional)
+* Go installed (Optional)
 
 # Projects using Cengal
 

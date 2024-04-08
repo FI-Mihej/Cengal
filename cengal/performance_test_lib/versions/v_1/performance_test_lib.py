@@ -21,7 +21,8 @@ from cengal.code_flow_control.gc import DisableGC
 from contextlib import contextmanager
 from cengal.code_flow_control.smart_values.versions.v_2 import ValueExistence
 from cengal.parallel_execution.coroutines.coro_standard_services.lazy_print.versions.v_0.lazy_print import lprint
-from cengal.time_management.load_best_timer import perf_counter, process_time
+from cengal.time_management.cpu_clock_cycles import perf_counter
+from cengal.time_management.load_best_timer import process_time
 from cengal.time_management.repeat_for_a_time import Tracer, ClockType
 from cengal.math.numbers import RationalNumber
 from cengal.introspection.inspect import is_async
@@ -37,7 +38,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.2"
+__version__ = "4.3.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -84,6 +85,10 @@ def test_run_time(test_name: str, number_of_iterations: int, throw_result: bool=
             else:
                 result_data['iterations_per_time_unit'] = None
             raise PerformanceTestResult(result_data)
+
+
+def measure_time(test_name: str = str()):
+    return test_run_time(test_name, 1, ignore_index=True)
 
 
 def test_function_run_time(

@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.2"
+__version__ = "4.3.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -61,5 +61,9 @@ cpdef void set_cycles_per_second(double cycles_per_second):
 
 
 cpdef double cpu_clock():
+    return c_cpu_clock_cycles() / _cycles_per_second
+
+
+cpdef double perf_counter():
     return c_cpu_clock_cycles() / _cycles_per_second
 

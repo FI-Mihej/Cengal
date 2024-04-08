@@ -16,23 +16,30 @@
 # limitations under the License.
 
 try:
-    from time import clock
-    perf_counter = process_time = clock
-except ImportError:
-    pass
-
-try:
-    from cengal.time_management.cpu_clock import cpu_clock as perf_counter
+    import cengal.time_management.cpu_clock as cpu_clock_module
+    if cpu_clock_module.CPU_TICKS_PER_SECOND:
+        from cengal.time_management.cpu_clock_cycles.versions.v_0.compilable.cpu_clock_cycles__cython import perf_counter
+    else:
+        from time import perf_counter
 except ImportError:
     try:
         from time import perf_counter
     except ImportError:
-        pass
+        try:
+            from time import clock
+            perf_counter = clock
+        except ImportError:
+            pass
 
 try:
     from time import process_time
 except ImportError:
-    pass
+    try:
+        from time import clock
+        perf_counter = clock
+    except ImportError:
+        pass
+
 
 """
 Module Docstring
@@ -43,7 +50,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.2"
+__version__ = "4.3.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"

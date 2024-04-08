@@ -16,7 +16,7 @@
 # limitations under the License.
 
 from cengal.time_management.repeat_for_a_time import BaseTracer, GreedyTracer
-from cengal.time_management.load_best_timer import perf_counter
+from cengal.time_management.cpu_clock_cycles import perf_counter
 from enum import Enum
 from typing import Tuple
 
@@ -29,7 +29,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.2"
+__version__ = "4.3.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"

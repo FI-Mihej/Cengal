@@ -47,7 +47,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.2"
+__version__ = "4.3.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -249,7 +249,8 @@ class CpuInfo:
             return field_name
 
         CpuInfo._cache_friendly, CpuInfo._stage = get_cpu_info_lazy({field_name,}, CpuInfo._stage, CpuInfo._cache_friendly)
-        CpuInfo._cache = self._normalize_cpu_info_values(CpuInfo._cache_friendly)
+        CpuInfo._cache.clear()
+        CpuInfo._cache.update(self._normalize_cpu_info_values(CpuInfo._cache_friendly))
         return field_name
     
     @property

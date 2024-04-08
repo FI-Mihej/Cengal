@@ -30,7 +30,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.2"
+__version__ = "4.3.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -46,10 +46,10 @@ from setuptools._distutils.dist import Distribution
 from cengal.file_system.path_manager import path_relative_to_src, RelativePath, get_relative_path_part, sep
 from cengal.file_system.directory_manager import current_src_dir, change_current_dir, ensure_dir
 from cengal.file_system.directory_manager import filtered_file_list, FilteringType, filtered_file_list_traversal, file_list_traversal, file_list_traversal_ex, FilteringEntity
-from cengal.file_system.file_manager import current_src_file_dir, file_exists, full_ext, file_name, last_ext
+from cengal.file_system.file_manager import current_src_file_dir, file_exists, full_ext, file_name as get_file_name, last_ext
 from cengal.build_tools.prepare_cflags import prepare_cflags, concat_cflags, prepare_compile_time_env, adjust_definition_names, \
     dict_of_tuples_to_dict, list_to_dict
-from cengal.introspection.inspect import get_exception, entity_repr_limited_try_qualname, pifrl, pdi
+from cengal.introspection.inspect import get_exception, exception_to_printable_text, entity_repr_limited_try_qualname, pifrl, pdi
 from cengal.text_processing.text_processing import find_text
 from cengal.system import OS_TYPE, TEMPLATE_MODULE_NAME
 from shutil import rmtree
@@ -222,7 +222,7 @@ class CengalGoBuildExtension(CengalBuildExtension):
                 params.extend(self.additional_build_params)
             
             params.append(self.src_dir)
-            params.append(f'./{file_name(self.definitions_module_name)}')
+            params.append(f'./{get_file_name(self.definitions_module_name)}')
             if self.additional_go_packages:
                 params.extend(self.additional_go_packages)
                 
@@ -248,8 +248,10 @@ class CengalGoBuildExtension(CengalBuildExtension):
             for file_path in exported_files_list:
                 adjusted_exported_files_list.append(get_relative_path_part(file_path, self.dir_path))
             
-            print('> Exported files:')
-            print(adjusted_exported_files_list)
+            if successed:
+                print('> Exported files:')
+                print(adjusted_exported_files_list)
+            
             print('==================================================')
             # raise RuntimeError
             return adjusted_exported_files_list if successed else None
@@ -257,7 +259,7 @@ class CengalGoBuildExtension(CengalBuildExtension):
             print('==================================================')
             print('!!! GO COMPILATION EXCEPTION !!!')
             print('==================================================')
-            print(get_exception())
+            print(exception_to_printable_text(get_exception()))
             print('==================================================')
             return None
     
@@ -394,7 +396,7 @@ const (
         constants_text: str = '\n'.join(constants_strings)
         file_content: str = file_content_template.format(
             config_file_name=self.definitions_module_file_name,
-            config_module_name=file_name(self.definitions_module_name),
+            config_module_name=get_file_name(self.definitions_module_name),
             constants_text=constants_text,
         )
 

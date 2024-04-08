@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.2"
+__version__ = "4.3.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -442,6 +442,10 @@ Model = TypeVar('Model', bound=EssenceModel)
 
 class EssenceInterface(Generic[Model]):
     essence_model_class: Type[Model] = EssenceModel
+
+    def __init_subclass__(cls, /, essence_model_class: Optional[Type[Model]] = None, **kwargs):
+        super().__init_subclass__(**kwargs)
+        cls.essence_model_class = EssenceModel if essence_model_class is None else essence_model_class
 
     def __init__(self, essence_model: Model, *args, **kwargs):
         self.essence_model: Model = essence_model

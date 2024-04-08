@@ -48,7 +48,7 @@ cengal<wbr>.build_tools<wbr>.build_extensions<wbr>.versions<wbr>.v_0<wbr>.build_
 </span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.1&quot;</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.3&quot;</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -107,73 +107,76 @@ cengal<wbr>.build_tools<wbr>.build_extensions<wbr>.versions<wbr>.v_0<wbr>.build_
 </span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 </span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
 </span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_class</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_class</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
 </span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>    
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>    <span class="nd">@property</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>    <span class="nd">@path</span><span class="o">.</span><span class="n">setter</span>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">value</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>    
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>    <span class="nd">@property</span>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>    <span class="k">def</span> <span class="nf">dir_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>        <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>    
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>    <span class="nd">@property</span>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>    <span class="k">def</span> <span class="nf">dir_path_rel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RelativePath</span><span class="p">:</span>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>        <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">RelativePath</span><span class="p">(</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">))</span>
-</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>    <span class="nd">@property</span>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>    <span class="k">def</span> <span class="nf">module_import_str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span>
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>    
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>    <span class="nd">@module_import_str</span><span class="o">.</span><span class="n">setter</span>
-</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>    <span class="k">def</span> <span class="nf">module_import_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span> <span class="o">=</span> <span class="n">value</span>
-</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>
-</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>    <span class="nd">@property</span>
-</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span>
-</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>
-</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>    <span class="nd">@property</span>
-</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>    <span class="k">def</span> <span class="nf">package</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>        <span class="k">return</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>    
-</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>    <span class="nd">@property</span>
-</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>    <span class="k">def</span> <span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files</span>
-</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>    
-</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>    <span class="nd">@files</span><span class="o">.</span><span class="n">setter</span>
-</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>    <span class="k">def</span> <span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_files</span> <span class="o">=</span> <span class="n">value</span>
-</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>
-</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>
-</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a><span class="k">class</span> <span class="nc">CengalSetuptoolsBuildExtension</span><span class="p">(</span><span class="n">CengalBuildExtension</span><span class="p">):</span>
-</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>    <span class="n">base_class</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">]</span> <span class="o">=</span> <span class="n">SetuptoolsExtension</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>    <span class="k">def</span> <span class="nf">sdist</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>    
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>    <span class="nd">@property</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>    <span class="nd">@path</span><span class="o">.</span><span class="n">setter</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">value</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>    
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>    <span class="nd">@property</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>    <span class="k">def</span> <span class="nf">dir_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>        <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>    
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>    <span class="nd">@property</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>    <span class="k">def</span> <span class="nf">dir_path_rel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RelativePath</span><span class="p">:</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>        <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">RelativePath</span><span class="p">(</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">))</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>    <span class="nd">@property</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>    <span class="k">def</span> <span class="nf">module_import_str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>    
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>    <span class="nd">@module_import_str</span><span class="o">.</span><span class="n">setter</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>    <span class="k">def</span> <span class="nf">module_import_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span> <span class="o">=</span> <span class="n">value</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>    <span class="nd">@property</span>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>    <span class="nd">@property</span>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>    <span class="k">def</span> <span class="nf">package</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>        <span class="k">return</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>    
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>    <span class="nd">@property</span>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>    <span class="k">def</span> <span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files</span>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>    
+</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>    <span class="nd">@files</span><span class="o">.</span><span class="n">setter</span>
+</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>    <span class="k">def</span> <span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_files</span> <span class="o">=</span> <span class="n">value</span>
+</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>
 </span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>
-</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a><span class="k">class</span> <span class="nc">CengalSetuptoolsBuildExtension</span><span class="p">(</span><span class="n">CengalBuildExtension</span><span class="p">):</span>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>    <span class="n">base_class</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">]</span> <span class="o">=</span> <span class="n">SetuptoolsExtension</span>
 </span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>
-</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>
-</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a><span class="k">class</span> <span class="nc">CengalCythonBuildExtension</span><span class="p">(</span><span class="n">CengalBuildExtension</span><span class="p">):</span>
-</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>    <span class="n">base_class</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">]</span> <span class="o">=</span> <span class="n">CythonExtension</span>
+</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>
 </span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>
-</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a><span class="k">class</span> <span class="nc">CengalCythonBuildExtension</span><span class="p">(</span><span class="n">CengalBuildExtension</span><span class="p">):</span>
+</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>    <span class="n">base_class</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">]</span> <span class="o">=</span> <span class="n">CythonExtension</span>
 </span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>
-</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>
-</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a><span class="k">class</span> <span class="nc">CengalGeneratorBuildExtension</span><span class="p">(</span><span class="n">CengalBuildExtension</span><span class="p">):</span>
-</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>    <span class="n">base_class</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a>    <span class="n">store_as_data</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a>
-</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
-</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>    
-</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>
+</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a>
+</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a><span class="k">class</span> <span class="nc">CengalGeneratorBuildExtension</span><span class="p">(</span><span class="n">CengalBuildExtension</span><span class="p">):</span>
+</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a>    <span class="n">base_class</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a>    <span class="n">store_as_data</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>
+</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a>    
+</span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 </span></pre></div>
 
 
@@ -199,48 +202,51 @@ cengal<wbr>.build_tools<wbr>.build_extensions<wbr>.versions<wbr>.v_0<wbr>.build_
 </span><span id="CengalBuildExtension-93"><a href="#CengalBuildExtension-93"><span class="linenos"> 93</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span id="CengalBuildExtension-94"><a href="#CengalBuildExtension-94"><span class="linenos"> 94</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 </span><span id="CengalBuildExtension-95"><a href="#CengalBuildExtension-95"><span class="linenos"> 95</span></a>
-</span><span id="CengalBuildExtension-96"><a href="#CengalBuildExtension-96"><span class="linenos"> 96</span></a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="CengalBuildExtension-96"><a href="#CengalBuildExtension-96"><span class="linenos"> 96</span></a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
 </span><span id="CengalBuildExtension-97"><a href="#CengalBuildExtension-97"><span class="linenos"> 97</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_class</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_class</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
 </span><span id="CengalBuildExtension-98"><a href="#CengalBuildExtension-98"><span class="linenos"> 98</span></a>    
-</span><span id="CengalBuildExtension-99"><a href="#CengalBuildExtension-99"><span class="linenos"> 99</span></a>    <span class="nd">@property</span>
-</span><span id="CengalBuildExtension-100"><a href="#CengalBuildExtension-100"><span class="linenos">100</span></a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="CengalBuildExtension-101"><a href="#CengalBuildExtension-101"><span class="linenos">101</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span>
-</span><span id="CengalBuildExtension-102"><a href="#CengalBuildExtension-102"><span class="linenos">102</span></a>
-</span><span id="CengalBuildExtension-103"><a href="#CengalBuildExtension-103"><span class="linenos">103</span></a>    <span class="nd">@path</span><span class="o">.</span><span class="n">setter</span>
-</span><span id="CengalBuildExtension-104"><a href="#CengalBuildExtension-104"><span class="linenos">104</span></a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="CengalBuildExtension-105"><a href="#CengalBuildExtension-105"><span class="linenos">105</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">value</span>
-</span><span id="CengalBuildExtension-106"><a href="#CengalBuildExtension-106"><span class="linenos">106</span></a>    
-</span><span id="CengalBuildExtension-107"><a href="#CengalBuildExtension-107"><span class="linenos">107</span></a>    <span class="nd">@property</span>
-</span><span id="CengalBuildExtension-108"><a href="#CengalBuildExtension-108"><span class="linenos">108</span></a>    <span class="k">def</span> <span class="nf">dir_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="CengalBuildExtension-109"><a href="#CengalBuildExtension-109"><span class="linenos">109</span></a>        <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
-</span><span id="CengalBuildExtension-110"><a href="#CengalBuildExtension-110"><span class="linenos">110</span></a>    
-</span><span id="CengalBuildExtension-111"><a href="#CengalBuildExtension-111"><span class="linenos">111</span></a>    <span class="nd">@property</span>
-</span><span id="CengalBuildExtension-112"><a href="#CengalBuildExtension-112"><span class="linenos">112</span></a>    <span class="k">def</span> <span class="nf">dir_path_rel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RelativePath</span><span class="p">:</span>
-</span><span id="CengalBuildExtension-113"><a href="#CengalBuildExtension-113"><span class="linenos">113</span></a>        <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">RelativePath</span><span class="p">(</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">))</span>
-</span><span id="CengalBuildExtension-114"><a href="#CengalBuildExtension-114"><span class="linenos">114</span></a>
-</span><span id="CengalBuildExtension-115"><a href="#CengalBuildExtension-115"><span class="linenos">115</span></a>    <span class="nd">@property</span>
-</span><span id="CengalBuildExtension-116"><a href="#CengalBuildExtension-116"><span class="linenos">116</span></a>    <span class="k">def</span> <span class="nf">module_import_str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="CengalBuildExtension-117"><a href="#CengalBuildExtension-117"><span class="linenos">117</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span>
-</span><span id="CengalBuildExtension-118"><a href="#CengalBuildExtension-118"><span class="linenos">118</span></a>    
-</span><span id="CengalBuildExtension-119"><a href="#CengalBuildExtension-119"><span class="linenos">119</span></a>    <span class="nd">@module_import_str</span><span class="o">.</span><span class="n">setter</span>
-</span><span id="CengalBuildExtension-120"><a href="#CengalBuildExtension-120"><span class="linenos">120</span></a>    <span class="k">def</span> <span class="nf">module_import_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="CengalBuildExtension-121"><a href="#CengalBuildExtension-121"><span class="linenos">121</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span> <span class="o">=</span> <span class="n">value</span>
-</span><span id="CengalBuildExtension-122"><a href="#CengalBuildExtension-122"><span class="linenos">122</span></a>
-</span><span id="CengalBuildExtension-123"><a href="#CengalBuildExtension-123"><span class="linenos">123</span></a>    <span class="nd">@property</span>
-</span><span id="CengalBuildExtension-124"><a href="#CengalBuildExtension-124"><span class="linenos">124</span></a>    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="CengalBuildExtension-125"><a href="#CengalBuildExtension-125"><span class="linenos">125</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span>
-</span><span id="CengalBuildExtension-126"><a href="#CengalBuildExtension-126"><span class="linenos">126</span></a>
-</span><span id="CengalBuildExtension-127"><a href="#CengalBuildExtension-127"><span class="linenos">127</span></a>    <span class="nd">@property</span>
-</span><span id="CengalBuildExtension-128"><a href="#CengalBuildExtension-128"><span class="linenos">128</span></a>    <span class="k">def</span> <span class="nf">package</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="CengalBuildExtension-129"><a href="#CengalBuildExtension-129"><span class="linenos">129</span></a>        <span class="k">return</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-</span><span id="CengalBuildExtension-130"><a href="#CengalBuildExtension-130"><span class="linenos">130</span></a>    
-</span><span id="CengalBuildExtension-131"><a href="#CengalBuildExtension-131"><span class="linenos">131</span></a>    <span class="nd">@property</span>
-</span><span id="CengalBuildExtension-132"><a href="#CengalBuildExtension-132"><span class="linenos">132</span></a>    <span class="k">def</span> <span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="CengalBuildExtension-133"><a href="#CengalBuildExtension-133"><span class="linenos">133</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files</span>
-</span><span id="CengalBuildExtension-134"><a href="#CengalBuildExtension-134"><span class="linenos">134</span></a>    
-</span><span id="CengalBuildExtension-135"><a href="#CengalBuildExtension-135"><span class="linenos">135</span></a>    <span class="nd">@files</span><span class="o">.</span><span class="n">setter</span>
-</span><span id="CengalBuildExtension-136"><a href="#CengalBuildExtension-136"><span class="linenos">136</span></a>    <span class="k">def</span> <span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="CengalBuildExtension-137"><a href="#CengalBuildExtension-137"><span class="linenos">137</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_files</span> <span class="o">=</span> <span class="n">value</span>
+</span><span id="CengalBuildExtension-99"><a href="#CengalBuildExtension-99"><span class="linenos"> 99</span></a>    <span class="k">def</span> <span class="nf">sdist</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+</span><span id="CengalBuildExtension-100"><a href="#CengalBuildExtension-100"><span class="linenos">100</span></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</span><span id="CengalBuildExtension-101"><a href="#CengalBuildExtension-101"><span class="linenos">101</span></a>    
+</span><span id="CengalBuildExtension-102"><a href="#CengalBuildExtension-102"><span class="linenos">102</span></a>    <span class="nd">@property</span>
+</span><span id="CengalBuildExtension-103"><a href="#CengalBuildExtension-103"><span class="linenos">103</span></a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="CengalBuildExtension-104"><a href="#CengalBuildExtension-104"><span class="linenos">104</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span>
+</span><span id="CengalBuildExtension-105"><a href="#CengalBuildExtension-105"><span class="linenos">105</span></a>
+</span><span id="CengalBuildExtension-106"><a href="#CengalBuildExtension-106"><span class="linenos">106</span></a>    <span class="nd">@path</span><span class="o">.</span><span class="n">setter</span>
+</span><span id="CengalBuildExtension-107"><a href="#CengalBuildExtension-107"><span class="linenos">107</span></a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="CengalBuildExtension-108"><a href="#CengalBuildExtension-108"><span class="linenos">108</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">value</span>
+</span><span id="CengalBuildExtension-109"><a href="#CengalBuildExtension-109"><span class="linenos">109</span></a>    
+</span><span id="CengalBuildExtension-110"><a href="#CengalBuildExtension-110"><span class="linenos">110</span></a>    <span class="nd">@property</span>
+</span><span id="CengalBuildExtension-111"><a href="#CengalBuildExtension-111"><span class="linenos">111</span></a>    <span class="k">def</span> <span class="nf">dir_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="CengalBuildExtension-112"><a href="#CengalBuildExtension-112"><span class="linenos">112</span></a>        <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
+</span><span id="CengalBuildExtension-113"><a href="#CengalBuildExtension-113"><span class="linenos">113</span></a>    
+</span><span id="CengalBuildExtension-114"><a href="#CengalBuildExtension-114"><span class="linenos">114</span></a>    <span class="nd">@property</span>
+</span><span id="CengalBuildExtension-115"><a href="#CengalBuildExtension-115"><span class="linenos">115</span></a>    <span class="k">def</span> <span class="nf">dir_path_rel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RelativePath</span><span class="p">:</span>
+</span><span id="CengalBuildExtension-116"><a href="#CengalBuildExtension-116"><span class="linenos">116</span></a>        <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">RelativePath</span><span class="p">(</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">))</span>
+</span><span id="CengalBuildExtension-117"><a href="#CengalBuildExtension-117"><span class="linenos">117</span></a>
+</span><span id="CengalBuildExtension-118"><a href="#CengalBuildExtension-118"><span class="linenos">118</span></a>    <span class="nd">@property</span>
+</span><span id="CengalBuildExtension-119"><a href="#CengalBuildExtension-119"><span class="linenos">119</span></a>    <span class="k">def</span> <span class="nf">module_import_str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="CengalBuildExtension-120"><a href="#CengalBuildExtension-120"><span class="linenos">120</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span>
+</span><span id="CengalBuildExtension-121"><a href="#CengalBuildExtension-121"><span class="linenos">121</span></a>    
+</span><span id="CengalBuildExtension-122"><a href="#CengalBuildExtension-122"><span class="linenos">122</span></a>    <span class="nd">@module_import_str</span><span class="o">.</span><span class="n">setter</span>
+</span><span id="CengalBuildExtension-123"><a href="#CengalBuildExtension-123"><span class="linenos">123</span></a>    <span class="k">def</span> <span class="nf">module_import_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="CengalBuildExtension-124"><a href="#CengalBuildExtension-124"><span class="linenos">124</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span> <span class="o">=</span> <span class="n">value</span>
+</span><span id="CengalBuildExtension-125"><a href="#CengalBuildExtension-125"><span class="linenos">125</span></a>
+</span><span id="CengalBuildExtension-126"><a href="#CengalBuildExtension-126"><span class="linenos">126</span></a>    <span class="nd">@property</span>
+</span><span id="CengalBuildExtension-127"><a href="#CengalBuildExtension-127"><span class="linenos">127</span></a>    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="CengalBuildExtension-128"><a href="#CengalBuildExtension-128"><span class="linenos">128</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span>
+</span><span id="CengalBuildExtension-129"><a href="#CengalBuildExtension-129"><span class="linenos">129</span></a>
+</span><span id="CengalBuildExtension-130"><a href="#CengalBuildExtension-130"><span class="linenos">130</span></a>    <span class="nd">@property</span>
+</span><span id="CengalBuildExtension-131"><a href="#CengalBuildExtension-131"><span class="linenos">131</span></a>    <span class="k">def</span> <span class="nf">package</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="CengalBuildExtension-132"><a href="#CengalBuildExtension-132"><span class="linenos">132</span></a>        <span class="k">return</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</span><span id="CengalBuildExtension-133"><a href="#CengalBuildExtension-133"><span class="linenos">133</span></a>    
+</span><span id="CengalBuildExtension-134"><a href="#CengalBuildExtension-134"><span class="linenos">134</span></a>    <span class="nd">@property</span>
+</span><span id="CengalBuildExtension-135"><a href="#CengalBuildExtension-135"><span class="linenos">135</span></a>    <span class="k">def</span> <span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="CengalBuildExtension-136"><a href="#CengalBuildExtension-136"><span class="linenos">136</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files</span>
+</span><span id="CengalBuildExtension-137"><a href="#CengalBuildExtension-137"><span class="linenos">137</span></a>    
+</span><span id="CengalBuildExtension-138"><a href="#CengalBuildExtension-138"><span class="linenos">138</span></a>    <span class="nd">@files</span><span class="o">.</span><span class="n">setter</span>
+</span><span id="CengalBuildExtension-139"><a href="#CengalBuildExtension-139"><span class="linenos">139</span></a>    <span class="k">def</span> <span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="CengalBuildExtension-140"><a href="#CengalBuildExtension-140"><span class="linenos">140</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_files</span> <span class="o">=</span> <span class="n">value</span>
 </span></pre></div>
 
 
@@ -302,6 +308,25 @@ cengal<wbr>.build_tools<wbr>.build_extensions<wbr>.versions<wbr>.v_0<wbr>.build_
     
 
                             </div>
+                            <div id="CengalBuildExtension.sdist" class="classattr">
+                                        <input id="CengalBuildExtension.sdist-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">sdist</span><span class="signature pdoc-code condensed">(<span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
+
+                <label class="view-source-button" for="CengalBuildExtension.sdist-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#CengalBuildExtension.sdist"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalBuildExtension.sdist-99"><a href="#CengalBuildExtension.sdist-99"><span class="linenos"> 99</span></a>    <span class="k">def</span> <span class="nf">sdist</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+</span><span id="CengalBuildExtension.sdist-100"><a href="#CengalBuildExtension.sdist-100"><span class="linenos">100</span></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</span></pre></div>
+
+
+    
+
+                            </div>
                             <div id="CengalBuildExtension.path" class="classattr">
                                         <input id="CengalBuildExtension.path-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr variable">
@@ -311,9 +336,9 @@ cengal<wbr>.build_tools<wbr>.build_extensions<wbr>.versions<wbr>.v_0<wbr>.build_
 
     </div>
     <a class="headerlink" href="#CengalBuildExtension.path"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalBuildExtension.path-99"><a href="#CengalBuildExtension.path-99"><span class="linenos"> 99</span></a>    <span class="nd">@property</span>
-</span><span id="CengalBuildExtension.path-100"><a href="#CengalBuildExtension.path-100"><span class="linenos">100</span></a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="CengalBuildExtension.path-101"><a href="#CengalBuildExtension.path-101"><span class="linenos">101</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalBuildExtension.path-102"><a href="#CengalBuildExtension.path-102"><span class="linenos">102</span></a>    <span class="nd">@property</span>
+</span><span id="CengalBuildExtension.path-103"><a href="#CengalBuildExtension.path-103"><span class="linenos">103</span></a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="CengalBuildExtension.path-104"><a href="#CengalBuildExtension.path-104"><span class="linenos">104</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span>
 </span></pre></div>
 
 
@@ -329,9 +354,9 @@ cengal<wbr>.build_tools<wbr>.build_extensions<wbr>.versions<wbr>.v_0<wbr>.build_
 
     </div>
     <a class="headerlink" href="#CengalBuildExtension.dir_path"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalBuildExtension.dir_path-107"><a href="#CengalBuildExtension.dir_path-107"><span class="linenos">107</span></a>    <span class="nd">@property</span>
-</span><span id="CengalBuildExtension.dir_path-108"><a href="#CengalBuildExtension.dir_path-108"><span class="linenos">108</span></a>    <span class="k">def</span> <span class="nf">dir_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="CengalBuildExtension.dir_path-109"><a href="#CengalBuildExtension.dir_path-109"><span class="linenos">109</span></a>        <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalBuildExtension.dir_path-110"><a href="#CengalBuildExtension.dir_path-110"><span class="linenos">110</span></a>    <span class="nd">@property</span>
+</span><span id="CengalBuildExtension.dir_path-111"><a href="#CengalBuildExtension.dir_path-111"><span class="linenos">111</span></a>    <span class="k">def</span> <span class="nf">dir_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="CengalBuildExtension.dir_path-112"><a href="#CengalBuildExtension.dir_path-112"><span class="linenos">112</span></a>        <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -347,9 +372,9 @@ cengal<wbr>.build_tools<wbr>.build_extensions<wbr>.versions<wbr>.v_0<wbr>.build_
 
     </div>
     <a class="headerlink" href="#CengalBuildExtension.dir_path_rel"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalBuildExtension.dir_path_rel-111"><a href="#CengalBuildExtension.dir_path_rel-111"><span class="linenos">111</span></a>    <span class="nd">@property</span>
-</span><span id="CengalBuildExtension.dir_path_rel-112"><a href="#CengalBuildExtension.dir_path_rel-112"><span class="linenos">112</span></a>    <span class="k">def</span> <span class="nf">dir_path_rel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RelativePath</span><span class="p">:</span>
-</span><span id="CengalBuildExtension.dir_path_rel-113"><a href="#CengalBuildExtension.dir_path_rel-113"><span class="linenos">113</span></a>        <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">RelativePath</span><span class="p">(</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">))</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalBuildExtension.dir_path_rel-114"><a href="#CengalBuildExtension.dir_path_rel-114"><span class="linenos">114</span></a>    <span class="nd">@property</span>
+</span><span id="CengalBuildExtension.dir_path_rel-115"><a href="#CengalBuildExtension.dir_path_rel-115"><span class="linenos">115</span></a>    <span class="k">def</span> <span class="nf">dir_path_rel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RelativePath</span><span class="p">:</span>
+</span><span id="CengalBuildExtension.dir_path_rel-116"><a href="#CengalBuildExtension.dir_path_rel-116"><span class="linenos">116</span></a>        <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">RelativePath</span><span class="p">(</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">))</span>
 </span></pre></div>
 
 
@@ -365,9 +390,9 @@ cengal<wbr>.build_tools<wbr>.build_extensions<wbr>.versions<wbr>.v_0<wbr>.build_
 
     </div>
     <a class="headerlink" href="#CengalBuildExtension.module_import_str"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalBuildExtension.module_import_str-115"><a href="#CengalBuildExtension.module_import_str-115"><span class="linenos">115</span></a>    <span class="nd">@property</span>
-</span><span id="CengalBuildExtension.module_import_str-116"><a href="#CengalBuildExtension.module_import_str-116"><span class="linenos">116</span></a>    <span class="k">def</span> <span class="nf">module_import_str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="CengalBuildExtension.module_import_str-117"><a href="#CengalBuildExtension.module_import_str-117"><span class="linenos">117</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalBuildExtension.module_import_str-118"><a href="#CengalBuildExtension.module_import_str-118"><span class="linenos">118</span></a>    <span class="nd">@property</span>
+</span><span id="CengalBuildExtension.module_import_str-119"><a href="#CengalBuildExtension.module_import_str-119"><span class="linenos">119</span></a>    <span class="k">def</span> <span class="nf">module_import_str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="CengalBuildExtension.module_import_str-120"><a href="#CengalBuildExtension.module_import_str-120"><span class="linenos">120</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span>
 </span></pre></div>
 
 
@@ -383,9 +408,9 @@ cengal<wbr>.build_tools<wbr>.build_extensions<wbr>.versions<wbr>.v_0<wbr>.build_
 
     </div>
     <a class="headerlink" href="#CengalBuildExtension.name"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalBuildExtension.name-123"><a href="#CengalBuildExtension.name-123"><span class="linenos">123</span></a>    <span class="nd">@property</span>
-</span><span id="CengalBuildExtension.name-124"><a href="#CengalBuildExtension.name-124"><span class="linenos">124</span></a>    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="CengalBuildExtension.name-125"><a href="#CengalBuildExtension.name-125"><span class="linenos">125</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalBuildExtension.name-126"><a href="#CengalBuildExtension.name-126"><span class="linenos">126</span></a>    <span class="nd">@property</span>
+</span><span id="CengalBuildExtension.name-127"><a href="#CengalBuildExtension.name-127"><span class="linenos">127</span></a>    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="CengalBuildExtension.name-128"><a href="#CengalBuildExtension.name-128"><span class="linenos">128</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span>
 </span></pre></div>
 
 
@@ -401,9 +426,9 @@ cengal<wbr>.build_tools<wbr>.build_extensions<wbr>.versions<wbr>.v_0<wbr>.build_
 
     </div>
     <a class="headerlink" href="#CengalBuildExtension.package"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalBuildExtension.package-127"><a href="#CengalBuildExtension.package-127"><span class="linenos">127</span></a>    <span class="nd">@property</span>
-</span><span id="CengalBuildExtension.package-128"><a href="#CengalBuildExtension.package-128"><span class="linenos">128</span></a>    <span class="k">def</span> <span class="nf">package</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="CengalBuildExtension.package-129"><a href="#CengalBuildExtension.package-129"><span class="linenos">129</span></a>        <span class="k">return</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalBuildExtension.package-130"><a href="#CengalBuildExtension.package-130"><span class="linenos">130</span></a>    <span class="nd">@property</span>
+</span><span id="CengalBuildExtension.package-131"><a href="#CengalBuildExtension.package-131"><span class="linenos">131</span></a>    <span class="k">def</span> <span class="nf">package</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="CengalBuildExtension.package-132"><a href="#CengalBuildExtension.package-132"><span class="linenos">132</span></a>        <span class="k">return</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_module_import_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 </span></pre></div>
 
 
@@ -419,9 +444,9 @@ cengal<wbr>.build_tools<wbr>.build_extensions<wbr>.versions<wbr>.v_0<wbr>.build_
 
     </div>
     <a class="headerlink" href="#CengalBuildExtension.files"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalBuildExtension.files-131"><a href="#CengalBuildExtension.files-131"><span class="linenos">131</span></a>    <span class="nd">@property</span>
-</span><span id="CengalBuildExtension.files-132"><a href="#CengalBuildExtension.files-132"><span class="linenos">132</span></a>    <span class="k">def</span> <span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="CengalBuildExtension.files-133"><a href="#CengalBuildExtension.files-133"><span class="linenos">133</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalBuildExtension.files-134"><a href="#CengalBuildExtension.files-134"><span class="linenos">134</span></a>    <span class="nd">@property</span>
+</span><span id="CengalBuildExtension.files-135"><a href="#CengalBuildExtension.files-135"><span class="linenos">135</span></a>    <span class="k">def</span> <span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="CengalBuildExtension.files-136"><a href="#CengalBuildExtension.files-136"><span class="linenos">136</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files</span>
 </span></pre></div>
 
 
@@ -440,11 +465,11 @@ cengal<wbr>.build_tools<wbr>.build_extensions<wbr>.versions<wbr>.v_0<wbr>.build_
 
     </div>
     <a class="headerlink" href="#CengalSetuptoolsBuildExtension"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalSetuptoolsBuildExtension-140"><a href="#CengalSetuptoolsBuildExtension-140"><span class="linenos">140</span></a><span class="k">class</span> <span class="nc">CengalSetuptoolsBuildExtension</span><span class="p">(</span><span class="n">CengalBuildExtension</span><span class="p">):</span>
-</span><span id="CengalSetuptoolsBuildExtension-141"><a href="#CengalSetuptoolsBuildExtension-141"><span class="linenos">141</span></a>    <span class="n">base_class</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">]</span> <span class="o">=</span> <span class="n">SetuptoolsExtension</span>
-</span><span id="CengalSetuptoolsBuildExtension-142"><a href="#CengalSetuptoolsBuildExtension-142"><span class="linenos">142</span></a>
-</span><span id="CengalSetuptoolsBuildExtension-143"><a href="#CengalSetuptoolsBuildExtension-143"><span class="linenos">143</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="CengalSetuptoolsBuildExtension-144"><a href="#CengalSetuptoolsBuildExtension-144"><span class="linenos">144</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalSetuptoolsBuildExtension-143"><a href="#CengalSetuptoolsBuildExtension-143"><span class="linenos">143</span></a><span class="k">class</span> <span class="nc">CengalSetuptoolsBuildExtension</span><span class="p">(</span><span class="n">CengalBuildExtension</span><span class="p">):</span>
+</span><span id="CengalSetuptoolsBuildExtension-144"><a href="#CengalSetuptoolsBuildExtension-144"><span class="linenos">144</span></a>    <span class="n">base_class</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">]</span> <span class="o">=</span> <span class="n">SetuptoolsExtension</span>
+</span><span id="CengalSetuptoolsBuildExtension-145"><a href="#CengalSetuptoolsBuildExtension-145"><span class="linenos">145</span></a>
+</span><span id="CengalSetuptoolsBuildExtension-146"><a href="#CengalSetuptoolsBuildExtension-146"><span class="linenos">146</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="CengalSetuptoolsBuildExtension-147"><a href="#CengalSetuptoolsBuildExtension-147"><span class="linenos">147</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -460,8 +485,8 @@ cengal<wbr>.build_tools<wbr>.build_extensions<wbr>.versions<wbr>.v_0<wbr>.build_
 
     </div>
     <a class="headerlink" href="#CengalSetuptoolsBuildExtension.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalSetuptoolsBuildExtension.__init__-143"><a href="#CengalSetuptoolsBuildExtension.__init__-143"><span class="linenos">143</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="CengalSetuptoolsBuildExtension.__init__-144"><a href="#CengalSetuptoolsBuildExtension.__init__-144"><span class="linenos">144</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalSetuptoolsBuildExtension.__init__-146"><a href="#CengalSetuptoolsBuildExtension.__init__-146"><span class="linenos">146</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="CengalSetuptoolsBuildExtension.__init__-147"><a href="#CengalSetuptoolsBuildExtension.__init__-147"><span class="linenos">147</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -486,6 +511,7 @@ cengal<wbr>.build_tools<wbr>.build_extensions<wbr>.versions<wbr>.v_0<wbr>.build_
                                     <div><dt><a href="#CengalBuildExtension">CengalBuildExtension</a></dt>
                                 <dd id="CengalSetuptoolsBuildExtension.store_as_data" class="variable"><a href="#CengalBuildExtension.store_as_data">store_as_data</a></dd>
                 <dd id="CengalSetuptoolsBuildExtension.kwargs" class="variable"><a href="#CengalBuildExtension.kwargs">kwargs</a></dd>
+                <dd id="CengalSetuptoolsBuildExtension.sdist" class="function"><a href="#CengalBuildExtension.sdist">sdist</a></dd>
                 <dd id="CengalSetuptoolsBuildExtension.path" class="variable"><a href="#CengalBuildExtension.path">path</a></dd>
                 <dd id="CengalSetuptoolsBuildExtension.dir_path" class="variable"><a href="#CengalBuildExtension.dir_path">dir_path</a></dd>
                 <dd id="CengalSetuptoolsBuildExtension.dir_path_rel" class="variable"><a href="#CengalBuildExtension.dir_path_rel">dir_path_rel</a></dd>
@@ -509,11 +535,11 @@ cengal<wbr>.build_tools<wbr>.build_extensions<wbr>.versions<wbr>.v_0<wbr>.build_
 
     </div>
     <a class="headerlink" href="#CengalCythonBuildExtension"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalCythonBuildExtension-147"><a href="#CengalCythonBuildExtension-147"><span class="linenos">147</span></a><span class="k">class</span> <span class="nc">CengalCythonBuildExtension</span><span class="p">(</span><span class="n">CengalBuildExtension</span><span class="p">):</span>
-</span><span id="CengalCythonBuildExtension-148"><a href="#CengalCythonBuildExtension-148"><span class="linenos">148</span></a>    <span class="n">base_class</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">]</span> <span class="o">=</span> <span class="n">CythonExtension</span>
-</span><span id="CengalCythonBuildExtension-149"><a href="#CengalCythonBuildExtension-149"><span class="linenos">149</span></a>
-</span><span id="CengalCythonBuildExtension-150"><a href="#CengalCythonBuildExtension-150"><span class="linenos">150</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="CengalCythonBuildExtension-151"><a href="#CengalCythonBuildExtension-151"><span class="linenos">151</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalCythonBuildExtension-150"><a href="#CengalCythonBuildExtension-150"><span class="linenos">150</span></a><span class="k">class</span> <span class="nc">CengalCythonBuildExtension</span><span class="p">(</span><span class="n">CengalBuildExtension</span><span class="p">):</span>
+</span><span id="CengalCythonBuildExtension-151"><a href="#CengalCythonBuildExtension-151"><span class="linenos">151</span></a>    <span class="n">base_class</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">]</span> <span class="o">=</span> <span class="n">CythonExtension</span>
+</span><span id="CengalCythonBuildExtension-152"><a href="#CengalCythonBuildExtension-152"><span class="linenos">152</span></a>
+</span><span id="CengalCythonBuildExtension-153"><a href="#CengalCythonBuildExtension-153"><span class="linenos">153</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="CengalCythonBuildExtension-154"><a href="#CengalCythonBuildExtension-154"><span class="linenos">154</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -529,8 +555,8 @@ cengal<wbr>.build_tools<wbr>.build_extensions<wbr>.versions<wbr>.v_0<wbr>.build_
 
     </div>
     <a class="headerlink" href="#CengalCythonBuildExtension.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalCythonBuildExtension.__init__-150"><a href="#CengalCythonBuildExtension.__init__-150"><span class="linenos">150</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="CengalCythonBuildExtension.__init__-151"><a href="#CengalCythonBuildExtension.__init__-151"><span class="linenos">151</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalCythonBuildExtension.__init__-153"><a href="#CengalCythonBuildExtension.__init__-153"><span class="linenos">153</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="CengalCythonBuildExtension.__init__-154"><a href="#CengalCythonBuildExtension.__init__-154"><span class="linenos">154</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -555,6 +581,7 @@ cengal<wbr>.build_tools<wbr>.build_extensions<wbr>.versions<wbr>.v_0<wbr>.build_
                                     <div><dt><a href="#CengalBuildExtension">CengalBuildExtension</a></dt>
                                 <dd id="CengalCythonBuildExtension.store_as_data" class="variable"><a href="#CengalBuildExtension.store_as_data">store_as_data</a></dd>
                 <dd id="CengalCythonBuildExtension.kwargs" class="variable"><a href="#CengalBuildExtension.kwargs">kwargs</a></dd>
+                <dd id="CengalCythonBuildExtension.sdist" class="function"><a href="#CengalBuildExtension.sdist">sdist</a></dd>
                 <dd id="CengalCythonBuildExtension.path" class="variable"><a href="#CengalBuildExtension.path">path</a></dd>
                 <dd id="CengalCythonBuildExtension.dir_path" class="variable"><a href="#CengalBuildExtension.dir_path">dir_path</a></dd>
                 <dd id="CengalCythonBuildExtension.dir_path_rel" class="variable"><a href="#CengalBuildExtension.dir_path_rel">dir_path_rel</a></dd>
@@ -578,15 +605,15 @@ cengal<wbr>.build_tools<wbr>.build_extensions<wbr>.versions<wbr>.v_0<wbr>.build_
 
     </div>
     <a class="headerlink" href="#CengalGeneratorBuildExtension"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalGeneratorBuildExtension-154"><a href="#CengalGeneratorBuildExtension-154"><span class="linenos">154</span></a><span class="k">class</span> <span class="nc">CengalGeneratorBuildExtension</span><span class="p">(</span><span class="n">CengalBuildExtension</span><span class="p">):</span>
-</span><span id="CengalGeneratorBuildExtension-155"><a href="#CengalGeneratorBuildExtension-155"><span class="linenos">155</span></a>    <span class="n">base_class</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="CengalGeneratorBuildExtension-156"><a href="#CengalGeneratorBuildExtension-156"><span class="linenos">156</span></a>    <span class="n">store_as_data</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="CengalGeneratorBuildExtension-157"><a href="#CengalGeneratorBuildExtension-157"><span class="linenos">157</span></a>
-</span><span id="CengalGeneratorBuildExtension-158"><a href="#CengalGeneratorBuildExtension-158"><span class="linenos">158</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="CengalGeneratorBuildExtension-159"><a href="#CengalGeneratorBuildExtension-159"><span class="linenos">159</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
-</span><span id="CengalGeneratorBuildExtension-160"><a href="#CengalGeneratorBuildExtension-160"><span class="linenos">160</span></a>    
-</span><span id="CengalGeneratorBuildExtension-161"><a href="#CengalGeneratorBuildExtension-161"><span class="linenos">161</span></a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="CengalGeneratorBuildExtension-162"><a href="#CengalGeneratorBuildExtension-162"><span class="linenos">162</span></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalGeneratorBuildExtension-157"><a href="#CengalGeneratorBuildExtension-157"><span class="linenos">157</span></a><span class="k">class</span> <span class="nc">CengalGeneratorBuildExtension</span><span class="p">(</span><span class="n">CengalBuildExtension</span><span class="p">):</span>
+</span><span id="CengalGeneratorBuildExtension-158"><a href="#CengalGeneratorBuildExtension-158"><span class="linenos">158</span></a>    <span class="n">base_class</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="CengalGeneratorBuildExtension-159"><a href="#CengalGeneratorBuildExtension-159"><span class="linenos">159</span></a>    <span class="n">store_as_data</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="CengalGeneratorBuildExtension-160"><a href="#CengalGeneratorBuildExtension-160"><span class="linenos">160</span></a>
+</span><span id="CengalGeneratorBuildExtension-161"><a href="#CengalGeneratorBuildExtension-161"><span class="linenos">161</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="CengalGeneratorBuildExtension-162"><a href="#CengalGeneratorBuildExtension-162"><span class="linenos">162</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+</span><span id="CengalGeneratorBuildExtension-163"><a href="#CengalGeneratorBuildExtension-163"><span class="linenos">163</span></a>    
+</span><span id="CengalGeneratorBuildExtension-164"><a href="#CengalGeneratorBuildExtension-164"><span class="linenos">164</span></a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="CengalGeneratorBuildExtension-165"><a href="#CengalGeneratorBuildExtension-165"><span class="linenos">165</span></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 </span></pre></div>
 
 
@@ -602,8 +629,8 @@ cengal<wbr>.build_tools<wbr>.build_extensions<wbr>.versions<wbr>.v_0<wbr>.build_
 
     </div>
     <a class="headerlink" href="#CengalGeneratorBuildExtension.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalGeneratorBuildExtension.__init__-158"><a href="#CengalGeneratorBuildExtension.__init__-158"><span class="linenos">158</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="CengalGeneratorBuildExtension.__init__-159"><a href="#CengalGeneratorBuildExtension.__init__-159"><span class="linenos">159</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CengalGeneratorBuildExtension.__init__-161"><a href="#CengalGeneratorBuildExtension.__init__-161"><span class="linenos">161</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="CengalGeneratorBuildExtension.__init__-162"><a href="#CengalGeneratorBuildExtension.__init__-162"><span class="linenos">162</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -639,6 +666,7 @@ cengal<wbr>.build_tools<wbr>.build_extensions<wbr>.versions<wbr>.v_0<wbr>.build_
                                 <dl>
                                     <div><dt><a href="#CengalBuildExtension">CengalBuildExtension</a></dt>
                                 <dd id="CengalGeneratorBuildExtension.kwargs" class="variable"><a href="#CengalBuildExtension.kwargs">kwargs</a></dd>
+                <dd id="CengalGeneratorBuildExtension.sdist" class="function"><a href="#CengalBuildExtension.sdist">sdist</a></dd>
                 <dd id="CengalGeneratorBuildExtension.path" class="variable"><a href="#CengalBuildExtension.path">path</a></dd>
                 <dd id="CengalGeneratorBuildExtension.dir_path" class="variable"><a href="#CengalBuildExtension.dir_path">dir_path</a></dd>
                 <dd id="CengalGeneratorBuildExtension.dir_path_rel" class="variable"><a href="#CengalBuildExtension.dir_path_rel">dir_path_rel</a></dd>

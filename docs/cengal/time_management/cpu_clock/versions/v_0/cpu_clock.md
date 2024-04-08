@@ -31,7 +31,7 @@ cengal<wbr>.time_management<wbr>.cpu_clock<wbr>.versions<wbr>.v_0<wbr>.cpu_clock
 </span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="c1"># limitations under the License.</span>
 </span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>
 </span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cpu_clock&#39;</span><span class="p">,</span> <span class="s1">&#39;CPU_TICKS_PER_SECOND&#39;</span><span class="p">]</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cpu_clock&#39;</span><span class="p">,</span> <span class="s1">&#39;perf_counter&#39;</span><span class="p">,</span> <span class="s1">&#39;cpu_clock_cycles&#39;</span><span class="p">,</span> <span class="s1">&#39;CPU_TICKS_PER_SECOND&#39;</span><span class="p">]</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>
 </span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>
 </span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="sd">&quot;&quot;&quot;</span>
@@ -43,7 +43,7 @@ cengal<wbr>.time_management<wbr>.cpu_clock<wbr>.versions<wbr>.v_0<wbr>.cpu_clock
 </span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.1&quot;</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.3&quot;</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -51,18 +51,30 @@ cengal<wbr>.time_management<wbr>.cpu_clock<wbr>.versions<wbr>.v_0<wbr>.cpu_clock
 </span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="c1"># __status__ = &quot;Production&quot;</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>
 </span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>
-</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a><span class="kn">from</span> <span class="nn">cengal.time_management.cpu_clock_cycles</span> <span class="kn">import</span> <span class="n">cpu_clock_cycles</span><span class="p">,</span> <span class="n">set_cycles_per_second</span><span class="p">,</span> <span class="n">cpu_clock</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="kn">from</span> <span class="nn">cengal.hardware.info.cpu</span> <span class="kn">import</span> <span class="n">cpu_info</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">perf_counter</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a><span class="k">try</span><span class="p">:</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a>    <span class="kn">from</span> <span class="nn">cengal.time_management.cpu_clock_cycles.versions.v_0.compilable.cpu_clock_cycles__cython</span> <span class="kn">import</span> <span class="n">cpu_clock_cycles</span><span class="p">,</span> <span class="n">set_cycles_per_second</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>    <span class="kn">from</span> <span class="nn">cengal.hardware.info.cpu</span> <span class="kn">import</span> <span class="n">cpu_info</span>
 </span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>
 </span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>
-</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a><span class="n">CPU_TICKS_PER_SECOND</span> <span class="o">=</span> <span class="n">cpu_info</span><span class="p">()</span><span class="o">.</span><span class="n">hz_advertised</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>    <span class="n">CPU_TICKS_PER_SECOND</span> <span class="o">=</span> <span class="n">cpu_info</span><span class="p">()</span><span class="o">.</span><span class="n">hz_advertised</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>
 </span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>
-</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a><span class="k">if</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">CPU_TICKS_PER_SECOND</span><span class="p">:</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>    <span class="n">cpu_clock</span> <span class="o">=</span> <span class="n">perf_counter</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a><span class="k">else</span><span class="p">:</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>    <span class="n">set_cycles_per_second</span><span class="p">(</span><span class="n">CPU_TICKS_PER_SECOND</span><span class="p">)</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>    <span class="k">if</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">CPU_TICKS_PER_SECOND</span><span class="p">:</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>        <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">perf_counter</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>        <span class="n">cpu_clock</span> <span class="o">=</span> <span class="n">perf_counter</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>        <span class="n">set_cycles_per_second</span><span class="p">(</span><span class="n">CPU_TICKS_PER_SECOND</span><span class="p">)</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>        <span class="kn">from</span> <span class="nn">cengal.time_management.cpu_clock_cycles.versions.v_0.compilable.cpu_clock_cycles__cython</span> <span class="kn">import</span> <span class="n">perf_counter</span><span class="p">,</span> <span class="n">cpu_clock</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>
+</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a><span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>    <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">perf_counter</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>
+</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a>    <span class="n">CPU_TICKS_PER_SECOND</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a>    
+</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a>    <span class="n">cpu_clock</span> <span class="o">=</span> <span class="n">perf_counter</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>    
+</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a>    <span class="k">def</span> <span class="nf">cpu_clock_cycles</span><span class="p">():</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a>        <span class="k">return</span> <span class="mi">0</span>
 </span></pre></div>
 
 
@@ -71,23 +83,45 @@ cengal<wbr>.time_management<wbr>.cpu_clock<wbr>.versions<wbr>.v_0<wbr>.cpu_clock
                     <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">cpu_clock</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">unknown</span></span><span class="return-annotation">):</span></span>
+        <span class="name">cpu_clock</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
 
         
     </div>
     <a class="headerlink" href="#cpu_clock"></a>
     
-            <div class="docstring"><p>perf_counter() -> float</p>
+    
 
-<p>Performance counter for benchmarking.</p>
-</div>
+                </section>
+                <section id="perf_counter">
+                    <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">perf_counter</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
 
+        
+    </div>
+    <a class="headerlink" href="#perf_counter"></a>
+    
+    
+
+                </section>
+                <section id="cpu_clock_cycles">
+                    <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">cpu_clock_cycles</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#cpu_clock_cycles"></a>
+    
+    
 
                 </section>
                 <section id="CPU_TICKS_PER_SECOND">
                     <div class="attr variable">
             <span class="name">CPU_TICKS_PER_SECOND</span>        =
-<span class="default_value">0</span>
+<span class="default_value">3400000000</span>
 
         
     </div>

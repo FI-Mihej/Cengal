@@ -27,7 +27,7 @@ from cengal.parallel_execution.coroutines.coro_standard_services.put_coro import
 from cengal.parallel_execution.coroutines.coro_standard_services.timer_func_runner import *
 from cengal.parallel_execution.coroutines.coro_standard_services.instance import *
 from cengal.file_system.file_manager import path_relative_to_current_dir
-from cengal.time_management.load_best_timer import perf_counter
+from cengal.time_management.cpu_clock_cycles import perf_counter
 from cengal.data_manipulation.serialization import *
 from cengal.introspection.inspect import get_exception
 from cengal.file_system.app_fs_structure.app_dir_path import AppDirPath, AppDirectoryType
@@ -63,7 +63,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.2"
+__version__ = "4.3.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"

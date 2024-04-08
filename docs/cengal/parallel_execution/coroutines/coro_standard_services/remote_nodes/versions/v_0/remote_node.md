@@ -44,7 +44,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 </span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.1&quot;</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.3&quot;</span>
 </span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -60,7 +60,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 </span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a><span class="kn">from</span> <span class="nn">cengal.parallel_execution.coroutines.coro_standard_services.put_coro</span> <span class="kn">import</span> <span class="o">*</span>
 </span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a><span class="kn">from</span> <span class="nn">cengal.parallel_execution.coroutines.coro_standard_services.timer_func_runner</span> <span class="kn">import</span> <span class="o">*</span>
 </span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="kn">from</span> <span class="nn">cengal.file_system.file_manager</span> <span class="kn">import</span> <span class="n">path_relative_to_current_dir</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="kn">from</span> <span class="nn">cengal.time_management.load_best_timer</span> <span class="kn">import</span> <span class="n">perf_counter</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="kn">from</span> <span class="nn">cengal.time_management.cpu_clock_cycles</span> <span class="kn">import</span> <span class="n">perf_counter</span>
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="kn">from</span> <span class="nn">cengal.data_manipulation.serialization</span> <span class="kn">import</span> <span class="o">*</span>
 </span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Type</span>
 </span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="kn">from</span> <span class="nn">cengal.introspection.inspect</span> <span class="kn">import</span> <span class="n">get_exception</span><span class="p">,</span> <span class="n">entity_owning_module_importable_str</span><span class="p">,</span> <span class="n">entity_owning_module_info_and_owning_path</span><span class="p">,</span> <span class="n">entity_properties</span>
@@ -194,7 +194,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
                             </div>
                             <div id="RemoteNode.request_id_gen" class="classattr">
                                 <div class="attr variable">
-            <span class="name">request_id_gen</span><span class="annotation">: &lt;cyfunction IDGenerator at 0x7f977c1f0ad0&gt;</span>
+            <span class="name">request_id_gen</span><span class="annotation">: &lt;cyfunction IDGenerator at 0x7f9624e41110&gt;</span>
 
         
     </div>
@@ -312,7 +312,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 
                             <div id="RemoteServer.service_class_id_gen" class="classattr">
                                 <div class="attr variable">
-            <span class="name">service_class_id_gen</span><span class="annotation">: &lt;cyfunction IDGenerator at 0x7f977c1f0ad0&gt;</span>
+            <span class="name">service_class_id_gen</span><span class="annotation">: &lt;cyfunction IDGenerator at 0x7f9624e41110&gt;</span>
 
         
     </div>
@@ -334,7 +334,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
                             </div>
                             <div id="RemoteServer.request_class_id_gen" class="classattr">
                                 <div class="attr variable">
-            <span class="name">request_class_id_gen</span><span class="annotation">: &lt;cyfunction IDGenerator at 0x7f977c1f0ad0&gt;</span>
+            <span class="name">request_class_id_gen</span><span class="annotation">: &lt;cyfunction IDGenerator at 0x7f9624e41110&gt;</span>
 
         
     </div>

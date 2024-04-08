@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.2"
+__version__ = "4.3.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -36,7 +36,7 @@ __status__ = "Development"
 
 from cengal.time_management.cpu_clock_cycles import cpu_clock_cycles, set_cycles_per_second, cpu_clock
 from cengal.time_management.cpu_clock import cpu_clock as py_cpu_clock, CPU_TICKS_PER_SECOND
-from cengal.time_management.load_best_timer import perf_counter
+from cengal.time_management.cpu_clock_cycles import perf_counter
 from cengal.time_management.timer_precision import timer_precision_99_95_68
 from rdtsc import get_cycles
 from hwcounter import Timer, count, count_end

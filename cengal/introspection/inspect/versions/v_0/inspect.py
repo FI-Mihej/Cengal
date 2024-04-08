@@ -38,7 +38,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.2"
+__version__ = "4.3.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -658,13 +658,68 @@ pifr = print_intro_func_repr
 
 
 def get_str_of_data_info(data):
+    """Returns string with data info: type and value
+
+    Args:
+        data (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """    
     return f'type: {type(data)}; value: {data}'
 
 
 gsodi = get_str_of_data_info
 
 
+def get_multistr_of_data_info(data, shift_num: Optional[int] = None, shift_char: str = '\t'):
+    """Returns multiline string with data info: type and value
+
+    Args:
+        data (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    shift_num = shift_num or 0
+    shift_str = shift_char * shift_num
+    from pprint import pformat
+    data_str = pformat(data)
+    data_str_lines = data_str.split('\n')
+    data_str = '\n'.join([f'{shift_str}{line}' for line in data_str_lines])
+    return f'type: {type(data)}; value: \n{data_str}'
+
+
+gmsodi = get_multistr_of_data_info
+
+
+def get_multistr_of_data_value(data, shift_num: Optional[int] = None, shift_char: str = '\t'):
+    """Returns multiline string with data value
+
+    Args:
+        data (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    shift_num = shift_num or 0
+    shift_str = shift_char * shift_num
+    from pprint import pformat
+    data_str = pformat(data)
+    data_str_lines = data_str.split('\n')
+    data_str = '\n'.join([f'{shift_str}{line}' for line in data_str_lines])
+    return data_str
+
+
+gmsodv = get_multistr_of_data_value
+
+
 def print_data_info(data):
+    """Print data info: type and value
+
+    Args:
+        data (_type_): _description_
+    """    
     print(get_str_of_data_info(data))
 
 

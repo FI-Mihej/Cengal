@@ -24,7 +24,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.2"
+__version__ = "4.3.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -51,7 +51,7 @@ from cengal.parallel_execution.coroutines.coro_standard_services.asyncio_loop im
 from cengal.parallel_execution.coroutines.coro_standard_services.instance import InstanceRequest
 from cengal.parallel_execution.coroutines.coro_standard_services.shutdown_on_keyboard_interrupt import ShutdownOnKeyboardInterrupt
 from cengal.parallel_execution.coroutines.coro_standard_services.db.versions.v_1 import *
-from cengal.time_management.load_best_timer import perf_counter
+from cengal.time_management.cpu_clock_cycles import perf_counter
 from contextlib import contextmanager, asynccontextmanager
 from time import perf_counter
 from typing import Tuple, Optional, OrderedDict as OrderedDictType

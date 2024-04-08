@@ -34,7 +34,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.2"
+__version__ = "4.3.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -43,6 +43,18 @@ __status__ = "Development"
 
 
 def statistics(iterable_readings: Iterable[Number]) -> Tuple[float, Sequence[Number]]:
+    """Example
+    
+        ```
+        diff_mean, readings = statistics(iterable_readings)
+        ```
+
+    Args:
+        iterable_readings (Iterable[Number]): _description_
+
+    Returns:
+        Tuple[float, Sequence[Number]]: _description_
+    """    
     readings = deque()
     data_sum = 0
     for reading in iterable_readings:
@@ -58,6 +70,26 @@ def statistics(iterable_readings: Iterable[Number]) -> Tuple[float, Sequence[Num
 
 
 def variance(diff_mean: float, readings: Sequence[Number]) -> Tuple[float, float, float, float]:
+    """Example:
+
+        ```
+        diff_mean, readings = statistics(iterable_readings)
+        diff_mean, variance, max_deviation, min_deviation = variance(diff_mean, readings)
+        ```
+
+    Alternative example:
+
+        ```
+        diff_mean, variance, max_deviation, min_deviation = variance(*statistics(iterable_readings))
+        ```
+
+    Args:
+        diff_mean (float): _description_
+        readings (Sequence[Number]): _description_
+
+    Returns:
+        Tuple[float, float, float, float]: _description_
+    """    
     max_deviation = None
     min_deviation = None
     deviation_square_sum = 0
@@ -80,10 +112,57 @@ def variance(diff_mean: float, readings: Sequence[Number]) -> Tuple[float, float
 
 
 def standard_deviation(diff_mean, variance, max_deviation, min_deviation) -> Tuple[float, float, float, float]:
+    """Example:
+
+        ```
+        diff_mean, readings = statistics(iterable_readings)
+        diff_mean, variance, max_deviation, min_deviation = variance(diff_mean, readings)
+        diff_mean, sd, max_deviation, min_deviation = standard_deviation(diff_mean, variance, max_deviation, min_deviation)
+        ```
+
+    Alternative example:
+
+        ```
+        diff_mean, sd, max_deviation, min_deviation = standard_deviation(*variance(*statistics(iterable_readings)))
+        ```
+
+    Args:
+        diff_mean (_type_): _description_
+        variance (_type_): _description_
+        max_deviation (_type_): _description_
+        min_deviation (_type_): _description_
+
+    Returns:
+        Tuple[float, float, float, float]: _description_
+    """    
     return diff_mean, sqrt(variance), max_deviation, min_deviation
 
 
 def guess_99_95_68(mean, sd, max_deviation, min_deviation) -> Tuple[float, float, float, float, float]:
+    """Example:
+
+        ```
+        diff_mean, readings = statistics(iterable_readings)
+        diff_mean, variance, max_deviation, min_deviation = variance(diff_mean, readings)
+        diff_mean, sd, max_deviation, min_deviation = standard_deviation(diff_mean, variance, max_deviation, min_deviation)
+        val_99, val_95, val_68, max_deviation, min_deviation = guess_99_95_68(diff_mean, sd, max_deviation, min_deviation)
+        ```
+
+    Alternative example:
+
+        ```
+        val_99, val_95, val_68, max_deviation, min_deviation = guess_99_95_68(*standard_deviation(*variance(*statistics(iterable_readings)))
+        ```
+
+    Args:
+        mean (_type_): _description_
+        sd (_type_): _description_
+        max_deviation (_type_): _description_
+        min_deviation (_type_): _description_
+
+    Returns:
+        Tuple[float, float, float, float, float]: _description_
+    """    
     # See: https://en.wikipedia.org/wiki/68%E2%80%9395%E2%80%9399.7_rule
     val_68 = mean + sd
     val_95 = mean + 2 * sd
@@ -91,7 +170,7 @@ def guess_99_95_68(mean, sd, max_deviation, min_deviation) -> Tuple[float, float
     return val_99, val_95, val_68, max_deviation, min_deviation
 
 
-def average(data: Sequence):
+def average(data: Sequence[Number]) -> Number:
     data_len = len(data)
     data_sum = sum(data)
     try:
@@ -101,6 +180,15 @@ def average(data: Sequence):
 
 
 def count_99_95_68(iterable_readings: Iterable[Number], operation: Callable=average) -> Tuple[float, float, float, float, float]:
+    """_summary_
+
+    Args:
+        iterable_readings (Iterable[Number]): _description_
+        operation (Callable, optional): _description_. Defaults to average. You can use other functions like min, max, median, etc.
+
+    Returns:
+        Tuple[float, float, float, float, float]: _description_
+    """    
     diff_mean, readings = statistics(iterable_readings)
     _, _, max_deviation, min_deviation = variance(diff_mean, readings)
     sorted_readings = sorted(readings)

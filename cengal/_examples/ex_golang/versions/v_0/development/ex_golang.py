@@ -28,7 +28,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.2"
+__version__ = "4.3.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -36,13 +36,20 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
+from cengal.performance_test_lib import measure_time
+from cengal.code_inspection.line_tracer import nln
 from cengal._examples.ex_golang import Greet, Greet2
 
 
 def main():
-    Greet('World')
-    Greet2('World')
-    print('Done!')
+    with measure_time(f'{nln()}: Greet'):
+        Greet('World')
+
+    with measure_time(f'{nln()}: Greet2'):
+        Greet2('World')
+    
+    with measure_time(f'{nln()}: print'):
+        print('Done!')
 
 
 if '__main__' == __name__:

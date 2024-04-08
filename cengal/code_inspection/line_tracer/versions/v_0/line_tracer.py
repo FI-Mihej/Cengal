@@ -30,7 +30,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.2"
+__version__ = "4.3.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -90,6 +90,20 @@ class LineTracer:
         result = (filename, function_name, previous_line_num, lines, index)
         return result
 
+    def trace_self(self, depth: Optional[int] = 1):
+        if not self.trace_allowed:
+            result = (None, None, None, None, None)
+            return result
+        
+        frame, filename, line_number, function_name, lines, index = self._frame_info(depth + 1)
+        current_line_num = line_number
+        lines = self._get_file_line(filename, current_line_num)
+        if not self.print_full_file_name:
+            filename = os.path.basename(filename)
+        
+        result = (filename, function_name, current_line_num, lines, index)
+        return result
+
     def trace_next(self, depth: Optional[int] = 1):
         if not self.trace_allowed:
             result = (None, None, None, None, None)
@@ -118,3 +132,24 @@ class LineTracer:
             print(f'<< {name} >>', self.trace(depth=depth))
         else:
             print(self.trace(depth=depth))
+
+
+line_tracer = LineTracer()
+line_tracer_full_file_name = LineTracer(print_full_file_name=True)
+
+
+def previous_line_number(depth: Optional[int] = 1) -> int:
+    return line_tracer.trace(depth + 1)[2]
+
+
+def current_line_number(depth: Optional[int] = 1) -> int:
+    return previous_line_number(depth + 1) + 1
+
+
+def next_line_number(depth: Optional[int] = 1) -> int:
+    return previous_line_number(depth + 1) + 2
+
+
+pln = previous_line_number
+cln = current_line_number
+nln = next_line_number

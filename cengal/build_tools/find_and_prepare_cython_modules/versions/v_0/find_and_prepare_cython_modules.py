@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.2"
+__version__ = "4.3.3"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -87,7 +87,7 @@ cython_transpiled_ext = {'.c'}
 compilable_ext = {'.pyx', '.cpp', '.c++', '.cxx', '.cc'}
 codegen_files_ext = {'.c', '.cpp', '.c++', '.cxx', '.cc'}
 headers_ext = {'.h', '.hpp', '.h++', '.hh', '.hxx'}
-libs_ext = {'.lib', '.dll', '.so'}
+libs_ext = {'.lib', '.dylib', '.dll', '.so', '.exp', '.obj'}
 all_ext = cython_transpiled_ext | compilable_ext | headers_ext | libs_ext
 
 
