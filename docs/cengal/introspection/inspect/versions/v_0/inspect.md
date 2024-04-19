@@ -53,7 +53,7 @@ cengal<wbr>.introspection<wbr>.inspect<wbr>.versions<wbr>.v_0<wbr>.inspect    </
 </span><span id="L-38"><a href="#L-38"><span class="linenos">  38</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-39"><a href="#L-39"><span class="linenos">  39</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-40"><a href="#L-40"><span class="linenos">  40</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos">  41</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.3&quot;</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">  41</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.4&quot;</span>
 </span><span id="L-42"><a href="#L-42"><span class="linenos">  42</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-43"><a href="#L-43"><span class="linenos">  43</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-44"><a href="#L-44"><span class="linenos">  44</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -1302,7 +1302,7 @@ cengal<wbr>.introspection<wbr>.inspect<wbr>.versions<wbr>.v_0<wbr>.inspect    </
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">frame</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">frame</span>:</span></span>
+        <span class="name">frame</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">frame</span>:</span></span>
 
                 <label class="view-source-button" for="frame-view-source"><span>View Source</span></label>
 
@@ -1455,7 +1455,7 @@ cengal<wbr>.introspection<wbr>.inspect<wbr>.versions<wbr>.v_0<wbr>.inspect    </
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">entity_arguments_description</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">entity</span><span class="p">:</span> <span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>:</span></span>
+        <span class="name">entity_arguments_description</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">entity</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>:</span></span>
 
                 <label class="view-source-button" for="entity_arguments_description-view-source"><span>View Source</span></label>
 
@@ -1809,7 +1809,7 @@ cengal<wbr>.introspection<wbr>.inspect<wbr>.versions<wbr>.v_0<wbr>.inspect    </
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">entity_by_name_module_importable_str_and_owning_names_path</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">entity_name</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">module_importable_str</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">owning_names_path</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">entity_by_name_module_importable_str_and_owning_names_path</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">entity_name</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">module_importable_str</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">owning_names_path</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="entity_by_name_module_importable_str_and_owning_names_path-view-source"><span>View Source</span></label>
 
@@ -1844,7 +1844,7 @@ cengal<wbr>.introspection<wbr>.inspect<wbr>.versions<wbr>.v_0<wbr>.inspect    </
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">normalized_owner_repr</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">owner</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">str</span>:</span></span>
+        <span class="name">normalized_owner_repr</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">owner</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">str</span>:</span></span>
 
                 <label class="view-source-button" for="normalized_owner_repr-view-source"><span>View Source</span></label>
 
@@ -1868,7 +1868,7 @@ cengal<wbr>.introspection<wbr>.inspect<wbr>.versions<wbr>.v_0<wbr>.inspect    </
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">normalized_code_owner_repr</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">code</span><span class="p">:</span> <span class="n">code</span>, </span><span class="param"><span class="n">owner</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">str</span>:</span></span>
+        <span class="name">normalized_code_owner_repr</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">code</span><span class="p">:</span> <span class="n">code</span>, </span><span class="param"><span class="n">owner</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">str</span>:</span></span>
 
                 <label class="view-source-button" for="normalized_code_owner_repr-view-source"><span>View Source</span></label>
 
@@ -1917,7 +1917,7 @@ cengal<wbr>.introspection<wbr>.inspect<wbr>.versions<wbr>.v_0<wbr>.inspect    </
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">owner_name</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">owner</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">str</span>:</span></span>
+        <span class="name">owner_name</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">owner</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">str</span>:</span></span>
 
                 <label class="view-source-button" for="owner_name-view-source"><span>View Source</span></label>
 
@@ -1977,7 +1977,7 @@ cengal<wbr>.introspection<wbr>.inspect<wbr>.versions<wbr>.v_0<wbr>.inspect    </
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">intro_func_param_names</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">cengal</span><span class="o">.</span><span class="n">code_flow_control</span><span class="o">.</span><span class="n">python_bytecode_manipulator</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">v_0</span><span class="o">.</span><span class="n">python_bytecode_manipulator</span><span class="o">.</span><span class="n">CodeParamNames</span>:</span></span>
+        <span class="name">intro_func_param_names</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">cengal</span><span class="o">.</span><span class="n">code_flow_control</span><span class="o">.</span><span class="n">python_bytecode_manipulator</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">v_0</span><span class="o">.</span><span class="n">python_bytecode_manipulator</span><span class="o">.</span><span class="n">CodeParamNames</span>:</span></span>
 
                 <label class="view-source-button" for="intro_func_param_names-view-source"><span>View Source</span></label>
 
@@ -2062,7 +2062,7 @@ cengal<wbr>.introspection<wbr>.inspect<wbr>.versions<wbr>.v_0<wbr>.inspect    </
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">func_params_with_values</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">func</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">Awaitable</span><span class="p">]</span>,</span><span class="param">	<span class="n">args</span>,</span><span class="param">	<span class="n">kwargs</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="n">cengal</span><span class="o">.</span><span class="n">code_flow_control</span><span class="o">.</span><span class="n">python_bytecode_manipulator</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">v_0</span><span class="o">.</span><span class="n">python_bytecode_manipulator</span><span class="o">.</span><span class="n">CodeParamNames</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]</span>:</span></span>
+        <span class="name">func_params_with_values</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">func</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Awaitable</span><span class="p">]</span>,</span><span class="param">	<span class="n">args</span>,</span><span class="param">	<span class="n">kwargs</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="n">cengal</span><span class="o">.</span><span class="n">code_flow_control</span><span class="o">.</span><span class="n">python_bytecode_manipulator</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">v_0</span><span class="o">.</span><span class="n">python_bytecode_manipulator</span><span class="o">.</span><span class="n">CodeParamNames</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="func_params_with_values-view-source"><span>View Source</span></label>
 
@@ -2104,7 +2104,7 @@ cengal<wbr>.introspection<wbr>.inspect<wbr>.versions<wbr>.v_0<wbr>.inspect    </
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">intro_func_params_with_values</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">cengal</span><span class="o">.</span><span class="n">code_flow_control</span><span class="o">.</span><span class="n">python_bytecode_manipulator</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">v_0</span><span class="o">.</span><span class="n">python_bytecode_manipulator</span><span class="o">.</span><span class="n">CodeParamNames</span>:</span></span>
+        <span class="name">intro_func_params_with_values</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">cengal</span><span class="o">.</span><span class="n">code_flow_control</span><span class="o">.</span><span class="n">python_bytecode_manipulator</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">v_0</span><span class="o">.</span><span class="n">python_bytecode_manipulator</span><span class="o">.</span><span class="n">CodeParamNames</span>:</span></span>
 
                 <label class="view-source-button" for="intro_func_params_with_values-view-source"><span>View Source</span></label>
 
@@ -2145,7 +2145,7 @@ cengal<wbr>.introspection<wbr>.inspect<wbr>.versions<wbr>.v_0<wbr>.inspect    </
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">intro_func_all_params_with_values</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>:</span></span>
+        <span class="name">intro_func_all_params_with_values</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>:</span></span>
 
                 <label class="view-source-button" for="intro_func_all_params_with_values-view-source"><span>View Source</span></label>
 
@@ -2183,7 +2183,7 @@ cengal<wbr>.introspection<wbr>.inspect<wbr>.versions<wbr>.v_0<wbr>.inspect    </
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">intro_func_all_params_with_values_as_ordered_dict</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">OrderedDict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>:</span></span>
+        <span class="name">intro_func_all_params_with_values_as_ordered_dict</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">OrderedDict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="intro_func_all_params_with_values_as_ordered_dict-view-source"><span>View Source</span></label>
 
@@ -2567,7 +2567,7 @@ print(entity_properties(my_func))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">class_properties</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">entity</span><span class="p">:</span> <span class="n">Type</span></span><span class="return-annotation">) -> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>:</span></span>
+        <span class="name">class_properties</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">entity</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span></span><span class="return-annotation">) -> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="class_properties-view-source"><span>View Source</span></label>
 
@@ -2636,7 +2636,7 @@ print(entity_properties(my_func))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">class_properties_including_overrided</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">entity</span><span class="p">:</span> <span class="n">Type</span></span><span class="return-annotation">) -> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>:</span></span>
+        <span class="name">class_properties_including_overrided</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">entity</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span></span><span class="return-annotation">) -> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="class_properties_including_overrided-view-source"><span>View Source</span></label>
 
@@ -2744,7 +2744,7 @@ print(entity_properties(my_func))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">intro_func_repr_limited</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
+        <span class="name">intro_func_repr_limited</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="intro_func_repr_limited-view-source"><span>View Source</span></label>
 
@@ -2763,7 +2763,7 @@ print(entity_properties(my_func))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">print_intro_func_repr_limited</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
+        <span class="name">print_intro_func_repr_limited</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="print_intro_func_repr_limited-view-source"><span>View Source</span></label>
 
@@ -2782,7 +2782,7 @@ print(entity_properties(my_func))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">pifrl</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
+        <span class="name">pifrl</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="pifrl-view-source"><span>View Source</span></label>
 
@@ -2801,7 +2801,7 @@ print(entity_properties(my_func))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">intro_func_repr</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
+        <span class="name">intro_func_repr</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="intro_func_repr-view-source"><span>View Source</span></label>
 
@@ -2820,7 +2820,7 @@ print(entity_properties(my_func))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">print_intro_func_repr</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
+        <span class="name">print_intro_func_repr</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="print_intro_func_repr-view-source"><span>View Source</span></label>
 
@@ -2839,7 +2839,7 @@ print(entity_properties(my_func))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">pifr</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
+        <span class="name">pifr</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="pifr-view-source"><span>View Source</span></label>
 
@@ -2928,7 +2928,7 @@ print(entity_properties(my_func))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_multistr_of_data_info</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">data</span>, </span><span class="param"><span class="n">shift_num</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">shift_char</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span></span><span class="return-annotation">):</span></span>
+        <span class="name">get_multistr_of_data_info</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data</span>,</span><span class="param">	<span class="n">shift_num</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">shift_char</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="get_multistr_of_data_info-view-source"><span>View Source</span></label>
 
@@ -2969,7 +2969,7 @@ print(entity_properties(my_func))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">gmsodi</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">data</span>, </span><span class="param"><span class="n">shift_num</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">shift_char</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span></span><span class="return-annotation">):</span></span>
+        <span class="name">gmsodi</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data</span>,</span><span class="param">	<span class="n">shift_num</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">shift_char</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="gmsodi-view-source"><span>View Source</span></label>
 
@@ -3010,7 +3010,7 @@ print(entity_properties(my_func))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_multistr_of_data_value</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">data</span>, </span><span class="param"><span class="n">shift_num</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">shift_char</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span></span><span class="return-annotation">):</span></span>
+        <span class="name">get_multistr_of_data_value</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data</span>,</span><span class="param">	<span class="n">shift_num</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">shift_char</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="get_multistr_of_data_value-view-source"><span>View Source</span></label>
 
@@ -3051,7 +3051,7 @@ print(entity_properties(my_func))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">gmsodv</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">data</span>, </span><span class="param"><span class="n">shift_num</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">shift_char</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span></span><span class="return-annotation">):</span></span>
+        <span class="name">gmsodv</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data</span>,</span><span class="param">	<span class="n">shift_num</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">shift_char</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="gmsodv-view-source"><span>View Source</span></label>
 
@@ -3226,7 +3226,7 @@ print(entity_properties(my_func))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_str_of_data_info_by_name</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">name</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
+        <span class="name">get_str_of_data_info_by_name</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">name</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="get_str_of_data_info_by_name-view-source"><span>View Source</span></label>
 
@@ -3247,7 +3247,7 @@ print(entity_properties(my_func))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">gsodibn</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">name</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
+        <span class="name">gsodibn</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">name</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="gsodibn-view-source"><span>View Source</span></label>
 
@@ -3268,7 +3268,7 @@ print(entity_properties(my_func))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">print_data_info_by_name</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">name</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
+        <span class="name">print_data_info_by_name</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">name</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="print_data_info_by_name-view-source"><span>View Source</span></label>
 
@@ -3287,7 +3287,7 @@ print(entity_properties(my_func))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">pdibn</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">name</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
+        <span class="name">pdibn</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">name</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="pdibn-view-source"><span>View Source</span></label>
 
@@ -3548,7 +3548,7 @@ print(entity_properties(my_func))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">current_entity_name</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
+        <span class="name">current_entity_name</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="current_entity_name-view-source"><span>View Source</span></label>
 
@@ -3574,7 +3574,7 @@ print(entity_properties(my_func))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">cen</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
+        <span class="name">cen</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="cen-view-source"><span>View Source</span></label>
 
@@ -3600,7 +3600,7 @@ print(entity_properties(my_func))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">current_entity_owner_name</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
+        <span class="name">current_entity_owner_name</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="current_entity_owner_name-view-source"><span>View Source</span></label>
 
@@ -4241,7 +4241,7 @@ print(entity_properties(my_func))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">find_entity</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">entity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">code</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
+        <span class="name">find_entity</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">entity</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">code</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
 
                 <label class="view-source-button" for="find_entity-view-source"><span>View Source</span></label>
 
@@ -4301,7 +4301,7 @@ print(entity_properties(my_func))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">find_current_entity</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
+        <span class="name">find_current_entity</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
 
                 <label class="view-source-button" for="find_current_entity-view-source"><span>View Source</span></label>
 

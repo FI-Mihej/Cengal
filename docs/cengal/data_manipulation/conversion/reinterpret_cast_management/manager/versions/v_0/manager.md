@@ -44,7 +44,7 @@ cengal<wbr>.data_manipulation<wbr>.conversion<wbr>.reinterpret_cast_management<w
 </span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.3&quot;</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.4&quot;</span>
 </span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -471,7 +471,7 @@ cengal<wbr>.data_manipulation<wbr>.conversion<wbr>.reinterpret_cast_management<w
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">wrapping_required</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">Any</span>,</span><span class="param">	<span class="n">base_type</span><span class="p">:</span> <span class="n">Type</span>,</span><span class="param">	<span class="n">fields</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>,</span><span class="param">	<span class="n">planned_type_name</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
+        <span class="name">wrapping_required</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>,</span><span class="param">	<span class="n">base_type</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span>,</span><span class="param">	<span class="n">fields</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>,</span><span class="param">	<span class="n">planned_type_name</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
                 <label class="view-source-button" for="BaseAutoDerivedObjWrapper.wrapping_required-view-source"><span>View Source</span></label>
 
@@ -490,7 +490,7 @@ cengal<wbr>.data_manipulation<wbr>.conversion<wbr>.reinterpret_cast_management<w
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">methods</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">Any</span>,</span><span class="param">	<span class="n">base_type</span><span class="p">:</span> <span class="n">Type</span>,</span><span class="param">	<span class="n">fields</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span>:</span></span>
+        <span class="name">methods</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>,</span><span class="param">	<span class="n">base_type</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span>,</span><span class="param">	<span class="n">fields</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="BaseAutoDerivedObjWrapper.methods-view-source"><span>View Source</span></label>
 
@@ -509,7 +509,7 @@ cengal<wbr>.data_manipulation<wbr>.conversion<wbr>.reinterpret_cast_management<w
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">base_classes</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span>, </span><span class="param"><span class="n">base_type</span><span class="p">:</span> <span class="n">Type</span>, </span><span class="param"><span class="n">fields</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">]</span>:</span></span>
+        <span class="name">base_classes</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>,</span><span class="param">	<span class="n">base_type</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span>,</span><span class="param">	<span class="n">fields</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="BaseAutoDerivedObjWrapper.base_classes-view-source"><span>View Source</span></label>
 
@@ -528,7 +528,7 @@ cengal<wbr>.data_manipulation<wbr>.conversion<wbr>.reinterpret_cast_management<w
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">gen_fields_tuple</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">):</span></span>
+        <span class="name">gen_fields_tuple</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="BaseAutoDerivedObjWrapper.gen_fields_tuple-view-source"><span>View Source</span></label>
 
@@ -552,7 +552,7 @@ cengal<wbr>.data_manipulation<wbr>.conversion<wbr>.reinterpret_cast_management<w
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">type</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">):</span></span>
+        <span class="name">type</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="BaseAutoDerivedObjWrapper.type-view-source"><span>View Source</span></label>
 
@@ -583,7 +583,7 @@ cengal<wbr>.data_manipulation<wbr>.conversion<wbr>.reinterpret_cast_management<w
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">temporary</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">):</span></span>
+        <span class="name">temporary</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="BaseAutoDerivedObjWrapper.temporary-view-source"><span>View Source</span></label>
 
@@ -602,7 +602,7 @@ cengal<wbr>.data_manipulation<wbr>.conversion<wbr>.reinterpret_cast_management<w
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">persistent</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">):</span></span>
+        <span class="name">persistent</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="BaseAutoDerivedObjWrapper.persistent-view-source"><span>View Source</span></label>
 
@@ -768,7 +768,7 @@ cengal<wbr>.data_manipulation<wbr>.conversion<wbr>.reinterpret_cast_management<w
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">edit_derived_type</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">Any</span>,</span><span class="param">	<span class="n">attributes_and_methods</span>,</span><span class="param">	<span class="n">field_names</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>:</span></span>
+        <span class="name">edit_derived_type</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>,</span><span class="param">	<span class="n">attributes_and_methods</span>,</span><span class="param">	<span class="n">field_names</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="ClassWrappingFactory.edit_derived_type-view-source"><span>View Source</span></label>
 
@@ -809,7 +809,7 @@ cengal<wbr>.data_manipulation<wbr>.conversion<wbr>.reinterpret_cast_management<w
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">gen_kwargs</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">Any</span>,</span><span class="param">	<span class="n">attributes_and_methods</span>,</span><span class="param">	<span class="n">field_names</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
+        <span class="name">gen_kwargs</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>,</span><span class="param">	<span class="n">attributes_and_methods</span>,</span><span class="param">	<span class="n">field_names</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="ClassWrappingFactory.gen_kwargs-view-source"><span>View Source</span></label>
 
@@ -850,7 +850,7 @@ cengal<wbr>.data_manipulation<wbr>.conversion<wbr>.reinterpret_cast_management<w
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">gen_fields_tuple</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">):</span></span>
+        <span class="name">gen_fields_tuple</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="ClassWrappingFactory.gen_fields_tuple-view-source"><span>View Source</span></label>
 
@@ -908,7 +908,7 @@ cengal<wbr>.data_manipulation<wbr>.conversion<wbr>.reinterpret_cast_management<w
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">edit_derived_type</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">Any</span>,</span><span class="param">	<span class="n">attributes_and_methods</span>,</span><span class="param">	<span class="n">field_names</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>,</span><span class="param">	<span class="n">data_size</span><span class="p">:</span> <span class="nb">int</span></span><span class="return-annotation">) -> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>:</span></span>
+        <span class="name">edit_derived_type</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>,</span><span class="param">	<span class="n">attributes_and_methods</span>,</span><span class="param">	<span class="n">field_names</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>,</span><span class="param">	<span class="n">data_size</span><span class="p">:</span> <span class="nb">int</span></span><span class="return-annotation">) -> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="ClassWrappingFactoryWithObjDataSizeLog.edit_derived_type-view-source"><span>View Source</span></label>
 

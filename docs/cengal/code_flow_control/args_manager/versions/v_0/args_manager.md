@@ -49,7 +49,7 @@ cengal<wbr>.code_flow_control<wbr>.args_manager<wbr>.versions<wbr>.v_0<wbr>.args
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.3&quot;</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.4&quot;</span>
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -616,7 +616,7 @@ cengal<wbr>.code_flow_control<wbr>.args_manager<wbr>.versions<wbr>.v_0<wbr>.args
                                         <input id="EntityArgsHolder.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">EntityArgsHolder</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">entity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span>, </span><span class="param"><span class="o">*</span><span class="n">args</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span>)</span>
+        <span class="name">EntityArgsHolder</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">entity</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">]</span>, </span><span class="param"><span class="o">*</span><span class="n">args</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span>)</span>
 
                 <label class="view-source-button" for="EntityArgsHolder.__init__-view-source"><span>View Source</span></label>
 
@@ -741,7 +741,7 @@ cengal<wbr>.code_flow_control<wbr>.args_manager<wbr>.versions<wbr>.v_0<wbr>.args
                                         <input id="EntityArgsHolderExplicit.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">EntityArgsHolderExplicit</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">entity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span>, </span><span class="param"><span class="n">args</span>, </span><span class="param"><span class="n">kwargs</span></span>)</span>
+        <span class="name">EntityArgsHolderExplicit</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">entity</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">]</span>, </span><span class="param"><span class="n">args</span>, </span><span class="param"><span class="n">kwargs</span></span>)</span>
 
                 <label class="view-source-button" for="EntityArgsHolderExplicit.__init__-view-source"><span>View Source</span></label>
 
@@ -1412,7 +1412,7 @@ page.append(am(html, Item.Button))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">add_interceptor</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">interceptor</span><span class="p">:</span> <span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n"><a href="#ArgsManager">ArgsManager</a></span>:</span></span>
+        <span class="name">add_interceptor</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">interceptor</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n"><a href="#ArgsManager">ArgsManager</a></span>:</span></span>
 
                 <label class="view-source-button" for="ArgsManager.add_interceptor-view-source"><span>View Source</span></label>
 
@@ -1432,7 +1432,7 @@ page.append(am(html, Item.Button))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">add_interceptor_one_shot</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">interceptor</span><span class="p">:</span> <span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n"><a href="#ArgsManager">ArgsManager</a></span>:</span></span>
+        <span class="name">add_interceptor_one_shot</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">interceptor</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n"><a href="#ArgsManager">ArgsManager</a></span>:</span></span>
 
                 <label class="view-source-button" for="ArgsManager.add_interceptor_one_shot-view-source"><span>View Source</span></label>
 
@@ -1452,7 +1452,7 @@ page.append(am(html, Item.Button))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">callable</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">entity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
+        <span class="name">callable</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">entity</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
 
                 <label class="view-source-button" for="ArgsManager.callable-view-source"><span>View Source</span></label>
 
@@ -1494,7 +1494,7 @@ page.append(am(html, Item.Button))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">merge_func_args</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">func_list</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Tuple</span>:</span></span>
+        <span class="name">merge_func_args</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">func_list</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Tuple</span>:</span></span>
 
                 <label class="view-source-button" for="merge_func_args-view-source"><span>View Source</span></label>
 
@@ -1749,7 +1749,7 @@ page.append(am(html, Item.Button))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">prepare_arguments_positions</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">positional</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>,</span><span class="param">	<span class="n">keyword_only</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]]</span>:</span></span>
+        <span class="name">prepare_arguments_positions</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">positional</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>,</span><span class="param">	<span class="n">keyword_only</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]]</span>:</span></span>
 
                 <label class="view-source-button" for="prepare_arguments_positions-view-source"><span>View Source</span></label>
 
@@ -1810,7 +1810,7 @@ page.append(am(html, Item.Button))
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">find_arg_position_and_value</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">arg_name</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">positions</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]]</span>,</span><span class="param">	<span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span>,</span><span class="param">	<span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span>:</span></span>
+        <span class="name">find_arg_position_and_value</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">arg_name</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">positions</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]]</span>,</span><span class="param">	<span class="n">args</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span>,</span><span class="param">	<span class="n">kwargs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="find_arg_position_and_value-view-source"><span>View Source</span></label>
 
@@ -1944,7 +1944,7 @@ except UnknownArgumentError as ex:
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">try_find_arg_position_and_value</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">arg_name</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">positions</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]]</span>,</span><span class="param">	<span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span>,</span><span class="param">	<span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span>:</span></span>
+        <span class="name">try_find_arg_position_and_value</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">arg_name</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">positions</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]]</span>,</span><span class="param">	<span class="n">args</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span>,</span><span class="param">	<span class="n">kwargs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="try_find_arg_position_and_value-view-source"><span>View Source</span></label>
 

@@ -141,7 +141,7 @@ cengal<wbr>.parallel_execution<wbr>.coroutines<wbr>.coro_tools<wbr>.wait_tasks<w
 </span><span id="L-126"><a href="#L-126"><span class="linenos"> 126</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-127"><a href="#L-127"><span class="linenos"> 127</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-128"><a href="#L-128"><span class="linenos"> 128</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-129"><a href="#L-129"><span class="linenos"> 129</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.3&quot;</span>
+</span><span id="L-129"><a href="#L-129"><span class="linenos"> 129</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.4&quot;</span>
 </span><span id="L-130"><a href="#L-130"><span class="linenos"> 130</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-131"><a href="#L-131"><span class="linenos"> 131</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-132"><a href="#L-132"><span class="linenos"> 132</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>

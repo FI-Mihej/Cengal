@@ -44,7 +44,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 </span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.3&quot;</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.4&quot;</span>
 </span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -214,7 +214,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">tree_to_list</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">tree</span><span class="p">:</span> <span class="n">Dict</span></span><span class="return-annotation">) -> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span>:</span></span>
+        <span class="name">tree_to_list</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">tree</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span></span><span class="return-annotation">) -> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="tree_to_list-view-source"><span>View Source</span></label>
 
@@ -255,7 +255,7 @@ Is an implementation of the <a href="#Tree.get_all_children">Tree.get_all_childr
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">travers_tree</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">tree</span><span class="p">:</span> <span class="n">Dict</span>, </span><span class="param"><span class="n">functor</span><span class="p">:</span> <span class="n">Callable</span></span><span class="return-annotation">):</span></span>
+        <span class="name">travers_tree</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">tree</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span>, </span><span class="param"><span class="n">functor</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="travers_tree-view-source"><span>View Source</span></label>
 
@@ -357,7 +357,7 @@ Is an implementation of the <a href="#Tree.get_all_children">Tree.get_all_childr
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">put</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">path</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span></span><span class="return-annotation">):</span></span>
+        <span class="name">put</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">path</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span><span class="p">]</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="Tree.put-view-source"><span>View Source</span></label>
 
@@ -380,7 +380,7 @@ Is an implementation of the <a href="#Tree.get_all_children">Tree.get_all_childr
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_subtree</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">path</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">Dict</span>:</span></span>
+        <span class="name">get_subtree</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">path</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">Dict</span>:</span></span>
 
                 <label class="view-source-button" for="Tree.get_subtree-view-source"><span>View Source</span></label>
 
@@ -408,7 +408,7 @@ Is an implementation of the <a href="#Tree.get_all_children">Tree.get_all_childr
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_immediate_children</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">path</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span>:</span></span>
+        <span class="name">get_immediate_children</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">path</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="Tree.get_immediate_children-view-source"><span>View Source</span></label>
 
@@ -436,7 +436,7 @@ Is an implementation of the <a href="#Tree.get_all_children">Tree.get_all_childr
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_all_children</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">path</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span>:</span></span>
+        <span class="name">get_all_children</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">path</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="Tree.get_all_children-view-source"><span>View Source</span></label>
 
@@ -466,7 +466,7 @@ The same as tree_to_list() function but for current object and for the given pat
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">travers_subtree</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">functor</span><span class="p">:</span> <span class="n">Callable</span>, </span><span class="param"><span class="n">path</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">):</span></span>
+        <span class="name">travers_subtree</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">functor</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span>,</span><span class="param">	<span class="n">path</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="Tree.travers_subtree-view-source"><span>View Source</span></label>
 
@@ -494,7 +494,7 @@ The same as tree_to_list() function but for current object and for the given pat
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">travers_tree_with_path</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">functor</span><span class="p">:</span> <span class="n">Callable</span>, </span><span class="param"><span class="n">path</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">):</span></span>
+        <span class="name">travers_tree_with_path</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">functor</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span>,</span><span class="param">	<span class="n">path</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="Tree.travers_tree_with_path-view-source"><span>View Source</span></label>
 

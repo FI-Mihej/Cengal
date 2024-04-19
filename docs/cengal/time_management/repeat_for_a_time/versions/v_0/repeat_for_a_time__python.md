@@ -58,7 +58,7 @@ cengal<wbr>.time_management<wbr>.repeat_for_a_time<wbr>.versions<wbr>.v_0<wbr>.r
 </span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.3&quot;</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.4&quot;</span>
 </span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -456,7 +456,7 @@ cengal<wbr>.time_management<wbr>.repeat_for_a_time<wbr>.versions<wbr>.v_0<wbr>.r
                                         <input id="TimeLimitIsTooSmall.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">TimeLimitIsTooSmall</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">min_time</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span>, </span><span class="param"><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">object</span></span>)</span>
+        <span class="name">TimeLimitIsTooSmall</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">min_time</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span>, </span><span class="param"><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">object</span></span>)</span>
 
                 <label class="view-source-button" for="TimeLimitIsTooSmall.__init__-view-source"><span>View Source</span></label>
 

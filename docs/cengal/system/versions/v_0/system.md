@@ -34,7 +34,7 @@ cengal<wbr>.system<wbr>.versions<wbr>.v_0<wbr>.system    </h1>
 </span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>            <span class="s1">&#39;PLATFORM_NAME&#39;</span><span class="p">,</span> <span class="s1">&#39;PYTHON_IMPLEMENTATION&#39;</span><span class="p">,</span> <span class="s1">&#39;PYTHON_VERSION&#39;</span><span class="p">,</span> <span class="s1">&#39;PYTHON_VERSION_STR&#39;</span><span class="p">,</span> 
 </span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a>            <span class="s1">&#39;PYTHON_VERSION_INT&#39;</span><span class="p">,</span> <span class="s1">&#39;IS_RUNNING_IN_PYCHARM&#39;</span><span class="p">,</span> <span class="s1">&#39;RAW_OS_PLATFORM&#39;</span><span class="p">,</span> <span class="s1">&#39;OS_API_TYPE&#39;</span><span class="p">,</span> 
-</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>            <span class="s1">&#39;OS_TYPE&#39;</span><span class="p">,</span> <span class="s1">&#39;IS_RUNNING_IN_EMSCRIPTEN&#39;</span><span class="p">,</span> <span class="s1">&#39;IS_RUNNING_IN_PYODIDE&#39;</span><span class="p">,</span> <span class="s1">&#39;IS_BUILDING_FOR_PYODIDE&#39;</span><span class="p">,</span> 
+</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>            <span class="s1">&#39;OS_TYPE&#39;</span><span class="p">,</span> <span class="s1">&#39;KIVY_PLATFORM&#39;</span><span class="p">,</span> <span class="s1">&#39;KIVY_TARGET_PLATFORM&#39;</span><span class="p">,</span> <span class="s1">&#39;IS_RUNNING_IN_EMSCRIPTEN&#39;</span><span class="p">,</span> <span class="s1">&#39;IS_RUNNING_IN_PYODIDE&#39;</span><span class="p">,</span> <span class="s1">&#39;IS_BUILDING_FOR_PYODIDE&#39;</span><span class="p">,</span> 
 </span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>            <span class="s1">&#39;CENGAL_IS_IN_BUILD_MODE&#39;</span><span class="p">,</span> <span class="s1">&#39;TEMPLATE_MODULE_NAME&#39;</span><span class="p">,</span> <span class="s1">&#39;cengal_module_rel_path&#39;</span><span class="p">,</span> 
 </span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>            <span class="s1">&#39;cengal_module_import_str&#39;</span><span class="p">,</span> <span class="s1">&#39;current_cengal_module_rel_path&#39;</span><span class="p">,</span> <span class="s1">&#39;current_cengal_module_import_str&#39;</span><span class="p">,</span>
 </span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a>            <span class="s1">&#39;CENGAL_UNITTESTS_DISCOVER_IS_RUNNING&#39;</span><span class="p">,</span> <span class="s1">&#39;IS_INSIDE_OR_FOR_WEB_BROWSER&#39;</span><span class="p">,</span> <span class="s1">&#39;IS_RUNNING_IN_WASI&#39;</span><span class="p">,</span> 
@@ -59,7 +59,7 @@ cengal<wbr>.system<wbr>.versions<wbr>.v_0<wbr>.system    </h1>
 </span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.3&quot;</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.4&quot;</span>
 </span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -82,50 +82,57 @@ cengal<wbr>.system<wbr>.versions<wbr>.v_0<wbr>.system    </h1>
 </span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="n">RAW_OS_PLATFORM</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span>  <span class="c1"># &#39;emscripten&#39;, &#39;wasi&#39;, &#39;darwin&#39;, &#39;win32&#39;, &#39;cygwin&#39;, &#39;linux&#39;, &#39;linux2&#39;, &#39;linux3&#39;, &#39;darwin&#39;, &#39;freebsd8&#39;, &#39;aix&#39;, aix5&#39;, &#39;aix7&#39;, ...</span>
 </span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="n">OS_API_TYPE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span>  <span class="c1"># The following names have currently been registered: &#39;posix&#39;, &#39;nt&#39;, &#39;java&#39;. Android and iOS will return &#39;posix&#39;.</span>
 </span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="n">OS_TYPE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span>  <span class="c1"># &#39;Linux&#39;, &#39;Windows&#39;, &#39;Darwin&#39;, &#39;Java&#39;</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="n">IS_RUNNING_IN_EMSCRIPTEN</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="s1">&#39;emscripten&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="n">IS_RUNNING_IN_WASI</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="s1">&#39;wasi&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="n">IS_RUNNING_IN_PYODIDE</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="s2">&quot;pyodide&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="n">IS_BUILDING_FOR_PYODIDE</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="s2">&quot;PYODIDE&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span>  <span class="c1"># for setup.py execution time</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="n">IS_INSIDE_OR_FOR_WEB_BROWSER</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">IS_RUNNING_IN_EMSCRIPTEN</span> <span class="ow">or</span> <span class="n">IS_RUNNING_IN_WASI</span> <span class="ow">or</span> <span class="n">IS_BUILDING_FOR_PYODIDE</span> <span class="ow">or</span> <span class="n">IS_RUNNING_IN_PYODIDE</span>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="n">CENGAL_IS_IN_BUILD_MODE</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;CENGAL_IS_IN_BUILD_MODE&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;true&#39;</span> <span class="o">==</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;CENGAL_IS_IN_BUILD_MODE&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">casefold</span><span class="p">())</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="n">TEMPLATE_MODULE_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;_template_module&#39;</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="n">CENGAL_UNITTESTS_DISCOVER_IS_RUNNING</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;CENGAL_UNITTESTS_DISCOVER_IS_RUNNING&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;true&#39;</span> <span class="o">==</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;CENGAL_UNITTESTS_DISCOVER_IS_RUNNING&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">casefold</span><span class="p">())</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="n">CENGAL_VERSION_STR</span> <span class="o">=</span> <span class="n">__version__</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="n">CENGAL_VERSION</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">part</span><span class="p">)</span> <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">CENGAL_VERSION_STR</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)])</span>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="n">CENGAL_VERSION_MAJOR</span> <span class="o">=</span> <span class="n">CENGAL_VERSION</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="n">CENGAL_VERSION_MINOR</span> <span class="o">=</span> <span class="n">CENGAL_VERSION</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a><span class="n">CENGAL_VERSION_MICRO</span> <span class="o">=</span> <span class="n">CENGAL_VERSION</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="n">CENGAL_VERSION_MAJOR_STR</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">CENGAL_VERSION_MAJOR</span><span class="p">)</span>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="n">CENGAL_VERSION_MINOR_STR</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">CENGAL_VERSION_MINOR</span><span class="p">)</span>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="n">CENGAL_VERSION_MICRO_STR</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">CENGAL_VERSION_MICRO</span><span class="p">)</span>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="k">def</span> <span class="nf">cengal_module_rel_path</span><span class="p">(</span><span class="n">cengal_module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>    <span class="kn">from</span> <span class="nn">cengal.modules_management.module_rel_path</span> <span class="kn">import</span> <span class="n">module_rel_path</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>    <span class="kn">import</span> <span class="nn">cengal</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>    <span class="k">return</span> <span class="n">module_rel_path</span><span class="p">(</span><span class="n">cengal</span><span class="p">,</span> <span class="n">cengal_module</span><span class="p">)</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="k">def</span> <span class="nf">cengal_module_import_str</span><span class="p">(</span><span class="n">cengal_module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>    <span class="kn">from</span> <span class="nn">cengal.modules_management.module_rel_path</span> <span class="kn">import</span> <span class="n">module_import_str</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>    <span class="kn">import</span> <span class="nn">cengal</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>    <span class="k">return</span> <span class="n">module_import_str</span><span class="p">(</span><span class="n">cengal</span><span class="p">,</span> <span class="n">cengal_module</span><span class="p">)</span>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="k">try</span><span class="p">:</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>    <span class="kn">from</span> <span class="nn">kivy.utils</span> <span class="kn">import</span> <span class="n">platform</span> <span class="k">as</span> <span class="n">kivy_platform</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>    <span class="n">KIVY_PLATFORM</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">kivy_platform</span>  <span class="c1"># &#39;win&#39;, &#39;linux&#39;, &#39;android&#39;, &#39;macosx&#39;, &#39;ios&#39;, &#39;unknown&#39;</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>    <span class="n">KIVY_PLATFORM</span> <span class="o">=</span> <span class="s1">&#39;unknown&#39;</span>  <span class="c1"># &#39;win&#39;, &#39;linux&#39;, &#39;android&#39;, &#39;macosx&#39;, &#39;ios&#39;, &#39;unknown&#39;</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="n">KIVY_TARGET_PLATFORM</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;KIVY_TARGET_PLATFORM&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;unknown&#39;</span><span class="p">)</span>  <span class="c1"># It is required for the developer to manually set the &#39;KIVY_TARGET_PLATFORM&#39; environment variable prior to the build process to ensure accurate platform detection.</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="n">IS_RUNNING_IN_EMSCRIPTEN</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="s1">&#39;emscripten&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="n">IS_RUNNING_IN_WASI</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="s1">&#39;wasi&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="n">IS_RUNNING_IN_PYODIDE</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="s2">&quot;pyodide&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="n">IS_BUILDING_FOR_PYODIDE</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="s2">&quot;PYODIDE&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span>  <span class="c1"># for setup.py execution time</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="n">IS_INSIDE_OR_FOR_WEB_BROWSER</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">IS_RUNNING_IN_EMSCRIPTEN</span> <span class="ow">or</span> <span class="n">IS_RUNNING_IN_WASI</span> <span class="ow">or</span> <span class="n">IS_BUILDING_FOR_PYODIDE</span> <span class="ow">or</span> <span class="n">IS_RUNNING_IN_PYODIDE</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="n">CENGAL_IS_IN_BUILD_MODE</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;CENGAL_IS_IN_BUILD_MODE&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;true&#39;</span> <span class="o">==</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;CENGAL_IS_IN_BUILD_MODE&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">casefold</span><span class="p">())</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="n">TEMPLATE_MODULE_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;_template_module&#39;</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="n">CENGAL_UNITTESTS_DISCOVER_IS_RUNNING</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;CENGAL_UNITTESTS_DISCOVER_IS_RUNNING&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;true&#39;</span> <span class="o">==</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;CENGAL_UNITTESTS_DISCOVER_IS_RUNNING&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">casefold</span><span class="p">())</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="n">CENGAL_VERSION_STR</span> <span class="o">=</span> <span class="n">__version__</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="n">CENGAL_VERSION</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">part</span><span class="p">)</span> <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">CENGAL_VERSION_STR</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)])</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="n">CENGAL_VERSION_MAJOR</span> <span class="o">=</span> <span class="n">CENGAL_VERSION</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="n">CENGAL_VERSION_MINOR</span> <span class="o">=</span> <span class="n">CENGAL_VERSION</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="n">CENGAL_VERSION_MICRO</span> <span class="o">=</span> <span class="n">CENGAL_VERSION</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="n">CENGAL_VERSION_MAJOR_STR</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">CENGAL_VERSION_MAJOR</span><span class="p">)</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="n">CENGAL_VERSION_MINOR_STR</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">CENGAL_VERSION_MINOR</span><span class="p">)</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="n">CENGAL_VERSION_MICRO_STR</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">CENGAL_VERSION_MICRO</span><span class="p">)</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="k">def</span> <span class="nf">cengal_module_rel_path</span><span class="p">(</span><span class="n">cengal_module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>    <span class="kn">from</span> <span class="nn">cengal.modules_management.module_rel_path</span> <span class="kn">import</span> <span class="n">module_rel_path</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>    <span class="kn">import</span> <span class="nn">cengal</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>    <span class="k">return</span> <span class="n">module_rel_path</span><span class="p">(</span><span class="n">cengal</span><span class="p">,</span> <span class="n">cengal_module</span><span class="p">)</span>
 </span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="k">def</span> <span class="nf">current_cengal_module_rel_path</span><span class="p">(</span><span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>    <span class="kn">from</span> <span class="nn">cengal.modules_management.module_rel_path</span> <span class="kn">import</span> <span class="n">current_module_rel_path</span>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>    <span class="kn">import</span> <span class="nn">cengal</span>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>    <span class="k">return</span> <span class="n">current_module_rel_path</span><span class="p">(</span><span class="n">cengal</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a><span class="k">def</span> <span class="nf">cengal_module_import_str</span><span class="p">(</span><span class="n">cengal_module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>    <span class="kn">from</span> <span class="nn">cengal.modules_management.module_rel_path</span> <span class="kn">import</span> <span class="n">module_import_str</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>    <span class="kn">import</span> <span class="nn">cengal</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>    <span class="k">return</span> <span class="n">module_import_str</span><span class="p">(</span><span class="n">cengal</span><span class="p">,</span> <span class="n">cengal_module</span><span class="p">)</span>
 </span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a><span class="k">def</span> <span class="nf">current_cengal_module_import_str</span><span class="p">(</span><span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>    <span class="kn">from</span> <span class="nn">cengal.modules_management.module_rel_path</span> <span class="kn">import</span> <span class="n">current_module_import_str</span>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>    <span class="kn">import</span> <span class="nn">cengal</span>
-</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>    <span class="k">return</span> <span class="n">current_module_import_str</span><span class="p">(</span><span class="n">cengal</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a><span class="k">def</span> <span class="nf">current_cengal_module_rel_path</span><span class="p">(</span><span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>    <span class="kn">from</span> <span class="nn">cengal.modules_management.module_rel_path</span> <span class="kn">import</span> <span class="n">current_module_rel_path</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>    <span class="kn">import</span> <span class="nn">cengal</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>    <span class="k">return</span> <span class="n">current_module_rel_path</span><span class="p">(</span><span class="n">cengal</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="k">def</span> <span class="nf">current_cengal_module_import_str</span><span class="p">(</span><span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>    <span class="kn">from</span> <span class="nn">cengal.modules_management.module_rel_path</span> <span class="kn">import</span> <span class="n">current_module_import_str</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>    <span class="kn">import</span> <span class="nn">cengal</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>    <span class="k">return</span> <span class="n">current_module_import_str</span><span class="p">(</span><span class="n">cengal</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -238,6 +245,30 @@ cengal<wbr>.system<wbr>.versions<wbr>.v_0<wbr>.system    </h1>
     
 
                 </section>
+                <section id="KIVY_PLATFORM">
+                    <div class="attr variable">
+            <span class="name">KIVY_PLATFORM</span>        =
+<span class="default_value">&#39;unknown&#39;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#KIVY_PLATFORM"></a>
+    
+    
+
+                </section>
+                <section id="KIVY_TARGET_PLATFORM">
+                    <div class="attr variable">
+            <span class="name">KIVY_TARGET_PLATFORM</span><span class="annotation">: str</span>        =
+<span class="default_value">&#39;unknown&#39;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#KIVY_TARGET_PLATFORM"></a>
+    
+    
+
+                </section>
                 <section id="IS_RUNNING_IN_EMSCRIPTEN">
                     <div class="attr variable">
             <span class="name">IS_RUNNING_IN_EMSCRIPTEN</span><span class="annotation">: bool</span>        =
@@ -309,10 +340,10 @@ cengal<wbr>.system<wbr>.versions<wbr>.v_0<wbr>.system    </h1>
 
     </div>
     <a class="headerlink" href="#cengal_module_rel_path"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="cengal_module_rel_path-93"><a href="#cengal_module_rel_path-93"><span class="linenos">93</span></a><span class="k">def</span> <span class="nf">cengal_module_rel_path</span><span class="p">(</span><span class="n">cengal_module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="cengal_module_rel_path-94"><a href="#cengal_module_rel_path-94"><span class="linenos">94</span></a>    <span class="kn">from</span> <span class="nn">cengal.modules_management.module_rel_path</span> <span class="kn">import</span> <span class="n">module_rel_path</span>
-</span><span id="cengal_module_rel_path-95"><a href="#cengal_module_rel_path-95"><span class="linenos">95</span></a>    <span class="kn">import</span> <span class="nn">cengal</span>
-</span><span id="cengal_module_rel_path-96"><a href="#cengal_module_rel_path-96"><span class="linenos">96</span></a>    <span class="k">return</span> <span class="n">module_rel_path</span><span class="p">(</span><span class="n">cengal</span><span class="p">,</span> <span class="n">cengal_module</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="cengal_module_rel_path-100"><a href="#cengal_module_rel_path-100"><span class="linenos">100</span></a><span class="k">def</span> <span class="nf">cengal_module_rel_path</span><span class="p">(</span><span class="n">cengal_module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="cengal_module_rel_path-101"><a href="#cengal_module_rel_path-101"><span class="linenos">101</span></a>    <span class="kn">from</span> <span class="nn">cengal.modules_management.module_rel_path</span> <span class="kn">import</span> <span class="n">module_rel_path</span>
+</span><span id="cengal_module_rel_path-102"><a href="#cengal_module_rel_path-102"><span class="linenos">102</span></a>    <span class="kn">import</span> <span class="nn">cengal</span>
+</span><span id="cengal_module_rel_path-103"><a href="#cengal_module_rel_path-103"><span class="linenos">103</span></a>    <span class="k">return</span> <span class="n">module_rel_path</span><span class="p">(</span><span class="n">cengal</span><span class="p">,</span> <span class="n">cengal_module</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -330,10 +361,10 @@ cengal<wbr>.system<wbr>.versions<wbr>.v_0<wbr>.system    </h1>
 
     </div>
     <a class="headerlink" href="#cengal_module_import_str"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="cengal_module_import_str-99"><a href="#cengal_module_import_str-99"><span class="linenos"> 99</span></a><span class="k">def</span> <span class="nf">cengal_module_import_str</span><span class="p">(</span><span class="n">cengal_module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="cengal_module_import_str-100"><a href="#cengal_module_import_str-100"><span class="linenos">100</span></a>    <span class="kn">from</span> <span class="nn">cengal.modules_management.module_rel_path</span> <span class="kn">import</span> <span class="n">module_import_str</span>
-</span><span id="cengal_module_import_str-101"><a href="#cengal_module_import_str-101"><span class="linenos">101</span></a>    <span class="kn">import</span> <span class="nn">cengal</span>
-</span><span id="cengal_module_import_str-102"><a href="#cengal_module_import_str-102"><span class="linenos">102</span></a>    <span class="k">return</span> <span class="n">module_import_str</span><span class="p">(</span><span class="n">cengal</span><span class="p">,</span> <span class="n">cengal_module</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="cengal_module_import_str-106"><a href="#cengal_module_import_str-106"><span class="linenos">106</span></a><span class="k">def</span> <span class="nf">cengal_module_import_str</span><span class="p">(</span><span class="n">cengal_module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="cengal_module_import_str-107"><a href="#cengal_module_import_str-107"><span class="linenos">107</span></a>    <span class="kn">from</span> <span class="nn">cengal.modules_management.module_rel_path</span> <span class="kn">import</span> <span class="n">module_import_str</span>
+</span><span id="cengal_module_import_str-108"><a href="#cengal_module_import_str-108"><span class="linenos">108</span></a>    <span class="kn">import</span> <span class="nn">cengal</span>
+</span><span id="cengal_module_import_str-109"><a href="#cengal_module_import_str-109"><span class="linenos">109</span></a>    <span class="k">return</span> <span class="n">module_import_str</span><span class="p">(</span><span class="n">cengal</span><span class="p">,</span> <span class="n">cengal_module</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -345,16 +376,16 @@ cengal<wbr>.system<wbr>.versions<wbr>.v_0<wbr>.system    </h1>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">current_cengal_module_rel_path</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="nb">str</span>:</span></span>
+        <span class="name">current_cengal_module_rel_path</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="nb">str</span>:</span></span>
 
                 <label class="view-source-button" for="current_cengal_module_rel_path-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#current_cengal_module_rel_path"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="current_cengal_module_rel_path-105"><a href="#current_cengal_module_rel_path-105"><span class="linenos">105</span></a><span class="k">def</span> <span class="nf">current_cengal_module_rel_path</span><span class="p">(</span><span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="current_cengal_module_rel_path-106"><a href="#current_cengal_module_rel_path-106"><span class="linenos">106</span></a>    <span class="kn">from</span> <span class="nn">cengal.modules_management.module_rel_path</span> <span class="kn">import</span> <span class="n">current_module_rel_path</span>
-</span><span id="current_cengal_module_rel_path-107"><a href="#current_cengal_module_rel_path-107"><span class="linenos">107</span></a>    <span class="kn">import</span> <span class="nn">cengal</span>
-</span><span id="current_cengal_module_rel_path-108"><a href="#current_cengal_module_rel_path-108"><span class="linenos">108</span></a>    <span class="k">return</span> <span class="n">current_module_rel_path</span><span class="p">(</span><span class="n">cengal</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="current_cengal_module_rel_path-112"><a href="#current_cengal_module_rel_path-112"><span class="linenos">112</span></a><span class="k">def</span> <span class="nf">current_cengal_module_rel_path</span><span class="p">(</span><span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="current_cengal_module_rel_path-113"><a href="#current_cengal_module_rel_path-113"><span class="linenos">113</span></a>    <span class="kn">from</span> <span class="nn">cengal.modules_management.module_rel_path</span> <span class="kn">import</span> <span class="n">current_module_rel_path</span>
+</span><span id="current_cengal_module_rel_path-114"><a href="#current_cengal_module_rel_path-114"><span class="linenos">114</span></a>    <span class="kn">import</span> <span class="nn">cengal</span>
+</span><span id="current_cengal_module_rel_path-115"><a href="#current_cengal_module_rel_path-115"><span class="linenos">115</span></a>    <span class="k">return</span> <span class="n">current_module_rel_path</span><span class="p">(</span><span class="n">cengal</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -366,16 +397,16 @@ cengal<wbr>.system<wbr>.versions<wbr>.v_0<wbr>.system    </h1>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">current_cengal_module_import_str</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="nb">str</span>:</span></span>
+        <span class="name">current_cengal_module_import_str</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="nb">str</span>:</span></span>
 
                 <label class="view-source-button" for="current_cengal_module_import_str-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#current_cengal_module_import_str"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="current_cengal_module_import_str-111"><a href="#current_cengal_module_import_str-111"><span class="linenos">111</span></a><span class="k">def</span> <span class="nf">current_cengal_module_import_str</span><span class="p">(</span><span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="current_cengal_module_import_str-112"><a href="#current_cengal_module_import_str-112"><span class="linenos">112</span></a>    <span class="kn">from</span> <span class="nn">cengal.modules_management.module_rel_path</span> <span class="kn">import</span> <span class="n">current_module_import_str</span>
-</span><span id="current_cengal_module_import_str-113"><a href="#current_cengal_module_import_str-113"><span class="linenos">113</span></a>    <span class="kn">import</span> <span class="nn">cengal</span>
-</span><span id="current_cengal_module_import_str-114"><a href="#current_cengal_module_import_str-114"><span class="linenos">114</span></a>    <span class="k">return</span> <span class="n">current_module_import_str</span><span class="p">(</span><span class="n">cengal</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="current_cengal_module_import_str-118"><a href="#current_cengal_module_import_str-118"><span class="linenos">118</span></a><span class="k">def</span> <span class="nf">current_cengal_module_import_str</span><span class="p">(</span><span class="n">depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="current_cengal_module_import_str-119"><a href="#current_cengal_module_import_str-119"><span class="linenos">119</span></a>    <span class="kn">from</span> <span class="nn">cengal.modules_management.module_rel_path</span> <span class="kn">import</span> <span class="n">current_module_import_str</span>
+</span><span id="current_cengal_module_import_str-120"><a href="#current_cengal_module_import_str-120"><span class="linenos">120</span></a>    <span class="kn">import</span> <span class="nn">cengal</span>
+</span><span id="current_cengal_module_import_str-121"><a href="#current_cengal_module_import_str-121"><span class="linenos">121</span></a>    <span class="k">return</span> <span class="n">current_module_import_str</span><span class="p">(</span><span class="n">cengal</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -421,7 +452,7 @@ cengal<wbr>.system<wbr>.versions<wbr>.v_0<wbr>.system    </h1>
                 <section id="CENGAL_VERSION_STR">
                     <div class="attr variable">
             <span class="name">CENGAL_VERSION_STR</span>        =
-<span class="default_value">&#39;4.3.3&#39;</span>
+<span class="default_value">&#39;4.3.4&#39;</span>
 
         
     </div>
@@ -457,7 +488,7 @@ cengal<wbr>.system<wbr>.versions<wbr>.v_0<wbr>.system    </h1>
                 <section id="CENGAL_VERSION_MICRO_STR">
                     <div class="attr variable">
             <span class="name">CENGAL_VERSION_MICRO_STR</span>        =
-<span class="default_value">&#39;3&#39;</span>
+<span class="default_value">&#39;4&#39;</span>
 
         
     </div>
@@ -469,7 +500,7 @@ cengal<wbr>.system<wbr>.versions<wbr>.v_0<wbr>.system    </h1>
                 <section id="CENGAL_VERSION">
                     <div class="attr variable">
             <span class="name">CENGAL_VERSION</span>        =
-<span class="default_value">(4, 3, 3)</span>
+<span class="default_value">(4, 3, 4)</span>
 
         
     </div>
@@ -505,7 +536,7 @@ cengal<wbr>.system<wbr>.versions<wbr>.v_0<wbr>.system    </h1>
                 <section id="CENGAL_VERSION_MICRO">
                     <div class="attr variable">
             <span class="name">CENGAL_VERSION_MICRO</span>        =
-<span class="default_value">3</span>
+<span class="default_value">4</span>
 
         
     </div>

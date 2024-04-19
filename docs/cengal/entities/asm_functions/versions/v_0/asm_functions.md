@@ -68,7 +68,7 @@ cengal<wbr>.entities<wbr>.asm_functions<wbr>.versions<wbr>.v_0<wbr>.asm_function
 </span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.3&quot;</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.4&quot;</span>
 </span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -524,7 +524,7 @@ cengal<wbr>.entities<wbr>.asm_functions<wbr>.versions<wbr>.v_0<wbr>.asm_function
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">asm_funcs_guard</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">asm_functions</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n"><a href="#ASM">ASM</a></span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Generator</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="n">Callable</span><span class="p">],</span> <span class="n">NoneType</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
+        <span class="name">asm_funcs_guard</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">asm_functions</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n"><a href="#ASM">ASM</a></span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Generator</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="n">Callable</span><span class="p">],</span> <span class="n">NoneType</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="asm_funcs_guard-view-source"><span>View Source</span></label>
 
@@ -822,7 +822,7 @@ cengal<wbr>.entities<wbr>.asm_functions<wbr>.versions<wbr>.v_0<wbr>.asm_function
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">compile_asm_function</span><span class="signature pdoc-code multiline">(<span class="param">	declaration: &lt;class &#x27;NamedTuple&#x27;&gt;</span><span class="return-annotation">) -> <span class="n"><a href="#ASM">ASM</a></span>:</span></span>
+        <span class="name">compile_asm_function</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">declaration</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">NamedTuple</span></span><span class="return-annotation">) -> <span class="n"><a href="#ASM">ASM</a></span>:</span></span>
 
                 <label class="view-source-button" for="compile_asm_function-view-source"><span>View Source</span></label>
 
@@ -843,7 +843,7 @@ cengal<wbr>.entities<wbr>.asm_functions<wbr>.versions<wbr>.v_0<wbr>.asm_function
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">caf</span><span class="signature pdoc-code multiline">(<span class="param">	declaration: &lt;class &#x27;NamedTuple&#x27;&gt;</span><span class="return-annotation">) -> <span class="n"><a href="#ASM">ASM</a></span>:</span></span>
+        <span class="name">caf</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">declaration</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">NamedTuple</span></span><span class="return-annotation">) -> <span class="n"><a href="#ASM">ASM</a></span>:</span></span>
 
                 <label class="view-source-button" for="caf-view-source"><span>View Source</span></label>
 
@@ -864,7 +864,7 @@ cengal<wbr>.entities<wbr>.asm_functions<wbr>.versions<wbr>.v_0<wbr>.asm_function
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">run_asm_func</span><span class="signature pdoc-code condensed">(<span class="param">declaration: &lt;class &#x27;NamedTuple&#x27;&gt;, </span><span class="param"><span class="o">*</span><span class="n">args</span></span><span class="return-annotation">):</span></span>
+        <span class="name">run_asm_func</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">declaration</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">NamedTuple</span>, </span><span class="param"><span class="o">*</span><span class="n">args</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="run_asm_func-view-source"><span>View Source</span></label>
 

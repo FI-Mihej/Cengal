@@ -19,7 +19,7 @@
 __all__ = [
             'PLATFORM_NAME', 'PYTHON_IMPLEMENTATION', 'PYTHON_VERSION', 'PYTHON_VERSION_STR', 
             'PYTHON_VERSION_INT', 'IS_RUNNING_IN_PYCHARM', 'RAW_OS_PLATFORM', 'OS_API_TYPE', 
-            'OS_TYPE', 'IS_RUNNING_IN_EMSCRIPTEN', 'IS_RUNNING_IN_PYODIDE', 'IS_BUILDING_FOR_PYODIDE', 
+            'OS_TYPE', 'KIVY_PLATFORM', 'KIVY_TARGET_PLATFORM', 'IS_RUNNING_IN_EMSCRIPTEN', 'IS_RUNNING_IN_PYODIDE', 'IS_BUILDING_FOR_PYODIDE', 
             'CENGAL_IS_IN_BUILD_MODE', 'TEMPLATE_MODULE_NAME', 'cengal_module_rel_path', 
             'cengal_module_import_str', 'current_cengal_module_rel_path', 'current_cengal_module_import_str',
             'CENGAL_UNITTESTS_DISCOVER_IS_RUNNING', 'IS_INSIDE_OR_FOR_WEB_BROWSER', 'IS_RUNNING_IN_WASI', 
@@ -44,7 +44,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.3"
+__version__ = "4.3.4"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -67,6 +67,13 @@ IS_RUNNING_IN_PYCHARM: bool = "PYCHARM_HOSTED" in os.environ
 RAW_OS_PLATFORM: str = sys.platform  # 'emscripten', 'wasi', 'darwin', 'win32', 'cygwin', 'linux', 'linux2', 'linux3', 'darwin', 'freebsd8', 'aix', aix5', 'aix7', ...
 OS_API_TYPE: str = os.name  # The following names have currently been registered: 'posix', 'nt', 'java'. Android and iOS will return 'posix'.
 OS_TYPE: str = platform.system()  # 'Linux', 'Windows', 'Darwin', 'Java'
+try:
+    from kivy.utils import platform as kivy_platform
+    KIVY_PLATFORM: str = kivy_platform  # 'win', 'linux', 'android', 'macosx', 'ios', 'unknown'
+except ImportError:
+    KIVY_PLATFORM = 'unknown'  # 'win', 'linux', 'android', 'macosx', 'ios', 'unknown'
+
+KIVY_TARGET_PLATFORM: str = os.environ.get('KIVY_TARGET_PLATFORM', default='unknown')  # It is required for the developer to manually set the 'KIVY_TARGET_PLATFORM' environment variable prior to the build process to ensure accurate platform detection.
 
 IS_RUNNING_IN_EMSCRIPTEN: bool = 'emscripten' == sys.platform
 IS_RUNNING_IN_WASI: bool = 'wasi' == sys.platform

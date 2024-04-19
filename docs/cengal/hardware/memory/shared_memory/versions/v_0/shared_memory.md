@@ -48,7 +48,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 </span><span id="L-30"><a href="#L-30"><span class="linenos">  30</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-31"><a href="#L-31"><span class="linenos">  31</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos">  32</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos">  33</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.3&quot;</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">  33</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.4&quot;</span>
 </span><span id="L-34"><a href="#L-34"><span class="linenos">  34</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-35"><a href="#L-35"><span class="linenos">  35</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-36"><a href="#L-36"><span class="linenos">  36</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -3730,7 +3730,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">map_to_shared_memory</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">shared_memory</span><span class="p">:</span> <span class="n"><a href="#SharedMemory">SharedMemory</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>:</span></span>
+        <span class="name">map_to_shared_memory</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">shared_memory</span><span class="p">:</span> <span class="n"><a href="#SharedMemory">SharedMemory</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="TBase.map_to_shared_memory-view-source"><span>View Source</span></label>
 
@@ -5642,7 +5642,7 @@ The argument must be an iterable if specified.</p>
                                         <input id="IListTrue.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">IListTrue</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">shared_memory</span><span class="p">:</span> <span class="n"><a href="#SharedMemory">SharedMemory</a></span>,</span><span class="param">	<span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="kc">None</span></span>)</span>
+        <span class="name">IListTrue</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">shared_memory</span><span class="p">:</span> <span class="n"><a href="#SharedMemory">SharedMemory</a></span>,</span><span class="param">	<span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span> <span class="o">=</span> <span class="kc">None</span></span>)</span>
 
                 <label class="view-source-button" for="IListTrue.__init__-view-source"><span>View Source</span></label>
 
@@ -5722,7 +5722,7 @@ The argument must be an iterable if specified.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">append</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">item</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+        <span class="name">append</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">item</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="IListTrue.append-view-source"><span>View Source</span></label>
 
@@ -5748,7 +5748,7 @@ The argument must be an iterable if specified.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">extend</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">items</span><span class="p">:</span> <span class="n">Sequence</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+        <span class="name">extend</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">items</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="IListTrue.extend-view-source"><span>View Source</span></label>
 
@@ -5777,7 +5777,7 @@ The argument must be an iterable if specified.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">insert</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">index</span><span class="p">:</span> <span class="nb">int</span>, </span><span class="param"><span class="n">item</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+        <span class="name">insert</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">index</span><span class="p">:</span> <span class="nb">int</span>, </span><span class="param"><span class="n">item</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="IListTrue.insert-view-source"><span>View Source</span></label>
 
@@ -5848,7 +5848,7 @@ The argument must be an iterable if specified.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">remove</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">item</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+        <span class="name">remove</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">item</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="IListTrue.remove-view-source"><span>View Source</span></label>
 
@@ -5906,7 +5906,7 @@ The argument must be an iterable if specified.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">index</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">item</span><span class="p">:</span> <span class="n">Any</span>, </span><span class="param"><span class="n">start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>, </span><span class="param"><span class="n">stop</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
+        <span class="name">index</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">item</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>, </span><span class="param"><span class="n">start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>, </span><span class="param"><span class="n">stop</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
 
                 <label class="view-source-button" for="IListTrue.index-view-source"><span>View Source</span></label>
 
@@ -5937,7 +5937,7 @@ The argument must be an iterable if specified.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">count</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">item</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
+        <span class="name">count</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">item</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
 
                 <label class="view-source-button" for="IListTrue.count-view-source"><span>View Source</span></label>
 
@@ -5988,7 +5988,7 @@ The argument must be an iterable if specified.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">sort</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">key</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">reverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+        <span class="name">sort</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">key</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">reverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="IListTrue.sort-view-source"><span>View Source</span></label>
 
@@ -7135,7 +7135,7 @@ The argument must be an iterable if specified.</p>
                                         <input id="IList.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">IList</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">shared_memory</span><span class="p">:</span> <span class="n"><a href="#SharedMemory">SharedMemory</a></span>,</span><span class="param">	<span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="kc">None</span></span>)</span>
+        <span class="name">IList</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">shared_memory</span><span class="p">:</span> <span class="n"><a href="#SharedMemory">SharedMemory</a></span>,</span><span class="param">	<span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span> <span class="o">=</span> <span class="kc">None</span></span>)</span>
 
                 <label class="view-source-button" for="IList.__init__-view-source"><span>View Source</span></label>
 
@@ -7296,7 +7296,7 @@ The argument must be an iterable if specified.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">append</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">item</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+        <span class="name">append</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">item</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="IList.append-view-source"><span>View Source</span></label>
 
@@ -7321,7 +7321,7 @@ The argument must be an iterable if specified.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">extend</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">items</span><span class="p">:</span> <span class="n">Sequence</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+        <span class="name">extend</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">items</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="IList.extend-view-source"><span>View Source</span></label>
 
@@ -7349,7 +7349,7 @@ The argument must be an iterable if specified.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">insert</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">index</span><span class="p">:</span> <span class="nb">int</span>, </span><span class="param"><span class="n">item</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+        <span class="name">insert</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">index</span><span class="p">:</span> <span class="nb">int</span>, </span><span class="param"><span class="n">item</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="IList.insert-view-source"><span>View Source</span></label>
 
@@ -7472,7 +7472,7 @@ The argument must be an iterable if specified.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">remove</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+        <span class="name">remove</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="IList.remove-view-source"><span>View Source</span></label>
 
@@ -7530,7 +7530,7 @@ The argument must be an iterable if specified.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">index</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span>, </span><span class="param"><span class="n">start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>, </span><span class="param"><span class="n">stop</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
+        <span class="name">index</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>, </span><span class="param"><span class="n">start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>, </span><span class="param"><span class="n">stop</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
 
                 <label class="view-source-button" for="IList.index-view-source"><span>View Source</span></label>
 
@@ -7567,7 +7567,7 @@ The argument must be an iterable if specified.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">count</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
+        <span class="name">count</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
 
                 <label class="view-source-button" for="IList.count-view-source"><span>View Source</span></label>
 
@@ -7620,7 +7620,7 @@ The argument must be an iterable if specified.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">sort</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">key</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">reverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+        <span class="name">sort</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">key</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">reverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="IList.sort-view-source"><span>View Source</span></label>
 
@@ -9498,7 +9498,7 @@ ascending or descending, according to their function values.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">wait_creator_ready</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">time_limit</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">periodic_sleep_time</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-09</span></span><span class="return-annotation">):</span></span>
+        <span class="name">wait_creator_ready</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">time_limit</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">periodic_sleep_time</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-09</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="SharedMemory.wait_creator_ready-view-source"><span>View Source</span></label>
 
@@ -9526,7 +9526,7 @@ ascending or descending, according to their function values.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">wait_consumer_ready</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">time_limit</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">periodic_sleep_time</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-09</span></span><span class="return-annotation">):</span></span>
+        <span class="name">wait_consumer_ready</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">time_limit</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">periodic_sleep_time</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-09</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="SharedMemory.wait_consumer_ready-view-source"><span>View Source</span></label>
 
@@ -10244,7 +10244,7 @@ ascending or descending, according to their function values.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">put_obj</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">):</span></span>
+        <span class="name">put_obj</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="SharedMemory.put_obj-view-source"><span>View Source</span></label>
 
@@ -10365,7 +10365,7 @@ ascending or descending, according to their function values.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">map_object</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">map_object</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="SharedMemory.map_object-view-source"><span>View Source</span></label>
 
@@ -10425,7 +10425,7 @@ ascending or descending, according to their function values.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">write_message</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">):</span></span>
+        <span class="name">write_message</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="SharedMemory.write_message-view-source"><span>View Source</span></label>
 
@@ -10463,7 +10463,7 @@ ascending or descending, according to their function values.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">put_message</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">):</span></span>
+        <span class="name">put_message</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="SharedMemory.put_message-view-source"><span>View Source</span></label>
 
@@ -10483,7 +10483,7 @@ ascending or descending, according to their function values.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">put_message_2</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">):</span></span>
+        <span class="name">put_message_2</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="SharedMemory.put_message_2-view-source"><span>View Source</span></label>
 
@@ -10882,7 +10882,7 @@ ascending or descending, according to their function values.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">wait_my_turn</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">time_limit</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">periodic_sleep_time</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-09</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
+        <span class="name">wait_my_turn</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">time_limit</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">periodic_sleep_time</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-09</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
                 <label class="view-source-button" for="SharedMemory.wait_my_turn-view-source"><span>View Source</span></label>
 
@@ -10912,7 +10912,7 @@ ascending or descending, according to their function values.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">wait_for_messages</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">time_limit</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">periodic_sleep_time</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-09</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
+        <span class="name">wait_for_messages</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">time_limit</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">periodic_sleep_time</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-09</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
                 <label class="view-source-button" for="SharedMemory.wait_for_messages-view-source"><span>View Source</span></label>
 
@@ -10973,7 +10973,7 @@ ascending or descending, according to their function values.</p>
                     <div class="decorator">@contextmanager</div>
 
         <span class="def">def</span>
-        <span class="name">wait_my_turn</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">shared_memory</span><span class="p">:</span> <span class="n"><a href="#SharedMemory">SharedMemory</a></span>,</span><span class="param">	<span class="n">time_limit</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">periodic_sleep_time</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-09</span></span><span class="return-annotation">):</span></span>
+        <span class="name">wait_my_turn</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">shared_memory</span><span class="p">:</span> <span class="n"><a href="#SharedMemory">SharedMemory</a></span>,</span><span class="param">	<span class="n">time_limit</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">periodic_sleep_time</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-09</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="wait_my_turn-view-source"><span>View Source</span></label>
 

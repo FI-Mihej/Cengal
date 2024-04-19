@@ -44,7 +44,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 </span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.3&quot;</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.4&quot;</span>
 </span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -179,7 +179,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
                                         <input id="LocalClassInfo.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">LocalClassInfo</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">local_id</span><span class="p">:</span> <span class="n">Hashable</span>, </span><span class="param"><span class="n">class_type</span><span class="p">:</span> <span class="n">Type</span></span>)</span>
+        <span class="name">LocalClassInfo</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">local_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span>, </span><span class="param"><span class="n">class_type</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span></span>)</span>
 
                 <label class="view-source-button" for="LocalClassInfo.__init__-view-source"><span>View Source</span></label>
 
@@ -303,7 +303,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
                                         <input id="RemoteClassInfo.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">RemoteClassInfo</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">local_id</span><span class="p">:</span> <span class="n">Hashable</span>, </span><span class="param"><span class="n">class_name</span><span class="p">:</span> <span class="nb">str</span>, </span><span class="param"><span class="n">module_importable_str</span><span class="p">:</span> <span class="nb">str</span></span>)</span>
+        <span class="name">RemoteClassInfo</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">local_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span>,</span><span class="param">	<span class="n">class_name</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">module_importable_str</span><span class="p">:</span> <span class="nb">str</span></span>)</span>
 
                 <label class="view-source-button" for="RemoteClassInfo.__init__-view-source"><span>View Source</span></label>
 
@@ -371,7 +371,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
                     <div class="decorator">@classmethod</div>
 
         <span class="def">def</span>
-        <span class="name">from_data</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">cls</span>,</span><span class="param">	<span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n"><a href="#RemoteClassInfo">RemoteClassInfo</a></span>:</span></span>
+        <span class="name">from_data</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">cls</span>,</span><span class="param">	<span class="n">data</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n"><a href="#RemoteClassInfo">RemoteClassInfo</a></span>:</span></span>
 
                 <label class="view-source-button" for="RemoteClassInfo.from_data-view-source"><span>View Source</span></label>
 

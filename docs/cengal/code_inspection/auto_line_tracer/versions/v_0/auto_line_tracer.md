@@ -50,7 +50,7 @@ cengal<wbr>.code_inspection<wbr>.auto_line_tracer<wbr>.versions<wbr>.v_0<wbr>.au
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.3&quot;</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.4&quot;</span>
 </span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -862,7 +862,7 @@ cengal<wbr>.code_inspection<wbr>.auto_line_tracer<wbr>.versions<wbr>.v_0<wbr>.au
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">previous_line</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
+        <span class="name">previous_line</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="AutoLineTracer.previous_line-view-source"><span>View Source</span></label>
 
@@ -886,7 +886,7 @@ cengal<wbr>.code_inspection<wbr>.auto_line_tracer<wbr>.versions<wbr>.v_0<wbr>.au
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">print_previous_line</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
+        <span class="name">print_previous_line</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="AutoLineTracer.print_previous_line-view-source"><span>View Source</span></label>
 
@@ -906,7 +906,7 @@ cengal<wbr>.code_inspection<wbr>.auto_line_tracer<wbr>.versions<wbr>.v_0<wbr>.au
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">current_line</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">line_result</span>, </span><span class="param"><span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
+        <span class="name">current_line</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">line_result</span>,</span><span class="param">	<span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="AutoLineTracer.current_line-view-source"><span>View Source</span></label>
 
@@ -932,7 +932,7 @@ cengal<wbr>.code_inspection<wbr>.auto_line_tracer<wbr>.versions<wbr>.v_0<wbr>.au
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">print_current_line</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">line_result</span>,</span><span class="param">	<span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">print_current_line</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">line_result</span>,</span><span class="param">	<span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="AutoLineTracer.print_current_line-view-source"><span>View Source</span></label>
 
@@ -974,7 +974,7 @@ cengal<wbr>.code_inspection<wbr>.auto_line_tracer<wbr>.versions<wbr>.v_0<wbr>.au
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">print_current_line_pp_type_value</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">line_result</span>,</span><span class="param">	<span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">print_current_line_pp_type_value</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">line_result</span>,</span><span class="param">	<span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="AutoLineTracer.print_current_line_pp_type_value-view-source"><span>View Source</span></label>
 
@@ -996,7 +996,7 @@ cengal<wbr>.code_inspection<wbr>.auto_line_tracer<wbr>.versions<wbr>.v_0<wbr>.au
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">print_current_line_pp_value</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">line_result</span>,</span><span class="param">	<span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">print_current_line_pp_value</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">line_result</span>,</span><span class="param">	<span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="AutoLineTracer.print_current_line_pp_value-view-source"><span>View Source</span></label>
 
@@ -1017,7 +1017,7 @@ cengal<wbr>.code_inspection<wbr>.auto_line_tracer<wbr>.versions<wbr>.v_0<wbr>.au
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">next_line</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
+        <span class="name">next_line</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="AutoLineTracer.next_line-view-source"><span>View Source</span></label>
 
@@ -1041,7 +1041,7 @@ cengal<wbr>.code_inspection<wbr>.auto_line_tracer<wbr>.versions<wbr>.v_0<wbr>.au
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">print_next_line</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
+        <span class="name">print_next_line</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="AutoLineTracer.print_next_line-view-source"><span>View Source</span></label>
 
@@ -1170,7 +1170,7 @@ cengal<wbr>.code_inspection<wbr>.auto_line_tracer<wbr>.versions<wbr>.v_0<wbr>.au
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">trace_self__general</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">line_result</span>, </span><span class="param"><span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">trace_self__general</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">line_result</span>,</span><span class="param">	<span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="trace_self__general-view-source"><span>View Source</span></label>
 
@@ -1189,7 +1189,7 @@ cengal<wbr>.code_inspection<wbr>.auto_line_tracer<wbr>.versions<wbr>.v_0<wbr>.au
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">trace_self__general_verbose</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">line_result</span>, </span><span class="param"><span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">trace_self__general_verbose</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">line_result</span>,</span><span class="param">	<span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="trace_self__general_verbose-view-source"><span>View Source</span></label>
 
@@ -1208,7 +1208,7 @@ cengal<wbr>.code_inspection<wbr>.auto_line_tracer<wbr>.versions<wbr>.v_0<wbr>.au
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">trace_self__limited</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">line_result</span>, </span><span class="param"><span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">trace_self__limited</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">line_result</span>,</span><span class="param">	<span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="trace_self__limited-view-source"><span>View Source</span></label>
 
@@ -1227,7 +1227,7 @@ cengal<wbr>.code_inspection<wbr>.auto_line_tracer<wbr>.versions<wbr>.v_0<wbr>.au
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">trace_self__limited_verbose</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">line_result</span>, </span><span class="param"><span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">trace_self__limited_verbose</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">line_result</span>,</span><span class="param">	<span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="trace_self__limited_verbose-view-source"><span>View Source</span></label>
 
@@ -1246,7 +1246,7 @@ cengal<wbr>.code_inspection<wbr>.auto_line_tracer<wbr>.versions<wbr>.v_0<wbr>.au
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">tsg</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">line_result</span>, </span><span class="param"><span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">tsg</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">line_result</span>,</span><span class="param">	<span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="tsg-view-source"><span>View Source</span></label>
 
@@ -1265,7 +1265,7 @@ cengal<wbr>.code_inspection<wbr>.auto_line_tracer<wbr>.versions<wbr>.v_0<wbr>.au
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">tsgv</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">line_result</span>, </span><span class="param"><span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">tsgv</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">line_result</span>,</span><span class="param">	<span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="tsgv-view-source"><span>View Source</span></label>
 
@@ -1284,7 +1284,7 @@ cengal<wbr>.code_inspection<wbr>.auto_line_tracer<wbr>.versions<wbr>.v_0<wbr>.au
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">tsl</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">line_result</span>, </span><span class="param"><span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">tsl</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">line_result</span>,</span><span class="param">	<span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="tsl-view-source"><span>View Source</span></label>
 
@@ -1303,7 +1303,7 @@ cengal<wbr>.code_inspection<wbr>.auto_line_tracer<wbr>.versions<wbr>.v_0<wbr>.au
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">tslv</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">line_result</span>, </span><span class="param"><span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">tslv</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">line_result</span>,</span><span class="param">	<span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="tslv-view-source"><span>View Source</span></label>
 
@@ -1322,7 +1322,7 @@ cengal<wbr>.code_inspection<wbr>.auto_line_tracer<wbr>.versions<wbr>.v_0<wbr>.au
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">ts</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">line_result</span>, </span><span class="param"><span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">ts</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">line_result</span>,</span><span class="param">	<span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="ts-view-source"><span>View Source</span></label>
 
@@ -1341,7 +1341,7 @@ cengal<wbr>.code_inspection<wbr>.auto_line_tracer<wbr>.versions<wbr>.v_0<wbr>.au
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">fake_trace_self</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">line_result</span>, </span><span class="param"><span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
+        <span class="name">fake_trace_self</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">line_result</span>,</span><span class="param">	<span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="fake_trace_self-view-source"><span>View Source</span></label>
 
@@ -1360,7 +1360,7 @@ cengal<wbr>.code_inspection<wbr>.auto_line_tracer<wbr>.versions<wbr>.v_0<wbr>.au
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">fts</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">line_result</span>, </span><span class="param"><span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
+        <span class="name">fts</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">line_result</span>,</span><span class="param">	<span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="fts-view-source"><span>View Source</span></label>
 

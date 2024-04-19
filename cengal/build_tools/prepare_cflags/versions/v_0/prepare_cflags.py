@@ -48,7 +48,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.3"
+__version__ = "4.3.4"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -79,6 +79,8 @@ from cengal.system import (
     RAW_OS_PLATFORM,
     OS_API_TYPE,
     OS_TYPE,
+    KIVY_PLATFORM,
+    KIVY_TARGET_PLATFORM,
     IS_RUNNING_IN_EMSCRIPTEN,
     IS_RUNNING_IN_WASI,
     IS_RUNNING_IN_PYODIDE,
@@ -324,6 +326,8 @@ def prepare_compile_time_env(additional_cflags: Optional[Union[Sequence[str], Di
         'RAW_OS_PLATFORM': RAW_OS_PLATFORM,  # 'emscripten', 'wasi', 'darwin', 'win32', 'cygwin', 'linux', 'linux2', 'linux3', 'darwin', 'freebsd8', 'aix', aix5', 'aix7', ...
         'OS_API_TYPE': OS_API_TYPE,  # 'posix', 'nt', 'java'. Android and iOS will return 'posix'.
         'OS_TYPE': OS_TYPE,  # 'Linux', 'Windows', 'Darwin'
+        'KIVY_PLATFORM': KIVY_PLATFORM, # 'win', 'linux', 'android', 'macosx', 'ios', 'unknown'
+        'KIVY_TARGET_PLATFORM': KIVY_TARGET_PLATFORM, # 'win', 'linux', 'android', 'macosx', 'ios', 'unknown'
         'IS_RUNNING_IN_EMSCRIPTEN_BOOL': IS_RUNNING_IN_EMSCRIPTEN,  # 'True', 'False'
         'IS_RUNNING_IN_WASI_BOOL': IS_RUNNING_IN_WASI,  # 'True', 'False'
         'IS_RUNNING_IN_PYODIDE_BOOL': IS_RUNNING_IN_PYODIDE,  # 'True', 'False'
@@ -423,6 +427,34 @@ def prepare_compile_time_flags(additional_cflags: Sequence[str] = None):
         macro_flags_list.add('Windows')
     elif 'Darwin' == OS_TYPE:
         macro_flags_list.add('Darwin')
+    elif 'Java' == OS_TYPE:
+        macro_flags_list.add('Java')
+    
+    if 'win' == KIVY_PLATFORM:
+        macro_flags_list.add('KIVY_PLATFORM_win')
+    elif 'linux' == KIVY_PLATFORM:
+        macro_flags_list.add('KIVY_PLATFORM_linux')
+    elif 'android' == KIVY_PLATFORM:
+        macro_flags_list.add('KIVY_PLATFORM_android')
+    elif 'macosx' == KIVY_PLATFORM:
+        macro_flags_list.add('KIVY_PLATFORM_macosx')
+    elif 'ios' == KIVY_PLATFORM:
+        macro_flags_list.add('KIVY_PLATFORM_ios')
+    elif 'unknown' == KIVY_PLATFORM:
+        macro_flags_list.add('KIVY_PLATFORM_unknown')
+    
+    if 'win' == KIVY_TARGET_PLATFORM:
+        macro_flags_list.add('KIVY_TARGET_PLATFORM_win')
+    elif 'linux' == KIVY_TARGET_PLATFORM:
+        macro_flags_list.add('KIVY_TARGET_PLATFORM_linux')
+    elif 'android' == KIVY_TARGET_PLATFORM:
+        macro_flags_list.add('KIVY_TARGET_PLATFORM_android')
+    elif 'macosx' == KIVY_TARGET_PLATFORM:
+        macro_flags_list.add('KIVY_TARGET_PLATFORM_macosx')
+    elif 'ios' == KIVY_TARGET_PLATFORM:
+        macro_flags_list.add('KIVY_TARGET_PLATFORM_ios')
+    elif 'unknown' == KIVY_TARGET_PLATFORM:
+        macro_flags_list.add('KIVY_TARGET_PLATFORM_unknown')
     
     if 'posix' == OS_API_TYPE:
         macro_flags_list.add('posix')

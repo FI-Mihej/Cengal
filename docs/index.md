@@ -1,33 +1,51 @@
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/cengal-light?color=darkgreen)
 
-![PyPI - Version](https://img.shields.io/pypi/v/cengal-light) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cengal-light) ![PyPI - Implementation](https://img.shields.io/pypi/implementation/cengal-light) ![PyPI - Format](https://img.shields.io/pypi/format/cengal-light?color=darkgreen) ![Static Badge](https://img.shields.io/badge/Architecture-x86__64_%7C_ARM__64-blue)
+![GitHub tag (with filter)](https://img.shields.io/github/v/tag/FI-Mihej/Cengal) ![Static Badge](https://img.shields.io/badge/OS-Linux_%7C_Windows_%7C_macOS-blue) ![Static Badge](https://img.shields.io/badge/coverage-38%25-blue) ![Static Badge](https://img.shields.io/badge/covered_lines_of_code-15855-blue)
 
-![Static Badge](https://img.shields.io/badge/wheels-Linux_%7C_Windows_%7C_macOS-blue) ![Static Badge](https://img.shields.io/badge/OS-Linux_%7C_Windows_%7C_macOS-blue)
+![PyPI - Version](https://img.shields.io/pypi/v/cengal-light) ![PyPI - Format](https://img.shields.io/pypi/format/cengal-light?color=darkgreen) ![Static Badge](https://img.shields.io/badge/wheels-Linux_%7C_Windows_%7C_macOS-blue) ![Static Badge](https://img.shields.io/badge/Architecture-x86__64_%7C_ARM__64-blue) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cengal-light) ![Static Badge](https://img.shields.io/badge/PyPy-3.8_%7C_3.9_%7C_3.10-blue) ![PyPI - Implementation](https://img.shields.io/pypi/implementation/cengal-light) 
 
-![GitHub tag (with filter)](https://img.shields.io/github/v/tag/FI-Mihej/Cengal) ![PyPI - Status](https://img.shields.io/pypi/status/cengal) ![Static Badge](https://img.shields.io/badge/coverage-38%25-blue) ![Static Badge](https://img.shields.io/badge/covered_lines_of_code-15855-blue)
-
-![GitHub License](https://img.shields.io/github/license/FI-Mihej/Cengal?color=darkgreen)
+![GitHub License](https://img.shields.io/github/license/FI-Mihej/Cengal?color=darkgreen) ![PyPI - Status](https://img.shields.io/pypi/status/cengal) 
 
 # Cengal
 
 Cengal is a versatile Python library designed for a wide range of applications. To enhance performance, certain modules within Cengal have been implemented using Cython, C/C++, Nim or Go.
 
-## API Design Approach
+## Architecture & API Design Rationale
+
+<details>
+<summary title="Rationale"><kbd> Rationale </kbd></summary>
 
 The Cengal library adheres to an API design approach used in frameworks such as Qt. For those familiar with the C++ language, I will draw comparisons between the approaches of Qt and the C++ Standard Template Library (STL). The API provided by the STL was designed to significantly reduce the burden on programmers who develop the STL. This decision was logical from the standpoint of marketing the STL among compiler creators. However, this led to the usability of the STL for the user not being great. This is evident in the fact that the STL provides the most minimal possible API, and any conveniences must be programmed anew by each programmer every time - constantly reinventing the wheel. In contrast, Qt uses the opposite approach to API construction: classes have many methods whose purposes are similar, but are aimed at different usage models. This simplifies the use of Qt for users, speeds up the writing of the final code, and avoids many errors that we usually make when we write our own 'bicycles' for the same actions each time (not because the we are not smart, but because we are humans and therefore prone to make mistakes from time to time).
 
+</details>
+
 ## Cengal compatibility and requirements
 
-* Target platforms: Win32, Linux, OS X, Android, iOS, Emscripten
+<details>
+<summary title="Compatibility and requirements"><kbd> Compatibility and requirements </kbd></summary>
+
+* Target platforms: Win32, Linux, macOS, Android, iOS, Emscripten
 * Target architectures: x64, x86, ARM
 * Target interpreters: CPython, PyPy
 * Recommended Python versions: 3.8+
 
+</details>
+
 ## Installation
+
+<details>
+<summary title="General wheel"><kbd> General wheel </kbd></summary>
 
 To get started with Cengal, you can easily install it along with all the mandatory dependencies by running `pip install cengal`. This command not only installs Cengal and its required dependencies but also takes care of fetching and installing prebuilt wheels tailored for the Cengal library. These wheels are compatible with both Windows and Linux systems and work seamlessly with both CPython and PyPy interpreters.
 
+</details>
+
+<details>
+<summary title="Wheel without dependencies"><kbd> Wheel without dependencies </kbd></summary>
+
 If you prefer to install Cengal without its dependencies, you can opt for the 'cengal-light' package, which serves as the backend for the 'cengal' package. Simply run `pip install cengal-light` to get the lightweight version of Cengal.
+
+</details>
 
 ## Documentation
 
@@ -43,11 +61,16 @@ For example [Wiki: Cengal Coroutines Concepts & Usage](https://github.com/FI-Mih
 
 ## Stand-Alone Packages for Specific Cengal Modules
 
+<details>
+<summary title="Rationale"><kbd> Rationale </kbd></summary>
+
 To cater to varying needs and streamline the installation process, I've introduced stand-alone packages for select Cengal modules. These packages are designed to offer users the ability to install specific Cengal functionality without the burden of the library's full set of dependencies.
 
 The core of this approach lies in our 'cengal-light' package, which houses both Python and compiled Cengal modules. The 'cengal' package itself serves as a lightweight shell, devoid of its own modules, but dependent on 'cengal-light[full]' for a complete Cengal library installation with all required dependencies.
 
 For users seeking individual Cengal features or looking to minimize dependencies, our stand-alone packages provide a convenient solution. Each stand-alone package is dedicated to a specific Cengal module and relies on 'cengal-light' as its sole dependency.
+
+</details>
 
 Below, you'll find a list of these stand-alone packages, each corresponding to a distinct Cengal module:
 
@@ -58,6 +81,10 @@ Below, you'll find a list of these stand-alone packages, each corresponding to a
 Stay tuned for future additions to our collection of stand-alone packages!
 
 ## Exclusive Features: No Alternatives Online
+
+
+<details>
+<summary title="Build system (work in progress)"><kbd> Build system (work in progress) </kbd></summary>
 
 ### Build system (work in progress)
 
@@ -70,6 +97,11 @@ Compiles your code, gather binary artifacts and puts them into your wheel.
 * [Compilable Golang module](https://github.com/FI-Mihej/Cengal/blob/master/cengal/_examples/ex_golang)
 * [Compilable Nim module](https://github.com/FI-Mihej/Cengal/blob/master/cengal/_examples/ex_nim)
 * [Pure Python module auto-compiled with Cython](https://github.com/FI-Mihej/Cengal/blob/master/examples/compiled_python)
+
+</details>
+
+<details>
+<summary title="Concurrent Execution of blocking CPU-Bound and GUI Tasks on a Single Thread"><kbd> Concurrent Execution of blocking CPU-Bound and GUI Tasks on a Single Thread </kbd></summary>
 
 ### Concurrent Execution of blocking CPU-Bound and GUI Tasks on a Single Thread
 
@@ -99,6 +131,11 @@ In this example, an application concurrently (at the same time) executes all of 
 
 * [Decorator which converts blocking code to concurrent code](https://github.com/FI-Mihej/Cengal/wiki/Decorator-which-converts-blocking-code-to-concurrent-code)
 
+</details>
+
+
+<details>
+<summary title="True Interprocess Shared Memory (Proof of Concept)"><kbd> True Interprocess Shared Memory (Proof of Concept) </kbd></summary>
 
 ### True Interprocess Shared Memory (Proof of Concept)
 
@@ -151,7 +188,7 @@ def work(manager, shared_data)
     index = 0
     while index < switches:
         with wait_my_turn(manager):
-            ## emulatin our working process
+            # emulatin our working process
             for i in range(changes_per_switch):
                 shared_data[1] += 1
 
@@ -202,10 +239,20 @@ Cengal's shared `list` container demonstrates remarkable speed, boasting the abi
 * Implement an appropriate Service for `cengal.parallel_execution.coroutines` - for comfortable shared memory usage inside an async code (including `asyncio`) 
 * Improve memory allocation algorithm in an attempt of making it faster
 
+</details>
+
+<details>
+<summary title="Async LMDB database API"><kbd> Async LMDB database API </kbd></summary>
+
 ### Async LMDB database API
 
 An example of usage (unit test of the module):
 * [test__db.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/coro_standard_services/db/versions/v_1/tests/test__db.py)
+
+</details>
+
+<details>
+<summary title="Async logging into LMDB database"><kbd> Async logging into LMDB database </kbd></summary>
 
 ### Async logging into LMDB database
 
@@ -218,27 +265,57 @@ An example of usage of the admin_tk:
 Alternatively, developer can load logs in off-line mode using Log Viewer application (made with async Tkinter GUI):
 * [log_viewer.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/coro_tools/log_viewer/versions/v_0/log_viewer.py)
 
+</details>
+
+<details>
+<summary title="Async Tkinter and Customtkinter"><kbd> Async Tkinter and Customtkinter </kbd></summary>
+
 ### Async Tkinter and Customtkinter
 
 * [tkinter_0.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/coro_standard_services/tkinter/versions/v_0/development/tkinter_0.py)
 * [customtkinter_0.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/coro_standard_services/tkinter/versions/v_0/development/customtkinter_0.py)
 
+</details>
+
+<details>
+<summary title="Async wxPython"><kbd> Async wxPython </kbd></summary>
+
 ### Async wxPython
 
 * [async_wxpython_example.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/wxpython/versions/v_0/development/async_wxpython_example.py)
+
+</details>
+
+<details>
+<summary title="Async QT (PySide, PySide2, PySide6, PyQt4, PyQt5, PyQt6)"><kbd> Async QT (PySide, PySide2, PySide6, PyQt4, PyQt5, PyQt6) </kbd></summary>
 
 ### Async QT (PySide, PySide2, PySide6, PyQt4, PyQt5, PyQt6)
 
 * [pyside6__coro_slot_example_0.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/qt/pyside6/versions/v_0/development/pyside6__coro_slot_example_0.py)
 
-## Async [PyTermGUI](https://github.com/bczsalba/pytermgui)
+</details>
+
+<details>
+<summary title="Async PyTermGUI"><kbd> Async PyTermGUI </kbd></summary>
+
+### Async [PyTermGUI](https://github.com/bczsalba/pytermgui)
 
 * [hello_world_app_autoexit.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/pytermgui/versions/v_0/development/hello_world_app_autoexit.py)
 * [hello_world.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/pytermgui/versions/v_0/development/hello_world.py)
 
-## Wrapper for [Netti (reliable UDP connection library for games in Nim)](https://github.com/treeform/netty)
+</details>
 
-* [ex_nim.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/nim__netty/core/versions/v_0/development/ex_nim.py)
+<details>
+<summary title="Wrapper for Netti (reliable UDP connection library for games in Nim)"><kbd> Wrapper for Netti (reliable UDP connection library for games in Nim) </kbd></summary>
+
+### Wrapper for [Netti (reliable UDP connection library for games in Nim)](https://github.com/treeform/netty)
+
+* [netty_benchmarks.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/integrations/nim__netty/core/versions/v_0/development/netty_benchmarks.py)
+
+</details>
+
+<details>
+<summary title="Transparent background for your desktop applications (TBA)"><kbd> Transparent background for your desktop applications (TBA) </kbd></summary>
 
 ### Transparent background for your desktop applications (TBA)
 
@@ -249,12 +326,22 @@ Alternatively, developer can load logs in off-line mode using Log Viewer applica
 ,
 ![title](https://github.com/FI-Mihej/Cengal/raw/master/docs/assets/Cengal_Kivy_Transparent_UI_Windows_10.png)
 
+</details>
+
+<details>
+<summary title="Tkinter True Borderless apps for Windows platform (TBA)"><kbd> Tkinter True Borderless apps for Windows platform (TBA) </kbd></summary>
+
 ### Tkinter True Borderless apps for Windows platform (TBA)
 
 * Target OS: Windows 11, Windows 10, Windows 8, Windows 7, Windows Vista.
 * Target frameworks: CustomTkinter, Tkinter, ttkbootstrap, ...
 
 ![title](https://github.com/FI-Mihej/Cengal/raw/master/docs/assets/Cengal_Tkinter_True_Borderless_Draggable_Applications_Windows_10.png)
+
+</details>
+
+<details>
+<summary title="Cengal Coroutines and Asyncio Administration and Monitoring Page"><kbd> Cengal Coroutines and Asyncio Administration and Monitoring Page </kbd></summary>
 
 ### Cengal Coroutines and Asyncio Administration and Monitoring Page
 
@@ -270,8 +357,13 @@ Observe loop performance, services state and coroutines list with details. Use a
 
 [admin_test.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/coroutines/coro_tools/loop_administration/admin_tk/versions/v_0/development/admin_test.py)
 
+</details>
+
 
 ## Modules with unique functionality
+
+<details>
+<summary title="Unique modules List (was not updated for some time)"><kbd> Unique modules List (was not updated for some time) </kbd></summary>
 
 * **"parallel_execution"**
     * **"coroutines"** - asynchronous loop with almost preemptive multitasking within the single thread. Brings an async approach to an unmodified Tkinter, Qt, Kivy, etc. Unlike asyncio/trio/curio, it uses microkernel (services-based) approach which makes it highly- and easily-expandable. Can be executed both independently (asyncio/uvloop loop will be injected within the Cengal-coroutine when needed) and within already executed asyncio/uvloop loop. Can be used from the PyScript for the Web app creation.
@@ -307,7 +399,13 @@ Observe loop performance, services state and coroutines list with details. Use a
     * **"cpu_clock_cycles"** - Returnes value of `RDTSCP` on x86/x86_64 or `CNTVCT_EL0` on ARM. Fast implementation: 6-12 times faster than all other competitors on Github. Note: CPU Time Stamp Counter (TSC) is not depends on actual current CPU frequency in modern CPUs (starting from around year 2007) so can be safely used as a high precision clock (see `time_management.cpu_clock` module). Windows, Linux and other Operating Systems are using it internaly.
     * **"cpu_clock"** - like `perf_counter()` but 25% faster. Supports both x86/x86_64 and ARM. `cpu_clock` is slightly faster than `cpu_clock_cycles` because `double` (`float` in Python terms) transfered from C-code to Python code more efficiently than `64-bit int` (which needs an addition internal logic inside the Python itself for conversion). Highest-precision possible since it is CPU Time Stamp Counter based which is not depends on actual current CPU frequency in modern CPUs (starting from around year 2007) so can be safely used as a high precision clock (and Windows, Linux and other Operating Systems are using it internaly in this way). **Benchmark**: [cpu_clock_test.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/time_management/cpu_clock/versions/v_0/development/cpu_clock_test.py)
 
+</details>
+
 ## Some Other modules
+
+<details>
+<summary title="Other modules List (was not updated for some time)"><kbd> Other modules List (was not updated for some time) </kbd></summary>
+
 * **"parallel_execution"**
     * **"coroutines"** - 
         * **"coro_tools"** - tools
@@ -372,6 +470,8 @@ Observe loop performance, services state and coroutines list with details. Use a
     * **"detect_browsers_host_device_type"** - 
         * **"by_http_user_agent"** - detects is it mobile or tablet device by analizing its http user_agent string
 
+</details>
+
 ### Size of the Cengal library
 
 At the moment of 19 Mar 2024:
@@ -408,6 +508,9 @@ Stmts   Miss  Cover
 
 ### Examples
 
+<details>
+<summary title="Examples locations"><kbd> Examples locations </kbd></summary>
+
 * Can be found in [examples](https://github.com/FI-Mihej/Cengal/blob/master/examples/) dir
 * Each module has a `development` folder. Examples are usually placed there
 * Some of old examples can be fined inside the [tests](https://github.com/FI-Mihej/Cengal/blob/master/tests/) dir.
@@ -422,7 +525,12 @@ Stmts   Miss  Cover
 
 [Ensures and updates copyright (with dates) in each Cengal's source file](https://github.com/FI-Mihej/Cengal/blob/master/cengal_setup_scripts/ensure_copyright/ensure_copyright.py)
 
-## Manual Build
+</details>
+
+## Build from sources
+
+<details>
+<summary title="Build instructions"><kbd> Build instructions </kbd></summary>
 
 Linux, macOS:
 
@@ -447,6 +555,8 @@ Installation process requires compilation. So ensure that:
 * At least `Visual Studio Community - Build Tools` are installed on your Windows and you are installing Cengal from within its `Developer Command Prompt` for an appropriate target CPU architecture (`x64 Native Tools Command Prompt for VS 2022` for example). Make sure that you have compatible version of Visual Studio for your target CPython interpreter (see `python -VV` command output. For example `Python 3.9.11 (tags/v3.9.11:2de452f, Mar 16 2022, 14:33:45) [MSC v.1929 64 bit (AMD64)]`: this python interpreter requires Visual Studio 2019 version 16.11.2+ according to `1929` word search in [Wikipedia page](https://en.wikipedia.org/wiki/Microsoft_Visual_C%2B%2B))
 * Nim installed (Optional)
 * Go installed (Optional)
+
+</details>
 
 ## Projects using Cengal
 

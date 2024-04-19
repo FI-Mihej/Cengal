@@ -49,7 +49,7 @@ cengal<wbr>.file_system<wbr>.path_manager<wbr>.versions<wbr>.v_0<wbr>.path_manag
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.3&quot;</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.4&quot;</span>
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -186,7 +186,7 @@ cengal<wbr>.file_system<wbr>.path_manager<wbr>.versions<wbr>.v_0<wbr>.path_manag
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">relative_to_src</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n"><a href="#RelativePath">RelativePath</a></span>:</span></span>
+        <span class="name">relative_to_src</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n"><a href="#RelativePath">RelativePath</a></span>:</span></span>
 
                 <label class="view-source-button" for="relative_to_src-view-source"><span>View Source</span></label>
 
@@ -215,7 +215,7 @@ cengal<wbr>.file_system<wbr>.path_manager<wbr>.versions<wbr>.v_0<wbr>.path_manag
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">path_relative_to_src</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">relative_path</span><span class="p">:</span> <span class="nb">str</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="nb">str</span>:</span></span>
+        <span class="name">path_relative_to_src</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">relative_path</span><span class="p">:</span> <span class="nb">str</span>, </span><span class="param"><span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="nb">str</span>:</span></span>
 
                 <label class="view-source-button" for="path_relative_to_src-view-source"><span>View Source</span></label>
 

@@ -17,7 +17,7 @@
 
 from typing import Dict, List, Union, Set
 from cengal.bulk_pip_actions.install import *
-from cengal.system import IS_INSIDE_OR_FOR_WEB_BROWSER, OS_TYPE
+from cengal.system import IS_INSIDE_OR_FOR_WEB_BROWSER, OS_TYPE, KIVY_PLATFORM, KIVY_TARGET_PLATFORM
 from cengal.hardware.info.cpu import cpu_info
 
 
@@ -30,7 +30,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.3"
+__version__ = "4.3.4"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -58,6 +58,32 @@ class ModulesLists(object):
         self.osx_forbidden: Set[str] = set()
         self.emscripten_allowed: Set[str] = set()
         self.emscripten_forbidden: Set[str] = set()
+
+        self.kivy_linux_allowed: Set[str] = set()
+        self.kivy_linux_forbidden: Set[str] = set()
+        self.kivy_win_allowed: Set[str] = set()
+        self.kivy_win_forbidden: Set[str] = set()
+        self.kivy_macosx_allowed: Set[str] = set()
+        self.kivy_macosx_forbidden: Set[str] = set()
+        self.kivy_ios_allowed: Set[str] = set()
+        self.kivy_ios_forbidden: Set[str] = set()
+        self.kivy_android_allowed: Set[str] = set()
+        self.kivy_android_forbidden: Set[str] = set()
+        self.kivy_unknown_allowed: Set[str] = set()
+        self.kivy_unknown_forbidden: Set[str] = set()
+
+        self.kivy_target_linux_allowed: Set[str] = set()
+        self.kivy_target_linux_forbidden: Set[str] = set()
+        self.kivy_target_win_allowed: Set[str] = set()
+        self.kivy_target_win_forbidden: Set[str] = set()
+        self.kivy_target_macosx_allowed: Set[str] = set()
+        self.kivy_target_macosx_forbidden: Set[str] = set()
+        self.kivy_target_ios_allowed: Set[str] = set()
+        self.kivy_target_ios_forbidden: Set[str] = set()
+        self.kivy_target_android_allowed: Set[str] = set()
+        self.kivy_target_android_forbidden: Set[str] = set()
+        self.kivy_target_unknown_allowed: Set[str] = set()
+        self.kivy_target_unknown_forbidden: Set[str] = set()
 
         self.arch__x86__allowed: Set[str] = set()
         self.arch__x86__forbidden: Set[str] = set()
@@ -93,7 +119,45 @@ class ModulesLists(object):
         elif 'Darwin' == OS_TYPE:
             self._allowed.update(self.osx_allowed)
             self._forbidden.update(self.osx_forbidden)
-        
+
+        if 'linux' == KIVY_PLATFORM:
+            self._allowed.update(self.kivy_linux_allowed)
+            self._forbidden.update(self.kivy_linux_forbidden)
+        elif 'win' == KIVY_PLATFORM:
+            self._allowed.update(self.kivy_win_allowed)
+            self._forbidden.update(self.kivy_win_forbidden)
+        elif 'macosx' == KIVY_PLATFORM:
+            self._allowed.update(self.kivy_macosx_allowed)
+            self._forbidden.update(self.kivy_macosx_forbidden)
+        elif 'ios' == KIVY_PLATFORM:
+            self._allowed.update(self.kivy_ios_allowed)
+            self._forbidden.update(self.kivy_ios_forbidden)
+        elif 'android' == KIVY_PLATFORM:
+            self._allowed.update(self.kivy_android_allowed)
+            self._forbidden.update(self.kivy_android_forbidden)
+        elif 'unknown' == KIVY_PLATFORM:
+            self._allowed.update(self.kivy_unknown_allowed)
+            self._forbidden.update(self.kivy_unknown_forbidden)
+
+        if 'linux' == KIVY_TARGET_PLATFORM:
+            self._allowed.update(self.kivy_target_linux_allowed)
+            self._forbidden.update(self.kivy_target_linux_forbidden)
+        elif 'win' == KIVY_TARGET_PLATFORM:
+            self._allowed.update(self.kivy_target_win_allowed)
+            self._forbidden.update(self.kivy_target_win_forbidden)
+        elif 'macosx' == KIVY_TARGET_PLATFORM:
+            self._allowed.update(self.kivy_target_macosx_allowed)
+            self._forbidden.update(self.kivy_target_macosx_forbidden)
+        elif 'ios' == KIVY_TARGET_PLATFORM:
+            self._allowed.update(self.kivy_target_ios_allowed)
+            self._forbidden.update(self.kivy_target_ios_forbidden)
+        elif 'android' == KIVY_TARGET_PLATFORM:
+            self._allowed.update(self.kivy_target_android_allowed)
+            self._forbidden.update(self.kivy_target_android_forbidden)
+        elif 'unknown' == KIVY_TARGET_PLATFORM:
+            self._allowed.update(self.kivy_target_unknown_allowed)
+            self._forbidden.update(self.kivy_target_unknown_forbidden)
+
         arch = cpu_info().arch.casefold()
         if cpu_info().is_x86:
             self._allowed.update(self.arch__x86__allowed)
