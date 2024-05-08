@@ -44,7 +44,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 </span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.4&quot;</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.4.0&quot;</span>
 </span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -284,7 +284,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">gly_patch</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">entity</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n">code</span>:</span></span>
+        <span class="name">gly_patch</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">entity</span><span class="p">:</span> <span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n">code</span>:</span></span>
 
                 <label class="view-source-button" for="gly_patch-view-source"><span>View Source</span></label>
 
@@ -403,7 +403,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">agly_patch</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">entity</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
+        <span class="name">agly_patch</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">entity</span><span class="p">:</span> <span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
 
                 <label class="view-source-button" for="agly_patch-view-source"><span>View Source</span></label>
 
@@ -428,7 +428,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">gly_patched</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">func</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
+        <span class="name">gly_patched</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
 
                 <label class="view-source-button" for="gly_patched-view-source"><span>View Source</span></label>
 
@@ -524,7 +524,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">glyp</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">func</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
+        <span class="name">glyp</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
 
                 <label class="view-source-button" for="glyp-view-source"><span>View Source</span></label>
 
@@ -620,7 +620,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">gp</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">func</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
+        <span class="name">gp</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
 
                 <label class="view-source-button" for="gp-view-source"><span>View Source</span></label>
 
@@ -716,7 +716,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">agly_patched</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">func</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
+        <span class="name">agly_patched</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
 
                 <label class="view-source-button" for="agly_patched-view-source"><span>View Source</span></label>
 
@@ -736,7 +736,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">aglyp</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">func</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
+        <span class="name">aglyp</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
 
                 <label class="view-source-button" for="aglyp-view-source"><span>View Source</span></label>
 
@@ -756,7 +756,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">agp</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">func</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
+        <span class="name">agp</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
 
                 <label class="view-source-button" for="agp-view-source"><span>View Source</span></label>
 
@@ -887,7 +887,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">restore</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">func</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span>, </span><span class="param"><span class="n">tree</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
+        <span class="name">restore</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span>, </span><span class="param"><span class="n">tree</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
 
                 <label class="view-source-button" for="GlyPatchManager.restore-view-source"><span>View Source</span></label>
 
@@ -913,7 +913,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">gly_patched_tree</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">entity</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span>,</span><span class="param">	<span class="n">gly_patch_manager</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n"><a href="#GlyPatchManager">GlyPatchManager</a></span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
+        <span class="name">gly_patched_tree</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">entity</span><span class="p">:</span> <span class="n">Callable</span>,</span><span class="param">	<span class="n">gly_patch_manager</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n"><a href="#GlyPatchManager">GlyPatchManager</a></span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
 
                 <label class="view-source-button" for="gly_patched_tree-view-source"><span>View Source</span></label>
 
@@ -932,7 +932,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">agly_patched_tree</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">entity</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span>,</span><span class="param">	<span class="n">gly_patch_manager</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n"><a href="#GlyPatchManager">GlyPatchManager</a></span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
+        <span class="name">agly_patched_tree</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">entity</span><span class="p">:</span> <span class="n">Callable</span>,</span><span class="param">	<span class="n">gly_patch_manager</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n"><a href="#GlyPatchManager">GlyPatchManager</a></span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
 
                 <label class="view-source-button" for="agly_patched_tree-view-source"><span>View Source</span></label>
 

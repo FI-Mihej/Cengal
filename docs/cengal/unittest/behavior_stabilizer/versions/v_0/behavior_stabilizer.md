@@ -63,7 +63,7 @@ cengal<wbr>.unittest<wbr>.behavior_stabilizer<wbr>.versions<wbr>.v_0<wbr>.behavi
 </span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.4&quot;</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.4.0&quot;</span>
 </span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -1428,7 +1428,7 @@ cengal<wbr>.unittest<wbr>.behavior_stabilizer<wbr>.versions<wbr>.v_0<wbr>.behavi
                                         <input id="TestCaseState.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">TestCaseState</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">raise_exceptions</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>,</span><span class="param">	<span class="n">register</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>,</span><span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span>)</span>
+        <span class="name">TestCaseState</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">raise_exceptions</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>,</span><span class="param">	<span class="n">register</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>,</span><span class="param">	<span class="n">depth</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></span>)</span>
 
                 <label class="view-source-button" for="TestCaseState.__init__-view-source"><span>View Source</span></label>
 
@@ -1800,7 +1800,7 @@ cengal<wbr>.unittest<wbr>.behavior_stabilizer<wbr>.versions<wbr>.v_0<wbr>.behavi
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">register_intro</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">raise_exceptions</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">AbstractContextManager</span><span class="p">[</span><span class="n">cengal</span><span class="o">.</span><span class="n">code_flow_control</span><span class="o">.</span><span class="n">smart_values</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">v_2</span><span class="o">.</span><span class="n">smart_values</span><span class="o">.</span><span class="n">ValueHolder</span><span class="p">]</span>:</span></span>
+        <span class="name">register_intro</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">raise_exceptions</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">AbstractContextManager</span><span class="p">[</span><span class="n">cengal</span><span class="o">.</span><span class="n">code_flow_control</span><span class="o">.</span><span class="n">smart_values</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">v_2</span><span class="o">.</span><span class="n">smart_values</span><span class="o">.</span><span class="n">ValueHolder</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="TestCaseState.register_intro-view-source"><span>View Source</span></label>
 
@@ -1867,7 +1867,7 @@ cengal<wbr>.unittest<wbr>.behavior_stabilizer<wbr>.versions<wbr>.v_0<wbr>.behavi
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">ri</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">raise_exceptions</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">AbstractContextManager</span><span class="p">[</span><span class="n">cengal</span><span class="o">.</span><span class="n">code_flow_control</span><span class="o">.</span><span class="n">smart_values</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">v_2</span><span class="o">.</span><span class="n">smart_values</span><span class="o">.</span><span class="n">ValueHolder</span><span class="p">]</span>:</span></span>
+        <span class="name">ri</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">raise_exceptions</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">AbstractContextManager</span><span class="p">[</span><span class="n">cengal</span><span class="o">.</span><span class="n">code_flow_control</span><span class="o">.</span><span class="n">smart_values</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">v_2</span><span class="o">.</span><span class="n">smart_values</span><span class="o">.</span><span class="n">ValueHolder</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="TestCaseState.ri-view-source"><span>View Source</span></label>
 
@@ -1934,7 +1934,7 @@ cengal<wbr>.unittest<wbr>.behavior_stabilizer<wbr>.versions<wbr>.v_0<wbr>.behavi
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">register_outro</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">func</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span>,</span><span class="param">	<span class="n">raise_exceptions</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
+        <span class="name">register_outro</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">func</span><span class="p">:</span> <span class="n">Callable</span>,</span><span class="param">	<span class="n">raise_exceptions</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
 
                 <label class="view-source-button" for="TestCaseState.register_outro-view-source"><span>View Source</span></label>
 
@@ -2032,7 +2032,7 @@ cengal<wbr>.unittest<wbr>.behavior_stabilizer<wbr>.versions<wbr>.v_0<wbr>.behavi
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">ro</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">func</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span>,</span><span class="param">	<span class="n">raise_exceptions</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
+        <span class="name">ro</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">func</span><span class="p">:</span> <span class="n">Callable</span>,</span><span class="param">	<span class="n">raise_exceptions</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">Callable</span>:</span></span>
 
                 <label class="view-source-button" for="TestCaseState.ro-view-source"><span>View Source</span></label>
 
@@ -2130,7 +2130,7 @@ cengal<wbr>.unittest<wbr>.behavior_stabilizer<wbr>.versions<wbr>.v_0<wbr>.behavi
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">register_last_result</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">result</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+        <span class="name">register_last_result</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">result</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="TestCaseState.register_last_result-view-source"><span>View Source</span></label>
 
@@ -2154,7 +2154,7 @@ cengal<wbr>.unittest<wbr>.behavior_stabilizer<wbr>.versions<wbr>.v_0<wbr>.behavi
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">rls</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">result</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+        <span class="name">rls</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">result</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="TestCaseState.rls-view-source"><span>View Source</span></label>
 
@@ -2178,7 +2178,7 @@ cengal<wbr>.unittest<wbr>.behavior_stabilizer<wbr>.versions<wbr>.v_0<wbr>.behavi
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">register_last_exception</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">result</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+        <span class="name">register_last_exception</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">result</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="TestCaseState.register_last_exception-view-source"><span>View Source</span></label>
 
@@ -2202,7 +2202,7 @@ cengal<wbr>.unittest<wbr>.behavior_stabilizer<wbr>.versions<wbr>.v_0<wbr>.behavi
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">rle</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">result</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+        <span class="name">rle</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">result</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="TestCaseState.rle-view-source"><span>View Source</span></label>
 

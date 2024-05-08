@@ -16,6 +16,16 @@
 # limitations under the License.
 
 
+__all__ = [
+    'decode',
+    'detect_and_decode',
+    'is_utf8_text',
+    'is_text_is_7bit_utf8_compatible',
+    'is_probably_utf8',
+    'is_utf8',
+]
+
+
 from typing import Tuple, Union
 import cchardet as chardet
 from cengal.modules_management.alternative_import import alt_import
@@ -39,7 +49,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.4"
+__version__ = "4.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -47,7 +57,7 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-def detect_and_decode(text: Union[bytes, bytearray]) -> Tuple[str, str, bytes]:
+def detect_and_decode(text: Union[bytes, bytearray], detect_as_utf8_when_possible: bool = True, check_text_for_utf8_compliance: bool = True) -> Tuple[str, str, bytes]:
     if not text:
         return str(), 'utf-8', bytes()
 
@@ -71,8 +81,63 @@ def detect_and_decode(text: Union[bytes, bytearray]) -> Tuple[str, str, bytes]:
             detection = cn_detect(text)
             
         encoding = detection["encoding"]
+        if detect_as_utf8_when_possible:
+            if check_text_for_utf8_compliance:
+                result_encoding = 'utf-8' if is_utf8_text(encoding, text) else encoding
+            else:
+                result_encoding = 'utf-8' if (is_utf8(encoding) or is_probably_utf8(encoding)) else encoding
+        else:
+            result_encoding = encoding
+        
         bom_bytes = bytes()
-        return text.decode(encoding), encoding, bom_bytes
+        return text.decode(encoding), result_encoding, bom_bytes
+
+
+utf8_compatible_encodings = {
+    'utf-8',
+    'ISO-8859-1',
+    'Latin 1',
+}
+utf8_compatible_encodings_lower = {encoding.lower() for encoding in utf8_compatible_encodings}
+
+
+utf8_half_compatible_encodings = {
+    'US-ASCII',
+    'ASCII',
+    'ANSI_X3.4-1968',
+    'iso-ir-6',
+    'ANSI_X3.4-1986',
+    'ISO_646.irv:1991',
+    'ASCII-7',
+    'ASCII-8',
+    'ISO646-US',
+    'us',
+    'IBM367',
+    'cp367',
+    'csASCII',
+}
+utf8_half_compatible_encodings_lower = {encoding.lower() for encoding in utf8_half_compatible_encodings}
+
+
+def is_utf8(encoding: str) -> bool:
+    return encoding.lower() in utf8_compatible_encodings_lower
+
+
+def is_probably_utf8(encoding: str) -> bool:
+    return encoding.lower() in utf8_half_compatible_encodings_lower
+
+
+def is_text_is_7bit_utf8_compatible(text: Union[bytes, bytearray]) -> bool:
+    return all(b <= 127 for b in text)
+
+
+def is_utf8_text(encoding: str, text: Union[bytes, bytearray]) -> bool:
+    if is_utf8(encoding):
+        return True
+    elif is_probably_utf8(encoding):
+        return is_text_is_7bit_utf8_compatible(text)
+    else:
+        return False
 
 
 def decode(text: Union[bytes, bytearray]) -> str:

@@ -16,6 +16,9 @@
 # limitations under the License.
 
 
+__all__ = ['WrongTextType', 'KNOWN_BOMS', 'determine_text_bom', 'remove_bom', 'determine_bom_encoding', 'decode_text_and_remove_all_wrong_symbols']
+
+
 """
 Module Docstring
 Docstrings: http://www.python.org/dev/peps/pep-0257/
@@ -26,7 +29,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.4"
+__version__ = "4.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -34,24 +37,10 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-__all__ = ['WrongTextType', 'KNOWN_BOMS', 'determine_text_bom', 'remove_bom', 'determine_bom_encoding', 'decode_text_and_remove_all_wrong_symbols']
-
-
-#!/usr/bin/env python
-# coding=utf-8
-
-
-
-
 import platform, sys
 import codecs
 from typing import Optional, Union
 from cengal.text_processing.text_processing import Text, DEFAULT_ENCODING, normalize_text, removeprefix
-
-
-
-
-
 
 
 class WrongTextType(Exception):

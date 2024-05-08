@@ -30,7 +30,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.4"
+__version__ = "4.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -116,6 +116,34 @@ class LineTracer:
             filename = os.path.basename(filename)
         
         result = (filename, function_name, next_line_num, lines, index)
+        return result
+
+    def trace_exact(self, line_num: int, depth: Optional[int] = 1):
+        if not self.trace_allowed:
+            result = (None, None, None, None, None)
+            return result
+        
+        frame, filename, line_number, function_name, lines, index = self._frame_info(depth + 1)
+        exact_line_num = line_num
+        lines = self._get_file_line(filename, exact_line_num)
+        if not self.print_full_file_name:
+            filename = os.path.basename(filename)
+        
+        result = (filename, function_name, exact_line_num, lines, index)
+        return result
+
+    def trace_relative(self, line_num_offset: int, depth: Optional[int] = 1):
+        if not self.trace_allowed:
+            result = (None, None, None, None, None)
+            return result
+        
+        frame, filename, line_number, function_name, lines, index = self._frame_info(depth + 1)
+        exact_line_num = line_number + line_num_offset
+        lines = self._get_file_line(filename, exact_line_num)
+        if not self.print_full_file_name:
+            filename = os.path.basename(filename)
+        
+        result = (filename, function_name, exact_line_num, lines, index)
         return result
 
     def __call__(self, depth: Optional[int] = 1):

@@ -27,7 +27,9 @@ from cengal.time_management.repeat_for_a_time import Tracer, ClockType
 from cengal.math.numbers import RationalNumber
 from cengal.introspection.inspect import is_async
 from cengal.introspection.inspect import func_name, entity_properties
-from typing import Union, Callable, Awaitable, List, Optional
+from cengal.code_inspection.auto_line_tracer import alt, LineType, OutputFields, AutoLineTracer
+
+from typing import Union, Callable, Awaitable, List, Optional, Type, Set
 
 """
 Module Docstring
@@ -38,7 +40,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.4"
+__version__ = "4.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -243,8 +245,9 @@ class PrecisePerformanceTestTracer(Tracer):
 
 
 class MeasureTime:
-    def __init__(self, name: str=None, do_print: Union[bool, Callable] = True, raise_exceptions: bool = True):
-        self.name = name
+    def __init__(self, name: str=None, iterations: int = 1, do_print: Union[bool, Callable] = True, raise_exceptions: bool = True):
+        self.name: str = name
+        self.iterations: int = 1 if iterations < 1 else iterations
         self.do_print: Union[bool, Callable] = do_print
         self.raise_exceptions: bool = raise_exceptions
         self.start_time = None
@@ -277,9 +280,13 @@ class MeasureTime:
                     print(f'\t Exception value: {self.exc_value}')
                     print(f'\t Exception traceback: {self.exc_tb}')
                 
-                print(f'\t It was used {self.time_spent} seconds')
+                if self.iterations > 1:
+                    print(f'\t It was used {self.time_spent} secondss to process {self.iterations} iterations')
+                else:
+                    print(f'\t It was used {self.time_spent} seconds')
+                
                 if self.time_spent:
-                    print(f'\t It is {1 / self.time_spent} iterations/seconds')
+                    print(f'\t There is {self.iterations / self.time_spent} iterations/seconds')
                     print()
             else:
                 self.do_print(self)
@@ -287,11 +294,61 @@ class MeasureTime:
         return not self.raise_exceptions
 
 
+class MeasureTimeTraceLine:
+    def __init__(self, name: str=None, iterations: int = 1, raise_exceptions: bool = True, measuring_class: Type = MeasureTime, 
+                 line_type: LineType = LineType.current_line, line_num: Optional[int] = None, output_fields: Optional[Set[OutputFields]] = None, 
+                 do_print: Union[bool, Callable] = True, auto_line_tracer: AutoLineTracer = None, depth: int = 1):
+        self.measuring_class: Type = measuring_class
+        self.measuring_obj: MeasureTime = self.measuring_class(name, iterations, self.printer if do_print is True else do_print, raise_exceptions)
+        self.depth: int = depth
+        self.output_fields: Set[OutputFields] = {
+            OutputFields.trace_name, 
+            OutputFields.file_name,
+            OutputFields.line,
+            OutputFields.func_name,
+            OutputFields.code_line,
+            OutputFields.new_line_after_end,
+        } if output_fields is None else output_fields
+        self.line_type: LineType = line_type
+        self.line_num: Optional[int] = line_num
+        self.auto_line_tracer: AutoLineTracer = alt if auto_line_tracer is None else auto_line_tracer
+    
+    def printer(self, measuring_obj: MeasureTime) -> None:
+        print('='*40)
+        if self.measuring_obj.name is not None:
+            print(f'>>> "{measuring_obj.name}"')
+
+        self.auto_line_tracer.pc('', line_type=self.line_type, line_num=self.line_num, output_fields=self.output_fields, depth=self.depth + 3)
+
+        if measuring_obj.exc_type is not None:
+            print(f'\t Exception: {measuring_obj.exc_type}')
+            print(f'\t Exception value: {measuring_obj.exc_value}')
+            print(f'\t Exception traceback: {measuring_obj.exc_tb}')
+        
+        if measuring_obj.iterations > 1:
+            print(f'It was used {measuring_obj.time_spent} secondss to process {measuring_obj.iterations} iterations')
+        else:
+            print(f'It was used {measuring_obj.time_spent} seconds')
+        
+        if measuring_obj.time_spent:
+            print(f'There is {measuring_obj.iterations / measuring_obj.time_spent} iterations/seconds')
+        
+        print()
+
+    def __enter__(self):
+        return self.measuring_obj.__enter__()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        return self.measuring_obj.__exit__(exc_type, exc_val, exc_tb)
+
+
 class MeasureProcessTime:
-    def __init__(self, name: str=None, do_print: Union[bool, Callable] = False, raise_exceptions: bool = True):
-        self.name = name
+    def __init__(self, name: str=None, iterations: int = 1, do_print: Union[bool, Callable] = False, raise_exceptions: bool = True, depth: int = 1):
+        self.name: str = name
+        self.iterations: int = 1 if iterations < 1 else iterations
         self.do_print: Union[bool, Callable] = do_print
         self.raise_exceptions: bool = raise_exceptions
+        self.depth: int = depth
         self.start_time = None
         self.stop_time = None
         self.time_spent = None
@@ -322,9 +379,13 @@ class MeasureProcessTime:
                     print(f'\t Exception value: {self.exc_value}')
                     print(f'\t Exception traceback: {self.exc_tb}')
                 
-                print(f'\t It was used {self.time_spent} seconds')
+                if self.iterations > 1:
+                    print(f'\t It was used {self.time_spent} secondss to process {self.iterations} iterations')
+                else:
+                    print(f'\t It was used {self.time_spent} seconds')
+                
                 if self.time_spent:
-                    print(f'\t It is {1 / self.time_spent} iterations/seconds')
+                    print(f'\t There is {self.iterations / self.time_spent} iterations/seconds')
                     print()
             else:
                 self.do_print(self)

@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.4"
+__version__ = "4.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -37,19 +37,9 @@ __status__ = "Development"
 __all__ = ['find_brackets', 'find_text_in_brackets', 'find_text_with_brackets', 'replace_text_in_brackets', 'replace_text_with_brackets']
 
 
-#!/usr/bin/env python
-# coding=utf-8
-
-
-
 from typing import Optional, Tuple, Callable, List
 from cengal.text_processing.text_processing import Text, find_text, replace_slice, DEFAULT_ENCODING
 from .brackets import *
-
-
-
-
-
 
 
 def find_brackets(data: Text, brackets: BracketPair, start: int = 0, stop: Optional[int] = None, encoding: Optional[str] = DEFAULT_ENCODING, normalizer: Optional[Callable] = None) -> Tuple[Optional[slice], Optional[slice]]:

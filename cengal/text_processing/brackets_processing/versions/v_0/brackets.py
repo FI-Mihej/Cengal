@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.4"
+__version__ = "4.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -37,20 +37,9 @@ __status__ = "Development"
 __all__ = ['Bracket', 'BracketPair', 'BracketsList', 'BracketAbsentType']
 
 
-#!/usr/bin/env python
-# coding=utf-8
-
-
-
-
 from enum import Enum
 from typing import Optional, Union, List
 from cengal.text_processing.text_processing import Text
-
-
-
-
-
 
 
 class BracketAbsentType(Enum):

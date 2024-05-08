@@ -32,7 +32,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.4"
+__version__ = "4.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -60,3 +60,11 @@ def bit_cast__float_to_uint32(x: float) -> int:
 
 def bit_cast__uint32_to_float(x: int) -> float:
     return unpack('f', pack('I', x))
+
+
+def bit_cast__double_to_uint64(x: float) -> int:
+    return unpack('Q', pack('d', x))
+
+
+def bit_cast__uint64_to_double(x: int) -> float:
+    return unpack('d', pack('Q', x))

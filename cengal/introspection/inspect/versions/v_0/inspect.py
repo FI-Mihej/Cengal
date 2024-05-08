@@ -38,7 +38,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.4"
+__version__ = "4.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -590,6 +590,29 @@ def class_properties(entity: Type) -> Set[str]:
 def class_properties_values(entity) -> Dict[str, Any]:
     result = dict()
     for property_name in sorted(class_properties(entity)):
+        result[property_name] = getattr(entity, property_name)
+    
+    return result
+
+
+def class_properties_withot_object(entity: Type) -> Set[str]:
+    """
+    Example:
+
+    Args:
+        entity (_type_): _description_
+
+    Returns:
+        Set[str]: _description_
+    """    
+    object_type_items = set(dir(object))
+    entity_items = set(dir(entity))
+    return entity_items - object_type_items
+
+
+def class_properties_withot_object_values(entity) -> Dict[str, Any]:
+    result = dict()
+    for property_name in sorted(class_properties_withot_object(entity)):
         result[property_name] = getattr(entity, property_name)
     
     return result

@@ -59,7 +59,7 @@ cengal<wbr>.system<wbr>.versions<wbr>.v_0<wbr>.system    </h1>
 </span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.4&quot;</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.4.0&quot;</span>
 </span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -452,7 +452,7 @@ cengal<wbr>.system<wbr>.versions<wbr>.v_0<wbr>.system    </h1>
                 <section id="CENGAL_VERSION_STR">
                     <div class="attr variable">
             <span class="name">CENGAL_VERSION_STR</span>        =
-<span class="default_value">&#39;4.3.4&#39;</span>
+<span class="default_value">&#39;4.4.0&#39;</span>
 
         
     </div>
@@ -476,7 +476,7 @@ cengal<wbr>.system<wbr>.versions<wbr>.v_0<wbr>.system    </h1>
                 <section id="CENGAL_VERSION_MINOR_STR">
                     <div class="attr variable">
             <span class="name">CENGAL_VERSION_MINOR_STR</span>        =
-<span class="default_value">&#39;3&#39;</span>
+<span class="default_value">&#39;4&#39;</span>
 
         
     </div>
@@ -488,7 +488,7 @@ cengal<wbr>.system<wbr>.versions<wbr>.v_0<wbr>.system    </h1>
                 <section id="CENGAL_VERSION_MICRO_STR">
                     <div class="attr variable">
             <span class="name">CENGAL_VERSION_MICRO_STR</span>        =
-<span class="default_value">&#39;4&#39;</span>
+<span class="default_value">&#39;0&#39;</span>
 
         
     </div>
@@ -500,7 +500,7 @@ cengal<wbr>.system<wbr>.versions<wbr>.v_0<wbr>.system    </h1>
                 <section id="CENGAL_VERSION">
                     <div class="attr variable">
             <span class="name">CENGAL_VERSION</span>        =
-<span class="default_value">(4, 3, 4)</span>
+<span class="default_value">(4, 4, 0)</span>
 
         
     </div>
@@ -524,7 +524,7 @@ cengal<wbr>.system<wbr>.versions<wbr>.v_0<wbr>.system    </h1>
                 <section id="CENGAL_VERSION_MINOR">
                     <div class="attr variable">
             <span class="name">CENGAL_VERSION_MINOR</span>        =
-<span class="default_value">3</span>
+<span class="default_value">4</span>
 
         
     </div>
@@ -536,7 +536,7 @@ cengal<wbr>.system<wbr>.versions<wbr>.v_0<wbr>.system    </h1>
                 <section id="CENGAL_VERSION_MICRO">
                     <div class="attr variable">
             <span class="name">CENGAL_VERSION_MICRO</span>        =
-<span class="default_value">4</span>
+<span class="default_value">0</span>
 
         
     </div>

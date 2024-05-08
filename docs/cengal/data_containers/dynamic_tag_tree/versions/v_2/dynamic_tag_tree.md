@@ -43,7 +43,7 @@ cengal<wbr>.data_containers<wbr>.dynamic_tag_tree<wbr>.versions<wbr>.v_2<wbr>.dy
 </span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.4&quot;</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.4.0&quot;</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -332,7 +332,7 @@ cengal<wbr>.data_containers<wbr>.dynamic_tag_tree<wbr>.versions<wbr>.v_2<wbr>.dy
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">tags_set_2_tuple</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">tags</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span>:</span></span>
+        <span class="name">tags_set_2_tuple</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">tags</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="tags_set_2_tuple-view-source"><span>View Source</span></label>
 
@@ -608,7 +608,7 @@ cengal<wbr>.data_containers<wbr>.dynamic_tag_tree<wbr>.versions<wbr>.v_2<wbr>.dy
                                         <input id="DynamicTagTree.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">DynamicTagTree</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">growth_during_the_search_is_allowed</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">scheduler</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span>)</span>
+        <span class="name">DynamicTagTree</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">growth_during_the_search_is_allowed</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">scheduler</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span>)</span>
 
                 <label class="view-source-button" for="DynamicTagTree.__init__-view-source"><span>View Source</span></label>
 
@@ -854,7 +854,7 @@ cengal<wbr>.data_containers<wbr>.dynamic_tag_tree<wbr>.versions<wbr>.v_2<wbr>.dy
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">set_scheduler</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">scheduler</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span></span><span class="return-annotation">):</span></span>
+        <span class="name">set_scheduler</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">scheduler</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="DynamicTagTree.set_scheduler-view-source"><span>View Source</span></label>
 
@@ -892,7 +892,7 @@ cengal<wbr>.data_containers<wbr>.dynamic_tag_tree<wbr>.versions<wbr>.v_2<wbr>.dy
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">put</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">item_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span>,</span><span class="param">	<span class="n">tags</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">FrozenSet</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Hashable</span>:</span></span>
+        <span class="name">put</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">item_id</span><span class="p">:</span> <span class="n">Hashable</span>, </span><span class="param"><span class="n">tags</span><span class="p">:</span> <span class="n">FrozenSet</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Hashable</span>:</span></span>
 
                 <label class="view-source-button" for="DynamicTagTree.put-view-source"><span>View Source</span></label>
 
@@ -949,7 +949,7 @@ cengal<wbr>.data_containers<wbr>.dynamic_tag_tree<wbr>.versions<wbr>.v_2<wbr>.dy
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">item_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span>,</span><span class="param">	<span class="n">tags</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">FrozenSet</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
+        <span class="name">get</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">item_id</span><span class="p">:</span> <span class="n">Hashable</span>,</span><span class="param">	<span class="n">tags</span><span class="p">:</span> <span class="n">FrozenSet</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="DynamicTagTree.get-view-source"><span>View Source</span></label>
 
@@ -968,7 +968,7 @@ cengal<wbr>.data_containers<wbr>.dynamic_tag_tree<wbr>.versions<wbr>.v_2<wbr>.dy
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">item</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">unique_item_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">FrozenSet</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]],</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
+        <span class="name">item</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">unique_item_id</span><span class="p">:</span> <span class="n">Hashable</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">FrozenSet</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]],</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="DynamicTagTree.item-view-source"><span>View Source</span></label>
 
@@ -987,7 +987,7 @@ cengal<wbr>.data_containers<wbr>.dynamic_tag_tree<wbr>.versions<wbr>.v_2<wbr>.dy
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">delete</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">unique_item_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span></span><span class="return-annotation">):</span></span>
+        <span class="name">delete</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">unique_item_id</span><span class="p">:</span> <span class="n">Hashable</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="DynamicTagTree.delete-view-source"><span>View Source</span></label>
 
@@ -1006,7 +1006,7 @@ cengal<wbr>.data_containers<wbr>.dynamic_tag_tree<wbr>.versions<wbr>.v_2<wbr>.dy
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">list_direct_items</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">tags</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">FrozenSet</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span><span class="p">]</span></span><span class="return-annotation">):</span></span>
+        <span class="name">list_direct_items</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">tags</span><span class="p">:</span> <span class="n">FrozenSet</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="DynamicTagTree.list_direct_items-view-source"><span>View Source</span></label>
 
@@ -1025,7 +1025,7 @@ cengal<wbr>.data_containers<wbr>.dynamic_tag_tree<wbr>.versions<wbr>.v_2<wbr>.dy
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">list_all_items</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">tags</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">FrozenSet</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span><span class="p">]</span></span><span class="return-annotation">):</span></span>
+        <span class="name">list_all_items</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">tags</span><span class="p">:</span> <span class="n">FrozenSet</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="DynamicTagTree.list_all_items-view-source"><span>View Source</span></label>
 
@@ -1044,7 +1044,7 @@ cengal<wbr>.data_containers<wbr>.dynamic_tag_tree<wbr>.versions<wbr>.v_2<wbr>.dy
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">list_direct_tags</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">tags</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">FrozenSet</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span><span class="p">]</span></span><span class="return-annotation">):</span></span>
+        <span class="name">list_direct_tags</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">tags</span><span class="p">:</span> <span class="n">FrozenSet</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="DynamicTagTree.list_direct_tags-view-source"><span>View Source</span></label>
 
@@ -1063,7 +1063,7 @@ cengal<wbr>.data_containers<wbr>.dynamic_tag_tree<wbr>.versions<wbr>.v_2<wbr>.dy
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">list_all_tags</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">tags</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">FrozenSet</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span><span class="p">]</span></span><span class="return-annotation">):</span></span>
+        <span class="name">list_all_tags</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">tags</span><span class="p">:</span> <span class="n">FrozenSet</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="DynamicTagTree.list_all_tags-view-source"><span>View Source</span></label>
 
@@ -1082,7 +1082,7 @@ cengal<wbr>.data_containers<wbr>.dynamic_tag_tree<wbr>.versions<wbr>.v_2<wbr>.dy
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_nearest_non_empty_tags_set</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">tags</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">FrozenSet</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Hashable</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">FrozenSet</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
+        <span class="name">get_nearest_non_empty_tags_set</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">tags</span><span class="p">:</span> <span class="n">FrozenSet</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">FrozenSet</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="DynamicTagTree.get_nearest_non_empty_tags_set-view-source"><span>View Source</span></label>
 

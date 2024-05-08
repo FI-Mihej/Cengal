@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.4"
+__version__ = "4.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -37,19 +37,9 @@ __status__ = "Development"
 __all__ = ['out_of_data_bounds', 'out_of_accessible_data_bounds', 'line_delimiter_n', 'line_delimiter_rn', 'line_delimiter', 'first_line', 'first_visible_line', 'line', 'last_line', 'last_visible_line', 'round_l', 'round_r', 'round', 'square_l', 'square_r', 'square', 'triangle_l', 'triangle_r', 'triangle', 'brace_l', 'brace_r', 'brace', 'quote', 'quotes', 'apostrophe', 'apostrophes', 'backtick', 'backticks']
 
 
-#!/usr/bin/env python
-# coding=utf-8
-
-
-
-
 from enum import Enum
 from typing import Optional, Union
 from .brackets import *
-
-
-
-
 
 
 out_of_data_bounds: Bracket = Bracket(BracketAbsentType.out_of_data_bounds)

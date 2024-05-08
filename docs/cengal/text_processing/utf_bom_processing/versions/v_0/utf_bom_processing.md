@@ -8,124 +8,110 @@ title: utf_bom_processing
                     <h1 class="modulename">
 cengal<wbr>.text_processing<wbr>.utf_bom_processing<wbr>.versions<wbr>.v_0<wbr>.utf_bom_processing    </h1>
 
-                        <div class="docstring"><p>Module Docstring
-Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python.org/dev/peps/pep-0257/</a></p>
-</div>
-
+                
                         <input id="mod-utf_bom_processing-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
                         <label class="view-source-button" for="mod-utf_bom_processing-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="ch">#!/usr/bin/env python</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="c1"># coding=utf-8</span>
-</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="c1"># Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="c1"># </span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="c1"># you may not use this file except in compliance with the License.</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="c1"># You may obtain a copy of the License at</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="c1"># </span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="c1"># </span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a><span class="c1"># See the License for the specific language governing permissions and</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="c1"># limitations under the License.</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>
-</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a>
-</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="sd">Module Docstring</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="sd">Docstrings: http://www.python.org/dev/peps/pep-0257/</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>
-</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>
-</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.4&quot;</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Development&quot;</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="c1"># __status__ = &quot;Production&quot;</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>
-</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>
-</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;WrongTextType&#39;</span><span class="p">,</span> <span class="s1">&#39;KNOWN_BOMS&#39;</span><span class="p">,</span> <span class="s1">&#39;determine_text_bom&#39;</span><span class="p">,</span> <span class="s1">&#39;remove_bom&#39;</span><span class="p">,</span> <span class="s1">&#39;determine_bom_encoding&#39;</span><span class="p">,</span> <span class="s1">&#39;decode_text_and_remove_all_wrong_symbols&#39;</span><span class="p">]</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>
-</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>
-</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a><span class="c1">#!/usr/bin/env python</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a><span class="c1"># coding=utf-8</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>
-</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>
-</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>
-</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>
-</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="kn">import</span> <span class="nn">platform</span><span class="o">,</span> <span class="nn">sys</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="kn">import</span> <span class="nn">codecs</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="kn">from</span> <span class="nn">cengal.text_processing.text_processing</span> <span class="kn">import</span> <span class="n">Text</span><span class="p">,</span> <span class="n">DEFAULT_ENCODING</span><span class="p">,</span> <span class="n">normalize_text</span><span class="p">,</span> <span class="n">removeprefix</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>
-</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>
-</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>
-</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>
-</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>
-</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="k">class</span> <span class="nc">WrongTextType</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>    <span class="k">pass</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="n">KNOWN_BOMS</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>    <span class="n">codecs</span><span class="o">.</span><span class="n">BOM_UTF8</span><span class="p">:</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">,</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>    <span class="n">codecs</span><span class="o">.</span><span class="n">BOM_UTF16_BE</span><span class="p">:</span> <span class="s1">&#39;utf-16be&#39;</span><span class="p">,</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>    <span class="n">codecs</span><span class="o">.</span><span class="n">BOM_UTF16_LE</span><span class="p">:</span> <span class="s1">&#39;utf-16le&#39;</span><span class="p">,</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>    <span class="n">codecs</span><span class="o">.</span><span class="n">BOM_UTF32_BE</span><span class="p">:</span> <span class="s1">&#39;utf-32be&#39;</span><span class="p">,</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>    <span class="n">codecs</span><span class="o">.</span><span class="n">BOM_UTF32_LE</span><span class="p">:</span> <span class="s1">&#39;utf-32le&#39;</span><span class="p">,</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="p">}</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="n">KNOWN_BOMS_ORDER</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>    <span class="n">codecs</span><span class="o">.</span><span class="n">BOM_UTF8</span><span class="p">,</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>    <span class="n">codecs</span><span class="o">.</span><span class="n">BOM_UTF32_BE</span><span class="p">,</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>    <span class="n">codecs</span><span class="o">.</span><span class="n">BOM_UTF32_LE</span><span class="p">,</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>    <span class="n">codecs</span><span class="o">.</span><span class="n">BOM_UTF16_BE</span><span class="p">,</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>    <span class="n">codecs</span><span class="o">.</span><span class="n">BOM_UTF16_LE</span><span class="p">,</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="p">]</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="k">def</span> <span class="nf">determine_text_bom</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]:</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">)):</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>        <span class="k">raise</span> <span class="n">WrongTextType</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>    
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>    <span class="n">bom_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>    
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>    <span class="n">absent_bom</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>    
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">):</span>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>        <span class="k">for</span> <span class="n">bom</span> <span class="ow">in</span> <span class="n">KNOWN_BOMS_ORDER</span><span class="p">:</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>            <span class="n">bom_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">normalize_text</span><span class="p">(</span><span class="n">bom</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">))</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>        
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>        <span class="n">absent_bom</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">absent_bom</span><span class="p">)</span>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>        <span class="n">bom_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">KNOWN_BOMS_ORDER</span><span class="p">)</span>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>    <span class="k">for</span> <span class="n">bom</span> <span class="ow">in</span> <span class="n">bom_list</span><span class="p">:</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>        <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">bom</span><span class="p">):</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>            <span class="k">return</span> <span class="n">bom</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>    
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>    <span class="k">return</span> <span class="n">absent_bom</span>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="k">def</span> <span class="nf">remove_bom</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">],</span> <span class="n">bom</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]:</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>    <span class="k">return</span> <span class="n">removeprefix</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">bom</span><span class="p">)</span>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="k">def</span> <span class="nf">determine_bom_encoding</span><span class="p">(</span><span class="n">bom</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>    <span class="n">bom</span> <span class="o">=</span> <span class="n">normalize_text</span><span class="p">(</span><span class="n">bom</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>    <span class="k">return</span> <span class="n">KNOWN_BOMS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bom</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="k">def</span> <span class="nf">decode_text_and_remove_all_wrong_symbols</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">],</span> <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>    <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="s1">&#39;replace&#39;</span><span class="p">)</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="ch">#!/usr/bin/env python</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="c1"># coding=utf-8</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="c1"># Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="c1"># </span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="c1"># you may not use this file except in compliance with the License.</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="c1"># You may obtain a copy of the License at</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="c1"># </span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="c1"># </span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="c1"># See the License for the specific language governing permissions and</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="c1"># limitations under the License.</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;WrongTextType&#39;</span><span class="p">,</span> <span class="s1">&#39;KNOWN_BOMS&#39;</span><span class="p">,</span> <span class="s1">&#39;determine_text_bom&#39;</span><span class="p">,</span> <span class="s1">&#39;remove_bom&#39;</span><span class="p">,</span> <span class="s1">&#39;determine_bom_encoding&#39;</span><span class="p">,</span> <span class="s1">&#39;decode_text_and_remove_all_wrong_symbols&#39;</span><span class="p">]</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a><span class="sd">Module Docstring</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a><span class="sd">Docstrings: http://www.python.org/dev/peps/pep-0257/</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.4.0&quot;</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Development&quot;</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="c1"># __status__ = &quot;Production&quot;</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="kn">import</span> <span class="nn">platform</span><span class="o">,</span> <span class="nn">sys</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="kn">import</span> <span class="nn">codecs</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a><span class="kn">from</span> <span class="nn">cengal.text_processing.text_processing</span> <span class="kn">import</span> <span class="n">Text</span><span class="p">,</span> <span class="n">DEFAULT_ENCODING</span><span class="p">,</span> <span class="n">normalize_text</span><span class="p">,</span> <span class="n">removeprefix</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a><span class="k">class</span> <span class="nc">WrongTextType</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>    <span class="k">pass</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>
+</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>
+</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a><span class="n">KNOWN_BOMS</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>    <span class="n">codecs</span><span class="o">.</span><span class="n">BOM_UTF8</span><span class="p">:</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">,</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>    <span class="n">codecs</span><span class="o">.</span><span class="n">BOM_UTF16_BE</span><span class="p">:</span> <span class="s1">&#39;utf-16be&#39;</span><span class="p">,</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>    <span class="n">codecs</span><span class="o">.</span><span class="n">BOM_UTF16_LE</span><span class="p">:</span> <span class="s1">&#39;utf-16le&#39;</span><span class="p">,</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>    <span class="n">codecs</span><span class="o">.</span><span class="n">BOM_UTF32_BE</span><span class="p">:</span> <span class="s1">&#39;utf-32be&#39;</span><span class="p">,</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>    <span class="n">codecs</span><span class="o">.</span><span class="n">BOM_UTF32_LE</span><span class="p">:</span> <span class="s1">&#39;utf-32le&#39;</span><span class="p">,</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a><span class="p">}</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a><span class="n">KNOWN_BOMS_ORDER</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a>    <span class="n">codecs</span><span class="o">.</span><span class="n">BOM_UTF8</span><span class="p">,</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a>    <span class="n">codecs</span><span class="o">.</span><span class="n">BOM_UTF32_BE</span><span class="p">,</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>    <span class="n">codecs</span><span class="o">.</span><span class="n">BOM_UTF32_LE</span><span class="p">,</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a>    <span class="n">codecs</span><span class="o">.</span><span class="n">BOM_UTF16_BE</span><span class="p">,</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a>    <span class="n">codecs</span><span class="o">.</span><span class="n">BOM_UTF16_LE</span><span class="p">,</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a><span class="p">]</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a>
+</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a>
+</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a><span class="k">def</span> <span class="nf">determine_text_bom</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]:</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a>    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">)):</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a>        <span class="k">raise</span> <span class="n">WrongTextType</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a>    
+</span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a>    <span class="n">bom_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos">71</span></a>    
+</span><span id="L-72"><a href="#L-72"><span class="linenos">72</span></a>    <span class="n">absent_bom</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos">73</span></a>    
+</span><span id="L-74"><a href="#L-74"><span class="linenos">74</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">):</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos">75</span></a>        <span class="k">for</span> <span class="n">bom</span> <span class="ow">in</span> <span class="n">KNOWN_BOMS_ORDER</span><span class="p">:</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos">76</span></a>            <span class="n">bom_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">normalize_text</span><span class="p">(</span><span class="n">bom</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">))</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos">77</span></a>        
+</span><span id="L-78"><a href="#L-78"><span class="linenos">78</span></a>        <span class="n">absent_bom</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">absent_bom</span><span class="p">)</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos">79</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos">80</span></a>        <span class="n">bom_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">KNOWN_BOMS_ORDER</span><span class="p">)</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos">81</span></a>
+</span><span id="L-82"><a href="#L-82"><span class="linenos">82</span></a>    <span class="k">for</span> <span class="n">bom</span> <span class="ow">in</span> <span class="n">bom_list</span><span class="p">:</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos">83</span></a>        <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">bom</span><span class="p">):</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos">84</span></a>            <span class="k">return</span> <span class="n">bom</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos">85</span></a>    
+</span><span id="L-86"><a href="#L-86"><span class="linenos">86</span></a>    <span class="k">return</span> <span class="n">absent_bom</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos">87</span></a>
+</span><span id="L-88"><a href="#L-88"><span class="linenos">88</span></a>
+</span><span id="L-89"><a href="#L-89"><span class="linenos">89</span></a><span class="k">def</span> <span class="nf">remove_bom</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">],</span> <span class="n">bom</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]:</span>
+</span><span id="L-90"><a href="#L-90"><span class="linenos">90</span></a>    <span class="k">return</span> <span class="n">removeprefix</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">bom</span><span class="p">)</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos">91</span></a>
+</span><span id="L-92"><a href="#L-92"><span class="linenos">92</span></a>
+</span><span id="L-93"><a href="#L-93"><span class="linenos">93</span></a><span class="k">def</span> <span class="nf">determine_bom_encoding</span><span class="p">(</span><span class="n">bom</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos">94</span></a>    <span class="n">bom</span> <span class="o">=</span> <span class="n">normalize_text</span><span class="p">(</span><span class="n">bom</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos">95</span></a>    <span class="k">return</span> <span class="n">KNOWN_BOMS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bom</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos">96</span></a>
+</span><span id="L-97"><a href="#L-97"><span class="linenos">97</span></a>
+</span><span id="L-98"><a href="#L-98"><span class="linenos">98</span></a><span class="k">def</span> <span class="nf">decode_text_and_remove_all_wrong_symbols</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">],</span> <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos">99</span></a>    <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="s1">&#39;replace&#39;</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -141,8 +127,8 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 
     </div>
     <a class="headerlink" href="#WrongTextType"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="WrongTextType-58"><a href="#WrongTextType-58"><span class="linenos">58</span></a><span class="k">class</span> <span class="nc">WrongTextType</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-</span><span id="WrongTextType-59"><a href="#WrongTextType-59"><span class="linenos">59</span></a>    <span class="k">pass</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="WrongTextType-47"><a href="#WrongTextType-47"><span class="linenos">47</span></a><span class="k">class</span> <span class="nc">WrongTextType</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+</span><span id="WrongTextType-48"><a href="#WrongTextType-48"><span class="linenos">48</span></a>    <span class="k">pass</span>
 </span></pre></div>
 
 
@@ -183,33 +169,33 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">determine_text_bom</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">text</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]</span>:</span></span>
+        <span class="name">determine_text_bom</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="determine_text_bom-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#determine_text_bom"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="determine_text_bom-78"><a href="#determine_text_bom-78"><span class="linenos">78</span></a><span class="k">def</span> <span class="nf">determine_text_bom</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]:</span>
-</span><span id="determine_text_bom-79"><a href="#determine_text_bom-79"><span class="linenos">79</span></a>    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">)):</span>
-</span><span id="determine_text_bom-80"><a href="#determine_text_bom-80"><span class="linenos">80</span></a>        <span class="k">raise</span> <span class="n">WrongTextType</span>
-</span><span id="determine_text_bom-81"><a href="#determine_text_bom-81"><span class="linenos">81</span></a>    
-</span><span id="determine_text_bom-82"><a href="#determine_text_bom-82"><span class="linenos">82</span></a>    <span class="n">bom_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-</span><span id="determine_text_bom-83"><a href="#determine_text_bom-83"><span class="linenos">83</span></a>    
-</span><span id="determine_text_bom-84"><a href="#determine_text_bom-84"><span class="linenos">84</span></a>    <span class="n">absent_bom</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
-</span><span id="determine_text_bom-85"><a href="#determine_text_bom-85"><span class="linenos">85</span></a>    
-</span><span id="determine_text_bom-86"><a href="#determine_text_bom-86"><span class="linenos">86</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">):</span>
-</span><span id="determine_text_bom-87"><a href="#determine_text_bom-87"><span class="linenos">87</span></a>        <span class="k">for</span> <span class="n">bom</span> <span class="ow">in</span> <span class="n">KNOWN_BOMS_ORDER</span><span class="p">:</span>
-</span><span id="determine_text_bom-88"><a href="#determine_text_bom-88"><span class="linenos">88</span></a>            <span class="n">bom_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">normalize_text</span><span class="p">(</span><span class="n">bom</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">))</span>
-</span><span id="determine_text_bom-89"><a href="#determine_text_bom-89"><span class="linenos">89</span></a>        
-</span><span id="determine_text_bom-90"><a href="#determine_text_bom-90"><span class="linenos">90</span></a>        <span class="n">absent_bom</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">absent_bom</span><span class="p">)</span>
-</span><span id="determine_text_bom-91"><a href="#determine_text_bom-91"><span class="linenos">91</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="determine_text_bom-92"><a href="#determine_text_bom-92"><span class="linenos">92</span></a>        <span class="n">bom_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">KNOWN_BOMS_ORDER</span><span class="p">)</span>
-</span><span id="determine_text_bom-93"><a href="#determine_text_bom-93"><span class="linenos">93</span></a>
-</span><span id="determine_text_bom-94"><a href="#determine_text_bom-94"><span class="linenos">94</span></a>    <span class="k">for</span> <span class="n">bom</span> <span class="ow">in</span> <span class="n">bom_list</span><span class="p">:</span>
-</span><span id="determine_text_bom-95"><a href="#determine_text_bom-95"><span class="linenos">95</span></a>        <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">bom</span><span class="p">):</span>
-</span><span id="determine_text_bom-96"><a href="#determine_text_bom-96"><span class="linenos">96</span></a>            <span class="k">return</span> <span class="n">bom</span>
-</span><span id="determine_text_bom-97"><a href="#determine_text_bom-97"><span class="linenos">97</span></a>    
-</span><span id="determine_text_bom-98"><a href="#determine_text_bom-98"><span class="linenos">98</span></a>    <span class="k">return</span> <span class="n">absent_bom</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="determine_text_bom-67"><a href="#determine_text_bom-67"><span class="linenos">67</span></a><span class="k">def</span> <span class="nf">determine_text_bom</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]:</span>
+</span><span id="determine_text_bom-68"><a href="#determine_text_bom-68"><span class="linenos">68</span></a>    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">)):</span>
+</span><span id="determine_text_bom-69"><a href="#determine_text_bom-69"><span class="linenos">69</span></a>        <span class="k">raise</span> <span class="n">WrongTextType</span>
+</span><span id="determine_text_bom-70"><a href="#determine_text_bom-70"><span class="linenos">70</span></a>    
+</span><span id="determine_text_bom-71"><a href="#determine_text_bom-71"><span class="linenos">71</span></a>    <span class="n">bom_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+</span><span id="determine_text_bom-72"><a href="#determine_text_bom-72"><span class="linenos">72</span></a>    
+</span><span id="determine_text_bom-73"><a href="#determine_text_bom-73"><span class="linenos">73</span></a>    <span class="n">absent_bom</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
+</span><span id="determine_text_bom-74"><a href="#determine_text_bom-74"><span class="linenos">74</span></a>    
+</span><span id="determine_text_bom-75"><a href="#determine_text_bom-75"><span class="linenos">75</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">):</span>
+</span><span id="determine_text_bom-76"><a href="#determine_text_bom-76"><span class="linenos">76</span></a>        <span class="k">for</span> <span class="n">bom</span> <span class="ow">in</span> <span class="n">KNOWN_BOMS_ORDER</span><span class="p">:</span>
+</span><span id="determine_text_bom-77"><a href="#determine_text_bom-77"><span class="linenos">77</span></a>            <span class="n">bom_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">normalize_text</span><span class="p">(</span><span class="n">bom</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">))</span>
+</span><span id="determine_text_bom-78"><a href="#determine_text_bom-78"><span class="linenos">78</span></a>        
+</span><span id="determine_text_bom-79"><a href="#determine_text_bom-79"><span class="linenos">79</span></a>        <span class="n">absent_bom</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">absent_bom</span><span class="p">)</span>
+</span><span id="determine_text_bom-80"><a href="#determine_text_bom-80"><span class="linenos">80</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="determine_text_bom-81"><a href="#determine_text_bom-81"><span class="linenos">81</span></a>        <span class="n">bom_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">KNOWN_BOMS_ORDER</span><span class="p">)</span>
+</span><span id="determine_text_bom-82"><a href="#determine_text_bom-82"><span class="linenos">82</span></a>
+</span><span id="determine_text_bom-83"><a href="#determine_text_bom-83"><span class="linenos">83</span></a>    <span class="k">for</span> <span class="n">bom</span> <span class="ow">in</span> <span class="n">bom_list</span><span class="p">:</span>
+</span><span id="determine_text_bom-84"><a href="#determine_text_bom-84"><span class="linenos">84</span></a>        <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">bom</span><span class="p">):</span>
+</span><span id="determine_text_bom-85"><a href="#determine_text_bom-85"><span class="linenos">85</span></a>            <span class="k">return</span> <span class="n">bom</span>
+</span><span id="determine_text_bom-86"><a href="#determine_text_bom-86"><span class="linenos">86</span></a>    
+</span><span id="determine_text_bom-87"><a href="#determine_text_bom-87"><span class="linenos">87</span></a>    <span class="k">return</span> <span class="n">absent_bom</span>
 </span></pre></div>
 
 
@@ -221,14 +207,14 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">remove_bom</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">text</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]</span>,</span><span class="param">	<span class="n">bom</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]</span>:</span></span>
+        <span class="name">remove_bom</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]</span>,</span><span class="param">	<span class="n">bom</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="remove_bom-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#remove_bom"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="remove_bom-101"><a href="#remove_bom-101"><span class="linenos">101</span></a><span class="k">def</span> <span class="nf">remove_bom</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">],</span> <span class="n">bom</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]:</span>
-</span><span id="remove_bom-102"><a href="#remove_bom-102"><span class="linenos">102</span></a>    <span class="k">return</span> <span class="n">removeprefix</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">bom</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="remove_bom-90"><a href="#remove_bom-90"><span class="linenos">90</span></a><span class="k">def</span> <span class="nf">remove_bom</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">],</span> <span class="n">bom</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]:</span>
+</span><span id="remove_bom-91"><a href="#remove_bom-91"><span class="linenos">91</span></a>    <span class="k">return</span> <span class="n">removeprefix</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">bom</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -240,15 +226,15 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">determine_bom_encoding</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">bom</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
+        <span class="name">determine_bom_encoding</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">bom</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="determine_bom_encoding-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#determine_bom_encoding"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="determine_bom_encoding-105"><a href="#determine_bom_encoding-105"><span class="linenos">105</span></a><span class="k">def</span> <span class="nf">determine_bom_encoding</span><span class="p">(</span><span class="n">bom</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="determine_bom_encoding-106"><a href="#determine_bom_encoding-106"><span class="linenos">106</span></a>    <span class="n">bom</span> <span class="o">=</span> <span class="n">normalize_text</span><span class="p">(</span><span class="n">bom</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span>
-</span><span id="determine_bom_encoding-107"><a href="#determine_bom_encoding-107"><span class="linenos">107</span></a>    <span class="k">return</span> <span class="n">KNOWN_BOMS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bom</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="determine_bom_encoding-94"><a href="#determine_bom_encoding-94"><span class="linenos">94</span></a><span class="k">def</span> <span class="nf">determine_bom_encoding</span><span class="p">(</span><span class="n">bom</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="determine_bom_encoding-95"><a href="#determine_bom_encoding-95"><span class="linenos">95</span></a>    <span class="n">bom</span> <span class="o">=</span> <span class="n">normalize_text</span><span class="p">(</span><span class="n">bom</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span>
+</span><span id="determine_bom_encoding-96"><a href="#determine_bom_encoding-96"><span class="linenos">96</span></a>    <span class="k">return</span> <span class="n">KNOWN_BOMS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bom</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -260,14 +246,14 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">decode_text_and_remove_all_wrong_symbols</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">text</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]</span>, </span><span class="param"><span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="nb">str</span>:</span></span>
+        <span class="name">decode_text_and_remove_all_wrong_symbols</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]</span>, </span><span class="param"><span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="nb">str</span>:</span></span>
 
                 <label class="view-source-button" for="decode_text_and_remove_all_wrong_symbols-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#decode_text_and_remove_all_wrong_symbols"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="decode_text_and_remove_all_wrong_symbols-110"><a href="#decode_text_and_remove_all_wrong_symbols-110"><span class="linenos">110</span></a><span class="k">def</span> <span class="nf">decode_text_and_remove_all_wrong_symbols</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">],</span> <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="decode_text_and_remove_all_wrong_symbols-111"><a href="#decode_text_and_remove_all_wrong_symbols-111"><span class="linenos">111</span></a>    <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="s1">&#39;replace&#39;</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="decode_text_and_remove_all_wrong_symbols-99"><a href="#decode_text_and_remove_all_wrong_symbols-99"><span class="linenos"> 99</span></a><span class="k">def</span> <span class="nf">decode_text_and_remove_all_wrong_symbols</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">],</span> <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="decode_text_and_remove_all_wrong_symbols-100"><a href="#decode_text_and_remove_all_wrong_symbols-100"><span class="linenos">100</span></a>    <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="s1">&#39;replace&#39;</span><span class="p">)</span>
 </span></pre></div>
 
 

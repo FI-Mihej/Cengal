@@ -17,7 +17,8 @@
 
 from cengal.code_flow_control.smart_values.versions.v_0 import ResultExistence
 import string
-from cengal.data_manipulation.help_tools import ubyte_to_bytes, get_slice_from_array
+from cengal.data_manipulation.conversion.binary import ubyte_to_bytes
+from cengal.data_manipulation.conversion.sequence import get_slice_from_array
 from typing import Tuple, Union
 
 """
@@ -29,7 +30,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.4"
+__version__ = "4.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"

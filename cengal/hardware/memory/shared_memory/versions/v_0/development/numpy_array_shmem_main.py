@@ -26,7 +26,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.4"
+__version__ = "4.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -85,7 +85,7 @@ def main():
         with test_run_time('Initialization Duration', 1, ignore_index=True):
             flow_control: Tuple[FlowControl, float] = creator.put_message([FlowControl.no_requests.value, None])
 
-            holder: bytes = b'\x00' * numpy_array_made_from_pointer_memory_size(shape, ctypes.c_double)
+            holder: bytes = bytes(numpy_array_made_from_pointer_memory_size(shape, ctypes.c_double))
             _, holder_offset = creator.put_message_2(holder)
             np_arr: np.ndarray = make_numpy_array_from_obj_offset(creator, holder_offset, shape, ctypes.c_double)
             np_arr.fill(0.0)

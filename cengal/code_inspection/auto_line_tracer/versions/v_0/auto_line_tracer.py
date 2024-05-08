@@ -18,8 +18,8 @@
 from cengal.code_inspection.line_tracer import LineTracer
 from cengal.data_generation.id_generator import IDGenerator
 from cengal.introspection.inspect import intro_func_repr, intro_func_repr_limited, get_multistr_of_data_value
-from enum import Enum
-from typing import Callable, Optional, Any
+from enum import Enum, IntEnum
+from typing import Callable, Optional, Any, Set
 try:
     import rich
     RICH_PRESENT = True
@@ -35,7 +35,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.4"
+__version__ = "4.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -43,17 +43,37 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-class CodeStartReplType(Enum):
+class CodeStartReplType(IntEnum):
     general = 0
     general_verbose = 1
     limited = 2
     limited_verbose = 3
 
 
+class LineType(IntEnum):
+    previous_line = 0
+    current_line = 1
+    next_line = 2
+    exact_line = 3
+    relative_line = 4
+
+
+class OutputFields(IntEnum):
+    trace_name = 0
+    file_name = 1
+    line = 2
+    func_name = 3
+    code_line = 4
+    result = 5
+    new_line_after_end = 6
+    start_short_name = 7
+
+
 class AutoLineTracer:
-    def __init__(self, code_start_repl_type: CodeStartReplType, print_allowed: bool = True, *args, **kwargs):
+    def __init__(self, code_start_repl_type: CodeStartReplType = CodeStartReplType.general, print_allowed: bool = True, rich_allowed: bool = True, *args, **kwargs):
         self.code_start_repl_type: CodeStartReplType = code_start_repl_type
         self.print_allowed: bool = print_allowed
+        self.rich_allowed: bool = rich_allowed
         if CodeStartReplType.general == code_start_repl_type:
             self.code_start_repl = self._start_impl_general
         elif CodeStartReplType.general_verbose == code_start_repl_type:
@@ -131,26 +151,73 @@ class AutoLineTracer:
         if self.print_allowed:
             print(self.previous_line(name, depth + 1) + '\n')
 
-    def current_line(self, line_result, name: Optional[str] = None, depth: int = 1):
-        filename, function_name, line_number, lines, index = self.lt.trace_self(depth + 1)
+    def current_line(self, line_result, name: Optional[str] = None, line_type: LineType = LineType.current_line, line_num: Optional[int] = None, 
+                     output_fields: Optional[Set[OutputFields]] = None, 
+                     depth: int = 1):
+        if output_fields is None:
+            output_fields = {
+                OutputFields.trace_name, 
+                OutputFields.file_name,
+                OutputFields.line,
+                OutputFields.func_name,
+                OutputFields.code_line,
+                OutputFields.result,
+            }
+
+        if LineType.current_line == line_type:
+            filename, function_name, line_number, lines, index = self.lt.trace_self(depth + 1)
+        elif LineType.exact_line == line_type:
+            filename, function_name, line_number, lines, index = self.lt.trace_exact(line_num, depth + 1)
+        elif LineType.relative_line == line_type:
+            filename, function_name, line_number, lines, index = self.lt.trace_relative(line_num, depth + 1)
+        elif LineType.previous_line == line_type:
+            filename, function_name, line_number, lines, index = self.lt.trace(depth + 1)
+        elif LineType.next_line == line_type:
+            filename, function_name, line_number, lines, index = self.lt.trace_next(depth + 1)
+
         lines = lines.strip()
         if name is None:
             result = self.line_template_name_less.format(index=self.index, file_name=filename, line=line_number, func_name=function_name, code_line=lines)
         else:
             result = self.line_template.format(index=self.index, name=name, file_name=filename, line=line_number, func_name=function_name, code_line=lines)
         
-        return result + f'\n\t\t| {line_result}'
+        if OutputFields.result in output_fields:
+            result += f'\n\t\t| {line_result}'
+        
+        return result
 
-    def print_current_line(self, line_result, name: Optional[str] = None, depth: int = 1) -> Any:
+    def print_current_line(self, line_result, name: Optional[str] = None, line_type: LineType = LineType.current_line, line_num: Optional[int] = None, output_fields: Optional[Set[OutputFields]] = None, depth: int = 1) -> Any:
+        if output_fields is None:
+            output_fields = {
+                OutputFields.trace_name, 
+                OutputFields.file_name,
+                OutputFields.line,
+                OutputFields.func_name,
+                OutputFields.code_line,
+                OutputFields.result,
+                OutputFields.new_line_after_end,
+            }
+
         if self.print_allowed:
-            if RICH_PRESENT:
+            if RICH_PRESENT and self.rich_allowed:
                 from rich.console import Console
                 from rich.syntax import Syntax
-                filename, function_name, line_number, lines, index = self.lt.trace_self(depth + 1)
+
+                if LineType.current_line == line_type:
+                    filename, function_name, line_number, lines, index = self.lt.trace_self(depth + 1)
+                elif LineType.exact_line == line_type:
+                    filename, function_name, line_number, lines, index = self.lt.trace_exact(line_num, depth + 1)
+                elif LineType.relative_line == line_type:
+                    filename, function_name, line_number, lines, index = self.lt.trace_relative(line_num, depth + 1)
+                elif LineType.previous_line == line_type:
+                    filename, function_name, line_number, lines, index = self.lt.trace(depth + 1)
+                elif LineType.next_line == line_type:
+                    filename, function_name, line_number, lines, index = self.lt.trace_next(depth + 1)
+
                 # lines = lines.strip()
                 syntax = Syntax(lines, "python", theme="monokai", line_numbers=True, start_line=line_number)
                 console = Console()
-                cl = self.current_line(line_result, name, depth + 1)
+                cl = self.current_line(line_result, name, line_type, line_num, output_fields, depth + 1)
                 clines = cl.split('\n')
                 # print(clines[0])
                 console.print(clines[0])
@@ -159,23 +226,29 @@ class AutoLineTracer:
                 for cline in clines_rest:
                     console.print(cline)
                 
-                print()
-                # console.print(clines[3])
-                # print(clines[2])
+                if OutputFields.new_line_after_end in output_fields:
+                    print()
+                    # console.print(clines[3])
+                    # print(clines[2])
             else:
-                print(self.current_line(line_result, name, depth + 1) + '\n')
+                if OutputFields.new_line_after_end in output_fields:
+                    ending = '\n'
+                else:
+                    ending = ''
+
+                print(self.current_line(line_result, name, line_type, line_num, output_fields, depth + 1) + ending)
         
         return line_result
 
-    def print_current_line_pp_type_value(self, line_result, name: Optional[str] = None, depth: int = 1) -> Any:
+    def print_current_line_pp_type_value(self, line_result, name: Optional[str] = None, line_type: LineType = LineType.current_line, line_num: Optional[int] = None, output_fields: Optional[Set[OutputFields]] = None, depth: int = 1) -> Any:
         multistr_data_value: str = get_multistr_of_data_value(line_result, 3).lstrip(' \t')
         str_template = f'{type(line_result)}\n\t\t| {multistr_data_value}'
-        self.print_current_line(str_template, name, depth + 1)
+        self.print_current_line(str_template, name, line_type, line_num, output_fields, depth + 1)
         return line_result
 
-    def print_current_line_pp_value(self, line_result, name: Optional[str] = None, depth: int = 1) -> Any:
+    def print_current_line_pp_value(self, line_result, name: Optional[str] = None, line_type: LineType = LineType.current_line, line_num: Optional[int] = None, output_fields: Optional[Set[OutputFields]] = None, depth: int = 1) -> Any:
         str_template = get_multistr_of_data_value(line_result, 3).lstrip(' \t')
-        self.print_current_line(str_template, name, depth + 1)
+        self.print_current_line(str_template, name, line_type, line_num, output_fields, depth + 1)
         return line_result
     
     def next_line(self, name: Optional[str] = None, depth: int = 1):
@@ -209,20 +282,20 @@ altlv = auto_line_tracer__limited_verbose
 alt = altg
 
 
-def trace_self__general(line_result, name: Optional[str] = None, depth: int = 1) -> Any:
-    return auto_line_tracer__general.print_current_line_pp_type_value(line_result, name, depth + 1)
+def trace_self__general(line_result, name: Optional[str] = None, line_type: LineType = LineType.current_line, line_num: Optional[int] = None, output_fields: Optional[Set[OutputFields]] = None, depth: int = 1) -> Any:
+    return auto_line_tracer__general.print_current_line_pp_type_value(line_result, name, line_type, line_num, output_fields, depth + 1)
 
 
-def trace_self__general_verbose(line_result, name: Optional[str] = None, depth: int = 1) -> Any:
-    return auto_line_tracer__general_verbose.print_current_line_pp_type_value(line_result, name, depth + 1)
+def trace_self__general_verbose(line_result, name: Optional[str] = None, line_type: LineType = LineType.current_line, line_num: Optional[int] = None, output_fields: Optional[Set[OutputFields]] = None, depth: int = 1) -> Any:
+    return auto_line_tracer__general_verbose.print_current_line_pp_type_value(line_result, name, line_type, line_num, output_fields, depth + 1)
 
 
-def trace_self__limited(line_result, name: Optional[str] = None, depth: int = 1) -> Any:
-    return auto_line_tracer__limited.print_current_line_pp_type_value(line_result, name, depth + 1)
+def trace_self__limited(line_result, name: Optional[str] = None, line_type: LineType = LineType.current_line, line_num: Optional[int] = None, output_fields: Optional[Set[OutputFields]] = None, depth: int = 1) -> Any:
+    return auto_line_tracer__limited.print_current_line_pp_type_value(line_result, name, line_type, line_num, output_fields, depth + 1)
 
 
-def trace_self__limited_verbose(line_result, name: Optional[str] = None, depth: int = 1) -> Any:
-    return auto_line_tracer__limited_verbose.print_current_line_pp_type_value(line_result, name, depth + 1)
+def trace_self__limited_verbose(line_result, name: Optional[str] = None, line_type: LineType = LineType.current_line, line_num: Optional[int] = None, output_fields: Optional[Set[OutputFields]] = None, depth: int = 1) -> Any:
+    return auto_line_tracer__limited_verbose.print_current_line_pp_type_value(line_result, name, line_type, line_num, output_fields, depth + 1)
 
 
 tsg = trace_self__general
@@ -233,7 +306,7 @@ tslv = trace_self__limited_verbose
 ts = tsg
 
 
-def fake_trace_self(line_result, name: Optional[str] = None, depth: int = 1):
+def fake_trace_self(line_result, name: Optional[str] = None, line_type: LineType = LineType.current_line, line_num: Optional[int] = None, output_fields: Optional[Set[OutputFields]] = None, depth: int = 1):
     return line_result
 
 

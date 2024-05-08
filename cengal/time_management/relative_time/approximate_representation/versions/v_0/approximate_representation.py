@@ -19,7 +19,7 @@ from typing import Union, Set, Tuple, Dict
 from math import modf
 from enum import Enum
 from copy import copy
-from cengal.data_manipulation.help_tools import inverse_mapping
+from cengal.data_manipulation.conversion.mapping import inverse_mapping
 from cengal.text_processing.optional_formatter.versions.v_0 import OptionalFormatter
 from ....constants import *
 
@@ -32,7 +32,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.4"
+__version__ = "4.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"

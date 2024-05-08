@@ -13,147 +13,301 @@ cengal<wbr>.text_processing<wbr>.encoding_detection<wbr>.versions<wbr>.v_0<wbr>.
 
                         <label class="view-source-button" for="mod-encoding_detection-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="ch">#!/usr/bin/env python</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="c1"># coding=utf-8</span>
-</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="c1"># Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="c1"># </span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="c1"># you may not use this file except in compliance with the License.</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="c1"># You may obtain a copy of the License at</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="c1"># </span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="c1"># </span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="c1"># See the License for the specific language governing permissions and</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="c1"># limitations under the License.</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="kn">import</span> <span class="nn">cchardet</span> <span class="k">as</span> <span class="nn">chardet</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="kn">from</span> <span class="nn">cengal.modules_management.alternative_import</span> <span class="kn">import</span> <span class="n">alt_import</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="k">with</span> <span class="n">alt_import</span><span class="p">(</span><span class="s1">&#39;cchardet&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">chardet</span><span class="p">:</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>    <span class="k">if</span> <span class="n">chardet</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>        <span class="n">CHARDET_PRESENT</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>        <span class="n">CHARDET_PRESENT</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a><span class="kn">from</span> <span class="nn">charset_normalizer</span> <span class="kn">import</span> <span class="n">detect</span> <span class="k">as</span> <span class="n">cn_detect</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a><span class="kn">from</span> <span class="nn">cengal.text_processing.text_processing</span> <span class="kn">import</span> <span class="n">Text</span><span class="p">,</span> <span class="n">normalize_text</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a><span class="kn">from</span> <span class="nn">cengal.text_processing.utf_bom_processing</span> <span class="kn">import</span> <span class="o">*</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>
-</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>
-</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a><span class="sd">Module Docstring</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a><span class="sd">Docstrings: http://www.python.org/dev/peps/pep-0257/</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>
-</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.4&quot;</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a><span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Development&quot;</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a><span class="c1"># __status__ = &quot;Production&quot;</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>
-</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>
-</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a><span class="k">def</span> <span class="nf">detect_and_decode</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]:</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">text</span><span class="p">:</span>
-</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>        <span class="k">return</span> <span class="nb">str</span><span class="p">(),</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">()</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>
-</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>    <span class="n">text</span> <span class="o">=</span> <span class="n">normalize_text</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span>
-</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>    <span class="n">possible_utf_bom</span> <span class="o">=</span> <span class="n">determine_text_bom</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>    <span class="n">text</span> <span class="o">=</span> <span class="n">remove_bom</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">possible_utf_bom</span><span class="p">)</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a>    <span class="n">possible_encoding</span> <span class="o">=</span> <span class="n">determine_bom_encoding</span><span class="p">(</span><span class="n">possible_utf_bom</span><span class="p">)</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a>    <span class="k">if</span> <span class="n">possible_encoding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a>        <span class="k">return</span> <span class="n">decode_text_and_remove_all_wrong_symbols</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">possible_encoding</span><span class="p">),</span> <span class="n">possible_encoding</span><span class="p">,</span> <span class="n">possible_utf_bom</span>
-</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a>        <span class="n">try_charset_normalizer</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a>            <span class="k">if</span> <span class="n">CHARDET_PRESENT</span><span class="p">:</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a>                <span class="n">detection</span> <span class="o">=</span> <span class="n">chardet</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a>            <span class="k">else</span><span class="p">:</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a>                <span class="n">try_charset_normalizer</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a>        <span class="k">except</span> <span class="ne">LookupError</span><span class="p">:</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a>            <span class="n">try_charset_normalizer</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a>        
-</span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a>        <span class="k">if</span> <span class="n">try_charset_normalizer</span><span class="p">:</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos">71</span></a>            <span class="n">detection</span> <span class="o">=</span> <span class="n">cn_detect</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos">72</span></a>            
-</span><span id="L-73"><a href="#L-73"><span class="linenos">73</span></a>        <span class="n">encoding</span> <span class="o">=</span> <span class="n">detection</span><span class="p">[</span><span class="s2">&quot;encoding&quot;</span><span class="p">]</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos">74</span></a>        <span class="n">bom_bytes</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">()</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos">75</span></a>        <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">),</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">bom_bytes</span>
-</span><span id="L-76"><a href="#L-76"><span class="linenos">76</span></a>
-</span><span id="L-77"><a href="#L-77"><span class="linenos">77</span></a>
-</span><span id="L-78"><a href="#L-78"><span class="linenos">78</span></a><span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos">79</span></a>    <span class="n">text</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">bom_bytes</span> <span class="o">=</span> <span class="n">detect_and_decode</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos">80</span></a>    <span class="k">return</span> <span class="n">text</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="ch">#!/usr/bin/env python</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="c1"># coding=utf-8</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a>
+</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="c1"># Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="c1"># </span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="c1"># you may not use this file except in compliance with the License.</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="c1"># You may obtain a copy of the License at</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="c1"># </span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="c1"># </span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a><span class="c1"># See the License for the specific language governing permissions and</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="c1"># limitations under the License.</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>
+</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a>
+</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>    <span class="s1">&#39;decode&#39;</span><span class="p">,</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a>    <span class="s1">&#39;detect_and_decode&#39;</span><span class="p">,</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>    <span class="s1">&#39;is_utf8_text&#39;</span><span class="p">,</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>    <span class="s1">&#39;is_text_is_7bit_utf8_compatible&#39;</span><span class="p">,</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>    <span class="s1">&#39;is_probably_utf8&#39;</span><span class="p">,</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a>    <span class="s1">&#39;is_utf8&#39;</span><span class="p">,</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="p">]</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>
+</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="kn">import</span> <span class="nn">cchardet</span> <span class="k">as</span> <span class="nn">chardet</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="kn">from</span> <span class="nn">cengal.modules_management.alternative_import</span> <span class="kn">import</span> <span class="n">alt_import</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="k">with</span> <span class="n">alt_import</span><span class="p">(</span><span class="s1">&#39;cchardet&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">chardet</span><span class="p">:</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>    <span class="k">if</span> <span class="n">chardet</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>        <span class="n">CHARDET_PRESENT</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>        <span class="n">CHARDET_PRESENT</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>
+</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a><span class="kn">from</span> <span class="nn">charset_normalizer</span> <span class="kn">import</span> <span class="n">detect</span> <span class="k">as</span> <span class="n">cn_detect</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="kn">from</span> <span class="nn">cengal.text_processing.text_processing</span> <span class="kn">import</span> <span class="n">Text</span><span class="p">,</span> <span class="n">normalize_text</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a><span class="kn">from</span> <span class="nn">cengal.text_processing.utf_bom_processing</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>
+</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>
+</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="sd">Module Docstring</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="sd">Docstrings: http://www.python.org/dev/peps/pep-0257/</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.4.0&quot;</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Development&quot;</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="c1"># __status__ = &quot;Production&quot;</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="k">def</span> <span class="nf">detect_and_decode</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">],</span> <span class="n">detect_as_utf8_when_possible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">check_text_for_utf8_compliance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]:</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">text</span><span class="p">:</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>        <span class="k">return</span> <span class="nb">str</span><span class="p">(),</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">()</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>    <span class="n">text</span> <span class="o">=</span> <span class="n">normalize_text</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>    <span class="n">possible_utf_bom</span> <span class="o">=</span> <span class="n">determine_text_bom</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>    <span class="n">text</span> <span class="o">=</span> <span class="n">remove_bom</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">possible_utf_bom</span><span class="p">)</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>    <span class="n">possible_encoding</span> <span class="o">=</span> <span class="n">determine_bom_encoding</span><span class="p">(</span><span class="n">possible_utf_bom</span><span class="p">)</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>    <span class="k">if</span> <span class="n">possible_encoding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>        <span class="k">return</span> <span class="n">decode_text_and_remove_all_wrong_symbols</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">possible_encoding</span><span class="p">),</span> <span class="n">possible_encoding</span><span class="p">,</span> <span class="n">possible_utf_bom</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>        <span class="n">try_charset_normalizer</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>            <span class="k">if</span> <span class="n">CHARDET_PRESENT</span><span class="p">:</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>                <span class="n">detection</span> <span class="o">=</span> <span class="n">chardet</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>            <span class="k">else</span><span class="p">:</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>                <span class="n">try_charset_normalizer</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>        <span class="k">except</span> <span class="ne">LookupError</span><span class="p">:</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>            <span class="n">try_charset_normalizer</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>        
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>        <span class="k">if</span> <span class="n">try_charset_normalizer</span><span class="p">:</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>            <span class="n">detection</span> <span class="o">=</span> <span class="n">cn_detect</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>            
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>        <span class="n">encoding</span> <span class="o">=</span> <span class="n">detection</span><span class="p">[</span><span class="s2">&quot;encoding&quot;</span><span class="p">]</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>        <span class="k">if</span> <span class="n">detect_as_utf8_when_possible</span><span class="p">:</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>            <span class="k">if</span> <span class="n">check_text_for_utf8_compliance</span><span class="p">:</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>                <span class="n">result_encoding</span> <span class="o">=</span> <span class="s1">&#39;utf-8&#39;</span> <span class="k">if</span> <span class="n">is_utf8_text</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span> <span class="k">else</span> <span class="n">encoding</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>            <span class="k">else</span><span class="p">:</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>                <span class="n">result_encoding</span> <span class="o">=</span> <span class="s1">&#39;utf-8&#39;</span> <span class="k">if</span> <span class="p">(</span><span class="n">is_utf8</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is_probably_utf8</span><span class="p">(</span><span class="n">encoding</span><span class="p">))</span> <span class="k">else</span> <span class="n">encoding</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>            <span class="n">result_encoding</span> <span class="o">=</span> <span class="n">encoding</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>        
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>        <span class="n">bom_bytes</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">()</span>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>        <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">),</span> <span class="n">result_encoding</span><span class="p">,</span> <span class="n">bom_bytes</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="n">utf8_compatible_encodings</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>    <span class="s1">&#39;utf-8&#39;</span><span class="p">,</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>    <span class="s1">&#39;ISO-8859-1&#39;</span><span class="p">,</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>    <span class="s1">&#39;Latin 1&#39;</span><span class="p">,</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="p">}</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="n">utf8_compatible_encodings_lower</span> <span class="o">=</span> <span class="p">{</span><span class="n">encoding</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">encoding</span> <span class="ow">in</span> <span class="n">utf8_compatible_encodings</span><span class="p">}</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="n">utf8_half_compatible_encodings</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>    <span class="s1">&#39;US-ASCII&#39;</span><span class="p">,</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>    <span class="s1">&#39;ASCII&#39;</span><span class="p">,</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>    <span class="s1">&#39;ANSI_X3.4-1968&#39;</span><span class="p">,</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>    <span class="s1">&#39;iso-ir-6&#39;</span><span class="p">,</span>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>    <span class="s1">&#39;ANSI_X3.4-1986&#39;</span><span class="p">,</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>    <span class="s1">&#39;ISO_646.irv:1991&#39;</span><span class="p">,</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>    <span class="s1">&#39;ASCII-7&#39;</span><span class="p">,</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>    <span class="s1">&#39;ASCII-8&#39;</span><span class="p">,</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>    <span class="s1">&#39;ISO646-US&#39;</span><span class="p">,</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>    <span class="s1">&#39;us&#39;</span><span class="p">,</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>    <span class="s1">&#39;IBM367&#39;</span><span class="p">,</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>    <span class="s1">&#39;cp367&#39;</span><span class="p">,</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>    <span class="s1">&#39;csASCII&#39;</span><span class="p">,</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="p">}</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a><span class="n">utf8_half_compatible_encodings_lower</span> <span class="o">=</span> <span class="p">{</span><span class="n">encoding</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">encoding</span> <span class="ow">in</span> <span class="n">utf8_half_compatible_encodings</span><span class="p">}</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="k">def</span> <span class="nf">is_utf8</span><span class="p">(</span><span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>    <span class="k">return</span> <span class="n">encoding</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">utf8_compatible_encodings_lower</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a><span class="k">def</span> <span class="nf">is_probably_utf8</span><span class="p">(</span><span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>    <span class="k">return</span> <span class="n">encoding</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">utf8_half_compatible_encodings_lower</span>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a><span class="k">def</span> <span class="nf">is_text_is_7bit_utf8_compatible</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>    <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">b</span> <span class="o">&lt;=</span> <span class="mi">127</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">text</span><span class="p">)</span>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a><span class="k">def</span> <span class="nf">is_utf8_text</span><span class="p">(</span><span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>    <span class="k">if</span> <span class="n">is_utf8</span><span class="p">(</span><span class="n">encoding</span><span class="p">):</span>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>    <span class="k">elif</span> <span class="n">is_probably_utf8</span><span class="p">(</span><span class="n">encoding</span><span class="p">):</span>
+</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>        <span class="k">return</span> <span class="n">is_text_is_7bit_utf8_compatible</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>        <span class="k">return</span> <span class="kc">False</span>
+</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>
+</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a><span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>    <span class="n">text</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">bom_bytes</span> <span class="o">=</span> <span class="n">detect_and_decode</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>    <span class="k">return</span> <span class="n">text</span>
 </span></pre></div>
 
 
             </section>
-                <section id="detect_and_decode">
-                            <input id="detect_and_decode-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                <section id="decode">
+                            <input id="decode-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">detect_and_decode</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">text</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]</span>:</span></span>
+        <span class="name">decode</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">str</span>:</span></span>
 
-                <label class="view-source-button" for="detect_and_decode-view-source"><span>View Source</span></label>
+                <label class="view-source-button" for="decode-view-source"><span>View Source</span></label>
 
     </div>
-    <a class="headerlink" href="#detect_and_decode"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="detect_and_decode-51"><a href="#detect_and_decode-51"><span class="linenos">51</span></a><span class="k">def</span> <span class="nf">detect_and_decode</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]:</span>
-</span><span id="detect_and_decode-52"><a href="#detect_and_decode-52"><span class="linenos">52</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">text</span><span class="p">:</span>
-</span><span id="detect_and_decode-53"><a href="#detect_and_decode-53"><span class="linenos">53</span></a>        <span class="k">return</span> <span class="nb">str</span><span class="p">(),</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">()</span>
-</span><span id="detect_and_decode-54"><a href="#detect_and_decode-54"><span class="linenos">54</span></a>
-</span><span id="detect_and_decode-55"><a href="#detect_and_decode-55"><span class="linenos">55</span></a>    <span class="n">text</span> <span class="o">=</span> <span class="n">normalize_text</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span>
-</span><span id="detect_and_decode-56"><a href="#detect_and_decode-56"><span class="linenos">56</span></a>    <span class="n">possible_utf_bom</span> <span class="o">=</span> <span class="n">determine_text_bom</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-</span><span id="detect_and_decode-57"><a href="#detect_and_decode-57"><span class="linenos">57</span></a>    <span class="n">text</span> <span class="o">=</span> <span class="n">remove_bom</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">possible_utf_bom</span><span class="p">)</span>
-</span><span id="detect_and_decode-58"><a href="#detect_and_decode-58"><span class="linenos">58</span></a>    <span class="n">possible_encoding</span> <span class="o">=</span> <span class="n">determine_bom_encoding</span><span class="p">(</span><span class="n">possible_utf_bom</span><span class="p">)</span>
-</span><span id="detect_and_decode-59"><a href="#detect_and_decode-59"><span class="linenos">59</span></a>    <span class="k">if</span> <span class="n">possible_encoding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="detect_and_decode-60"><a href="#detect_and_decode-60"><span class="linenos">60</span></a>        <span class="k">return</span> <span class="n">decode_text_and_remove_all_wrong_symbols</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">possible_encoding</span><span class="p">),</span> <span class="n">possible_encoding</span><span class="p">,</span> <span class="n">possible_utf_bom</span>
-</span><span id="detect_and_decode-61"><a href="#detect_and_decode-61"><span class="linenos">61</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="detect_and_decode-62"><a href="#detect_and_decode-62"><span class="linenos">62</span></a>        <span class="n">try_charset_normalizer</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="detect_and_decode-63"><a href="#detect_and_decode-63"><span class="linenos">63</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="detect_and_decode-64"><a href="#detect_and_decode-64"><span class="linenos">64</span></a>            <span class="k">if</span> <span class="n">CHARDET_PRESENT</span><span class="p">:</span>
-</span><span id="detect_and_decode-65"><a href="#detect_and_decode-65"><span class="linenos">65</span></a>                <span class="n">detection</span> <span class="o">=</span> <span class="n">chardet</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-</span><span id="detect_and_decode-66"><a href="#detect_and_decode-66"><span class="linenos">66</span></a>            <span class="k">else</span><span class="p">:</span>
-</span><span id="detect_and_decode-67"><a href="#detect_and_decode-67"><span class="linenos">67</span></a>                <span class="n">try_charset_normalizer</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="detect_and_decode-68"><a href="#detect_and_decode-68"><span class="linenos">68</span></a>        <span class="k">except</span> <span class="ne">LookupError</span><span class="p">:</span>
-</span><span id="detect_and_decode-69"><a href="#detect_and_decode-69"><span class="linenos">69</span></a>            <span class="n">try_charset_normalizer</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="detect_and_decode-70"><a href="#detect_and_decode-70"><span class="linenos">70</span></a>        
-</span><span id="detect_and_decode-71"><a href="#detect_and_decode-71"><span class="linenos">71</span></a>        <span class="k">if</span> <span class="n">try_charset_normalizer</span><span class="p">:</span>
-</span><span id="detect_and_decode-72"><a href="#detect_and_decode-72"><span class="linenos">72</span></a>            <span class="n">detection</span> <span class="o">=</span> <span class="n">cn_detect</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-</span><span id="detect_and_decode-73"><a href="#detect_and_decode-73"><span class="linenos">73</span></a>            
-</span><span id="detect_and_decode-74"><a href="#detect_and_decode-74"><span class="linenos">74</span></a>        <span class="n">encoding</span> <span class="o">=</span> <span class="n">detection</span><span class="p">[</span><span class="s2">&quot;encoding&quot;</span><span class="p">]</span>
-</span><span id="detect_and_decode-75"><a href="#detect_and_decode-75"><span class="linenos">75</span></a>        <span class="n">bom_bytes</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">()</span>
-</span><span id="detect_and_decode-76"><a href="#detect_and_decode-76"><span class="linenos">76</span></a>        <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">),</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">bom_bytes</span>
+    <a class="headerlink" href="#decode"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="decode-144"><a href="#decode-144"><span class="linenos">144</span></a><span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="decode-145"><a href="#decode-145"><span class="linenos">145</span></a>    <span class="n">text</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">bom_bytes</span> <span class="o">=</span> <span class="n">detect_and_decode</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</span><span id="decode-146"><a href="#decode-146"><span class="linenos">146</span></a>    <span class="k">return</span> <span class="n">text</span>
 </span></pre></div>
 
 
     
 
                 </section>
-                <section id="decode">
-                            <input id="decode-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                <section id="detect_and_decode">
+                            <input id="detect_and_decode-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">decode</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">text</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">str</span>:</span></span>
+        <span class="name">detect_and_decode</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]</span>,</span><span class="param">	<span class="n">detect_as_utf8_when_possible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>,</span><span class="param">	<span class="n">check_text_for_utf8_compliance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]</span>:</span></span>
 
-                <label class="view-source-button" for="decode-view-source"><span>View Source</span></label>
+                <label class="view-source-button" for="detect_and_decode-view-source"><span>View Source</span></label>
 
     </div>
-    <a class="headerlink" href="#decode"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="decode-79"><a href="#decode-79"><span class="linenos">79</span></a><span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="decode-80"><a href="#decode-80"><span class="linenos">80</span></a>    <span class="n">text</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">bom_bytes</span> <span class="o">=</span> <span class="n">detect_and_decode</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-</span><span id="decode-81"><a href="#decode-81"><span class="linenos">81</span></a>    <span class="k">return</span> <span class="n">text</span>
+    <a class="headerlink" href="#detect_and_decode"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="detect_and_decode-61"><a href="#detect_and_decode-61"><span class="linenos">61</span></a><span class="k">def</span> <span class="nf">detect_and_decode</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">],</span> <span class="n">detect_as_utf8_when_possible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">check_text_for_utf8_compliance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]:</span>
+</span><span id="detect_and_decode-62"><a href="#detect_and_decode-62"><span class="linenos">62</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">text</span><span class="p">:</span>
+</span><span id="detect_and_decode-63"><a href="#detect_and_decode-63"><span class="linenos">63</span></a>        <span class="k">return</span> <span class="nb">str</span><span class="p">(),</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">()</span>
+</span><span id="detect_and_decode-64"><a href="#detect_and_decode-64"><span class="linenos">64</span></a>
+</span><span id="detect_and_decode-65"><a href="#detect_and_decode-65"><span class="linenos">65</span></a>    <span class="n">text</span> <span class="o">=</span> <span class="n">normalize_text</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span>
+</span><span id="detect_and_decode-66"><a href="#detect_and_decode-66"><span class="linenos">66</span></a>    <span class="n">possible_utf_bom</span> <span class="o">=</span> <span class="n">determine_text_bom</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</span><span id="detect_and_decode-67"><a href="#detect_and_decode-67"><span class="linenos">67</span></a>    <span class="n">text</span> <span class="o">=</span> <span class="n">remove_bom</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">possible_utf_bom</span><span class="p">)</span>
+</span><span id="detect_and_decode-68"><a href="#detect_and_decode-68"><span class="linenos">68</span></a>    <span class="n">possible_encoding</span> <span class="o">=</span> <span class="n">determine_bom_encoding</span><span class="p">(</span><span class="n">possible_utf_bom</span><span class="p">)</span>
+</span><span id="detect_and_decode-69"><a href="#detect_and_decode-69"><span class="linenos">69</span></a>    <span class="k">if</span> <span class="n">possible_encoding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="detect_and_decode-70"><a href="#detect_and_decode-70"><span class="linenos">70</span></a>        <span class="k">return</span> <span class="n">decode_text_and_remove_all_wrong_symbols</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">possible_encoding</span><span class="p">),</span> <span class="n">possible_encoding</span><span class="p">,</span> <span class="n">possible_utf_bom</span>
+</span><span id="detect_and_decode-71"><a href="#detect_and_decode-71"><span class="linenos">71</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="detect_and_decode-72"><a href="#detect_and_decode-72"><span class="linenos">72</span></a>        <span class="n">try_charset_normalizer</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="detect_and_decode-73"><a href="#detect_and_decode-73"><span class="linenos">73</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="detect_and_decode-74"><a href="#detect_and_decode-74"><span class="linenos">74</span></a>            <span class="k">if</span> <span class="n">CHARDET_PRESENT</span><span class="p">:</span>
+</span><span id="detect_and_decode-75"><a href="#detect_and_decode-75"><span class="linenos">75</span></a>                <span class="n">detection</span> <span class="o">=</span> <span class="n">chardet</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</span><span id="detect_and_decode-76"><a href="#detect_and_decode-76"><span class="linenos">76</span></a>            <span class="k">else</span><span class="p">:</span>
+</span><span id="detect_and_decode-77"><a href="#detect_and_decode-77"><span class="linenos">77</span></a>                <span class="n">try_charset_normalizer</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="detect_and_decode-78"><a href="#detect_and_decode-78"><span class="linenos">78</span></a>        <span class="k">except</span> <span class="ne">LookupError</span><span class="p">:</span>
+</span><span id="detect_and_decode-79"><a href="#detect_and_decode-79"><span class="linenos">79</span></a>            <span class="n">try_charset_normalizer</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="detect_and_decode-80"><a href="#detect_and_decode-80"><span class="linenos">80</span></a>        
+</span><span id="detect_and_decode-81"><a href="#detect_and_decode-81"><span class="linenos">81</span></a>        <span class="k">if</span> <span class="n">try_charset_normalizer</span><span class="p">:</span>
+</span><span id="detect_and_decode-82"><a href="#detect_and_decode-82"><span class="linenos">82</span></a>            <span class="n">detection</span> <span class="o">=</span> <span class="n">cn_detect</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</span><span id="detect_and_decode-83"><a href="#detect_and_decode-83"><span class="linenos">83</span></a>            
+</span><span id="detect_and_decode-84"><a href="#detect_and_decode-84"><span class="linenos">84</span></a>        <span class="n">encoding</span> <span class="o">=</span> <span class="n">detection</span><span class="p">[</span><span class="s2">&quot;encoding&quot;</span><span class="p">]</span>
+</span><span id="detect_and_decode-85"><a href="#detect_and_decode-85"><span class="linenos">85</span></a>        <span class="k">if</span> <span class="n">detect_as_utf8_when_possible</span><span class="p">:</span>
+</span><span id="detect_and_decode-86"><a href="#detect_and_decode-86"><span class="linenos">86</span></a>            <span class="k">if</span> <span class="n">check_text_for_utf8_compliance</span><span class="p">:</span>
+</span><span id="detect_and_decode-87"><a href="#detect_and_decode-87"><span class="linenos">87</span></a>                <span class="n">result_encoding</span> <span class="o">=</span> <span class="s1">&#39;utf-8&#39;</span> <span class="k">if</span> <span class="n">is_utf8_text</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span> <span class="k">else</span> <span class="n">encoding</span>
+</span><span id="detect_and_decode-88"><a href="#detect_and_decode-88"><span class="linenos">88</span></a>            <span class="k">else</span><span class="p">:</span>
+</span><span id="detect_and_decode-89"><a href="#detect_and_decode-89"><span class="linenos">89</span></a>                <span class="n">result_encoding</span> <span class="o">=</span> <span class="s1">&#39;utf-8&#39;</span> <span class="k">if</span> <span class="p">(</span><span class="n">is_utf8</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is_probably_utf8</span><span class="p">(</span><span class="n">encoding</span><span class="p">))</span> <span class="k">else</span> <span class="n">encoding</span>
+</span><span id="detect_and_decode-90"><a href="#detect_and_decode-90"><span class="linenos">90</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="detect_and_decode-91"><a href="#detect_and_decode-91"><span class="linenos">91</span></a>            <span class="n">result_encoding</span> <span class="o">=</span> <span class="n">encoding</span>
+</span><span id="detect_and_decode-92"><a href="#detect_and_decode-92"><span class="linenos">92</span></a>        
+</span><span id="detect_and_decode-93"><a href="#detect_and_decode-93"><span class="linenos">93</span></a>        <span class="n">bom_bytes</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">()</span>
+</span><span id="detect_and_decode-94"><a href="#detect_and_decode-94"><span class="linenos">94</span></a>        <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">),</span> <span class="n">result_encoding</span><span class="p">,</span> <span class="n">bom_bytes</span>
+</span></pre></div>
+
+
+    
+
+                </section>
+                <section id="is_utf8_text">
+                            <input id="is_utf8_text-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">is_utf8_text</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span>, </span><span class="param"><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
+
+                <label class="view-source-button" for="is_utf8_text-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#is_utf8_text"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="is_utf8_text-135"><a href="#is_utf8_text-135"><span class="linenos">135</span></a><span class="k">def</span> <span class="nf">is_utf8_text</span><span class="p">(</span><span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="is_utf8_text-136"><a href="#is_utf8_text-136"><span class="linenos">136</span></a>    <span class="k">if</span> <span class="n">is_utf8</span><span class="p">(</span><span class="n">encoding</span><span class="p">):</span>
+</span><span id="is_utf8_text-137"><a href="#is_utf8_text-137"><span class="linenos">137</span></a>        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="is_utf8_text-138"><a href="#is_utf8_text-138"><span class="linenos">138</span></a>    <span class="k">elif</span> <span class="n">is_probably_utf8</span><span class="p">(</span><span class="n">encoding</span><span class="p">):</span>
+</span><span id="is_utf8_text-139"><a href="#is_utf8_text-139"><span class="linenos">139</span></a>        <span class="k">return</span> <span class="n">is_text_is_7bit_utf8_compatible</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</span><span id="is_utf8_text-140"><a href="#is_utf8_text-140"><span class="linenos">140</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="is_utf8_text-141"><a href="#is_utf8_text-141"><span class="linenos">141</span></a>        <span class="k">return</span> <span class="kc">False</span>
+</span></pre></div>
+
+
+    
+
+                </section>
+                <section id="is_text_is_7bit_utf8_compatible">
+                            <input id="is_text_is_7bit_utf8_compatible-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">is_text_is_7bit_utf8_compatible</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
+
+                <label class="view-source-button" for="is_text_is_7bit_utf8_compatible-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#is_text_is_7bit_utf8_compatible"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="is_text_is_7bit_utf8_compatible-131"><a href="#is_text_is_7bit_utf8_compatible-131"><span class="linenos">131</span></a><span class="k">def</span> <span class="nf">is_text_is_7bit_utf8_compatible</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="is_text_is_7bit_utf8_compatible-132"><a href="#is_text_is_7bit_utf8_compatible-132"><span class="linenos">132</span></a>    <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">b</span> <span class="o">&lt;=</span> <span class="mi">127</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">text</span><span class="p">)</span>
+</span></pre></div>
+
+
+    
+
+                </section>
+                <section id="is_probably_utf8">
+                            <input id="is_probably_utf8-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">is_probably_utf8</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
+
+                <label class="view-source-button" for="is_probably_utf8-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#is_probably_utf8"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="is_probably_utf8-127"><a href="#is_probably_utf8-127"><span class="linenos">127</span></a><span class="k">def</span> <span class="nf">is_probably_utf8</span><span class="p">(</span><span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="is_probably_utf8-128"><a href="#is_probably_utf8-128"><span class="linenos">128</span></a>    <span class="k">return</span> <span class="n">encoding</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">utf8_half_compatible_encodings_lower</span>
+</span></pre></div>
+
+
+    
+
+                </section>
+                <section id="is_utf8">
+                            <input id="is_utf8-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">is_utf8</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
+
+                <label class="view-source-button" for="is_utf8-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#is_utf8"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="is_utf8-123"><a href="#is_utf8-123"><span class="linenos">123</span></a><span class="k">def</span> <span class="nf">is_utf8</span><span class="p">(</span><span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="is_utf8-124"><a href="#is_utf8-124"><span class="linenos">124</span></a>    <span class="k">return</span> <span class="n">encoding</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">utf8_compatible_encodings_lower</span>
 </span></pre></div>
 
 

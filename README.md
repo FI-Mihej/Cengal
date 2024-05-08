@@ -74,6 +74,8 @@ For users seeking individual Cengal features or looking to minimize dependencies
 
 Below, you'll find a list of these stand-alone packages, each corresponding to a distinct Cengal module:
 
+* [CengalPolyBuild](https://github.com/FI-Mihej/CengalPolyBuild): A Comprehensive and Hackable Build System for Multilingual Python Packages: Cython (including automatic conversion from Python to Cython), C/C++, Objective-C, Go, and Nim, with ongoing expansions to include additional languages. (Planned to be released soon) 
+* [InterProcessPyObjects](https://github.com/FI-Mihej/InterProcessPyObjects) (package for `cengal.parallel_execution.asyncio.ashared_memory_manager` module): High-performance package delivers blazing-fast inter-process communication through shared memory, enabling Python objects to be shared across processes with exceptional efficiency. 
 * [cengal_memory_barriers](https://github.com/FI-Mihej/cengal_memory_barriers) (package for `cengal.hardware.memory.barriers` module): Fast crossplatform memory barriers for Python.
 * [cengal_cpu_info](https://github.com/FI-Mihej/cengal_cpu_info) (package for `cengal.hardware.info.cpu` module): Extended, cached CPU info with consistent output format.
 * [cengal_app_dir_path_finder](https://github.com/FI-Mihej/cengal_app_dir_path_finder) (package for `cengal.file_system.app_fs_structure.app_dir_path` module): Offering a unified API for easy retrieval of OS-specific application directories, enhancing data management across Windows, Linux, and macOS.
@@ -97,6 +99,87 @@ Compiles your code, gather binary artifacts and puts them into your wheel.
 * [Compilable Golang module](https://github.com/FI-Mihej/Cengal/blob/master/cengal/_examples/ex_golang)
 * [Compilable Nim module](https://github.com/FI-Mihej/Cengal/blob/master/cengal/_examples/ex_nim)
 * [Pure Python module auto-compiled with Cython](https://github.com/FI-Mihej/Cengal/blob/master/examples/compiled_python)
+
+</details>
+
+<details>
+<summary title="Fast inter-process communication through shared memory"><kbd> Fast inter-process communication through shared memory </kbd></summary>
+
+## Fast inter-process communication through shared memory
+
+blazing-fast inter-process communication through shared memory, enabling Python objects to be shared across processes with exceptional efficiency. By minimizing the need for frequent serialization-deserialization, it enhances overall speed and responsiveness. The package offers a comprehensive suite of functionalities designed to support a diverse array of Python types and facilitate asynchronous IPC, optimizing performance for demanding applications.
+
+![title](https://github.com/FI-Mihej/Cengal/raw/master/docs/assets/InterProcessPyObjects/ChartThroughputGiBs.png)
+
+```python
+from cengal.hardware.memory.shared_memory import *
+from cengal.parallel_execution.asyncio.ashared_memory_manager import *
+```
+
+### Key Features
+
+* Shared Memory Communication:
+    * Enables sharing of Python objects directly between processes using shared memory.
+    * Utilizes a linked list of global messages to inform connected processes about new shared objects.
+
+* Lock-Free Synchronization:
+    * Uses memory barriers for efficient communication, avoiding slow syscalls.
+    * Ensures each process can access and modify shared memory without contention.
+
+* Supported Python Types:
+    * Handles various Python data structures including:
+        * Basic types: `None`, `bool`, 64-bit `int`, large `int` (arbitrary precision integers), `float`, `complex`, `bytes`, `bytearray`, `str`.
+        * Standard types: `Decimal`, `slice`, `datetime`, `timedelta`, `timezone`, `date`, `time`
+        * Containers: `tuple`, `list`, classes inherited from: `AbstractSet` (`frozenset`), `MutableSet` (`set`), `Mapping` and `MutableMapping` (`dict`).
+        * Pickable classes instancess: custom classes including `dataclass`
+    * Allows mutable containers (lists, sets, mappings) to save basic types (`None`, `bool`, 64 bit `int`, `float`) internally, optimizing memory use and speed.
+
+* NumPy and Torch Support:
+    * Supports numpy arrays by creating shared bytes objects coupled with independent arrays.
+    * Supports torch tensors by coupling them with shared numpy arrays.
+
+* Custom Class Support:
+    * Projects pickable custom classes instancess (including `dataclasses`) onto shared dictionaries in shared memory.
+    * Modifies the class instance to override attribute access methods, managing data fields within the shared dictionary.
+    * supports classes with or without `__dict__` attr
+    * supports classes with or without `__slots__` attr
+
+* Asyncio Compatibility:
+    * Provides a wrapper module for async-await functionality, integrating seamlessly with asyncio.
+    * Ensures asynchronous operations work smoothly with the package's lock-free approach.
+
+### Docs
+
+[Readme.md](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/asyncio/ashared_memory_manager/versions/v_0/development/README.md)
+
+### Examples
+
+* An async examples (with asyncio):
+    * [shared_objects__example__sender.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/asyncio/ashared_memory_manager/versions/v_0/development/shared_objects__example__sender.py)
+    * [shared_objects__example__receiver.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/asyncio/ashared_memory_manager/versions/v_0/development/shared_objects__example__receiver.py)
+    * [shared_objects__types.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/parallel_execution/asyncio/ashared_memory_manager/versions/v_0/development/shared_objects__types.py)
+
+### Performance Benchmark results
+
+| Approach                        | sync/async | Throughput GiB/s |
+|---------------------------------|------------|------------------|
+| InterProcessPyObjects (sync)    | sync       | 3.770            |
+| InterProcessPyObjects + uvloop  | async      | 3.222            |
+| InterProcessPyObjects + asyncio | async      | 3.079            |
+| multiprocessing.shared_memory   | sync       | 2.685            |
+| uvloop.UnixDomainSockets        | async      | 0.966            |
+| asyncio + cengal.Streams        | async      | 0.942            |
+| uvloop.Streams                  | async      | 0.922            |
+| asyncio.Streams                 | async      | 0.784            |
+| asyncio.UnixDomainSockets       | async      | 0.708            |
+| multiprocessing.Queue           | sync       | 0.669            |
+| multiprocessing.Pipe            | sync       | 0.469            |
+
+### Todo
+
+- [ ] Connect more than two processes
+- [ ] Use third-party fast hashing implementations instead of or in addition to built in `hash()` call
+- [ ] Continuous performance improvements
 
 </details>
 
@@ -130,114 +213,6 @@ In this example, an application concurrently (at the same time) executes all of 
 #### Tutorial
 
 * [Decorator which converts blocking code to concurrent code](https://github.com/FI-Mihej/Cengal/wiki/Decorator-which-converts-blocking-code-to-concurrent-code)
-
-</details>
-
-
-<details>
-<summary title="True Interprocess Shared Memory (Proof of Concept)"><kbd> True Interprocess Shared Memory (Proof of Concept) </kbd></summary>
-
-## True Interprocess Shared Memory (Proof of Concept)
-
-Cengal introduces a novel approach to interprocess shared memory, currently at the proof of concept stage. With this feature, you can seamlessly share data between your Python processes (currently limited to 2 processes) and work with them just as you would in a single process. The underlying mechanism optimizes cross-process communication by employing efficient memory barriers instead of resource-intensive system calls.
-
-Supported data types (current stage):
-
-* shared Numpy arrays
-* `list`: Unlike `multiprocessing.shared_memory.ShareableList`, Cengal's shared lists are both `mutable` and `resizable` between different processes. They support various container types (lists, tuples, dicts) as items and implement all standard `list` methods. Plus, they offer superior performance compared to `multiprocessing.shared_memory.ShareableList`.
-* `dict`: Currently immutable.
-* `tuple`
-* `str`
-* `bytes`
-* `bytearray`
-* `bool`
-* `float`: Cengal's shared float values support Addition Assignment (`shared_list[20] += 999.3`) and all other native methods and operators, unlike values in `multiprocessing.shared_memory.ShareableList`.
-* `int`: Currently limited to int64. Similar to shared float values, Cengal's shared integers support Addition Assignment (`shared_list[15] += 999`) and all other native methods and operators.
-* `None`
-
-### Examples
-
-General example:
-
-* [shared_memory_example.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/hardware/memory/shared_memory/versions/v_0/development/shared_memory_example.py)
-
-Messages transmit:
-
-* [shmem_sender.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/hardware/memory/shared_memory/versions/v_0/development/shmem_sender.py)
-* [shmem_receiver.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/hardware/memory/shared_memory/versions/v_0/development/shmem_receiver.py)
-
-Shared Numpy Array:
-
-* [numpy_array_shmem_main.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/hardware/memory/shared_memory/versions/v_0/development/numpy_array_shmem_main.py)
-* [numpy_array_shmem_worker.py](https://github.com/FI-Mihej/Cengal/blob/master/cengal/hardware/memory/shared_memory/versions/v_0/development/numpy_array_shmem_worker.py)
-
-and smaller:
-
-```python
-from multiprocessing import Process
-from cengal.hardware.memory.shared_memory import *
-
-
-shared_memory_name = 'test_shared_mem'
-shared_memory_size = 200 * 1024 * 1024
-switches = 1000
-changes_per_switch = 2000
-
-
-def work(manager, shared_data)
-    index = 0
-    while index < switches:
-        with wait_my_turn(manager):
-            # emulatin our working process
-            for i in range(changes_per_switch):
-                shared_data[1] += 1
-
-def second_process():
-    consumer: SharedMemory = SharedMemory('test_shmem', False)
-    consumer.wait_for_messages()
-    with wait_my_turn(consumer):
-        shared_data = consumer.take_message()
-    
-    work(consumer, shared_data)
-
-
-creator: SharedMemory = SharedMemory(shared_memory_name, True, shared_memory_size)
-p = Process(target=second_process)
-p.start()
-creator.wait_consumer_ready()
-with wait_my_turn(creator):
-    data = [
-        'hello',
-        0,
-        (8, 2.0, False),
-        {
-            b'world': -6,
-            5: 4
-        }
-    ]
-    shared_data = creator.put_message(data)
-
-work(creator, shared_data)
-p.join()
-```
-
-### Performance Benchmark results
-
-In the realm of performance, Cengal's shared `list` container, although not yet fully optimized, is already outpacing the performance of `multiprocessing.shared_memory.ShareableList`. What sets it apart is its comprehensive support for native methods and operators, including Addition Assignment (`shared_list[15] += 999`), a feature unavailable in `multiprocessing.shared_memory.ShareableList`.
-
-Cengal's shared `list` container demonstrates remarkable speed, boasting the ability to handle over 30,000,000 reads/writes per second for an int64 value (`shared_list[2] = 1234` / `val = shared_list[7]`), or more than 1,450,000 addition assignments per second (`shared_list[15] += 999`). These performance figures underscore the efficiency and versatility of Cengal's interprocess shared memory solution, even in its current state.
-
-[Benchmark Results](https://github.com/FI-Mihej/Cengal/blob/master/cengal/hardware/memory/shared_memory/versions/v_0/development/benchmark_results.md)
-
-
-### Roadmap
-
-* Continuosly moving more logic to Cython
-* Implement mutable `dict` and `set` using an appropricate C hashmap library or C++ code (depending what will be faster in our case)
-* Increase number of interacting processes from 2 to variable value
-* Implement garbage collector for shared data in addition to manual `free()` call
-* Implement an appropriate Service for `cengal.parallel_execution.coroutines` - for comfortable shared memory usage inside an async code (including `asyncio`) 
-* Improve memory allocation algorithm in an attempt of making it faster
 
 </details>
 
@@ -560,6 +535,10 @@ Installation process requires compilation. So ensure that:
 
 # Projects using Cengal
 
+* [CengalPolyBuild](https://github.com/FI-Mihej/CengalPolyBuild) - A Comprehensive and Hackable Build System for Multilingual Python Packages: Cython (including automatic conversion from Python to Cython), C/C++, Objective-C, Go, and Nim, with ongoing expansions to include additional languages. (Planned to be released soon) 
+* [cengal_app_dir_path_finder](https://github.com/FI-Mihej/cengal_app_dir_path_finder) - A Python module offering a unified API for easy retrieval of OS-specific application directories, enhancing data management across Windows, Linux, and macOS 
+* [cengal_cpu_info](https://github.com/FI-Mihej/cengal_cpu_info) - Extended, cached CPU info with consistent output format.
+* [cengal_memory_barriers](https://github.com/FI-Mihej/cengal_memory_barriers) - Fast crossplatform memory barriers for Python.
 * [flet_async](https://github.com/FI-Mihej/flet_async) - wrapper which makes [Flet](https://github.com/flet-dev/flet) async and brings booth Cengal.coroutines and asyncio to Flet (Flutter based UI)
 * [justpy_containers](https://github.com/FI-Mihej/justpy_containers) - wrapper around [JustPy](https://github.com/justpy-org/justpy) in order to bring more security and more production-needed features to JustPy (VueJS based UI)
 * [Bensbach](https://github.com/FI-Mihej/Bensbach) - decompiler from Unreal Engine 3 bytecode to a Lisp-like script and compiler back to Unreal Engine 3 bytecode. Made for a game modding purposes

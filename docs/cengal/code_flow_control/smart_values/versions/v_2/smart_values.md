@@ -60,7 +60,7 @@ cengal<wbr>.code_flow_control<wbr>.smart_values<wbr>.versions<wbr>.v_2<wbr>.smar
 </span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.4&quot;</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.4.0&quot;</span>
 </span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -847,7 +847,7 @@ For example, a generic mapping type might be defined as::</p>
                     <div class="decorator">@classmethod</div>
 
         <span class="def">def</span>
-        <span class="name">from_tuple</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">cls</span>,</span><span class="param">	<span class="n">tuple_</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n"><a href="#ValueExistence">ValueExistence</a></span>:</span></span>
+        <span class="name">from_tuple</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">cls</span>,</span><span class="param">	<span class="n">tuple_</span><span class="p">:</span> <span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n"><a href="#ValueExistence">ValueExistence</a></span>:</span></span>
 
                 <label class="view-source-button" for="ValueExistence.from_tuple-view-source"><span>View Source</span></label>
 
@@ -889,7 +889,7 @@ For example, a generic mapping type might be defined as::</p>
                     <div class="decorator">@classmethod</div>
 
         <span class="def">def</span>
-        <span class="name">deserialize_from_dict</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">cls</span>,</span><span class="param">	<span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span>,</span><span class="param">	<span class="n">owning_info</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n"><a href="#ValueExistence">ValueExistence</a></span>:</span></span>
+        <span class="name">deserialize_from_dict</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">cls</span>,</span><span class="param">	<span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span>,</span><span class="param">	<span class="n">owning_info</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n"><a href="#ValueExistence">ValueExistence</a></span>:</span></span>
 
                 <label class="view-source-button" for="ValueExistence.deserialize_from_dict-view-source"><span>View Source</span></label>
 
@@ -914,7 +914,7 @@ For example, a generic mapping type might be defined as::</p>
                     <div class="decorator">@classmethod</div>
 
         <span class="def">def</span>
-        <span class="name">from_other</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">cls</span>,</span><span class="param">	<span class="n">value</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n"><a href="#ValueExistence">ValueExistence</a></span><span class="p">,</span> <span class="n"><a href="#ValueExistenceNamedTuple">ValueExistenceNamedTuple</a></span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">,</span> <span class="o">~</span><span class="n">VT</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n"><a href="#ValueExistence">ValueExistence</a></span>:</span></span>
+        <span class="name">from_other</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">cls</span>,</span><span class="param">	<span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n"><a href="#ValueExistence">ValueExistence</a></span><span class="p">,</span> <span class="n"><a href="#ValueExistenceNamedTuple">ValueExistenceNamedTuple</a></span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="o">~</span><span class="n">VT</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n"><a href="#ValueExistence">ValueExistence</a></span>:</span></span>
 
                 <label class="view-source-button" for="ValueExistence.from_other-view-source"><span>View Source</span></label>
 
@@ -1881,7 +1881,7 @@ For example, a generic mapping type might be defined as::</p>
                     <div class="decorator">@classmethod</div>
 
         <span class="def">def</span>
-        <span class="name">from_tuple</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">cls</span>,</span><span class="param">	<span class="n">tuple_</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n"><a href="#ValueExistence">ValueExistence</a></span>:</span></span>
+        <span class="name">from_tuple</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">cls</span>,</span><span class="param">	<span class="n">tuple_</span><span class="p">:</span> <span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n"><a href="#ValueExistence">ValueExistence</a></span>:</span></span>
 
                 <label class="view-source-button" for="ValueType.from_tuple-view-source"><span>View Source</span></label>
 
@@ -1923,7 +1923,7 @@ For example, a generic mapping type might be defined as::</p>
                     <div class="decorator">@classmethod</div>
 
         <span class="def">def</span>
-        <span class="name">deserialize_from_dict</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">cls</span>,</span><span class="param">	<span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span>,</span><span class="param">	<span class="n">owning_info</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n"><a href="#ValueExistence">ValueExistence</a></span>:</span></span>
+        <span class="name">deserialize_from_dict</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">cls</span>,</span><span class="param">	<span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span>,</span><span class="param">	<span class="n">owning_info</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n"><a href="#ValueExistence">ValueExistence</a></span>:</span></span>
 
                 <label class="view-source-button" for="ValueType.deserialize_from_dict-view-source"><span>View Source</span></label>
 
@@ -1948,7 +1948,7 @@ For example, a generic mapping type might be defined as::</p>
                     <div class="decorator">@classmethod</div>
 
         <span class="def">def</span>
-        <span class="name">from_other</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">cls</span>,</span><span class="param">	<span class="n">value</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n"><a href="#ValueExistence">ValueExistence</a></span><span class="p">,</span> <span class="n"><a href="#ValueTypeNamedTuple">ValueTypeNamedTuple</a></span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">,</span> <span class="o">~</span><span class="n">VT</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n"><a href="#ValueExistence">ValueExistence</a></span>:</span></span>
+        <span class="name">from_other</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">cls</span>,</span><span class="param">	<span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n"><a href="#ValueExistence">ValueExistence</a></span><span class="p">,</span> <span class="n"><a href="#ValueTypeNamedTuple">ValueTypeNamedTuple</a></span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="o">~</span><span class="n">VT</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n"><a href="#ValueExistence">ValueExistence</a></span>:</span></span>
 
                 <label class="view-source-button" for="ValueType.from_other-view-source"><span>View Source</span></label>
 
@@ -2338,7 +2338,7 @@ For example, a generic mapping type might be defined as::</p>
                     <div class="decorator">@classmethod</div>
 
         <span class="def">def</span>
-        <span class="name">from_tuple</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">cls</span>,</span><span class="param">	<span class="n">tuple_</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n"><a href="#ValueExistence">ValueExistence</a></span>:</span></span>
+        <span class="name">from_tuple</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">cls</span>,</span><span class="param">	<span class="n">tuple_</span><span class="p">:</span> <span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n"><a href="#ValueExistence">ValueExistence</a></span>:</span></span>
 
                 <label class="view-source-button" for="ValueWithType.from_tuple-view-source"><span>View Source</span></label>
 
@@ -2380,7 +2380,7 @@ For example, a generic mapping type might be defined as::</p>
                     <div class="decorator">@classmethod</div>
 
         <span class="def">def</span>
-        <span class="name">deserialize_from_dict</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">cls</span>,</span><span class="param">	<span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span>,</span><span class="param">	<span class="n">owning_info</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n"><a href="#ValueExistence">ValueExistence</a></span>:</span></span>
+        <span class="name">deserialize_from_dict</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">cls</span>,</span><span class="param">	<span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span>,</span><span class="param">	<span class="n">owning_info</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n"><a href="#ValueExistence">ValueExistence</a></span>:</span></span>
 
                 <label class="view-source-button" for="ValueWithType.deserialize_from_dict-view-source"><span>View Source</span></label>
 
@@ -2405,7 +2405,7 @@ For example, a generic mapping type might be defined as::</p>
                     <div class="decorator">@classmethod</div>
 
         <span class="def">def</span>
-        <span class="name">from_other</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">cls</span>,</span><span class="param">	<span class="n">value</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n"><a href="#ValueExistence">ValueExistence</a></span><span class="p">,</span> <span class="n"><a href="#ValueWithTypeNamedTuple">ValueWithTypeNamedTuple</a></span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">,</span> <span class="o">~</span><span class="n">VT</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n"><a href="#ValueExistence">ValueExistence</a></span>:</span></span>
+        <span class="name">from_other</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">cls</span>,</span><span class="param">	<span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n"><a href="#ValueExistence">ValueExistence</a></span><span class="p">,</span> <span class="n"><a href="#ValueWithTypeNamedTuple">ValueWithTypeNamedTuple</a></span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="o">~</span><span class="n">VT</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n"><a href="#ValueExistence">ValueExistence</a></span>:</span></span>
 
                 <label class="view-source-button" for="ValueWithType.from_other-view-source"><span>View Source</span></label>
 

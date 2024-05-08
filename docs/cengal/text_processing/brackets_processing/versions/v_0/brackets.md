@@ -44,7 +44,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 </span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.4&quot;</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.4.0&quot;</span>
 </span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -55,62 +55,51 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 </span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Bracket&#39;</span><span class="p">,</span> <span class="s1">&#39;BracketPair&#39;</span><span class="p">,</span> <span class="s1">&#39;BracketsList&#39;</span><span class="p">,</span> <span class="s1">&#39;BracketAbsentType&#39;</span><span class="p">]</span>
 </span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>
 </span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>
-</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="c1">#!/usr/bin/env python</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="c1"># coding=utf-8</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a><span class="kn">from</span> <span class="nn">cengal.text_processing.text_processing</span> <span class="kn">import</span> <span class="n">Text</span>
 </span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>
 </span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>
-</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>
-</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a><span class="kn">from</span> <span class="nn">cengal.text_processing.text_processing</span> <span class="kn">import</span> <span class="n">Text</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a><span class="k">class</span> <span class="nc">BracketAbsentType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>    <span class="n">out_of_data_bounds</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>    <span class="n">out_of_accessible_data_bounds</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>
 </span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>
-</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>
-</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>
-</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>
+</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a><span class="k">class</span> <span class="nc">BracketType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>    <span class="n">absent</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>    <span class="n">text</span> <span class="o">=</span> <span class="mi">1</span>
 </span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>
 </span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>
-</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>
-</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a><span class="k">class</span> <span class="nc">BracketAbsentType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a>    <span class="n">out_of_data_bounds</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a>    <span class="n">out_of_accessible_data_bounds</span> <span class="o">=</span> <span class="mi">1</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a>
-</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>
-</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a><span class="k">class</span> <span class="nc">BracketType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a>    <span class="n">absent</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a>    <span class="n">text</span> <span class="o">=</span> <span class="mi">1</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a>
-</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a>
-</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a><span class="n">_BRACKET_TYPE_ABSENT</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a><span class="n">_BRACKET_TYPE_TEXT</span> <span class="o">=</span> <span class="mi">1</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a>
-</span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a>
-</span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a><span class="k">class</span> <span class="nc">WrongBracketId</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos">71</span></a>    <span class="k">pass</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos">72</span></a>
-</span><span id="L-73"><a href="#L-73"><span class="linenos">73</span></a>
-</span><span id="L-74"><a href="#L-74"><span class="linenos">74</span></a><span class="k">class</span> <span class="nc">Bracket</span><span class="p">:</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos">75</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bracket_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Text</span><span class="p">,</span> <span class="n">BracketAbsentType</span><span class="p">]):</span>
-</span><span id="L-76"><a href="#L-76"><span class="linenos">76</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bracket_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Text</span><span class="p">,</span> <span class="n">BracketAbsentType</span><span class="p">]</span> <span class="o">=</span> <span class="n">bracket_id</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos">77</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bracket_id</span><span class="p">,</span> <span class="n">BracketAbsentType</span><span class="p">):</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos">78</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">_BRACKET_TYPE_ABSENT</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos">79</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos">80</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">_BRACKET_TYPE_TEXT</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos">81</span></a>    
-</span><span id="L-82"><a href="#L-82"><span class="linenos">82</span></a>    <span class="k">def</span> <span class="nf">text</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="L-83"><a href="#L-83"><span class="linenos">83</span></a>        <span class="k">return</span> <span class="n">_BRACKET_TYPE_TEXT</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos">84</span></a>    
-</span><span id="L-85"><a href="#L-85"><span class="linenos">85</span></a>    <span class="k">def</span> <span class="nf">absent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="L-86"><a href="#L-86"><span class="linenos">86</span></a>        <span class="k">return</span> <span class="n">_BRACKET_TYPE_ABSENT</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos">87</span></a>
-</span><span id="L-88"><a href="#L-88"><span class="linenos">88</span></a>
-</span><span id="L-89"><a href="#L-89"><span class="linenos">89</span></a><span class="n">BracketsList</span> <span class="o">=</span> <span class="n">List</span><span class="p">[</span><span class="n">Bracket</span><span class="p">]</span>
-</span><span id="L-90"><a href="#L-90"><span class="linenos">90</span></a>
-</span><span id="L-91"><a href="#L-91"><span class="linenos">91</span></a>
-</span><span id="L-92"><a href="#L-92"><span class="linenos">92</span></a><span class="k">class</span> <span class="nc">BracketPair</span><span class="p">:</span>
-</span><span id="L-93"><a href="#L-93"><span class="linenos">93</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span> <span class="n">BracketsList</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="n">BracketsList</span><span class="p">):</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos">94</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">left</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos">95</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a><span class="n">_BRACKET_TYPE_ABSENT</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a><span class="n">_BRACKET_TYPE_TEXT</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a>
+</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a>
+</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a><span class="k">class</span> <span class="nc">WrongBracketId</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>    <span class="k">pass</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a>
+</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a>
+</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a><span class="k">class</span> <span class="nc">Bracket</span><span class="p">:</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bracket_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Text</span><span class="p">,</span> <span class="n">BracketAbsentType</span><span class="p">]):</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bracket_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Text</span><span class="p">,</span> <span class="n">BracketAbsentType</span><span class="p">]</span> <span class="o">=</span> <span class="n">bracket_id</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bracket_id</span><span class="p">,</span> <span class="n">BracketAbsentType</span><span class="p">):</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">_BRACKET_TYPE_ABSENT</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">_BRACKET_TYPE_TEXT</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a>    
+</span><span id="L-71"><a href="#L-71"><span class="linenos">71</span></a>    <span class="k">def</span> <span class="nf">text</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos">72</span></a>        <span class="k">return</span> <span class="n">_BRACKET_TYPE_TEXT</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos">73</span></a>    
+</span><span id="L-74"><a href="#L-74"><span class="linenos">74</span></a>    <span class="k">def</span> <span class="nf">absent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos">75</span></a>        <span class="k">return</span> <span class="n">_BRACKET_TYPE_ABSENT</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos">76</span></a>
+</span><span id="L-77"><a href="#L-77"><span class="linenos">77</span></a>
+</span><span id="L-78"><a href="#L-78"><span class="linenos">78</span></a><span class="n">BracketsList</span> <span class="o">=</span> <span class="n">List</span><span class="p">[</span><span class="n">Bracket</span><span class="p">]</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos">79</span></a>
+</span><span id="L-80"><a href="#L-80"><span class="linenos">80</span></a>
+</span><span id="L-81"><a href="#L-81"><span class="linenos">81</span></a><span class="k">class</span> <span class="nc">BracketPair</span><span class="p">:</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos">82</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span> <span class="n">BracketsList</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="n">BracketsList</span><span class="p">):</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos">83</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">left</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos">84</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right</span>
 </span></pre></div>
 
 
@@ -126,19 +115,19 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 
     </div>
     <a class="headerlink" href="#Bracket"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Bracket-75"><a href="#Bracket-75"><span class="linenos">75</span></a><span class="k">class</span> <span class="nc">Bracket</span><span class="p">:</span>
-</span><span id="Bracket-76"><a href="#Bracket-76"><span class="linenos">76</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bracket_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Text</span><span class="p">,</span> <span class="n">BracketAbsentType</span><span class="p">]):</span>
-</span><span id="Bracket-77"><a href="#Bracket-77"><span class="linenos">77</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bracket_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Text</span><span class="p">,</span> <span class="n">BracketAbsentType</span><span class="p">]</span> <span class="o">=</span> <span class="n">bracket_id</span>
-</span><span id="Bracket-78"><a href="#Bracket-78"><span class="linenos">78</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bracket_id</span><span class="p">,</span> <span class="n">BracketAbsentType</span><span class="p">):</span>
-</span><span id="Bracket-79"><a href="#Bracket-79"><span class="linenos">79</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">_BRACKET_TYPE_ABSENT</span>
-</span><span id="Bracket-80"><a href="#Bracket-80"><span class="linenos">80</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="Bracket-81"><a href="#Bracket-81"><span class="linenos">81</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">_BRACKET_TYPE_TEXT</span>
-</span><span id="Bracket-82"><a href="#Bracket-82"><span class="linenos">82</span></a>    
-</span><span id="Bracket-83"><a href="#Bracket-83"><span class="linenos">83</span></a>    <span class="k">def</span> <span class="nf">text</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="Bracket-84"><a href="#Bracket-84"><span class="linenos">84</span></a>        <span class="k">return</span> <span class="n">_BRACKET_TYPE_TEXT</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span>
-</span><span id="Bracket-85"><a href="#Bracket-85"><span class="linenos">85</span></a>    
-</span><span id="Bracket-86"><a href="#Bracket-86"><span class="linenos">86</span></a>    <span class="k">def</span> <span class="nf">absent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="Bracket-87"><a href="#Bracket-87"><span class="linenos">87</span></a>        <span class="k">return</span> <span class="n">_BRACKET_TYPE_ABSENT</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Bracket-64"><a href="#Bracket-64"><span class="linenos">64</span></a><span class="k">class</span> <span class="nc">Bracket</span><span class="p">:</span>
+</span><span id="Bracket-65"><a href="#Bracket-65"><span class="linenos">65</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bracket_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Text</span><span class="p">,</span> <span class="n">BracketAbsentType</span><span class="p">]):</span>
+</span><span id="Bracket-66"><a href="#Bracket-66"><span class="linenos">66</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bracket_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Text</span><span class="p">,</span> <span class="n">BracketAbsentType</span><span class="p">]</span> <span class="o">=</span> <span class="n">bracket_id</span>
+</span><span id="Bracket-67"><a href="#Bracket-67"><span class="linenos">67</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bracket_id</span><span class="p">,</span> <span class="n">BracketAbsentType</span><span class="p">):</span>
+</span><span id="Bracket-68"><a href="#Bracket-68"><span class="linenos">68</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">_BRACKET_TYPE_ABSENT</span>
+</span><span id="Bracket-69"><a href="#Bracket-69"><span class="linenos">69</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="Bracket-70"><a href="#Bracket-70"><span class="linenos">70</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">_BRACKET_TYPE_TEXT</span>
+</span><span id="Bracket-71"><a href="#Bracket-71"><span class="linenos">71</span></a>    
+</span><span id="Bracket-72"><a href="#Bracket-72"><span class="linenos">72</span></a>    <span class="k">def</span> <span class="nf">text</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="Bracket-73"><a href="#Bracket-73"><span class="linenos">73</span></a>        <span class="k">return</span> <span class="n">_BRACKET_TYPE_TEXT</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span>
+</span><span id="Bracket-74"><a href="#Bracket-74"><span class="linenos">74</span></a>    
+</span><span id="Bracket-75"><a href="#Bracket-75"><span class="linenos">75</span></a>    <span class="k">def</span> <span class="nf">absent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="Bracket-76"><a href="#Bracket-76"><span class="linenos">76</span></a>        <span class="k">return</span> <span class="n">_BRACKET_TYPE_ABSENT</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span>
 </span></pre></div>
 
 
@@ -148,18 +137,18 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
                                         <input id="Bracket.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">Bracket</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">bracket_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n"><a href="#BracketAbsentType">BracketAbsentType</a></span><span class="p">]</span></span>)</span>
+        <span class="name">Bracket</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">bracket_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n"><a href="#BracketAbsentType">BracketAbsentType</a></span><span class="p">]</span></span>)</span>
 
                 <label class="view-source-button" for="Bracket.__init__-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#Bracket.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Bracket.__init__-76"><a href="#Bracket.__init__-76"><span class="linenos">76</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bracket_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Text</span><span class="p">,</span> <span class="n">BracketAbsentType</span><span class="p">]):</span>
-</span><span id="Bracket.__init__-77"><a href="#Bracket.__init__-77"><span class="linenos">77</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bracket_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Text</span><span class="p">,</span> <span class="n">BracketAbsentType</span><span class="p">]</span> <span class="o">=</span> <span class="n">bracket_id</span>
-</span><span id="Bracket.__init__-78"><a href="#Bracket.__init__-78"><span class="linenos">78</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bracket_id</span><span class="p">,</span> <span class="n">BracketAbsentType</span><span class="p">):</span>
-</span><span id="Bracket.__init__-79"><a href="#Bracket.__init__-79"><span class="linenos">79</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">_BRACKET_TYPE_ABSENT</span>
-</span><span id="Bracket.__init__-80"><a href="#Bracket.__init__-80"><span class="linenos">80</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="Bracket.__init__-81"><a href="#Bracket.__init__-81"><span class="linenos">81</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">_BRACKET_TYPE_TEXT</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Bracket.__init__-65"><a href="#Bracket.__init__-65"><span class="linenos">65</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bracket_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Text</span><span class="p">,</span> <span class="n">BracketAbsentType</span><span class="p">]):</span>
+</span><span id="Bracket.__init__-66"><a href="#Bracket.__init__-66"><span class="linenos">66</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bracket_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Text</span><span class="p">,</span> <span class="n">BracketAbsentType</span><span class="p">]</span> <span class="o">=</span> <span class="n">bracket_id</span>
+</span><span id="Bracket.__init__-67"><a href="#Bracket.__init__-67"><span class="linenos">67</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bracket_id</span><span class="p">,</span> <span class="n">BracketAbsentType</span><span class="p">):</span>
+</span><span id="Bracket.__init__-68"><a href="#Bracket.__init__-68"><span class="linenos">68</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">_BRACKET_TYPE_ABSENT</span>
+</span><span id="Bracket.__init__-69"><a href="#Bracket.__init__-69"><span class="linenos">69</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="Bracket.__init__-70"><a href="#Bracket.__init__-70"><span class="linenos">70</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">_BRACKET_TYPE_TEXT</span>
 </span></pre></div>
 
 
@@ -188,8 +177,8 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 
     </div>
     <a class="headerlink" href="#Bracket.text"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Bracket.text-83"><a href="#Bracket.text-83"><span class="linenos">83</span></a>    <span class="k">def</span> <span class="nf">text</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="Bracket.text-84"><a href="#Bracket.text-84"><span class="linenos">84</span></a>        <span class="k">return</span> <span class="n">_BRACKET_TYPE_TEXT</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Bracket.text-72"><a href="#Bracket.text-72"><span class="linenos">72</span></a>    <span class="k">def</span> <span class="nf">text</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="Bracket.text-73"><a href="#Bracket.text-73"><span class="linenos">73</span></a>        <span class="k">return</span> <span class="n">_BRACKET_TYPE_TEXT</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span>
 </span></pre></div>
 
 
@@ -207,8 +196,8 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 
     </div>
     <a class="headerlink" href="#Bracket.absent"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Bracket.absent-86"><a href="#Bracket.absent-86"><span class="linenos">86</span></a>    <span class="k">def</span> <span class="nf">absent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="Bracket.absent-87"><a href="#Bracket.absent-87"><span class="linenos">87</span></a>        <span class="k">return</span> <span class="n">_BRACKET_TYPE_ABSENT</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Bracket.absent-75"><a href="#Bracket.absent-75"><span class="linenos">75</span></a>    <span class="k">def</span> <span class="nf">absent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="Bracket.absent-76"><a href="#Bracket.absent-76"><span class="linenos">76</span></a>        <span class="k">return</span> <span class="n">_BRACKET_TYPE_ABSENT</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span>
 </span></pre></div>
 
 
@@ -227,10 +216,10 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 
     </div>
     <a class="headerlink" href="#BracketPair"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="BracketPair-93"><a href="#BracketPair-93"><span class="linenos">93</span></a><span class="k">class</span> <span class="nc">BracketPair</span><span class="p">:</span>
-</span><span id="BracketPair-94"><a href="#BracketPair-94"><span class="linenos">94</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span> <span class="n">BracketsList</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="n">BracketsList</span><span class="p">):</span>
-</span><span id="BracketPair-95"><a href="#BracketPair-95"><span class="linenos">95</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">left</span>
-</span><span id="BracketPair-96"><a href="#BracketPair-96"><span class="linenos">96</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="BracketPair-82"><a href="#BracketPair-82"><span class="linenos">82</span></a><span class="k">class</span> <span class="nc">BracketPair</span><span class="p">:</span>
+</span><span id="BracketPair-83"><a href="#BracketPair-83"><span class="linenos">83</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span> <span class="n">BracketsList</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="n">BracketsList</span><span class="p">):</span>
+</span><span id="BracketPair-84"><a href="#BracketPair-84"><span class="linenos">84</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">left</span>
+</span><span id="BracketPair-85"><a href="#BracketPair-85"><span class="linenos">85</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right</span>
 </span></pre></div>
 
 
@@ -240,15 +229,15 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
                                         <input id="BracketPair.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">BracketPair</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">left</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n"><a href="#Bracket">Bracket</a></span><span class="p">]</span>,</span><span class="param">	<span class="n">right</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n"><a href="#Bracket">Bracket</a></span><span class="p">]</span></span>)</span>
+        <span class="name">BracketPair</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">left</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n"><a href="#Bracket">Bracket</a></span><span class="p">]</span>,</span><span class="param">	<span class="n">right</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n"><a href="#Bracket">Bracket</a></span><span class="p">]</span></span>)</span>
 
                 <label class="view-source-button" for="BracketPair.__init__-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#BracketPair.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="BracketPair.__init__-94"><a href="#BracketPair.__init__-94"><span class="linenos">94</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span> <span class="n">BracketsList</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="n">BracketsList</span><span class="p">):</span>
-</span><span id="BracketPair.__init__-95"><a href="#BracketPair.__init__-95"><span class="linenos">95</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">left</span>
-</span><span id="BracketPair.__init__-96"><a href="#BracketPair.__init__-96"><span class="linenos">96</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="BracketPair.__init__-83"><a href="#BracketPair.__init__-83"><span class="linenos">83</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span> <span class="n">BracketsList</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="n">BracketsList</span><span class="p">):</span>
+</span><span id="BracketPair.__init__-84"><a href="#BracketPair.__init__-84"><span class="linenos">84</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">left</span>
+</span><span id="BracketPair.__init__-85"><a href="#BracketPair.__init__-85"><span class="linenos">85</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right</span>
 </span></pre></div>
 
 
@@ -301,9 +290,9 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 
     </div>
     <a class="headerlink" href="#BracketAbsentType"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="BracketAbsentType-57"><a href="#BracketAbsentType-57"><span class="linenos">57</span></a><span class="k">class</span> <span class="nc">BracketAbsentType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-</span><span id="BracketAbsentType-58"><a href="#BracketAbsentType-58"><span class="linenos">58</span></a>    <span class="n">out_of_data_bounds</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="BracketAbsentType-59"><a href="#BracketAbsentType-59"><span class="linenos">59</span></a>    <span class="n">out_of_accessible_data_bounds</span> <span class="o">=</span> <span class="mi">1</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="BracketAbsentType-46"><a href="#BracketAbsentType-46"><span class="linenos">46</span></a><span class="k">class</span> <span class="nc">BracketAbsentType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+</span><span id="BracketAbsentType-47"><a href="#BracketAbsentType-47"><span class="linenos">47</span></a>    <span class="n">out_of_data_bounds</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="BracketAbsentType-48"><a href="#BracketAbsentType-48"><span class="linenos">48</span></a>    <span class="n">out_of_accessible_data_bounds</span> <span class="o">=</span> <span class="mi">1</span>
 </span></pre></div>
 
 

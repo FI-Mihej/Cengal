@@ -28,7 +28,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.3.4"
+__version__ = "4.4.0"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -149,9 +149,6 @@ def set_version(script_file_full_path: str,
     version_bracket_pair = default_version_bracket_pair if version_bracket_pair is None else version_bracket_pair
     with open(script_file_full_path, 'r+b') as file:
         text, text_encoding, bom_bytes = detect_and_decode(file.read())
-        if not bom_bytes:
-            text_encoding = 'utf-8'
-        
         credits_string_pos: slice = find_text_in_brackets(text, credits_string_bracket_pair)
         if credits_string_pos is not None:
             credits_string: str = text[credits_string_pos]

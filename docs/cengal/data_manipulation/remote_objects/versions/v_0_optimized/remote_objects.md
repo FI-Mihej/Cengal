@@ -73,7 +73,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 </span><span id="L-58"><a href="#L-58"><span class="linenos">  58</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-59"><a href="#L-59"><span class="linenos">  59</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-60"><a href="#L-60"><span class="linenos">  60</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos">  61</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.3.4&quot;</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos">  61</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.4.0&quot;</span>
 </span><span id="L-62"><a href="#L-62"><span class="linenos">  62</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-63"><a href="#L-63"><span class="linenos">  63</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-64"><a href="#L-64"><span class="linenos">  64</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -2801,7 +2801,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
                                         <input id="RemoteObjectsManager.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">RemoteObjectsManager</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">on_new_class_handler</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">on_new_obj_info_handler</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">objects_db</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">classes_id_gen</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">objects_id_gen</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">serializable_data_types</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">],</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span>)</span>
+        <span class="name">RemoteObjectsManager</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">on_new_class_handler</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">on_new_obj_info_handler</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">objects_db</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">classes_id_gen</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">objects_id_gen</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">serializable_data_types</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="n">Type</span><span class="p">],</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span>)</span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.__init__-view-source"><span>View Source</span></label>
 
@@ -2852,7 +2852,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
                             </div>
                             <div id="RemoteObjectsManager.classes_id_gen" class="classattr">
                                 <div class="attr variable">
-            <span class="name">classes_id_gen</span><span class="annotation">: &lt;cyfunction IDGenerator at 0x7f4e4904e450&gt;</span>
+            <span class="name">classes_id_gen</span><span class="annotation">: &lt;cyfunction IDGenerator at 0x7f6a2fdffba0&gt;</span>
 
         
     </div>
@@ -2874,7 +2874,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
                             </div>
                             <div id="RemoteObjectsManager.objects_id_gen" class="classattr">
                                 <div class="attr variable">
-            <span class="name">objects_id_gen</span><span class="annotation">: &lt;cyfunction IDGenerator at 0x7f4e4904e450&gt;</span>
+            <span class="name">objects_id_gen</span><span class="annotation">: &lt;cyfunction IDGenerator at 0x7f6a2fdffba0&gt;</span>
 
         
     </div>
@@ -3244,7 +3244,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">adjust_to_serializable</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">type_id</span><span class="p">:</span> <span class="n"><a href="#DataType">DataType</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">adjust_to_serializable</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">type_id</span><span class="p">:</span> <span class="n"><a href="#DataType">DataType</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.adjust_to_serializable-view-source"><span>View Source</span></label>
 
@@ -3471,7 +3471,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">ats</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">type_id</span><span class="p">:</span> <span class="n"><a href="#DataType">DataType</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">ats</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">type_id</span><span class="p">:</span> <span class="n"><a href="#DataType">DataType</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.ats-view-source"><span>View Source</span></label>
 
@@ -3698,7 +3698,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">adjust_from_serializable</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">type_id</span><span class="p">:</span> <span class="n"><a href="#DataType">DataType</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">adjust_from_serializable</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">type_id</span><span class="p">:</span> <span class="n"><a href="#DataType">DataType</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.adjust_from_serializable-view-source"><span>View Source</span></label>
 
@@ -3910,7 +3910,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">afs</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">type_id</span><span class="p">:</span> <span class="n"><a href="#DataType">DataType</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">afs</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">type_id</span><span class="p">:</span> <span class="n"><a href="#DataType">DataType</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.afs-view-source"><span>View Source</span></label>
 
@@ -4122,7 +4122,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">serialize_container</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">type_id</span><span class="p">:</span> <span class="n"><a href="#DataType">DataType</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">serialize_container</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">type_id</span><span class="p">:</span> <span class="n"><a href="#DataType">DataType</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.serialize_container-view-source"><span>View Source</span></label>
 
@@ -4177,7 +4177,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">sc</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">type_id</span><span class="p">:</span> <span class="n"><a href="#DataType">DataType</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">sc</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">type_id</span><span class="p">:</span> <span class="n"><a href="#DataType">DataType</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.sc-view-source"><span>View Source</span></label>
 
@@ -4232,7 +4232,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">serialize_impl</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>,</span><span class="param">	<span class="n">ignore_empty_classes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>:</span></span>
+        <span class="name">serialize_impl</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span>, </span><span class="param"><span class="n">ignore_empty_classes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.serialize_impl-view-source"><span>View Source</span></label>
 
@@ -4506,7 +4506,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">si</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>,</span><span class="param">	<span class="n">ignore_empty_classes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>:</span></span>
+        <span class="name">si</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span>, </span><span class="param"><span class="n">ignore_empty_classes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.si-view-source"><span>View Source</span></label>
 
@@ -4780,7 +4780,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">serialize</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>,</span><span class="param">	<span class="n">ignore_empty_classes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>:</span></span>
+        <span class="name">serialize</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span>, </span><span class="param"><span class="n">ignore_empty_classes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.serialize-view-source"><span>View Source</span></label>
 
@@ -4800,7 +4800,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">s</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>,</span><span class="param">	<span class="n">ignore_empty_classes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>:</span></span>
+        <span class="name">s</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span>, </span><span class="param"><span class="n">ignore_empty_classes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.s-view-source"><span>View Source</span></label>
 
@@ -4820,7 +4820,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">deserialize_class_impl</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">class_info</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Type</span><span class="p">]</span>:</span></span>
+        <span class="name">deserialize_class_impl</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">class_info</span><span class="p">:</span> <span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Type</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.deserialize_class_impl-view-source"><span>View Source</span></label>
 
@@ -4858,7 +4858,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">dcli</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">class_info</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Type</span><span class="p">]</span>:</span></span>
+        <span class="name">dcli</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">class_info</span><span class="p">:</span> <span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Type</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.dcli-view-source"><span>View Source</span></label>
 
@@ -4896,7 +4896,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">deserialize_class</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">class_info</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Type</span><span class="p">]</span>:</span></span>
+        <span class="name">deserialize_class</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">class_info</span><span class="p">:</span> <span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Type</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.deserialize_class-view-source"><span>View Source</span></label>
 
@@ -4916,7 +4916,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">dcl</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">class_info</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Type</span><span class="p">]</span>:</span></span>
+        <span class="name">dcl</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">class_info</span><span class="p">:</span> <span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Type</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.dcl-view-source"><span>View Source</span></label>
 
@@ -4936,7 +4936,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">deserialize_container_impl</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">type_id</span><span class="p">:</span> <span class="n"><a href="#DataType">DataType</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">deserialize_container_impl</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">type_id</span><span class="p">:</span> <span class="n"><a href="#DataType">DataType</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.deserialize_container_impl-view-source"><span>View Source</span></label>
 
@@ -4981,7 +4981,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">dcoi</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">type_id</span><span class="p">:</span> <span class="n"><a href="#DataType">DataType</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">dcoi</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">type_id</span><span class="p">:</span> <span class="n"><a href="#DataType">DataType</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.dcoi-view-source"><span>View Source</span></label>
 
@@ -5026,7 +5026,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">deserialize_container</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">type_id</span><span class="p">:</span> <span class="n"><a href="#DataType">DataType</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">deserialize_container</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">type_id</span><span class="p">:</span> <span class="n"><a href="#DataType">DataType</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.deserialize_container-view-source"><span>View Source</span></label>
 
@@ -5046,7 +5046,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">dco</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">type_id</span><span class="p">:</span> <span class="n"><a href="#DataType">DataType</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
+        <span class="name">dco</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">type_id</span><span class="p">:</span> <span class="n"><a href="#DataType">DataType</a></span>,</span><span class="param">	<span class="n">obj</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.dco-view-source"><span>View Source</span></label>
 
@@ -5066,7 +5066,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">deserialize_obj_impl</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj_info</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>:</span></span>
+        <span class="name">deserialize_obj_impl</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj_info</span><span class="p">:</span> <span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.deserialize_obj_impl-view-source"><span>View Source</span></label>
 
@@ -5163,7 +5163,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">doi</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj_info</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>:</span></span>
+        <span class="name">doi</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj_info</span><span class="p">:</span> <span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.doi-view-source"><span>View Source</span></label>
 
@@ -5260,7 +5260,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">deserialize_obj</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj_info</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>:</span></span>
+        <span class="name">deserialize_obj</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj_info</span><span class="p">:</span> <span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.deserialize_obj-view-source"><span>View Source</span></label>
 
@@ -5280,7 +5280,7 @@ cengal<wbr>.data_manipulation<wbr>.remote_objects<wbr>.versions<wbr>.v_0_optimiz
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">do</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj_info</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>:</span></span>
+        <span class="name">do</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">obj_info</span><span class="p">:</span> <span class="n">Tuple</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RemoteObjectsManager.do-view-source"><span>View Source</span></label>
 
