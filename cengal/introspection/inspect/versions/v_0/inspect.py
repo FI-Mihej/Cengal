@@ -38,7 +38,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.4.0"
+__version__ = "4.4.1"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -896,6 +896,14 @@ def current_entity_name(depth: Optional[int] = 1):
 
 
 cen = current_entity_name
+
+
+def print_current_entity_name(depth: Optional[int] = 1):
+    print(current_entity_name(depth + 1))
+
+
+print_cen = print_current_entity_name
+pcen = print_current_entity_name
 
 
 def current_entity_owner_name(depth: Optional[int] = 1):

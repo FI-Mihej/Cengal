@@ -48,7 +48,7 @@ cengal<wbr>.parallel_execution<wbr>.asyncio<wbr>.ashared_memory_manager<wbr>.ver
 </span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.4.0&quot;</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.4.1&quot;</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -407,7 +407,7 @@ cengal<wbr>.parallel_execution<wbr>.asyncio<wbr>.ashared_memory_manager<wbr>.ver
                             </div>
                             <div id="ASharedMemoryContextManager.shared_memory" class="classattr">
                                 <div class="attr variable">
-            <span class="name">shared_memory</span><span class="annotation">: cengal.hardware.memory.shared_memory.versions.v_1.shared_memory.SharedMemory</span>
+            <span class="name">shared_memory</span><span class="annotation">: cengal.hardware.memory.shared_memory.versions.v_1.generated_optimized_shared_memory.SharedMemory</span>
 
         
     </div>
@@ -418,7 +418,7 @@ cengal<wbr>.parallel_execution<wbr>.asyncio<wbr>.ashared_memory_manager<wbr>.ver
                             </div>
                             <div id="ASharedMemoryContextManager.shared_memory_holder" class="classattr">
                                 <div class="attr variable">
-            <span class="name">shared_memory_holder</span><span class="annotation">: cengal.code_flow_control.smart_values.versions.v_2.smart_values.ValueHolder[cengal.hardware.memory.shared_memory.versions.v_1.shared_memory.SharedMemory]</span>
+            <span class="name">shared_memory_holder</span><span class="annotation">: cengal.code_flow_control.smart_values.versions.v_2.smart_values.ValueHolder[cengal.hardware.memory.shared_memory.versions.v_1.generated_optimized_shared_memory.SharedMemory]</span>
 
         
     </div>
@@ -716,7 +716,7 @@ cengal<wbr>.parallel_execution<wbr>.asyncio<wbr>.ashared_memory_manager<wbr>.ver
                                         <input id="ASharedMemoryManager.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">ASharedMemoryManager</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">shared_memory</span><span class="p">:</span> <span class="n">cengal</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">shared_memory</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">v_1</span><span class="o">.</span><span class="n">shared_memory</span><span class="o">.</span><span class="n">SharedMemory</span>,</span><span class="param">	<span class="n">save_cpu_time</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>,</span><span class="param">	<span class="n">time_limit</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span>)</span>
+        <span class="name">ASharedMemoryManager</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">shared_memory</span><span class="p">:</span> <span class="n">cengal</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">shared_memory</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">v_1</span><span class="o">.</span><span class="n">generated_optimized_shared_memory</span><span class="o">.</span><span class="n">SharedMemory</span>,</span><span class="param">	<span class="n">save_cpu_time</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>,</span><span class="param">	<span class="n">time_limit</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span>)</span>
 
                 <label class="view-source-button" for="ASharedMemoryManager.__init__-view-source"><span>View Source</span></label>
 
@@ -744,7 +744,7 @@ cengal<wbr>.parallel_execution<wbr>.asyncio<wbr>.ashared_memory_manager<wbr>.ver
                             </div>
                             <div id="ASharedMemoryManager.shared_memory" class="classattr">
                                 <div class="attr variable">
-            <span class="name">shared_memory</span><span class="annotation">: cengal.hardware.memory.shared_memory.versions.v_1.shared_memory.SharedMemory</span>
+            <span class="name">shared_memory</span><span class="annotation">: cengal.hardware.memory.shared_memory.versions.v_1.generated_optimized_shared_memory.SharedMemory</span>
 
         
     </div>

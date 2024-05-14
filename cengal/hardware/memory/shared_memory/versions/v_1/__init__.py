@@ -17,8 +17,8 @@
 
 from cengal.modules_management.ignore_in_build_mode import ignore_in_build_mode
 with ignore_in_build_mode():
-    from .shared_memory import *
-    # from .generated_optimized_shared_memory import *
+    # from .shared_memory import *
+    from .generated_optimized_shared_memory import *
 
 """
 Module Docstring
@@ -29,7 +29,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.4.0"
+__version__ = "4.4.1"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"

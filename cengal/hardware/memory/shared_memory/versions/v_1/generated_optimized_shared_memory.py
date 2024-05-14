@@ -30,7 +30,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.4.0"
+__version__ = "4.4.1"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -58,6 +58,8 @@ import asyncio
 import pickle
 import ctypes
 import numpy as np
+from datetime import datetime, timedelta, timezone, date, time
+from decimal import Decimal
 from enum import IntEnum
 from multiprocessing.shared_memory import SharedMemory as MultiprocessingSharedMemory
 from array import array
@@ -144,6 +146,9 @@ class ObjectType(IntEnum):
     tstaticobject = 25
     tfastset = 26
     tslice = 27
+    tdecimal = 28
+    tdatetime = 29
+    tstaticobjectwithslots = 30
 
 
 class SysValuesOffsets(IntEnum):
@@ -1192,6 +1197,8 @@ class ListOffsets(IntEnum):
 
 
 class IList(BaseIObject, list):
+    __slots__ = ('_shared_memory', '_base_address', '_offset', '_offset__data', '_offset__pointer_to_internal_list')
+
     def __init__(self, shared_memory: 'SharedMemory', offset: Offset = None, obj: List = None) -> None:
         self._shared_memory = shared_memory
         self._base_address = shared_memory.base_address
@@ -2182,6 +2189,93 @@ class TTuple:
 
 
 # ======================================================================================================================
+# === DatetimeTypes =============================================================================================================
+
+
+class DatetimeOffsets(IntEnum):
+    data_bytes_offset = 0
+
+
+DatetimeTypes = Union[datetime, timedelta, timezone, date, time]
+
+
+class TDatetime:
+    def map_to_shared_memory(self, shared_memory: 'SharedMemory', obj: DatetimeTypes) -> Tuple[DatetimeTypes, Offset, Size]:
+        offset, real_size = shared_memory.malloc(ObjectType.tdatetime, 8)
+        created_items_offsets: List[Offset] = list()
+        try:
+            data_tuple_mapped_obj, data_bytes_offset, data_tuple_size = shared_memory.put_obj(pickle_dumps(obj))
+            created_items_offsets.append(data_bytes_offset)
+            write_uint64(shared_memory.base_address, offset + 16 + 0, data_bytes_offset)
+        except:
+            shared_memory.free(offset)
+            for item_offset in created_items_offsets:
+                shared_memory.destroy_obj(item_offset)
+            
+            raise
+
+        return pickle_loads(data_tuple_mapped_obj), offset, real_size
+    
+    def init_from_shared_memory(self, shared_memory: 'SharedMemory', offset: Offset) -> DatetimeTypes:
+        if ObjectType.tdatetime != read_uint64(shared_memory.base_address, offset):
+            raise WrongObjectTypeError
+
+        data_bytes_offset = read_uint64(shared_memory.base_address, offset + 16 + 0)
+        result_tuple = shared_memory.get_obj(data_bytes_offset)
+        return pickle_loads(result_tuple)
+    
+    def destroy(self, shared_memory: 'SharedMemory', offset: Offset) -> None:
+        if ObjectType.tdatetime != read_uint64(shared_memory.base_address, offset):
+            raise WrongObjectTypeError
+
+        data_bytes_offset = read_uint64(shared_memory.base_address, offset + 16 + 0)
+        shared_memory.destroy_obj(data_bytes_offset)
+        shared_memory.free(offset)
+
+
+# ======================================================================================================================
+# === Decimal =============================================================================================================
+
+
+class DecimalOffsets(IntEnum):
+    data_tuple_offset = 0
+
+
+class TDecimal:
+    def map_to_shared_memory(self, shared_memory: 'SharedMemory', obj: Decimal) -> Tuple[Decimal, Offset, Size]:
+        offset, real_size = shared_memory.malloc(ObjectType.tdecimal, 8)
+        created_items_offsets: List[Offset] = list()
+        try:
+            data_tuple_mapped_obj, data_tuple_offset, data_tuple_size = shared_memory.put_obj(tuple(obj.as_tuple()))
+            created_items_offsets.append(data_tuple_offset)
+            write_uint64(shared_memory.base_address, offset + 16 + 0, data_tuple_offset)
+        except:
+            shared_memory.free(offset)
+            for item_offset in created_items_offsets:
+                shared_memory.destroy_obj(item_offset)
+            
+            raise
+
+        return Decimal(data_tuple_mapped_obj), offset, real_size
+    
+    def init_from_shared_memory(self, shared_memory: 'SharedMemory', offset: Offset) -> Decimal:
+        if ObjectType.tdecimal != read_uint64(shared_memory.base_address, offset):
+            raise WrongObjectTypeError
+
+        data_tuple_offset = read_uint64(shared_memory.base_address, offset + 16 + 0)
+        result_tuple = shared_memory.get_obj(data_tuple_offset)
+        return Decimal(result_tuple)
+    
+    def destroy(self, shared_memory: 'SharedMemory', offset: Offset) -> None:
+        if ObjectType.tdecimal != read_uint64(shared_memory.base_address, offset):
+            raise WrongObjectTypeError
+
+        data_tuple_offset = read_uint64(shared_memory.base_address, offset + 16 + 0)
+        shared_memory.destroy_obj(data_tuple_offset)
+        shared_memory.free(offset)
+
+
+# ======================================================================================================================
 # === Slice =============================================================================================================
 
 
@@ -2875,18 +2969,18 @@ class IMutableSet(BaseIObject, AbsMutableSet):
     
     @property
     def refresh_counter(self):
-        return read_uint64(self._shared_memory.base_address, self._offset__refresh_counter_offset)
+        return read_uint64(self._base_address, self._offset__refresh_counter_offset)
     
     def _increase_refresh_counter(self):
         if not self.ignore_rehash:
             self._refresh_counter += 1
-            write_uint64(self._shared_memory.base_address, self._offset__refresh_counter_offset, self._refresh_counter)
+            write_uint64(self._base_address, self._offset__refresh_counter_offset, self._refresh_counter)
     
     def _check_hashmap(self):
         if self.ignore_rehash:
             return False
         else:
-            base_address = self._shared_memory.base_address
+            base_address = self._base_address
             refresh_counter = read_uint64(base_address, self._offset__refresh_counter_offset)
             # hashmap_offset = read_uint64(base_address, self._offset__hashmap_offset)
             # if (self._refresh_counter != refresh_counter) or (self.hashmap_offset != hashmap_offset) or (self._hashmap._offset != hashmap_offset):
@@ -2901,7 +2995,7 @@ class IMutableSet(BaseIObject, AbsMutableSet):
     #     if self.ignore_rehash:
     #         return self._hashmap
     #     else:
-    #         hashmap_offset = read_uint64(self._shared_memory.base_address, self._offset__hashmap_offset)
+    #         hashmap_offset = read_uint64(self._base_address, self._offset__hashmap_offset)
     #         if (self.hashmap_offset != hashmap_offset) or (self._hashmap._offset != hashmap_offset):
     #             self._refresh_hashmap(self._offset)
             
@@ -2963,10 +3057,10 @@ class IMutableSet(BaseIObject, AbsMutableSet):
         new_other.hashmap = self.hashmap
         new_other.hashmap_offset = self.hashmap_offset
         new_other.buckets = self.buckets
-        write_uint64(new_other._shared_memory.base_address, new_other._offset__hashmap_offset, read_uint64(self._shared_memory.base_address, self._offset__hashmap_offset))
-        write_uint64(new_other._shared_memory.base_address, new_other._offset__size_offset, read_uint64(self._shared_memory.base_address, self._offset__size_offset))
-        write_uint64(new_other._shared_memory.base_address, new_other._offset__capacity_offset, read_uint64(self._shared_memory.base_address, self._offset__capacity_offset))
-        # write_uint64(new_other._shared_memory.base_address, new_other._offset__refresh_counter_offset, read_uint64(self._shared_memory.base_address, self._offset__refresh_counter_offset))
+        write_uint64(new_other._shared_memory.base_address, new_other._offset__hashmap_offset, read_uint64(self._base_address, self._offset__hashmap_offset))
+        write_uint64(new_other._shared_memory.base_address, new_other._offset__size_offset, read_uint64(self._base_address, self._offset__size_offset))
+        write_uint64(new_other._shared_memory.base_address, new_other._offset__capacity_offset, read_uint64(self._base_address, self._offset__capacity_offset))
+        # write_uint64(new_other._shared_memory.base_address, new_other._offset__refresh_counter_offset, read_uint64(self._base_address, self._offset__refresh_counter_offset))
 
         self._capacity = other_capacity
         self._hash_bits = other_hash_bits
@@ -2976,25 +3070,29 @@ class IMutableSet(BaseIObject, AbsMutableSet):
         self.hashmap = other_hashmap
         self.hashmap_offset = other_hashmap_offset
         self.buckets = other_buckets
-        write_uint64(self._shared_memory.base_address, self._offset__hashmap_offset, other_hashmap_offset_bin)
-        write_uint64(self._shared_memory.base_address, self._offset__size_offset, other_size_bin)
-        write_uint64(self._shared_memory.base_address, self._offset__capacity_offset, other_capacity_bin)
-        # write_uint64(self._shared_memory.base_address, self._offset__refresh_counter_offset, other_refresh_counter_bin)
+        write_uint64(self._base_address, self._offset__hashmap_offset, other_hashmap_offset_bin)
+        write_uint64(self._base_address, self._offset__size_offset, other_size_bin)
+        write_uint64(self._base_address, self._offset__capacity_offset, other_capacity_bin)
+        # write_uint64(self._base_address, self._offset__refresh_counter_offset, other_refresh_counter_bin)
 
         self._shared_memory.destroy_obj(new_other_offset)
 
         self.ignore_rehash = ignore_rehash
 
     def __len__(self):
+        self._check_hashmap()
         return self._size
     
     def __iter__(self):
+        self._check_hashmap()
         return IMutableSetIterator(self)
     
     def iter_offset(self):
+        self._check_hashmap()
         return IMutableSetIteratorAsOffset(self)
     
     def iter_offset_pop(self):
+        self._check_hashmap()
         return IMutableSetIteratorAsOffset(self, True)
     
     def __contains__(self, obj: Any) -> bool:
@@ -3026,7 +3124,7 @@ class IMutableSet(BaseIObject, AbsMutableSet):
 
                 bucket_field_hash = bucket[bucket_item_index + 1]
                 bucket_obj = bucket[bucket_item_index + 2]
-                if (item_hash == bucket[bucket_field_hash]) and (obj == bucket[bucket_obj]):
+                if (item_hash == bucket_field_hash) and (obj == bucket_obj):
                     return True
             
             return False
@@ -3211,7 +3309,7 @@ class IMutableSet(BaseIObject, AbsMutableSet):
                 
                 bucket_field_hash = bucket[bucket_item_index + 1]
                 bucket_obj = bucket[bucket_item_index + 2]
-                if (item_hash == bucket[bucket_field_hash]) and (obj == bucket[bucket_obj]):
+                if (item_hash == bucket_field_hash) and (obj == bucket_obj):
                     bucket[bucket_item_index + 0] = 0
                     bucket[bucket_item_index + 1] = None
                     bucket[bucket_item_index + 2] = None
@@ -3245,9 +3343,11 @@ class IMutableSet(BaseIObject, AbsMutableSet):
             self.hash_bits = int(ceil(log2(value)))
     
     def __str__(self) -> str:
+        self._check_hashmap()
         return set(self).__str__()
 
     def __repr__(self) -> str:
+        self._check_hashmap()
         return set(self).__repr__()
 
     def _free_mem(self):
@@ -3810,9 +3910,11 @@ class MutableMappingBucketOffsets(IntEnum):
 
 
 class IMutableMapping(BaseIObject, AbsMutableMapping):
-    @property
-    def __mro__(self) -> Tuple:
-        return BaseIObject, AbsMutableMapping, dict
+    __slots__ = ('_shared_memory', '_base_address', '_obj_size', '_offset', '_offset__data', '_offset__size_offset', '_offset__capacity_offset', '_offset__hashmap_offset', '_load_factor', '_load_factor_2', '_hash_bits', '_capacity', '_min_capacity', '_size', 'hashmap', 'hashmap_offset', 'buckets', '_refresh_counter', '_offset__refresh_counter_offset', 'ignore_rehash')
+
+    # @property
+    # def __mro__(self) -> Tuple:
+    #     return BaseIObject, AbsMutableMapping, dict
 
     def __init__(self, shared_memory: 'SharedMemory', offset: Offset = None, obj: AbsMutableMapping = None) -> None:
         self._shared_memory = shared_memory
@@ -4025,7 +4127,7 @@ class IMutableMapping(BaseIObject, AbsMutableMapping):
     
     @property
     def refresh_counter(self):
-        return read_uint64(self._shared_memory.base_address, self._offset__refresh_counter_offset)
+        return read_uint64(self._base_address, self._offset__refresh_counter_offset)
     
     def _increase_refresh_counter(self):
         if self.ignore_rehash:
@@ -4033,19 +4135,19 @@ class IMutableMapping(BaseIObject, AbsMutableMapping):
             pass
         else:
             # print(f'~ increase_refresh_counter {self._offset}: {intro_func_repr_limited()}')
-            # refresh_counter = read_uint64(self._shared_memory.base_address, self._offset__refresh_counter_offset)
+            # refresh_counter = read_uint64(self._base_address, self._offset__refresh_counter_offset)
             # if self._refresh_counter != refresh_counter:
             #     print('~!!! increase_refresh_counter')
             
             self._refresh_counter += 1
-            write_uint64(self._shared_memory.base_address, self._offset__refresh_counter_offset, self._refresh_counter)
+            write_uint64(self._base_address, self._offset__refresh_counter_offset, self._refresh_counter)
     
     def _check_hashmap(self):
         if self.ignore_rehash:
             # print(f'~ ignore check_hashmap {self._offset}: {intro_func_repr_limited()}')
             return False
         else:
-            base_address = self._shared_memory.base_address
+            base_address = self._base_address
             refresh_counter = read_uint64(base_address, self._offset__refresh_counter_offset)
             # hashmap_offset = read_uint64(base_address, self._offset__hashmap_offset)
             # if (self._refresh_counter != refresh_counter) or (self.hashmap_offset != hashmap_offset) or (self._hashmap._offset != hashmap_offset):
@@ -4122,10 +4224,10 @@ class IMutableMapping(BaseIObject, AbsMutableMapping):
         new_other.hashmap = self.hashmap
         new_other.hashmap_offset = self.hashmap_offset
         new_other.buckets = self.buckets
-        write_uint64(new_other._shared_memory.base_address, new_other._offset__hashmap_offset, read_uint64(self._shared_memory.base_address, self._offset__hashmap_offset))
-        write_uint64(new_other._shared_memory.base_address, new_other._offset__size_offset, read_uint64(self._shared_memory.base_address, self._offset__size_offset))
-        write_uint64(new_other._shared_memory.base_address, new_other._offset__capacity_offset, read_uint64(self._shared_memory.base_address, self._offset__capacity_offset))
-        # write_uint64(new_other._shared_memory.base_address, new_other._offset__refresh_counter_offset, read_uint64(self._shared_memory.base_address, self._offset__refresh_counter_offset))
+        write_uint64(new_other._shared_memory.base_address, new_other._offset__hashmap_offset, read_uint64(self._base_address, self._offset__hashmap_offset))
+        write_uint64(new_other._shared_memory.base_address, new_other._offset__size_offset, read_uint64(self._base_address, self._offset__size_offset))
+        write_uint64(new_other._shared_memory.base_address, new_other._offset__capacity_offset, read_uint64(self._base_address, self._offset__capacity_offset))
+        # write_uint64(new_other._shared_memory.base_address, new_other._offset__refresh_counter_offset, read_uint64(self._base_address, self._offset__refresh_counter_offset))
 
         self._capacity = other_capacity
         self._hash_bits = other_hash_bits
@@ -4135,10 +4237,10 @@ class IMutableMapping(BaseIObject, AbsMutableMapping):
         self.hashmap = other_hashmap
         self.hashmap_offset = other_hashmap_offset
         self.buckets = other_buckets
-        write_uint64(self._shared_memory.base_address, self._offset__hashmap_offset, other_hashmap_offset_bin)
-        write_uint64(self._shared_memory.base_address, self._offset__size_offset, other_size_bin)
-        write_uint64(self._shared_memory.base_address, self._offset__capacity_offset, other_capacity_bin)
-        # write_uint64(self._shared_memory.base_address, self._offset__refresh_counter_offset, refresh_counter_bin)
+        write_uint64(self._base_address, self._offset__hashmap_offset, other_hashmap_offset_bin)
+        write_uint64(self._base_address, self._offset__size_offset, other_size_bin)
+        write_uint64(self._base_address, self._offset__capacity_offset, other_capacity_bin)
+        # write_uint64(self._base_address, self._offset__refresh_counter_offset, refresh_counter_bin)
 
         self._shared_memory.destroy_obj(new_other_offset)
 
@@ -4458,9 +4560,11 @@ class IMutableMapping(BaseIObject, AbsMutableMapping):
             self.hash_bits = int(ceil(log2(value)))
     
     def __str__(self) -> str:
+        self._check_hashmap()
         return dict(self).__str__()
 
     def __repr__(self) -> str:
+        self._check_hashmap()
         return dict(self).__repr__()
 
     def _free_mem(self):
@@ -5087,6 +5191,228 @@ class TStaticObject:
 
 
 # ======================================================================================================================
+# === Static Object With Slots =============================================================================================================
+
+
+class StaticObjectWithSlotsOffsets(IntEnum):
+    pickled_obj = 0
+    pickled_attributes_dict = 1
+    attributes_slots = 2
+    setable_data_descriptor_field_names = 3
+
+
+def tstaticobjectwithslots_custom_getattribute(self, name):
+    if name in {'_tstaticobjectwithslots_attributes_dict', '_tstaticobjectwithslots_attributes_slots', '_tstaticobjectwithslots_setable_data_descriptor_field_names'} or name.startswith('__'):
+        return object.__getattribute__(self, name)
+    
+    try:
+        return self._tstaticobjectwithslots_attributes_slots[self._tstaticobjectwithslots_attributes_dict[name]]
+    except KeyError:
+        pass
+    
+    return object.__getattribute__(self, name)
+
+
+def tstaticobjectwithslots_custom_setattr(self, name, value):
+    if name in {'_tstaticobjectwithslots_attributes_dict', '_tstaticobjectwithslots_attributes_slots', '_tstaticobjectwithslots_setable_data_descriptor_field_names'} or name.startswith('__'):
+        object.__setattr__(self, name, value)
+    else:
+        if isfunction(value) or ismethod(value) or isinstance(value, FrameType) or isinstance(value, CodeType) or ismethoddescriptor(value):
+            object.__setattr__(self, name, value)
+            return
+        
+        # try:
+        #     if name in self._tstaticobjectwithslots_setable_data_descriptor_field_names:
+        #         object.__setattr__(self, name, value)
+        # except AttributeError:
+        #     pass
+        
+        try:
+            self._tstaticobjectwithslots_attributes_slots[self._tstaticobjectwithslots_attributes_dict[name]] = value
+            return
+        except KeyError:
+            pass
+            
+        object.__setattr__(self, name, value)
+
+
+def tstaticobjectwithslots_custom_delattr(self, name):
+    if name in {'_tstaticobjectwithslots_attributes_dict', '_tstaticobjectwithslots_attributes_slots', '_tstaticobjectwithslots_setable_data_descriptor_field_names'} or name.startswith('__'):
+        object.__delattr__(self, name)
+    else:
+        if name in self._tstaticobjectwithslots_attributes_dict:
+            raise AttributeError(f"'{type(self).__name__}' object attribute '{name}' is read-only")
+        else:
+            object.__delattr__(self, name)
+
+
+def tstaticobjectwithslots_custom_init(self, original, good_fields, attributes_dict, attributes_slots, setable_data_descriptor_field_names):
+    setattr(self, '_tstaticobjectwithslots_attributes_dict', attributes_dict)
+    setattr(self, '_tstaticobjectwithslots_attributes_slots', attributes_slots)
+    setattr(self, '_tstaticobjectwithslots_setable_data_descriptor_field_names', setable_data_descriptor_field_names)
+    for attr_name in good_fields:
+        setattr(self, attr_name, getattr(original, attr_name))
+
+
+def tstaticobjectwithslots_custom_eq(self, other):
+    parent_class = self.__class__.__bases__[0]
+    if not isinstance(other, (type(self), parent_class)):
+        return NotImplemented
+
+    for key in self._tstaticobjectwithslots_attributes_dict.keys():
+        if not hasattr(other, key):
+            return False
+        
+        if getattr(self, key) != getattr(other, key):
+            return False
+    
+    return True
+
+
+def tstaticobjectwithslots_wrap_obj(obj, attributes_dict: Dict, attributes_slots: IList, setable_data_descriptor_field_names: Set[str], init_mapped_attributes: bool) -> Any:
+    base = obj.__class__
+
+    good_fields: List[Hashable] = list()
+    if init_mapped_attributes:
+        if hasattr(base, '__slots__'):
+            obj_fields = base.__slots__
+        else:
+            object_fields = set(dir(object))
+            obj_fields = set(dir(obj)) - object_fields
+
+        for key in obj_fields:
+            value = getattr_static(obj, key)
+            if key in {'_tstaticobjectwithslots_attributes_dict', '_tstaticobjectwithslots_attributes_slots', '_tstaticobjectwithslots_setable_data_descriptor_field_names'} or key.startswith('__'):
+                continue
+
+            if isfunction(value) or ismethod(value) or isinstance(value, FrameType) or isinstance(value, CodeType) or ismethoddescriptor(value):
+                continue
+
+            if (not isclass(value)) and (hasattr(value, "__get__") and (not (hasattr(value, "__set__") or hasattr(value, "__delete__")))):
+                continue
+            
+            if is_setable_data_descriptor(value):
+                setable_data_descriptor_field_names.add(key)
+            
+            good_fields.append(key)
+        
+        good_fields_len = len(good_fields)
+        attributes_slots.set_capacity(good_fields_len)
+        attributes_slots.extend_with(good_fields_len, 0)
+        for index, key in enumerate(good_fields):
+            attributes_dict[key] = index
+            value = getattr(obj, key)
+            attributes_slots[index] = value
+    
+    NewClass = type(
+        base.__name__ + 'WrappedByTStaticObjectWithSlots',
+        (base,),
+        {
+            '__slots__': ['__dict__'],
+            '__init__': tstaticobjectwithslots_custom_init,
+            '__eq__': tstaticobjectwithslots_custom_eq,
+            '__getattribute__': tstaticobjectwithslots_custom_getattribute,
+            '__setattr__': tstaticobjectwithslots_custom_setattr,
+            '__delattr__': tstaticobjectwithslots_custom_delattr,
+        }
+    )
+
+    new_obj = NewClass(obj, good_fields, attributes_dict, attributes_slots, setable_data_descriptor_field_names)
+    
+    return new_obj
+
+
+class TStaticObjectWithSlots:
+    def map_to_shared_memory(self, shared_memory: 'SharedMemory', obj: Any) -> Tuple[Any, Offset, Size]:
+        offset, real_size = shared_memory.malloc(ObjectType.tstaticobjectwithslots, 8 * len(StaticObjectWithSlotsOffsets))
+        created_items_offsets: List[Offset] = list()
+        try:
+            dumped_obj: bytes = pickle_dumps(obj)
+            dumped_mapped_obj, dumped_obj_offset, dumped_obj_size = shared_memory.put_obj(dumped_obj)
+            created_items_offsets.append(dumped_obj_offset)
+            write_uint64(shared_memory.base_address, offset + 16 + 8 * StaticObjectWithSlotsOffsets.pickled_obj, dumped_obj_offset)
+
+            attributes_dict: Dict = dict()
+
+            attributes_slots, attributes_slots_offset, attributes_slots_size = shared_memory.put_obj(list())
+            created_items_offsets.append(attributes_slots_offset)
+            write_uint64(shared_memory.base_address, offset + 16 + 8 * StaticObjectWithSlotsOffsets.attributes_slots, attributes_slots_offset)
+            
+            setable_data_descriptor_field_names: Set[str] = set()
+
+            mapped_obj = None
+            loaded_obj = pickle_loads(dumped_obj)
+            mapped_obj = tstaticobjectwithslots_wrap_obj(loaded_obj, attributes_dict, attributes_slots, setable_data_descriptor_field_names, True)
+            
+            dumped_attributes_dict: bytes = pickle_dumps(attributes_dict)
+            dumped_mapped_attributes_dict, dumped_attributes_dict_offset, dumped_attributes_dict_size = shared_memory.put_obj(dumped_attributes_dict)
+            write_uint64(shared_memory.base_address, offset + 16 + 8 * StaticObjectWithSlotsOffsets.pickled_attributes_dict, dumped_attributes_dict_offset)
+            
+            dumped_setable_data_descriptor_field_names: bytes = pickle_dumps(setable_data_descriptor_field_names)
+            mapped_dumped_setable_data_descriptor_field_names, dumped_setable_data_descriptor_field_names_offset, dumped_setable_data_descriptor_field_names_size = shared_memory.put_obj(dumped_setable_data_descriptor_field_names)
+            write_uint64(shared_memory.base_address, offset + 16 + 8 * StaticObjectWithSlotsOffsets.setable_data_descriptor_field_names, dumped_setable_data_descriptor_field_names_offset)
+        except:
+            shared_memory.free(offset)
+            for item_offset in created_items_offsets:
+                shared_memory.destroy_obj(item_offset)
+            
+            raise
+        
+        return mapped_obj, offset, real_size
+    
+    def init_from_shared_memory(self, shared_memory: 'SharedMemory', offset: Offset) -> Any:
+        if ObjectType.tstaticobjectwithslots != read_uint64(shared_memory.base_address, offset):
+            raise WrongObjectTypeError
+
+        dumped_obj_offset = read_uint64(shared_memory.base_address, offset + 16 + 8 * StaticObjectWithSlotsOffsets.pickled_obj)
+        dumped_obj: bytes = shared_memory.get_obj(dumped_obj_offset)
+        obj = pickle_loads(dumped_obj)
+
+        attributes_slots_offset = read_uint64(shared_memory.base_address, offset + 16 + 8 * StaticObjectWithSlotsOffsets.attributes_slots)
+        attributes_slots: IList = shared_memory.get_obj(attributes_slots_offset)
+
+        dumped_attributes_dict_offset = read_uint64(shared_memory.base_address, offset + 16 + 8 * StaticObjectWithSlotsOffsets.pickled_attributes_dict)
+        dumped_attributes_dict = shared_memory.get_obj(dumped_attributes_dict_offset)
+        attributes_dict = pickle_loads(dumped_attributes_dict)
+
+        dumped_setable_data_descriptor_field_names_offset = read_uint64(shared_memory.base_address, offset + 16 + 8 * StaticObjectWithSlotsOffsets.setable_data_descriptor_field_names)
+        dumped_setable_data_descriptor_field_names = shared_memory.get_obj(dumped_setable_data_descriptor_field_names_offset)
+        setable_data_descriptor_field_names = pickle_loads(dumped_setable_data_descriptor_field_names)
+
+        mapped_obj = tstaticobjectwithslots_wrap_obj(obj, attributes_dict, attributes_slots, setable_data_descriptor_field_names, False)
+        return mapped_obj
+    
+    def destroy(self, shared_memory: 'SharedMemory', offset: Offset) -> None:
+        if ObjectType.tstaticobjectwithslots != read_uint64(shared_memory.base_address, offset):
+            raise WrongObjectTypeError
+
+        dumped_obj_offset = read_uint64(shared_memory.base_address, offset + 16 + 8 * StaticObjectWithSlotsOffsets.pickled_obj)
+        shared_memory.destroy_obj(dumped_obj_offset)
+        attributes_slots_offset = read_uint64(shared_memory.base_address, offset + 16 + 8 * StaticObjectWithSlotsOffsets.attributes_slots)
+        shared_memory.destroy_obj(attributes_slots_offset)
+        dumped_attributes_dict_offset = read_uint64(shared_memory.base_address, offset + 16 + 8 * StaticObjectWithSlotsOffsets.pickled_attributes_dict)
+        shared_memory.destroy_obj(dumped_attributes_dict_offset)
+        dumped_setable_data_descriptor_field_names_offset = read_uint64(shared_memory.base_address, offset + 16 + 8 * StaticObjectWithSlotsOffsets.setable_data_descriptor_field_names)
+        shared_memory.destroy_obj(dumped_setable_data_descriptor_field_names_offset)
+        shared_memory.free(offset)
+    
+    # def buffer(self, shared_memory: 'SharedMemory', offset: Offset) -> memoryview:
+    #     if ObjectType.tstaticobjectwithslots != read_uint64(shared_memory.base_address, offset + 0):
+    #         raise WrongObjectTypeError
+
+    #     dumped_obj_offset = read_uint64(shared_memory.base_address, offset + 16 + 8 * StaticObjectWithSlotsOffsets.pickled_obj)
+    #     return shared_memory.get_obj_buffer(dumped_obj_offset)
+    
+    # def buffer_2(self, shared_memory: 'SharedMemory', offset: Offset) -> Tuple[int, int]:
+    #     if ObjectType.tstaticobjectwithslots != read_uint64(shared_memory.base_address, offset + 0):
+    #         raise WrongObjectTypeError
+
+
+    #     dumped_obj_offset = read_uint64(shared_memory.base_address, offset + 16 + 8 * StaticObjectWithSlotsOffsets.pickled_obj)
+    #     return shared_memory.get_obj_buffer_2(dumped_obj_offset)
+
+
+# ======================================================================================================================
 # === Numpy ndarray =============================================================================================================
 
 
@@ -5233,6 +5559,10 @@ codec_by_type: Dict[ObjectType, TBase] = {
     ObjectType.tint: TInt(),
     ObjectType.tbool: TBool(),
     ObjectType.tfloat: TFloat(),
+    ObjectType.tcomplex: TComplex(),
+    ObjectType.tdecimal: TDecimal(),
+    ObjectType.tdatetime: TDatetime(),
+    ObjectType.tslice: TSlice(),
     ObjectType.tbytes: TBytes(),
     ObjectType.tbytearray: TBytearray(),
     ObjectType.tstr: TStr(),
@@ -5242,12 +5572,14 @@ codec_by_type: Dict[ObjectType, TBase] = {
     ObjectType.tset: TSet(),
     ObjectType.tmutablemapping: TMutableMapping(),
     ObjectType.tmapping: TMapping(),
+    ObjectType.tfastset: TFastSet(),
     ObjectType.tfastdict: TFastDict(),
     ObjectType.tsmallint: TSmallInt(),
     ObjectType.tbigint: TBigInt(),
     ObjectType.tgeneralobject: TGeneralObject(),
     ObjectType.tpickable: TGeneralObject(),
     ObjectType.tstaticobject: TStaticObject(),
+    ObjectType.tstaticobjectwithslots: TStaticObjectWithSlots(),
     ObjectType.tnumpyndarray: TNumpyNdarray(),
     ObjectType.ttorchtensor: TTorchTensor(),
 }
@@ -6423,6 +6755,8 @@ class SharedMemory:
             obj_type_atom = ObjectType.tfloat
         elif obj_type is complex:
             obj_type_atom = ObjectType.tcomplex
+        elif obj_type is Decimal:
+            obj_type_atom = ObjectType.tdecimal
         elif obj_type is slice:
             obj_type_atom = ObjectType.tslice
         elif obj_type is str:
@@ -6435,6 +6769,8 @@ class SharedMemory:
             obj_type_atom = ObjectType.ttuple
         elif obj_type is list:
             obj_type_atom = ObjectType.tlist
+        elif obj_type in {datetime, timedelta, timezone, date, time}:
+            obj_type_atom = ObjectType.tdatetime
         elif issubclass(obj_type, FastLimitedSet):
             obj_type_atom = ObjectType.tfastset
         elif issubclass(obj_type, AbsMutableSet):
@@ -6467,6 +6803,8 @@ class SharedMemory:
         #     obj_type_atom = ObjectType.tgeneralobject
         # else:
         #     obj_type_atom = ObjectType.tpickable
+        elif hasattr(obj, '__slots__') or ((not hasattr(obj, '__slots__')) and (not hasattr(obj, '__dict__'))):
+            obj_type_atom = ObjectType.tstaticobjectwithslots
         else:
             # obj_type_atom = ObjectType.tgeneralobject
             obj_type_atom = ObjectType.tstaticobject

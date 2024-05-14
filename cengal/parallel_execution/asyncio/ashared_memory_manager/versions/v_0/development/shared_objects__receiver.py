@@ -29,7 +29,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.4.0"
+__version__ = "4.4.1"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -40,6 +40,7 @@ __status__ = "Development"
 from cengal.hardware.memory.shared_memory import *
 from cengal.parallel_execution.asyncio.ashared_memory_manager import *
 from cengal.performance_test_lib import MeasureTimeTraceLine
+from cengal.code_inspection.line_tracer import cln
 from cengal.time_management.cpu_clock import perf_counter
 
 import asyncio
@@ -288,6 +289,14 @@ async def receiver():
             with MeasureTimeTraceLine(iterations=iter_num) as mt:
                 for _ in range(mt.iterations):
                     sso.company_info.income += 500_000.0
+                
+            with MeasureTimeTraceLine(iterations=iter_num) as mt:
+                for _ in range(mt.iterations):
+                    some_employee = sso.company_info.some_employee
+                
+            with MeasureTimeTraceLine(iterations=iter_num) as mt:
+                for _ in range(mt.iterations):
+                    some_employee.increase_years_of_employment()
                 
             with MeasureTimeTraceLine(iterations=iter_num) as mt:
                 for _ in range(mt.iterations):

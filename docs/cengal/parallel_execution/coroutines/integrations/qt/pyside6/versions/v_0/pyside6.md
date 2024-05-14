@@ -81,7 +81,7 @@ cengal<wbr>.parallel_execution<wbr>.coroutines<wbr>.integrations<wbr>.qt<wbr>.py
 </span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span><span class="p">,</span> <span class="p">]</span>
 </span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License, Version 2.0&quot;</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.4.0&quot;</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.4.1&quot;</span>
 </span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;ButenkoMS &lt;gtalk@butenkoms.space&gt;&quot;</span>
 </span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gtalk@butenkoms.space&quot;</span>
 </span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="c1"># __status__ = &quot;Prototype&quot;</span>
@@ -2051,8 +2051,8 @@ cengal<wbr>.parallel_execution<wbr>.coroutines<wbr>.integrations<wbr>.qt<wbr>.py
                 <dd id="CoroThreadWorker.thread" class="function">thread</dd>
                 <dd id="CoroThreadWorker.timerEvent" class="function">timerEvent</dd>
                 <dd id="CoroThreadWorker.tr" class="function">tr</dd>
-                <dd id="CoroThreadWorker.objectNameChanged" class="function">objectNameChanged</dd>
                 <dd id="CoroThreadWorker.destroyed" class="function">destroyed</dd>
+                <dd id="CoroThreadWorker.objectNameChanged" class="function">objectNameChanged</dd>
 
             </div>
                                 </dl>
@@ -2213,8 +2213,8 @@ cengal<wbr>.parallel_execution<wbr>.coroutines<wbr>.integrations<wbr>.qt<wbr>.py
                 <dd id="CoroThreadWithWorker.thread" class="function">thread</dd>
                 <dd id="CoroThreadWithWorker.timerEvent" class="function">timerEvent</dd>
                 <dd id="CoroThreadWithWorker.tr" class="function">tr</dd>
-                <dd id="CoroThreadWithWorker.objectNameChanged" class="function">objectNameChanged</dd>
                 <dd id="CoroThreadWithWorker.destroyed" class="function">destroyed</dd>
+                <dd id="CoroThreadWithWorker.objectNameChanged" class="function">objectNameChanged</dd>
 
             </div>
                                 </dl>

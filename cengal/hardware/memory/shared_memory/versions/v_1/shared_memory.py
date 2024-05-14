@@ -30,7 +30,7 @@ __author__ = "ButenkoMS <gtalk@butenkoms.space>"
 __copyright__ = "Copyright © 2012-2024 ButenkoMS. All rights reserved. Contacts: <gtalk@butenkoms.space>"
 __credits__ = ["ButenkoMS <gtalk@butenkoms.space>", ]
 __license__ = "Apache License, Version 2.0"
-__version__ = "4.4.0"
+__version__ = "4.4.1"
 __maintainer__ = "ButenkoMS <gtalk@butenkoms.space>"
 __email__ = "gtalk@butenkoms.space"
 # __status__ = "Prototype"
@@ -1197,6 +1197,8 @@ class ListOffsets(IntEnum):
 
 
 class IList(BaseIObject, list):
+    __slots__ = ('_shared_memory', '_base_address', '_offset', '_offset__data', '_offset__pointer_to_internal_list')
+
     def __init__(self, shared_memory: 'SharedMemory', offset: Offset = None, obj: List = None) -> None:
         self._shared_memory = shared_memory
         self._base_address = shared_memory.base_address
@@ -2477,6 +2479,8 @@ class SetBucketOffsets(IntEnum):
 
 
 class ISet(BaseIObject, AbsSet):
+    __slots__ = ('_shared_memory', '_base_address', '_obj_size', '_offset', '_offset__data', '_offset__size_offset', '_offset__capacity_offset', '_offset__hashmap_offset', '_load_factor', '_hash_bits', '_capacity', '_size', 'hashmap', 'hashmap_offset', 'buckets')
+
     def __init__(self, shared_memory: 'SharedMemory', offset: Offset = None, obj: AbsSet = None) -> None:
         self._shared_memory = shared_memory
         self._base_address = shared_memory.base_address
@@ -2778,6 +2782,8 @@ class MutableSetBucketOffsets(IntEnum):
 
 
 class IMutableSet(BaseIObject, AbsMutableSet):
+    __slots__ = ('_shared_memory', '_base_address', '_obj_size', '_offset', '_offset__data', '_offset__size_offset', '_offset__capacity_offset', '_offset__hashmap_offset', '_load_factor', '_load_factor_2', '_hash_bits', '_capacity', '_min_capacity', '_size', 'hashmap', '_refresh_counter', 'hashmap_offset', 'buckets', 'ignore_rehash')
+
     def __init__(self, shared_memory: 'SharedMemory', offset: Offset = None, obj: AbsMutableSet = None) -> None:
         self._shared_memory = shared_memory
         self._base_address = shared_memory.base_address
@@ -2967,18 +2973,18 @@ class IMutableSet(BaseIObject, AbsMutableSet):
     
     @property
     def refresh_counter(self):
-        return read_uint64(self._shared_memory.base_address, self._offset__refresh_counter_offset)
+        return read_uint64(self._base_address, self._offset__refresh_counter_offset)
     
     def _increase_refresh_counter(self):
         if not self.ignore_rehash:
             self._refresh_counter += 1
-            write_uint64(self._shared_memory.base_address, self._offset__refresh_counter_offset, self._refresh_counter)
+            write_uint64(self._base_address, self._offset__refresh_counter_offset, self._refresh_counter)
     
     def _check_hashmap(self):
         if self.ignore_rehash:
             return False
         else:
-            base_address = self._shared_memory.base_address
+            base_address = self._base_address
             refresh_counter = read_uint64(base_address, self._offset__refresh_counter_offset)
             # hashmap_offset = read_uint64(base_address, self._offset__hashmap_offset)
             # if (self._refresh_counter != refresh_counter) or (self.hashmap_offset != hashmap_offset) or (self._hashmap._offset != hashmap_offset):
@@ -2993,7 +2999,7 @@ class IMutableSet(BaseIObject, AbsMutableSet):
     #     if self.ignore_rehash:
     #         return self._hashmap
     #     else:
-    #         hashmap_offset = read_uint64(self._shared_memory.base_address, self._offset__hashmap_offset)
+    #         hashmap_offset = read_uint64(self._base_address, self._offset__hashmap_offset)
     #         if (self.hashmap_offset != hashmap_offset) or (self._hashmap._offset != hashmap_offset):
     #             self._refresh_hashmap(self._offset)
             
@@ -3055,10 +3061,10 @@ class IMutableSet(BaseIObject, AbsMutableSet):
         new_other.hashmap = self.hashmap
         new_other.hashmap_offset = self.hashmap_offset
         new_other.buckets = self.buckets
-        write_uint64(new_other._shared_memory.base_address, new_other._offset__hashmap_offset, read_uint64(self._shared_memory.base_address, self._offset__hashmap_offset))
-        write_uint64(new_other._shared_memory.base_address, new_other._offset__size_offset, read_uint64(self._shared_memory.base_address, self._offset__size_offset))
-        write_uint64(new_other._shared_memory.base_address, new_other._offset__capacity_offset, read_uint64(self._shared_memory.base_address, self._offset__capacity_offset))
-        # write_uint64(new_other._shared_memory.base_address, new_other._offset__refresh_counter_offset, read_uint64(self._shared_memory.base_address, self._offset__refresh_counter_offset))
+        write_uint64(new_other._shared_memory.base_address, new_other._offset__hashmap_offset, read_uint64(self._base_address, self._offset__hashmap_offset))
+        write_uint64(new_other._shared_memory.base_address, new_other._offset__size_offset, read_uint64(self._base_address, self._offset__size_offset))
+        write_uint64(new_other._shared_memory.base_address, new_other._offset__capacity_offset, read_uint64(self._base_address, self._offset__capacity_offset))
+        # write_uint64(new_other._shared_memory.base_address, new_other._offset__refresh_counter_offset, read_uint64(self._base_address, self._offset__refresh_counter_offset))
 
         self._capacity = other_capacity
         self._hash_bits = other_hash_bits
@@ -3068,10 +3074,10 @@ class IMutableSet(BaseIObject, AbsMutableSet):
         self.hashmap = other_hashmap
         self.hashmap_offset = other_hashmap_offset
         self.buckets = other_buckets
-        write_uint64(self._shared_memory.base_address, self._offset__hashmap_offset, other_hashmap_offset_bin)
-        write_uint64(self._shared_memory.base_address, self._offset__size_offset, other_size_bin)
-        write_uint64(self._shared_memory.base_address, self._offset__capacity_offset, other_capacity_bin)
-        # write_uint64(self._shared_memory.base_address, self._offset__refresh_counter_offset, other_refresh_counter_bin)
+        write_uint64(self._base_address, self._offset__hashmap_offset, other_hashmap_offset_bin)
+        write_uint64(self._base_address, self._offset__size_offset, other_size_bin)
+        write_uint64(self._base_address, self._offset__capacity_offset, other_capacity_bin)
+        # write_uint64(self._base_address, self._offset__refresh_counter_offset, other_refresh_counter_bin)
 
         self._shared_memory.destroy_obj(new_other_offset)
 
@@ -3554,6 +3560,8 @@ class MappingBucketOffsets(IntEnum):
 
 
 class IMapping(BaseIObject, AbsMapping):
+    __slots__ = ('_shared_memory', '_base_address', '_obj_size', '_offset', '_offset__data', '_offset__size_offset', '_offset__capacity_offset', '_offset__hashmap_offset', '_offset__refresh_counter_offset', '_load_factor', '_load_factor_2', '_hash_bits', '_capacity', '_min_capacity', '_size', 'hashmap', '_refresh_counter', 'hashmap_offset', 'buckets', 'ignore_rehash')
+
     def __init__(self, shared_memory: 'SharedMemory', offset: Offset = None, obj: AbsMapping = None) -> None:
         self._shared_memory = shared_memory
         self._base_address = shared_memory.base_address
@@ -3908,9 +3916,11 @@ class MutableMappingBucketOffsets(IntEnum):
 
 
 class IMutableMapping(BaseIObject, AbsMutableMapping):
-    @property
-    def __mro__(self) -> Tuple:
-        return BaseIObject, AbsMutableMapping, dict
+    __slots__ = ('_shared_memory', '_base_address', '_obj_size', '_offset', '_offset__data', '_offset__size_offset', '_offset__capacity_offset', '_offset__hashmap_offset', '_load_factor', '_load_factor_2', '_hash_bits', '_capacity', '_min_capacity', '_size', 'hashmap', 'hashmap_offset', 'buckets', '_refresh_counter', '_offset__refresh_counter_offset', 'ignore_rehash')
+
+    # @property
+    # def __mro__(self) -> Tuple:
+    #     return BaseIObject, AbsMutableMapping, dict
 
     def __init__(self, shared_memory: 'SharedMemory', offset: Offset = None, obj: AbsMutableMapping = None) -> None:
         self._shared_memory = shared_memory
@@ -4123,7 +4133,7 @@ class IMutableMapping(BaseIObject, AbsMutableMapping):
     
     @property
     def refresh_counter(self):
-        return read_uint64(self._shared_memory.base_address, self._offset__refresh_counter_offset)
+        return read_uint64(self._base_address, self._offset__refresh_counter_offset)
     
     def _increase_refresh_counter(self):
         if self.ignore_rehash:
@@ -4131,19 +4141,19 @@ class IMutableMapping(BaseIObject, AbsMutableMapping):
             pass
         else:
             # print(f'~ increase_refresh_counter {self._offset}: {intro_func_repr_limited()}')
-            # refresh_counter = read_uint64(self._shared_memory.base_address, self._offset__refresh_counter_offset)
+            # refresh_counter = read_uint64(self._base_address, self._offset__refresh_counter_offset)
             # if self._refresh_counter != refresh_counter:
             #     print('~!!! increase_refresh_counter')
             
             self._refresh_counter += 1
-            write_uint64(self._shared_memory.base_address, self._offset__refresh_counter_offset, self._refresh_counter)
+            write_uint64(self._base_address, self._offset__refresh_counter_offset, self._refresh_counter)
     
     def _check_hashmap(self):
         if self.ignore_rehash:
             # print(f'~ ignore check_hashmap {self._offset}: {intro_func_repr_limited()}')
             return False
         else:
-            base_address = self._shared_memory.base_address
+            base_address = self._base_address
             refresh_counter = read_uint64(base_address, self._offset__refresh_counter_offset)
             # hashmap_offset = read_uint64(base_address, self._offset__hashmap_offset)
             # if (self._refresh_counter != refresh_counter) or (self.hashmap_offset != hashmap_offset) or (self._hashmap._offset != hashmap_offset):
@@ -4220,10 +4230,10 @@ class IMutableMapping(BaseIObject, AbsMutableMapping):
         new_other.hashmap = self.hashmap
         new_other.hashmap_offset = self.hashmap_offset
         new_other.buckets = self.buckets
-        write_uint64(new_other._shared_memory.base_address, new_other._offset__hashmap_offset, read_uint64(self._shared_memory.base_address, self._offset__hashmap_offset))
-        write_uint64(new_other._shared_memory.base_address, new_other._offset__size_offset, read_uint64(self._shared_memory.base_address, self._offset__size_offset))
-        write_uint64(new_other._shared_memory.base_address, new_other._offset__capacity_offset, read_uint64(self._shared_memory.base_address, self._offset__capacity_offset))
-        # write_uint64(new_other._shared_memory.base_address, new_other._offset__refresh_counter_offset, read_uint64(self._shared_memory.base_address, self._offset__refresh_counter_offset))
+        write_uint64(new_other._shared_memory.base_address, new_other._offset__hashmap_offset, read_uint64(self._base_address, self._offset__hashmap_offset))
+        write_uint64(new_other._shared_memory.base_address, new_other._offset__size_offset, read_uint64(self._base_address, self._offset__size_offset))
+        write_uint64(new_other._shared_memory.base_address, new_other._offset__capacity_offset, read_uint64(self._base_address, self._offset__capacity_offset))
+        # write_uint64(new_other._shared_memory.base_address, new_other._offset__refresh_counter_offset, read_uint64(self._base_address, self._offset__refresh_counter_offset))
 
         self._capacity = other_capacity
         self._hash_bits = other_hash_bits
@@ -4233,10 +4243,10 @@ class IMutableMapping(BaseIObject, AbsMutableMapping):
         self.hashmap = other_hashmap
         self.hashmap_offset = other_hashmap_offset
         self.buckets = other_buckets
-        write_uint64(self._shared_memory.base_address, self._offset__hashmap_offset, other_hashmap_offset_bin)
-        write_uint64(self._shared_memory.base_address, self._offset__size_offset, other_size_bin)
-        write_uint64(self._shared_memory.base_address, self._offset__capacity_offset, other_capacity_bin)
-        # write_uint64(self._shared_memory.base_address, self._offset__refresh_counter_offset, refresh_counter_bin)
+        write_uint64(self._base_address, self._offset__hashmap_offset, other_hashmap_offset_bin)
+        write_uint64(self._base_address, self._offset__size_offset, other_size_bin)
+        write_uint64(self._base_address, self._offset__capacity_offset, other_capacity_bin)
+        # write_uint64(self._base_address, self._offset__refresh_counter_offset, refresh_counter_bin)
 
         self._shared_memory.destroy_obj(new_other_offset)
 

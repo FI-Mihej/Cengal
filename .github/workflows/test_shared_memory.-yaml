@@ -33,8 +33,6 @@ jobs:
       - name: Run tests
         run: |
           python -m pip install --upgrade pyobjc
-          python -m pip install --upgrade numpy
-          python -m pip install --upgrade py-cpuinfo
           python -m pip install --upgrade cengal
           python ./cengal/hardware/memory/shared_memory/versions/v_1/tests/test__shared_memory.py
 
@@ -64,8 +62,6 @@ jobs:
       - name: Run tests
         run: |
           python -m pip install --upgrade pyobjc
-          python -m pip install --upgrade numpy
-          python -m pip install --upgrade py-cpuinfo
           python -m pip install --upgrade cengal
           python ./cengal/hardware/memory/shared_memory/versions/v_1/tests/test__shared_memory.py
 
@@ -152,8 +148,6 @@ jobs:
       - name: Run tests
         run: |
           python -m pip install --upgrade pywin32
-          python -m pip install --upgrade numpy
-          python -m pip install --upgrade py-cpuinfo
           python -m pip install --upgrade cengal
           python ./cengal/hardware/memory/shared_memory/versions/v_1/tests/test__shared_memory.py
         shell: cmd
@@ -215,8 +209,6 @@ jobs:
       - name: Run tests
         run: |
           python -m pip install --upgrade pywin32
-          python -m pip install --upgrade numpy
-          python -m pip install --upgrade py-cpuinfo
           python -m pip install --upgrade cengal
           python ./cengal/hardware/memory/shared_memory/versions/v_1/tests/test__shared_memory.py
         shell: cmd
@@ -247,8 +239,6 @@ jobs:
         
       - name: Run tests
         run: |
-          python -m pip install --upgrade numpy
-          python -m pip install --upgrade py-cpuinfo
           python -m pip install --upgrade cengal
           python ./cengal/hardware/memory/shared_memory/versions/v_1/tests/test__shared_memory.py
 
@@ -278,8 +268,6 @@ jobs:
         
       - name: Run tests
         run: |
-          python -m pip install --upgrade numpy
-          python -m pip install --upgrade py-cpuinfo
           python -m pip install --upgrade cengal
           python ./cengal/hardware/memory/shared_memory/versions/v_1/tests/test__shared_memory.py
 
@@ -316,8 +304,6 @@ jobs:
 
       - name: Run tests
         run: |
-          python -m pip install --upgrade numpy
-          python -m pip install --upgrade py-cpuinfo
           python -m pip install --upgrade cengal
           python ./cengal/hardware/memory/shared_memory/versions/v_1/tests/test__shared_memory.py
 
@@ -354,7 +340,5 @@ jobs:
 
       - name: Run tests
         run: |
-          python -m pip install --upgrade numpy
-          python -m pip install --upgrade py-cpuinfo
           python -m pip install --upgrade cengal
           python ./cengal/hardware/memory/shared_memory/versions/v_1/tests/test__shared_memory.py

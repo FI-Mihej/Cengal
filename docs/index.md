@@ -8,7 +8,14 @@
 
 # Cengal
 
+![CengalLogo](https://github.com/FI-Mihej/Cengal/raw/master/docs/assets/CengalLogoRound128.png)
+<!-- ![CengalLogo](./docs/assets/CengalLogoRound128.png)  -->
+
 Cengal is a versatile Python library designed for a wide range of applications. To enhance performance, certain modules within Cengal have been implemented using Cython, C/C++, Nim or Go.
+
+Cengal features an extensive codebase with over 200 projects and more than 80,000 lines of code. I am continually focused on developing new features and making improvements. Contributions are very welcome, especially Pull Requests that include unit tests and documentation enhancements.
+
+If you have any questions or would like to participate in discussions, feel free to join the [Cengal Discord](https://discord.gg/TAy7xNgR). Your support and involvement are greatly appreciated as Cengal evolves.
 
 ## Architecture & API Design Rationale
 
@@ -29,15 +36,17 @@ If you prefer to install Cengal without its dependencies, you can opt for the 'c
 
 ## Documentation
 
+[Cengal Discord](https://discord.gg/TAy7xNgR)
+
 [Cengal Documentation](https://FI-Mihej.github.io/Cengal)
 
 For example [Cengal Coroutines Concepts & Usage](https://FI-Mihej.github.io/Cengal/coroutines_concepts/)
 
-or partially:
+<!-- or partially:
 
 [Cengal Wiki](https://github.com/FI-Mihej/Cengal/wiki)
 
-For example [Wiki: Cengal Coroutines Concepts & Usage](https://github.com/FI-Mihej/Cengal/wiki/Cengal-Coroutines)
+For example [Wiki: Cengal Coroutines Concepts & Usage](https://github.com/FI-Mihej/Cengal/wiki/Cengal-Coroutines) -->
 
 ## Stand-Alone Packages for Specific Cengal Modules
 
@@ -76,7 +85,9 @@ Compiles your code, gather binary artifacts and puts them into your wheel.
 
 blazing-fast inter-process communication through shared memory, enabling Python objects to be shared across processes with exceptional efficiency. By minimizing the need for frequent serialization-deserialization, it enhances overall speed and responsiveness. The package offers a comprehensive suite of functionalities designed to support a diverse array of Python types and facilitate asynchronous IPC, optimizing performance for demanding applications.
 
-![title](https://github.com/FI-Mihej/Cengal/raw/master/docs/assets/InterProcessPyObjects/ChartThroughputGiBs.png)
+![Throughput GiB/s](https://github.com/FI-Mihej/Cengal/raw/master/docs/assets/InterProcessPyObjects/ChartThroughputGiBs.png)
+
+![Dict increments per second](https://github.com/FI-Mihej/Cengal/raw/master/docs/assets/InterProcessPyObjects/ChartDictPerformanceComparison.png)
 
 ```python
 from cengal.hardware.memory.shared_memory import *
@@ -128,6 +139,8 @@ from cengal.parallel_execution.asyncio.ashared_memory_manager import *
 
 #### Performance Benchmark results
 
+#### Throughput
+
 | Approach                        | sync/async | Throughput GiB/s |
 |---------------------------------|------------|------------------|
 | InterProcessPyObjects (sync)    | sync       | 3.770            |
@@ -141,6 +154,17 @@ from cengal.parallel_execution.asyncio.ashared_memory_manager import *
 | asyncio.UnixDomainSockets       | async      | 0.708            |
 | multiprocessing.Queue           | sync       | 0.669            |
 | multiprocessing.Pipe            | sync       | 0.469            |
+
+#### Shared Dict Performance
+
+| Approach                                  | increments/s |
+|-------------------------------------------|--------------|
+| InterProcessPyObjects - IntEnumListStruct | 1189730      |
+| InterProcessPyObjects - Dataclass         | 143091       |
+| UltraDict                                 | 76214        |
+| InterProcessPyObjects - Dict              | 44285        |
+| shared_memory_dict                        | 42862        |
+| multiprocessing.Manager - dict            | 2751         |
 
 #### Todo
 
@@ -426,6 +450,7 @@ Installation process requires compilation. So ensure that:
 ## Projects using Cengal
 
 * [CengalPolyBuild](https://github.com/FI-Mihej/CengalPolyBuild) - A Comprehensive and Hackable Build System for Multilingual Python Packages: Cython (including automatic conversion from Python to Cython), C/C++, Objective-C, Go, and Nim, with ongoing expansions to include additional languages. (Planned to be released soon) 
+* [InterProcessPyObjects](https://github.com/FI-Mihej/InterProcessPyObjects) - High-performance package delivers blazing-fast inter-process communication through shared memory, enabling Python objects to be shared across processes with exceptional efficiency. 
 * [cengal_app_dir_path_finder](https://github.com/FI-Mihej/cengal_app_dir_path_finder) - A Python module offering a unified API for easy retrieval of OS-specific application directories, enhancing data management across Windows, Linux, and macOS 
 * [cengal_cpu_info](https://github.com/FI-Mihej/cengal_cpu_info) - Extended, cached CPU info with consistent output format.
 * [cengal_memory_barriers](https://github.com/FI-Mihej/cengal_memory_barriers) - Fast crossplatform memory barriers for Python.
