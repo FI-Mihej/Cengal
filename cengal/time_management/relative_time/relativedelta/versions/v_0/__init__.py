@@ -15,7 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .relativedelta import *
+try:
+    import dateutil
+    from .relativedelta import *
+except ImportError:
+    pass
 
 """
 Module Docstring

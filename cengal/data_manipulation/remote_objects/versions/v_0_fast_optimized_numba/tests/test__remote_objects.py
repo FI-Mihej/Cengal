@@ -32,13 +32,18 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
+from unittest import TestCase, main, SkipTest
+try:
+    import numba
+except ImportError:
+    raise SkipTest('numba is not installed')
+
 from cengal.data_manipulation.remote_objects.versions.v_0_fast_optimized_numba.remote_objects import *
 from cengal.code_flow_control.smart_values import ResultExistence
 from cengal.performance_test_lib import MeasureTime
 from cengal.introspection.inspect import cen
 from collections import deque
 from dataclasses import dataclass
-from unittest import TestCase, main, SkipTest
 from pickle import loads as pickle_loads, dumps as pickle_dumps
 from typing import Any, Dict, Optional, Callable, Set, Type, Tuple, List, FrozenSet, Deque
 

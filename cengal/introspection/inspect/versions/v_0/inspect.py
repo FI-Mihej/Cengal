@@ -17,16 +17,19 @@
 
 # __all__ = ['frame', 'get_exception', 'get_exception_tripple', 'exception_to_printable_text', 'is_async', 'is_callable', 'func_param_names', 'frame_param_names', 'intro_func_param_names', 'CodeParamsWithValues', 'intro_func_params_with_values', 'intro_func_all_params_with_values', 'intro_func_all_params_with_values_as_ordered_dict', 'code_params_with_values_to_signature_items_gen', 'code_params_with_values_to_signature']
 
-from typing import Any, Callable, Awaitable, Dict, Generator, List, Optional, Tuple, NamedTuple, OrderedDict as OrderedDictType, Type, Union, Set, Sequence, cast
-from types import ModuleType, CodeType, FrameType
-import traceback
-import inspect
-from inspect import getattr_static as inspect__getattr_static
-import sys
 from cengal.code_flow_control.python_bytecode_manipulator import CodeParamNames, code_param_names, has_code, get_code, code_name
 from cengal.text_processing.brackets_processing import Bracket, BracketPair, replace_text_with_brackets, find_text_in_brackets
+
+import traceback
+import inspect
+import sys
+from os.path import sep as os_path_sep, normpath, normcase
+
+from inspect import getattr_static as inspect__getattr_static
 from collections import OrderedDict
 from importlib import import_module
+from types import ModuleType, CodeType, FrameType
+from typing import Any, Callable, Awaitable, Dict, Generator, List, Optional, Tuple, NamedTuple, OrderedDict as OrderedDictType, Type, Union, Set, Sequence, cast
 
 
 """
@@ -88,11 +91,28 @@ def exception_to_printable_text(exception: Exception) -> str:
 
 
 def is_async(entity) -> bool:
+    # print(inspect.iscoroutine(entity), inspect.isgenerator(entity), inspect.iscoroutinefunction(entity), inspect.isgeneratorfunction(entity), inspect.isasyncgen(entity), inspect.isasyncgenfunction(entity), inspect.isawaitable(entity))
     return inspect.iscoroutine(entity) or inspect.isgenerator(entity) or inspect.iscoroutinefunction(entity) or inspect.isgeneratorfunction(entity) or inspect.isasyncgen(entity) or inspect.isasyncgenfunction(entity) or inspect.isawaitable(entity)
 
 
 def is_callable(entity) -> bool:
     return callable(entity)
+
+
+def is_sync_context_manager(entity) -> bool:
+    return hasattr(entity, '__enter__') and hasattr(entity, '__exit__')
+
+
+def is_async_context_manager(entity) -> bool:
+    return hasattr(entity, '__aenter__') and hasattr(entity, '__aexit__')
+
+
+def is_context_manager(entity) -> bool:
+    return (hasattr(entity, '__enter__') and hasattr(entity, '__exit__')) or (hasattr(entity, '__aenter__') and hasattr(entity, '__aexit__'))
+
+
+def is_uni_context_manager(entity) -> bool:
+    return (hasattr(entity, '__enter__') and hasattr(entity, '__exit__')) and (hasattr(entity, '__aenter__') and hasattr(entity, '__aexit__'))
 
 
 def func_param_names(func) -> CodeParamNames:
@@ -223,8 +243,14 @@ def get_module_importable_str_and_path(module) -> Tuple[str, str]:
     
     module_repr: str = repr(module)
     importable_str = module_repr[find_text_in_brackets(module_repr, module_repr_importable_str_bracket_pair)]
-    full_file_path = module_repr[find_text_in_brackets(module_repr, module_repr_full_file_path_bracket_pair)]
-    return importable_str, full_file_path
+    if hasattr(module, '__file__'):
+        full_file_path = module.__file__
+    else:
+        full_file_path = module_repr[find_text_in_brackets(module_repr, module_repr_full_file_path_bracket_pair)]
+        if '\\' == os_path_sep:
+            full_file_path = full_file_path.replace('\\\\', '\\')
+    
+    return importable_str, normcase(normpath(full_file_path))
 
 
 def entity_owning_module_info_and_owning_path(entity) -> Tuple[ModuleType, str, str, List[Union[Type, ModuleType]]]:
@@ -1036,7 +1062,93 @@ def entity_is_unbound_method(entity):
 
 
 def get_unbound_method_by_entity(entity) -> Optional[Callable]:
+    # TODO: implement
     raise NotImplementedError()
+
+
+def find_method_in_module_by_code(module, code_to_find: CodeType) -> Optional[CodeType]:
+    for entity_name_str in dir(module):
+        entity = getattr_ex(module, entity_name_str)
+        if inspect.isclass(entity):
+            possible_method = find_method_in_class_by_code(entity, code_to_find)
+            if possible_method is not None:
+                return possible_method
+    
+    return None
+
+
+def find_method_in_class_by_code(class_to_search_in, code_to_find: CodeType) -> Optional[CodeType]:
+    subclassess = list()
+    for entity_name_str in class_properties_including_overrided(class_to_search_in):
+        entity = getattr_ex(class_to_search_in, entity_name_str)
+        if inspect.isclass(entity):
+            subclassess.append(entity)
+        elif inspect.isfunction(entity) or inspect.ismethod(entity):
+            if get_code(entity) is code_to_find:
+                return entity
+        
+    for subclass in subclassess:
+        possible_method = find_method_in_class_by_code(subclass, code_to_find)
+        if possible_method is not None:
+            return possible_method
+    
+    return None
+
+
+class EntityWasNotFoundError(Exception):
+    pass
+
+
+def find_entity(entity: Union[Callable, FrameType, CodeType]) -> Callable:
+    if not (inspect.isfunction(entity) or inspect.ismethod(entity) or isinstance(entity, FrameType) or isinstance(entity, CodeType)):
+        raise TypeError(f'Only functions, methods, frames and codes are supported. {type(entity)} was provided instead')
+    
+    result = get_function_by_entity(entity)
+    if result is not None:
+        return result
+    
+    result = get_method_by_entity(entity)
+    if result is not None:
+        return result
+    
+    entity_name_str: str = entity_name(entity)
+    entity_instance: Callable = None
+    if isinstance(entity, FrameType):
+        owner = None
+        need_to_try_clr: bool = False
+        try:
+            owner = get_self_parameter(entity)
+        except AnAppropriateOwnerParameterWasNotFoundError:
+            need_to_try_clr = True
+        
+        if need_to_try_clr:
+            try:
+                owner = get_cls_parameter(entity)
+            except AnAppropriateOwnerParameterWasNotFoundError:
+                pass
+        
+        entity_code = entity.f_code
+        if owner is not None:
+            entity_instance = getattr_ex(owner, entity_name_str)
+            if get_code(entity_instance) is entity_code:
+                return entity_instance
+        
+        entity = entity_code
+    
+    if isinstance(entity, CodeType):
+        entity_owner_instance = entity_owner(entity)
+        entity_instance = find_method_in_module_by_code(entity_owner_instance, entity)
+        if entity_instance is not None:
+            return entity_instance
+    
+    raise EntityWasNotFoundError
+
+
+def find_current_entity(depth: Optional[int] = 1) -> Callable:
+    return find_entity(frame(depth + 1))
+
+
+current_entity = find_current_entity
 
 
 class AnAppropriateOwnerParameterWasNotFoundError(Exception):
@@ -1157,85 +1269,3 @@ def get_any_self_parameter(entity, any_positional: bool = True, any_keyword: boo
 
 def get_any_cls_parameter(entity, any_positional: bool = True, any_keyword: bool = True):
     return get_owner_parameter(entity, 'cls' , any_positional, any_keyword)
-
-
-def find_method_in_module_by_code(module, code_to_find: CodeType) -> Optional[CodeType]:
-    for entity_name_str in dir(module):
-        entity = getattr_ex(module, entity_name_str)
-        if inspect.isclass(entity):
-            possible_method = find_method_in_class_by_code(entity, code_to_find)
-            if possible_method is not None:
-                return possible_method
-    
-    return None
-
-
-def find_method_in_class_by_code(class_to_search_in, code_to_find: CodeType) -> Optional[CodeType]:
-    subclassess = list()
-    for entity_name_str in class_properties_including_overrided(class_to_search_in):
-        entity = getattr_ex(class_to_search_in, entity_name_str)
-        if inspect.isclass(entity):
-            subclassess.append(entity)
-        elif inspect.isfunction(entity) or inspect.ismethod(entity):
-            if get_code(entity) is code_to_find:
-                return entity
-        
-    for subclass in subclassess:
-        possible_method = find_method_in_class_by_code(subclass, code_to_find)
-        if possible_method is not None:
-            return possible_method
-    
-    return None
-
-
-class EntityWasNotFoundError(Exception):
-    pass
-
-
-def find_entity(entity: Union[Callable, FrameType, CodeType]) -> Callable:
-    if not (inspect.isfunction(entity) or inspect.ismethod(entity) or isinstance(entity, FrameType) or isinstance(entity, CodeType)):
-        raise TypeError(f'Only functions, methods, frames and codes are supported. {type(entity)} was provided instead')
-    
-    result = get_function_by_entity(entity)
-    if result is not None:
-        return result
-    
-    result = get_method_by_entity(entity)
-    if result is not None:
-        return result
-    
-    entity_name_str: str = entity_name(entity)
-    entity_instance: Callable = None
-    if isinstance(entity, FrameType):
-        owner = None
-        need_to_try_clr: bool = False
-        try:
-            owner = get_self_parameter(entity)
-        except AnAppropriateOwnerParameterWasNotFoundError:
-            need_to_try_clr = True
-        
-        if need_to_try_clr:
-            try:
-                owner = get_cls_parameter(entity)
-            except AnAppropriateOwnerParameterWasNotFoundError:
-                pass
-        
-        entity_code = entity.f_code
-        if owner is not None:
-            entity_instance = getattr_ex(owner, entity_name_str)
-            if get_code(entity_instance) is entity_code:
-                return entity_instance
-        
-        entity = entity_code
-    
-    if isinstance(entity, CodeType):
-        entity_owner_instance = entity_owner(entity)
-        entity_instance = find_method_in_module_by_code(entity_owner_instance, entity)
-        if entity_instance is not None:
-            return entity_instance
-    
-    raise EntityWasNotFoundError
-
-
-def find_current_entity(depth: Optional[int] = 1) -> Callable:
-    return find_entity(frame(depth + 1))

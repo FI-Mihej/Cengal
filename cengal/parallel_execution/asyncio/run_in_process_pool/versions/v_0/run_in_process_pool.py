@@ -35,6 +35,7 @@ __status__ = "Development"
 
 
 from cengal.introspection.inspect import get_exception, is_async
+from cengal.performance_test_lib import mtime_tl
 from cengal.code_flow_control.smart_values import ResultHolder
 
 import sys
@@ -147,6 +148,7 @@ class ProcessPool:
 
     @staticmethod
     def _pool_worker(worker: Callable, *args, **kwargs) -> Tuple[Any, Optional[BaseException]]:
+        # with mtime_tl('ProcessPool'):
         result = None
         exception = None
         try:
@@ -170,20 +172,21 @@ class ProcessPool:
         
         return ProcessPool._pool_worker(worker, *args, **kwargs)
 
-    @staticmethod
-    def _apool_worker(result_holder: ResultHolder, worker: Callable, *args, **kwargs) -> Tuple[Any, Optional[BaseException]]:
-        result = None
-        exception = None
-        try:
-            import asyncio
-            result = asyncio.run(worker(*args, **kwargs))
-        except:
-            exception = get_exception()
+    # @staticmethod
+    # def _apool_worker(result_holder: ResultHolder, worker: Callable, *args, **kwargs) -> Tuple[Any, Optional[BaseException]]:
+    #     result = None
+    #     exception = None
+    #     try:
+    #         import asyncio
+    #         result = asyncio.run(worker(*args, **kwargs))
+    #     except:
+    #         exception = get_exception()
         
-        result_holder.value = (result, exception)
+    #     result_holder.value = (result, exception)
     
     @staticmethod
     def _apool_worker(worker: Callable, *args, **kwargs) -> Tuple[Any, Optional[BaseException]]:
+        # with mtime_tl('ProcessPool'):
         return run_coroutine_in_new_thread(worker, *args, **kwargs)
 
     @staticmethod
@@ -256,76 +259,3 @@ class ProcessPool:
     
     async def __call__(self, worker: Callable, *args, **kwargs) -> Any:
         return await self.pool_execute(worker, *args, **kwargs)
-
-
-# def pool_initializer(text):
-#     import multiprocessing
-    
-#     print(text, multiprocessing.current_process()._identity[0])
-
-
-# def create_pool():
-#     global executor_init_params
-#     executor_init_params = (('hello pool',), dict())
-#     global executor
-#     if (3, 7) <= sys.version_info:
-#         pool_args, pool_kwargs = executor_init_params
-#         partial_pool_initializer = partial(pool_initializer, *pool_args, **pool_kwargs)
-#         executor = ProcessPoolExecutor(max_workers=2, initializer=partial_pool_initializer)
-#     else:
-#         executor = ProcessPoolExecutor(max_workers=2)
-
-
-# def pool_worker_impl(item: int):
-#     return 1000 / item
-
-
-# def pool_worker(*args, **kwargs):
-#     result = None
-#     exception = None
-#     try:
-#         result = pool_worker_impl(*args, **kwargs)
-#     except:
-#         exception = get_exception()
-    
-#     return result, exception
-
-
-# def pool_worker_wrapper(pool_init_params, *args, **kwargs):
-#     global process_initialized
-#     if 'process_initialized' not in globals():
-#         process_initialized = False
-    
-#     if not process_initialized:
-#         pool_args, pool_kwargs = pool_init_params
-#         pool_initializer(*pool_args, **pool_kwargs)
-#         process_initialized = True
-    
-#     return pool_worker(*args, **kwargs)
-        
-
-# async def pool_execute(*args, **kwargs):
-#     if (3, 7) <= sys.version_info:
-#         partial_pool_worker = partial(pool_worker, *args, **kwargs)
-#     else:
-#         partial_pool_worker = partial(pool_worker_wrapper, executor_init_params, *args, **kwargs)
-        
-#     if is_multiprocessing:
-#         result = await loop.run_in_executor(executor, partial_pool_worker)
-#     else:
-#         result = pool_worker(*args, **kwargs)
-    
-#     result, exception = result
-    
-#     if exception is not None:
-#         raise exception
-    
-#     return result
-
-
-# async def pool_single_processing_example(item: int = 2):
-#     return await pool_execute(item)
-
-
-# async def pool_gather_example(num: int = 3):
-#     return await asyncio.gather(*[pool_execute(i) for i in range(num)])

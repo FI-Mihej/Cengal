@@ -130,3 +130,11 @@ class ProgressMeter:
     @property
     def iterations_per_second(self):
         return self._last_iterations_per_second
+
+    def reset(self):
+        self._last_iterations_per_second = 0.0
+        self._iterations = 0
+        self._start_time = 0.0
+        self._last_tracked_time = 0.0
+        self._is_first_call = True
+        self._tracer = self._default_tracer(self._update_time)

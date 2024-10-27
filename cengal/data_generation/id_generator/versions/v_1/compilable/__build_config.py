@@ -36,7 +36,7 @@ __status__ = "Development"
 
 from typing import Dict
 from cengal.build_tools.current_compiler import compiler_type
-from cengal.hardware.info.cpu import cpu_info
+from cengal.hardware.cpu.info import cpu_info
 from cengal.system import (
     PYTHON_IMPLEMENTATION,
     PYTHON_VERSION,

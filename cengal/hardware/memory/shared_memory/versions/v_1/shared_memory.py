@@ -20,6 +20,19 @@
 #            'WrongObjectTypeError', 'NoMessagesInQueueError',
 #            'nearest_size', 'nsize', 'TBase', 'IList', 'codec_by_type', 'get_in_line', 'wait_my_turn']
 
+# __all__ = [
+#     'ensure_adjusted_pythonhashseed', 
+
+#     'ensure_adjusted_scientific', 
+
+#     'dict_to_list',
+#     'list_to_dict',
+    
+#     'intenum_dict_to_list',
+#     'intenum_list_to_dict',
+
+# ]
+
 
 """
 Module Docstring
@@ -38,26 +51,34 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-from cengal.introspection.inspect import is_callable, is_descriptor, is_async
 from cengal.math.numbers import RationalNumber
+from cengal.text_processing.text_processing import to_identifier
 from cengal.hardware.memory.barriers import full_memory_barrier, mm_pause
+from cengal.hardware.cpu.info import cpu_info
 from cengal.time_management.cpu_clock import cpu_clock
 from cengal.time_management.high_precision_sync_sleep import hps_sleep
 from cengal.time_management.sleep_tools import sleep
-from cengal.introspection.inspect import pdi, pifrl, intro_func_repr_limited
+# from cengal.code_inspection.auto_line_tracer import tr, ftr, tl, alt
 from cengal.system import OS_TYPE
-from cengal.file_system.file_manager import file_exists
+from cengal.file_system.file_manager import file_exists, get_executable_src_path
 from cengal.data_manipulation.conversion.binary import bint_to_bytes, bytes_to_bint
-from cengal.introspection.inspect import is_setable_data_descriptor
+from cengal.introspection.inspect import is_setable_data_descriptor, pdi, pifrl, intro_func_repr_limited, is_callable, is_descriptor, is_async
+from cengal.cpython_tools.pythonhashseed import ensure_adjusted_pythonhashseed
+from cengal.cpython_tools.scientific_interpreter_mode import ensure_adjusted_scientific
+from cengal.data_manipulation.conversion.list_and_dict import *
+from cengal.data_containers.intenum_struct import *
 # from .compilable import write_uint64 as write_uint64_c, read_uint64 as read_uint64_c, write_int64, read_int64, write_double, read_double, zero_memory
 from .compilable import write_uint64, read_uint64, read_uint8, write_int64, read_int64, write_double, read_double, \
     zero_memory, list__get_item, list__get_item_as_offset, list__set_item, list__set_item_as_offset, mask_least_significant_bits
 
 import os
+import sys
 import asyncio
 import pickle
 import ctypes
 import numpy as np
+import subprocess
+from random import seed, randint, random
 from datetime import datetime, timedelta, timezone, date, time
 from decimal import Decimal
 from enum import IntEnum
@@ -82,7 +103,11 @@ except ImportError:
         raise NotImplementedError
 
 from types import FrameType, CodeType
-from typing import Any, Tuple, Optional, List, Dict, Set, FrozenSet, AbstractSet, Type, Union, Sequence, cast, Hashable, Coroutine
+from typing import Any, Tuple, Optional, List, Dict, Set, FrozenSet, AbstractSet, Type, Union, Sequence, cast, Hashable, Coroutine, Callable
+
+
+numpy_ndarray = Any
+torch_Tensor = Any
 
 
 DEBUG = False
@@ -149,22 +174,43 @@ class ObjectType(IntEnum):
     tdecimal = 28
     tdatetime = 29
     tstaticobjectwithslots = 30
+    trwlock = 31
 
 
 class SysValuesOffsets(IntEnum):
-    total_mem_size = 0
-    data_start_offset = 1
-    data_size = 2
-    data_end_offset = 3
-    free_memory_search_start = 4
-    first_message_offset = 5
-    last_message_offset = 6
-    creator_in_charge = 7
-    consumer_in_charge = 8
-    creator_wants_to_be_in_charge = 9
-    consumer_wants_to_be_in_charge = 10
-    creator_ready = 11
-    consumer_ready = 12
+    shared_memory_type = 0
+    total_mem_size = 1
+    data_start_offset = 2
+    data_size = 3
+    data_end_offset = 4
+    free_memory_search_start = 5
+    first_message_offset = 6
+    last_message_offset = 7
+    creator_in_charge = 8
+    consumer_in_charge = 9
+    creator_wants_to_be_in_charge = 10
+    consumer_wants_to_be_in_charge = 11
+    creator_ready = 12
+    consumer_ready = 13
+    consumer_acquired = 14
+    consumer_pid = 15
+    consumer_executable_path = 16
+    max_consumers_num = 17
+    # consumers_num = 18
+
+
+class SharedMemoryType(IntEnum):
+    single_consumer = 0
+    smp = 1
+
+
+class AdditionalConsumersFields(IntEnum):
+    consumer_in_charge = 0
+    consumer_wants_to_be_in_charge = 1
+    consumer_ready = 2
+    consumer_acquired = 3
+    consumer_pid = 4
+    consumer_executable_path = 5
 
 
 Offset = int
@@ -208,6 +254,14 @@ class WrongObjectTypeError(SharedMemoryError):
 
 
 class NoMessagesInQueueError(SharedMemoryError):
+    pass
+
+
+class StackOfConsumersIsFullError(SharedMemoryError):
+    pass
+
+
+class WrongSharedMemoryTypeError(SharedMemoryError):
     pass
 
 
@@ -1513,6 +1567,14 @@ class IList(BaseIObject, list):
     
     def swap_items(self, key1: int, key2: int) -> None:
         return self._swap_items(key1, key2)
+    
+    def swap_items_between_lists(self, key1: int, other: 'IList', key2: int) -> None:
+        item_type1 = self._read_item_type(key1)
+        item_offset_or_data1 = self._read_item_offset_or_data(key1)
+        self._write_item_type(key1, other._read_item_type(key2))
+        other._write_item_type(key2, item_type1)
+        self._write_item_offset_or_data(key1, other._read_item_offset_or_data(key2))
+        other._write_item_offset_or_data(key2, item_offset_or_data1)
 
     def __len__(self) -> int:
         return self._list_len
@@ -2147,8 +2209,8 @@ class TTuple:
         offset, real_size = shared_memory.malloc(ObjectType.ttuple, bs * len(TupleOffsets) + len(obj) * bs * len(TupleFieldOffsets))
         created_items_offsets: List[Offset] = list()
         try:
-            if (1, [2, 3]) == obj:
-                shared_memory.offset_to_be_monitored = offset
+            # if (1, [2, 3]) == obj:
+            #     shared_memory._offset_to_be_monitored = offset
             
             write_uint64(shared_memory.base_address, offset + bs * len(BaseObjOffsets) + bs * TupleOffsets.size, len(obj))
             for i, item in enumerate(obj):
@@ -2327,7 +2389,7 @@ class ComplexOffsets(IntEnum):
 
 class TComplex:
     def map_to_shared_memory(self, shared_memory: 'SharedMemory', obj: complex) -> Tuple[complex, Offset, Size]:
-        offset, real_size = shared_memory.malloc(ObjectType.tfastset, bs * len(ComplexOffsets))
+        offset, real_size = shared_memory.malloc(ObjectType.tcomplex, bs * len(ComplexOffsets))
         created_items_offsets: List[Offset] = list()
         try:
             data_tuple_mapped_obj, data_tuple_offset, data_tuple_size = shared_memory.put_obj(tuple(obj.real, obj.imag))
@@ -2343,7 +2405,7 @@ class TComplex:
         return complex(real=data_tuple_mapped_obj[0], imag=data_tuple_mapped_obj[1]), offset, real_size
     
     def init_from_shared_memory(self, shared_memory: 'SharedMemory', offset: Offset) -> complex:
-        if ObjectType.tfastset != read_uint64(shared_memory.base_address, offset):
+        if ObjectType.tcomplex != read_uint64(shared_memory.base_address, offset):
             raise WrongObjectTypeError
 
         data_tuple_offset = read_uint64(shared_memory.base_address, offset + bs * len(BaseObjOffsets) + bs * ComplexOffsets.data_tuple_offset)
@@ -2351,7 +2413,7 @@ class TComplex:
         return complex(real=result_tuple[0], imag=result_tuple[1])
     
     def destroy(self, shared_memory: 'SharedMemory', offset: Offset) -> None:
-        if ObjectType.tfastset != read_uint64(shared_memory.base_address, offset):
+        if ObjectType.tcomplex != read_uint64(shared_memory.base_address, offset):
             raise WrongObjectTypeError
 
         data_tuple_offset = read_uint64(shared_memory.base_address, offset + bs * len(BaseObjOffsets) + bs * ComplexOffsets.data_tuple_offset)
@@ -2448,6 +2510,350 @@ class TFastDict:
 
         data_tuple_offset = read_uint64(shared_memory.base_address, offset + bs * len(BaseObjOffsets) + bs * FastDictOffsets.data_tuple_offset)
         shared_memory.destroy_obj(data_tuple_offset)
+        shared_memory.free(offset)
+
+
+# ======================================================================================================================
+# === RWLock =============================================================================================================
+
+
+class RWLockOperatorOffsets(IntEnum):
+    write_requested = 0
+    write_in_charge = 1
+    read_requested = 2
+    read_in_charge = 3
+
+
+class RWLockWrite:
+    __slots__ = ('rwlock', 'shared_memory', 'time_limit', 'periodic_sleep_time', 'last_write_requested_state', 'last_write_in_charge_state')
+
+    def __init__(self, rwlock: 'RWLock', time_limit: Optional[RationalNumber] = None, periodic_sleep_time: Optional[RationalNumber] = 0.000000001):
+        self.rwlock: 'RWLock' = rwlock
+        self.shared_memory: 'SharedMemory' = self.rwlock.shared_memory
+        self.time_limit: Optional[RationalNumber] = time_limit
+        self.periodic_sleep_time: Optional[RationalNumber] = periodic_sleep_time
+        self.last_write_requested_state: int = None
+        self.last_write_in_charge_state: int = None
+    
+    def __enter__(self):
+        self.last_write_requested_state = self.rwlock.check_my_write_request()
+        self.last_write_in_charge_state = self.rwlock.check_my_write_in_charge()
+        self.rwlock.request_write_access()
+        start_time: float = cpu_clock()
+        while not self.rwlock.acquire_write_access():
+            if self.time_limit is not None:
+                if (cpu_clock() - start_time) > self.time_limit:
+                    self.rwlock.restore_request_for_write_access(self.last_write_requested_state)
+                    raise OperationTimedOutError
+            
+            if self.periodic_sleep_time is None:
+                mm_pause()
+            else:
+                hps_sleep(self.periodic_sleep_time)
+            
+        return self
+    
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.rwlock.restore_write_access(self.last_write_in_charge_state)
+    
+    async def __aenter__(self):
+        self.last_write_requested_state = self.rwlock.check_my_write_request()
+        self.last_write_in_charge_state = self.rwlock.check_my_write_in_charge()
+        self.rwlock.request_write_access()
+        start_time: float = cpu_clock()
+        while not self.rwlock.acquire_write_access():
+            if self.time_limit is not None:
+                if (cpu_clock() - start_time) > self.time_limit:
+                    self.rwlock.restore_request_for_write_access(self.last_write_requested_state)
+                    raise OperationTimedOutError
+            
+            await self.shared_memory._asleep_func()
+            
+        return self
+    
+    async def __aexit__(self, exc_type, exc_value, traceback):
+        self.rwlock.restore_write_access(self.last_write_in_charge_state)
+
+
+class RWLockRead:
+    __slots__ = ('rwlock', 'shared_memory', 'time_limit', 'periodic_sleep_time', 'last_read_requested_state', 'last_read_in_charge_state')
+
+    def __init__(self, rwlock: 'RWLock', time_limit: Optional[RationalNumber] = None, periodic_sleep_time: Optional[RationalNumber] = 0.000000001):
+        self.rwlock: 'RWLock' = rwlock
+        self.shared_memory: 'SharedMemory' = self.rwlock.shared_memory
+        self.time_limit: Optional[RationalNumber] = time_limit
+        self.periodic_sleep_time: Optional[RationalNumber] = periodic_sleep_time
+        self.last_read_requested_state: int = None
+        self.last_read_in_charge_state: int = None
+    
+    def __enter__(self):
+        self.last_read_requested_state = self.rwlock.check_my_read_request()
+        self.last_read_in_charge_state = self.rwlock.check_my_read_in_charge()
+        self.rwlock.request_read_access()
+        start_time: float = cpu_clock()
+        while not self.rwlock.acquire_read_access():
+            if self.time_limit is not None:
+                if (cpu_clock() - start_time) > self.time_limit:
+                    self.rwlock.restore_request_for_read_access(self.last_read_requested_state)
+                    raise OperationTimedOutError
+            
+            if self.periodic_sleep_time is None:
+                mm_pause()
+            else:
+                hps_sleep(self.periodic_sleep_time)
+            
+        return self
+    
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.rwlock.restore_read_access(self.last_read_in_charge_state)
+    
+    async def __aenter__(self):
+        self.last_read_requested_state = self.rwlock.check_my_read_request()
+        self.last_read_in_charge_state = self.rwlock.check_my_read_in_charge()
+        self.rwlock.request_read_access()
+        start_time: float = cpu_clock()
+        while not self.rwlock.acquire_read_access():
+            if self.time_limit is not None:
+                if (cpu_clock() - start_time) > self.time_limit:
+                    self.rwlock.restore_request_for_read_access(self.last_read_requested_state)
+                    raise OperationTimedOutError
+            
+            await self.shared_memory._asleep_func()
+            
+        return self
+    
+    async def __aexit__(self, exc_type, exc_value, traceback):
+        self.rwlock.restore_read_access(self.last_read_in_charge_state)
+
+
+class RWLock:
+    __slots__ = ('shared_memory', 'base_address', 'operator_id', 'max_operators_num', 'offset', 'offset__data')
+
+    def __init__(self):
+        self.shared_memory: 'SharedMemory' = None
+        self.base_address: Offset = None
+        self.operator_id: int = None
+        self.max_operators_num: int = None
+        self.offset: Offset = None
+        self.offset__data: Offset = None
+    
+    def _init(self, shared_memory: 'SharedMemory' = None, offset: Offset = None):
+        self.shared_memory = shared_memory
+        self.base_address = self.shared_memory.base_address
+        self.operator_id = self.shared_memory.operator_id
+        self.max_operators_num = 1 + shared_memory._max_consumers_num
+        self.offset = offset
+        self.offset__data = offset + bs * len(BaseObjOffsets)
+        return self
+    
+    def write(self, time_limit: Optional[RationalNumber] = None, periodic_sleep_time: Optional[RationalNumber] = 0.000000001) -> RWLockWrite:
+        return RWLockWrite(self, time_limit, periodic_sleep_time)
+    
+    def read(self, time_limit: Optional[RationalNumber] = None, periodic_sleep_time: Optional[RationalNumber] = 0.000000001) -> RWLockRead:
+        return RWLockRead(self, time_limit, periodic_sleep_time)
+    
+    def request_read_access(self) -> None:
+        write_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.read_requested, 1)
+        full_memory_barrier()
+    
+    def request_write_access(self) -> None:
+        write_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.write_requested, 1)
+        full_memory_barrier()
+    
+    def request_read_write_access(self) -> None:
+        write_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.read_requested, 1)
+        write_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.write_requested, 1)
+        full_memory_barrier()
+    
+    def drop_request_for_read_access(self) -> None:
+        write_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.read_requested, 0)
+        full_memory_barrier()
+    
+    def drop_request_for_write_access(self) -> None:
+        write_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.write_requested, 0)
+        full_memory_barrier()
+    
+    def drop_request_for_read_write_access(self) -> None:
+        write_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.read_requested, 0)
+        write_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.write_requested, 0)
+        full_memory_barrier()
+    
+    def restore_request_for_read_access(self, value: int) -> None:
+        write_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.read_requested, value)
+        full_memory_barrier()
+    
+    def restore_request_for_write_access(self, value: int) -> None:
+        write_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.write_requested, value)
+        full_memory_barrier()
+    
+    def acquire_read_access(self) -> bool:
+        if self.check_write_requests():
+            return False
+    
+        if self.check_write_in_charge():
+            return False
+        
+        write_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.read_in_charge, 1)
+        # full_memory_barrier()
+    
+        if self.check_write_in_charge():
+            write_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.read_in_charge, 0)
+            full_memory_barrier()
+            return False
+
+        if self.check_write_requests():
+            write_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.read_in_charge, 0)
+            full_memory_barrier()
+            return False
+
+        self.drop_request_for_read_access()
+        return True
+    
+    def release_read_access(self) -> None:
+        write_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.read_in_charge, 0)
+        full_memory_barrier()
+    
+    def restore_read_access(self, value: int) -> None:
+        write_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.read_in_charge, value)
+        full_memory_barrier()
+    
+    def acquire_write_access(self) -> bool:
+        if self.check_in_charge():
+            return False
+        
+        # if self.check_read_requests():
+        #     return False
+    
+        write_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.write_in_charge, 1)
+        # full_memory_barrier()
+    
+        if self.check_in_charge():
+            write_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.write_in_charge, 0)
+            full_memory_barrier()
+            return False
+
+        # if self.check_read_requests():
+        #     write_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.write_in_charge, 0)
+        #     full_memory_barrier()
+        #     return False
+
+        self.drop_request_for_write_access()
+        return True
+    
+    def release_write_access(self) -> None:
+        write_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.write_in_charge, 0)
+        full_memory_barrier()
+    
+    def restore_write_access(self, value: int) -> None:
+        write_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.write_in_charge, value)
+        full_memory_barrier()
+            
+    def check_my_write_request(self) -> bool:
+        full_memory_barrier()
+        return read_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.write_requested)
+    
+    def check_my_read_request(self) -> bool:
+        full_memory_barrier()
+        return read_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.read_requested)
+    
+    def check_my_requests(self) -> bool:
+        full_memory_barrier()
+        return read_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.write_requested) or read_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.read_requested)
+    
+    def check_my_write_in_charge(self) -> bool:
+        full_memory_barrier()
+        return read_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.write_in_charge)
+    
+    def check_my_read_in_charge(self) -> bool:
+        full_memory_barrier()
+        return read_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.read_in_charge)
+    
+    def check_my_in_charge(self) -> bool:
+        full_memory_barrier()
+        return read_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.write_in_charge) or read_uint64(self.base_address, self.offset__data + self.operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.read_in_charge)
+    
+    def check_write_requests(self) -> bool:
+        full_memory_barrier()
+        for operator_id in range(self.max_operators_num):
+            if operator_id == self.operator_id:
+                continue
+
+            if read_uint64(self.base_address, self.offset__data + operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.write_requested):
+                return True
+        
+        return False
+    
+    def check_read_requests(self) -> bool:
+        full_memory_barrier()
+        for operator_id in range(self.max_operators_num):
+            if operator_id == self.operator_id:
+                continue
+
+            if read_uint64(self.base_address, self.offset__data + operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.read_requested):
+                return True
+        
+        return False
+    
+    def check_requests(self) -> bool:
+        full_memory_barrier()
+        for operator_id in range(self.max_operators_num):
+            if operator_id == self.operator_id:
+                continue
+
+            if read_uint64(self.base_address, self.offset__data + operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.write_requested) or read_uint64(self.base_address, self.offset__data + operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.read_requested):
+                return True
+        
+        return False
+    
+    def check_write_in_charge(self) -> bool:
+        full_memory_barrier()
+        for operator_id in range(self.max_operators_num):
+            if operator_id == self.operator_id:
+                continue
+
+            if read_uint64(self.base_address, self.offset__data + operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.write_in_charge):
+                return True
+        
+        return False
+    
+    def check_read_in_charge(self) -> bool:
+        full_memory_barrier()
+        for operator_id in range(self.max_operators_num):
+            if operator_id == self.operator_id:
+                continue
+
+            if read_uint64(self.base_address, self.offset__data + operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.read_in_charge):
+                return True
+        
+        return False
+    
+    def check_in_charge(self) -> bool:
+        full_memory_barrier()
+        for operator_id in range(self.max_operators_num):
+            if operator_id == self.operator_id:
+                continue
+
+            if read_uint64(self.base_address, self.offset__data + operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.write_in_charge) or read_uint64(self.base_address, self.offset__data + operator_id * bs * len(RWLockOperatorOffsets) + bs * RWLockOperatorOffsets.read_in_charge):
+                return True
+        
+        return False
+
+
+class TRWLock:
+    def map_to_shared_memory(self, shared_memory: 'SharedMemory', obj: RWLock) -> Tuple[Decimal, Offset, Size]:
+        offset, real_size = shared_memory.malloc(ObjectType.trwlock, (1 + shared_memory._max_consumers_num) * bs * len(RWLockOperatorOffsets), zero_mem=True)
+        return obj._init(shared_memory, offset), offset, real_size
+    
+    def init_from_shared_memory(self, shared_memory: 'SharedMemory', offset: Offset) -> Decimal:
+        if ObjectType.trwlock != read_uint64(shared_memory.base_address, offset):
+            raise WrongObjectTypeError
+
+        return RWLock()._init(shared_memory, offset)
+    
+    def destroy(self, shared_memory: 'SharedMemory', offset: Offset) -> None:
+        if ObjectType.trwlock != read_uint64(shared_memory.base_address, offset):
+            raise WrongObjectTypeError
+
         shared_memory.free(offset)
 
 
@@ -5588,6 +5994,7 @@ codec_by_type: Dict[ObjectType, TBase] = {
     ObjectType.tstaticobjectwithslots: TStaticObjectWithSlots(),
     ObjectType.tnumpyndarray: TNumpyNdarray(),
     ObjectType.ttorchtensor: TTorchTensor(),
+    ObjectType.trwlock: TRWLock(),
 }
 
 # Add your own types to `obj_type_map`
@@ -5606,33 +6013,45 @@ class MessageOffsets(IntEnum):
 
 
 class SharedMemory:
+    shared_memory_type: int = SharedMemoryType.smp.value
+
+    __slots__ = ['_shared_memory', '_shared_memory_type', '_initiated', '_consumer_id', '_max_consumers_num', '_wait_for_consumers_num', '_creator_destroy_timeout', '_offset_to_be_monitored', '_malloc_time', '_realloc_time', '_name', '_create', '_queue_type', '_zero_mem', '_last_message_offset', '_asleep_func', '_size', 'base_address', 'sys_values_offset', 'free_memory_search_start', 'global_sys_array_len', 'global_sys_area_size', 
+    '_get_in_line_on_write', '_get_in_line_on_write__time_limit', '_get_in_line_on_write__periodic_sleep_time']
+
     def __init__(self, name: str, create: bool = False, size: Optional[int] = None, queue_type: QueueType = QueueType.fifo, zero_mem: bool = True, 
-                 consumer_id: Optional[int] = None, creator_destroy_timeout: float = 5.0, unlink_old: bool = True):
+                 consumer_id: Optional[int] = None, creator_destroy_timeout: float = 5.0, unlink_old: bool = True, 
+                 max_consumers_num: Optional[int] = 1, wait_for_consumers_num: Optional[int] = None):
         global current_shared_memory_instance
         current_shared_memory_instance = self
+        self._shared_memory_type: int = self.shared_memory_type
         self._initiated: bool = False
         self._consumer_id: Optional[int] = consumer_id
+        self._max_consumers_num: int = max_consumers_num
+        self._wait_for_consumers_num: Optional[int] = wait_for_consumers_num
         self._creator_destroy_timeout: float = creator_destroy_timeout
-        self.offset_to_be_monitored: Offset = None
+        self._offset_to_be_monitored: Offset = None
         self._malloc_time: float = 0.0
         self._realloc_time: float = 0.0
+        name = name.strip('/')
+        name = to_identifier(name)
+        if len(name) > 512:
+            # Resource Tracker can not handle names longer than 512 characters
+            raise ValueError(f'`name` too long: Resource Tracker can not handle names longer than 512 characters: {name}')
+
         self._name: str = name
         self._create: bool = create
         self._queue_type: QueueType = queue_type
         self._zero_mem: bool = zero_mem
         self._last_message_offset: Offset = None
         self._asleep_func: Coroutine = self._default_asleep_func
+        self._size: Optional[int] = None
+        self.base_address = None
+        self.sys_values_offset = None
+        self._get_in_line_on_write: bool = False
+        self._get_in_line_on_write__time_limit: Optional[RationalNumber] = None
+        self._get_in_line_on_write__periodic_sleep_time: Optional[RationalNumber] = 0.000000001
 
-        sys_arr_length = len(SysValuesOffsets)
-        self.global_sys_array_len: int = sys_arr_length
-        arr_byte_size = sys_arr_length * bs
-        self.global_sys_area_size: int = arr_byte_size
-
-        self._size: Optional[int] = size or None
-        if (size is None) or (0 == size):
-            size = self.global_sys_area_size
-            if self._create:
-                self._size = size
+        self.calc_sys_arr_length(size)
         
         if self._create:
             if unlink_old:
@@ -5640,12 +6059,21 @@ class SharedMemory:
             
             self._shared_memory: MultiprocessingSharedMemory = MultiprocessingSharedMemory(name=name, create=create, size=size)
             self._init_post_mem()
+
+            if self._max_consumers_num is None:
+                self._max_consumers_num = self.recommended_max_consumers_num()
+
+            if (self._wait_for_consumers_num is not None) and (self._wait_for_consumers_num > self._max_consumers_num):
+                self._wait_for_consumers_num = self._max_consumers_num
+
+            arr_byte_size: int = self.calc_sys_arr_length(size)
             
+            write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.shared_memory_type, self._shared_memory_type)
             write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.total_mem_size, self._size)
-            write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.data_start_offset, sys_arr_length * bs)
+            write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.data_start_offset, arr_byte_size)
             write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.data_size, self._size - arr_byte_size)
             write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.data_end_offset, self._size)
-            write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.free_memory_search_start, sys_arr_length * bs)
+            write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.free_memory_search_start, arr_byte_size)
             write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.first_message_offset, 0)
             write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.last_message_offset, 0)
             write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.creator_in_charge, 0)
@@ -5654,6 +6082,11 @@ class SharedMemory:
             write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_wants_to_be_in_charge, 0)
             write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.creator_ready, 0)
             write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_ready, 0)
+            write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_acquired, 0)
+            write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_pid, 0)
+            write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_executable_path, 0)
+            write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.max_consumers_num, self._max_consumers_num)
+            # write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumers_num, 0)
             # print(bytes(self._shared_memory.buf[0:120]))
 
             self.free_memory_search_start = self.read_free_memory_search_start()
@@ -5673,6 +6106,31 @@ class SharedMemory:
             
         full_memory_barrier()
     
+    @staticmethod
+    def recommended_max_consumers_num() -> int:
+        return cpu_info().virtual_cores_num or 1
+    
+    def calc_sys_arr_length(self, size: Optional[int] = None):
+        if self._max_consumers_num is None:
+            additional_consumers_array_length = 0
+        else:
+            additional_consumers_array_length: int = len(AdditionalConsumersFields) * (self._max_consumers_num - 1)
+        
+        additional_consumers_array_size: int = bs * additional_consumers_array_length
+
+        sys_arr_length = len(SysValuesOffsets) + additional_consumers_array_length
+        self.global_sys_array_len: int = sys_arr_length
+        arr_byte_size = sys_arr_length * bs
+        self.global_sys_area_size: int = arr_byte_size
+
+        self._size: Optional[int] = size or None
+        if (size is None) or (0 == size):
+            size = self.global_sys_area_size
+            if self._create:
+                self._size = size
+        
+        return arr_byte_size
+    
     async def _default_asleep_func(self):
         await asyncio.sleep(0)
     
@@ -5682,11 +6140,26 @@ class SharedMemory:
 
     @property
     def name(self) -> str:
-        return self._name
+        if self._shared_memory is None:
+            return self._name
+        else:
+            return self._shared_memory.name
     
     @property
     def create(self) -> bool:
         return self._create
+    
+    @property
+    def operator_id(self) -> int:
+        return 0 if self._create else (2 + self._consumer_id)
+    
+    @property
+    def consumer_id(self) -> int:
+        return None if self._create else (1 + self._consumer_id)
+    
+    @property
+    def max_consumers_num(self) -> int:
+        return self._max_consumers_num
     
     def _init_post_mem(self):
         self.base_address = ctypes.addressof(ctypes.c_char.from_buffer(self._shared_memory.buf))
@@ -5704,11 +6177,11 @@ class SharedMemory:
         # else:
         #     self.log_arr = self.sys_arr
     
-    def init_consumer(self, time_limit: Optional[RationalNumber] = None) -> bool:
+    def init_consumer(self, time_limit: Optional[RationalNumber] = None, periodic_sleep_time: Optional[RationalNumber] = 0.000000001) -> bool:
         if self._initiated:
             return
 
-        if not self.wait_shared_memory_ready(time_limit):
+        if not self.wait_shared_memory_ready(time_limit, periodic_sleep_time):
             return False
         
         if (self._size is None) or (0 == self._size):
@@ -5718,7 +6191,12 @@ class SharedMemory:
 
         self._shared_memory: MultiprocessingSharedMemory = MultiprocessingSharedMemory(name=self._name, create=self._create, size=size)
         self._init_post_mem()
-        self.wait_creator_ready()
+        self.calc_sys_arr_length()
+        self._max_consumers_num = read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.max_consumers_num)
+        self.wait_creator_ready(time_limit, periodic_sleep_time)
+        
+        self.global_sys_area_size = read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.data_start_offset)
+        self._max_consumers_num = read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.max_consumers_num)
         
         if self._size is None:
             self._size = read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.total_mem_size)
@@ -5726,7 +6204,21 @@ class SharedMemory:
             self._shared_memory: MultiprocessingSharedMemory = MultiprocessingSharedMemory(name=self._name, create=self._create, size=self._size)
         
         self._init_post_mem()
+        shared_memory_type: int = read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.shared_memory_type)
+        if shared_memory_type != self._shared_memory_type:
+            current_consumer_shared_memory_type: SharedMemoryType = SharedMemoryType(self._shared_memory_type)
+            provided_shared_memory_type: SharedMemoryType = SharedMemoryType(shared_memory_type)
+            raise WrongSharedMemoryTypeError(f'Current consumer shared memory type is {current_consumer_shared_memory_type} but provided shared memory type is {provided_shared_memory_type}')
+
         self.free_memory_search_start = self.read_free_memory_search_start()
+        self.global_sys_area_size = read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.data_start_offset)
+        self._max_consumers_num = read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.max_consumers_num)
+        
+        if self._consumer_id is None:
+            self._consumer_id = self.try_register_new_consumer()
+        
+        if self._consumer_id is None:
+            raise StackOfConsumersIsFullError(f'{self.ready_consumers_num()} of {self.read_max_consumers_num()} consumers are registered already')
         
         self.set_consumer_ready()
 
@@ -5734,6 +6226,9 @@ class SharedMemory:
         self.get_data_end_offset()
         self._initiated = True
         full_memory_barrier()
+
+        self.wait_additional_consumers_ready(time_limit, periodic_sleep_time)
+        self.set_current_consumer_executable_path()
     
     async def ainit_consumer(self, time_limit: Optional[RationalNumber] = None) -> bool:
         if self._initiated:
@@ -5749,7 +6244,12 @@ class SharedMemory:
 
         self._shared_memory: MultiprocessingSharedMemory = MultiprocessingSharedMemory(name=self._name, create=self._create, size=size)
         self._init_post_mem()
+        self.calc_sys_arr_length()
+        self._max_consumers_num = read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.max_consumers_num)
         await self.await_creator_ready(time_limit)
+        
+        self.global_sys_area_size = read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.data_start_offset)
+        self._max_consumers_num = read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.max_consumers_num)
         
         if self._size is None:
             self._size = read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.total_mem_size)
@@ -5757,7 +6257,21 @@ class SharedMemory:
             self._shared_memory: MultiprocessingSharedMemory = MultiprocessingSharedMemory(name=self._name, create=self._create, size=self._size)
         
         self._init_post_mem()
+        shared_memory_type: int = read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.shared_memory_type)
+        if shared_memory_type != self._shared_memory_type:
+            current_consumer_shared_memory_type: SharedMemoryType = SharedMemoryType(self._shared_memory_type)
+            provided_shared_memory_type: SharedMemoryType = SharedMemoryType(shared_memory_type)
+            raise WrongSharedMemoryTypeError(f'Current consumer shared memory type is {current_consumer_shared_memory_type} but provided shared memory type is {provided_shared_memory_type}')
+
         self.free_memory_search_start = self.read_free_memory_search_start()
+        self.global_sys_area_size = read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.data_start_offset)
+        self._max_consumers_num = read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.max_consumers_num)
+        
+        if self._consumer_id is None:
+            self._consumer_id = self.try_register_new_consumer()
+        
+        if self._consumer_id is None:
+            raise StackOfConsumersIsFullError(f'{self.ready_consumers_num()} of {self.read_max_consumers_num()} consumers are registered already')
         
         self.set_consumer_ready()
 
@@ -5765,6 +6279,9 @@ class SharedMemory:
         self.get_data_end_offset()
         self._initiated = True
         full_memory_barrier()
+
+        await self.await_additional_consumers_ready(time_limit)
+        self.set_current_consumer_executable_path()
     
     def close_consumer(self):
         self.set_consumer_closed()
@@ -5783,18 +6300,22 @@ class SharedMemory:
         await self.aproper_close()
     
     def close(self):
+        if self._shared_memory is None:
+            return
+        
+        shared_memory_name: str = self._shared_memory._name
         self._shared_memory.close()
         if self._create:
             self._shared_memory.unlink()
-            SharedMemory.unlink_by_name(self._name)
+            SharedMemory.unlink_by_name(shared_memory_name)
         else:
-            if 'posix' == os.name:
-                try:
-                    from multiprocessing import resource_tracker
-                    shm_name = f'/{self._name}'
-                    resource_tracker.unregister(shm_name, "shared_memory")
-                except FileNotFoundError:
-                    pass
+            pass
+            # if 'posix' == os.name:
+            #     from multiprocessing import resource_tracker
+            #     try:
+            #         resource_tracker.unregister(shared_memory_name, "shared_memory")
+            #     except (FileNotFoundError, KeyError):
+            #         pass
 
     def proper_close(self):
         if self._create:
@@ -5824,9 +6345,8 @@ class SharedMemory:
             try:
                 import _posixshmem
                 from multiprocessing import resource_tracker
-                shm_name = f'/{shared_memory_name}'
-                _posixshmem.shm_unlink(shm_name)
-                resource_tracker.unregister(shm_name, "shared_memory")
+                _posixshmem.shm_unlink(shared_memory_name)
+                resource_tracker.unregister(shared_memory_name, "shared_memory")
             except FileNotFoundError:
                 pass
     
@@ -5863,16 +6383,58 @@ class SharedMemory:
         write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.creator_ready, 1)
     
     def set_consumer_ready(self):
-        write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_ready, 1)
+        if -1 == self._consumer_id:
+            write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_acquired, 1)
+            write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_pid, os.getpid())
+            write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_ready, 1)
+        else:
+            self.set_additional_consumer_ready()
+    
+    def set_additional_consumer_ready(self):
+        consumer_id: int = self._consumer_id
+        write_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * consumer_id + bs * AdditionalConsumersFields.consumer_acquired, 1)
+        write_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * consumer_id + bs * AdditionalConsumersFields.consumer_pid, os.getpid())
+        write_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * consumer_id + bs * AdditionalConsumersFields.consumer_ready, 1)
     
     def set_consumer_closed(self):
-        write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_ready, 0)
+        if -1 == self._consumer_id:
+            write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_ready, 0)
+            write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_acquired, 0)
+            write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_pid, 0)
+        else:
+            self.set_additional_consumer_closed()
+    
+    def set_additional_consumer_closed(self):
+        if self._consumer_id is None:
+            return
+        
+        consumer_id: int = self._consumer_id
+        write_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * consumer_id + bs * AdditionalConsumersFields.consumer_ready, 0)
+        write_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * consumer_id + bs * AdditionalConsumersFields.consumer_acquired, 0)
+        write_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * consumer_id + bs * AdditionalConsumersFields.consumer_pid, 0)
     
     def get_creator_ready(self):
         return read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.creator_ready)
     
-    def get_consumer_ready(self):
-        return read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_ready)
+    def get_consumer_ready(self, consumer_id: int):
+        if -1 == consumer_id:
+            return read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_ready)
+        else:
+            return self.get_additional_consumer_ready(consumer_id)
+    
+    def get_additional_consumer_ready(self, consumer_id: int):
+        return read_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * consumer_id + bs * AdditionalConsumersFields.consumer_ready)
+
+    def unlink_old(self, name) -> None:
+        shared_memory: MultiprocessingSharedMemory = None
+        try:
+            shared_memory: MultiprocessingSharedMemory = MultiprocessingSharedMemory(name=name, create=False)
+            shared_memory_name: str = shared_memory._name
+            shared_memory.close()
+            shared_memory.unlink()
+            SharedMemory.unlink_by_name(shared_memory_name)
+        except FileNotFoundError:
+            pass
 
     def wait_shared_memory_ready(self, time_limit: Optional[RationalNumber] = None, periodic_sleep_time: Optional[RationalNumber] = 0.000000001) -> bool:
         start_time = cpu_clock()
@@ -5965,6 +6527,8 @@ class SharedMemory:
                 hps_sleep(periodic_sleep_time)
             
             full_memory_barrier()
+        
+        self.wait_additional_consumers_ready(time_limit, periodic_sleep_time)
     
     async def await_consumer_ready(self, time_limit: Optional[RationalNumber] = None) -> bool:
         if not self._create:
@@ -5973,6 +6537,48 @@ class SharedMemory:
         start_time = cpu_clock()
         full_memory_barrier()
         while not read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_ready):
+            if time_limit is not None:
+                if (cpu_clock() - start_time) > time_limit:
+                    return False
+            
+            await self._asleep_func()
+            
+            full_memory_barrier()
+        
+        await self.await_additional_consumers_ready(time_limit)
+    
+    def wait_additional_consumers_ready(self, time_limit: Optional[RationalNumber] = None, periodic_sleep_time: Optional[RationalNumber] = 0.000000001) -> bool:
+        if (self._wait_for_consumers_num is not None) and 1 >= self._wait_for_consumers_num:
+            return
+
+        wait_for_consumers_num: int = self._max_consumers_num if self._wait_for_consumers_num is None else self._wait_for_consumers_num
+        
+        start_time = cpu_clock()
+        full_memory_barrier()
+        # consumers_num = self.ready_consumers_num()
+        while wait_for_consumers_num > self.ready_consumers_num():
+        # while wait_for_consumers_num > consumers_num:
+            # tr((wait_for_consumers_num, consumers_num))
+            if time_limit is not None:
+                if (cpu_clock() - start_time) > time_limit:
+                    return False
+            
+            if periodic_sleep_time is None:
+                mm_pause()
+            else:
+                hps_sleep(periodic_sleep_time)
+            
+            full_memory_barrier()
+    
+    async def await_additional_consumers_ready(self, time_limit: Optional[RationalNumber] = None) -> bool:
+        if (self._wait_for_consumers_num is not None) and 1 >= self._wait_for_consumers_num:
+            return
+
+        wait_for_consumers_num: int = self._max_consumers_num if self._wait_for_consumers_num is None else self._wait_for_consumers_num
+        
+        start_time = cpu_clock()
+        full_memory_barrier()
+        while wait_for_consumers_num > self.ready_consumers_num():
             if time_limit is not None:
                 if (cpu_clock() - start_time) > time_limit:
                     return False
@@ -5998,6 +6604,8 @@ class SharedMemory:
                 hps_sleep(periodic_sleep_time)
             
             full_memory_barrier()
+        
+        self.wait_additional_consumers_closed(time_limit, periodic_sleep_time)
     
     async def await_consumer_closed(self, time_limit: Optional[RationalNumber] = None) -> bool:
         if not self._create:
@@ -6013,12 +6621,94 @@ class SharedMemory:
             await self._asleep_func()
             
             full_memory_barrier()
+        
+        await self.await_additional_consumers_closed(time_limit)
+    
+    def wait_additional_consumers_closed(self, time_limit: Optional[RationalNumber] = None, periodic_sleep_time: Optional[RationalNumber] = 0.000000001) -> bool:
+        if not self._create:
+            return
+        
+        start_time = cpu_clock()
+        full_memory_barrier()
+        while 0 < self.ready_consumers_num():
+            if time_limit is not None:
+                if (cpu_clock() - start_time) > time_limit:
+                    return False
+            
+            if periodic_sleep_time is None:
+                mm_pause()
+            else:
+                hps_sleep(periodic_sleep_time)
+            
+            full_memory_barrier()
+    
+    async def await_additional_consumers_closed(self, time_limit: Optional[RationalNumber] = None) -> bool:
+        if not self._create:
+            return
+
+        start_time = cpu_clock()
+        full_memory_barrier()
+        while 0 < self.ready_consumers_num():
+            if time_limit is not None:
+                if (cpu_clock() - start_time) > time_limit:
+                    return False
+            
+            await self._asleep_func()
+            
+            full_memory_barrier()
     
     def creator_in_charge(self) -> bool:
         return read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.creator_in_charge)
     
     def consumer_in_charge(self) -> bool:
-        return read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_in_charge)
+        # return read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_in_charge) if 1 >= self._max_consumers_num else self.any_consumer_in_charge()
+        if 1 >= self._max_consumers_num:
+            return read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_in_charge)
+        else:
+            return self.any_consumer_in_charge()
+    
+    def any_consumer_in_charge(self) -> bool:
+        if read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_in_charge):
+            return 1
+        else:
+            for consumer_id in range(self._max_consumers_num - 1):
+                if read_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * consumer_id + bs * AdditionalConsumersFields.consumer_in_charge):
+                    return 1
+            
+            return 0
+    
+    def consumer_in_charge_except(self, except_consumer_id: int) -> bool:
+        if 1 >= self._max_consumers_num:
+            if -1 == except_consumer_id:
+                return False
+            
+            return read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_in_charge)
+        else:
+            return self.any_consumer_in_charge_except(except_consumer_id)
+    
+    def any_consumer_in_charge_except(self, except_consumer_id: int) -> bool:
+        if (0 <= except_consumer_id) and read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_in_charge):
+            return 1
+        else:
+            for consumer_id in range(self._max_consumers_num - 1):
+                if consumer_id == except_consumer_id:
+                    continue
+
+                if read_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * consumer_id + bs * AdditionalConsumersFields.consumer_in_charge):
+                    return 1
+            
+            return 0
+    
+    def ready_consumers_num(self) -> bool:
+        ready_num = 0
+        if read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_ready):
+            ready_num += 1
+
+        for consumer_id in range(self._max_consumers_num - 1):
+            if read_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * consumer_id + bs * AdditionalConsumersFields.consumer_ready):
+                ready_num += 1
+            
+        return ready_num
     
     def creator_wants_to_be_in_charge(self) -> bool:
         return read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.creator_wants_to_be_in_charge)
@@ -6029,6 +6719,95 @@ class SharedMemory:
     def read_free_memory_search_start(self) -> int:
         # return self.get_data_start_offset()
         return read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.free_memory_search_start)
+    
+    def read_max_consumers_num(self) -> int:
+        # return self.get_data_start_offset()
+        return read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.max_consumers_num)
+
+    @staticmethod
+    def random_wait_ms() -> None:
+        rand_mult: int = randint(0, 14)
+        time_atom: float = 0.001
+        time_base: float = 0.001
+        rand_wait_time = time_base + time_atom * rand_mult
+        hps_sleep(rand_wait_time)
+
+    def set_current_consumer_executable_path(self) -> Optional[int]:
+        self.random_wait_ms()
+        full_memory_barrier()
+        with wait_my_turn(self):
+            mapped_obj, offset, size = self.put_obj(get_executable_src_path())
+            if -1 == self._consumer_id:
+                write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_executable_path, offset)
+            else:
+                write_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * self._consumer_id + bs * AdditionalConsumersFields.consumer_executable_path, offset)
+            
+            full_memory_barrier()
+
+    def try_register_new_consumer(self) -> Optional[int]:
+        current_pid: int = os.getpid()
+        seed(current_pid)
+        
+        class InternalConsumerRegisteringError(Exception):
+            pass
+        
+        attempt_index = 0
+        while attempt_index < 7:
+            self.random_wait_ms()
+            attempt_index += 1
+            full_memory_barrier()
+            try:
+                if read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_ready) or \
+                    read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_acquired):
+                    for consumer_id in range(self._max_consumers_num - 1):
+                        if read_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * consumer_id + bs * AdditionalConsumersFields.consumer_ready) or \
+                            read_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * consumer_id + bs * AdditionalConsumersFields.consumer_acquired):
+                            continue
+                        else:
+                            write_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * consumer_id + bs * AdditionalConsumersFields.consumer_acquired, 1)
+                            write_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * consumer_id + bs * AdditionalConsumersFields.consumer_pid, current_pid)
+                            full_memory_barrier()
+                            sub_attempt_index = 0
+                            while sub_attempt_index < 3:
+                                self.random_wait_ms()
+                                sub_attempt_index += 1
+                                full_memory_barrier()
+                                if read_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * consumer_id + bs * AdditionalConsumersFields.consumer_ready):
+                                    raise InternalConsumerRegisteringError
+
+                                if (not read_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * consumer_id + bs * AdditionalConsumersFields.consumer_acquired)) or \
+                                    (read_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * consumer_id + bs * AdditionalConsumersFields.consumer_pid) != current_pid):
+                                    write_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * consumer_id + bs * AdditionalConsumersFields.consumer_acquired, 0)
+                                    write_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * consumer_id + bs * AdditionalConsumersFields.consumer_pid, 0)
+                                    full_memory_barrier()
+                                    raise InternalConsumerRegisteringError
+                                
+                            return consumer_id
+                else:
+                    write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_acquired, 1)
+                    write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_pid, current_pid)
+                    full_memory_barrier()
+                    sub_attempt_index = 0
+                    while sub_attempt_index < 3:
+                        self.random_wait_ms()
+                        sub_attempt_index += 1
+                        full_memory_barrier()
+                        if read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_ready):
+                            raise InternalConsumerRegisteringError
+                        
+                        if (not read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_acquired)) or \
+                            (read_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_pid) != current_pid):
+                            write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_acquired, 0)
+                            write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_pid, 0)
+                            full_memory_barrier()
+                            raise InternalConsumerRegisteringError
+                        
+                    return -1
+
+            except InternalConsumerRegisteringError:
+                attempt_index = 0
+        
+        return None
     
     def update_free_memory_search_start(self) -> int:
         self.free_memory_search_start = self.read_free_memory_search_start()
@@ -6319,6 +7098,11 @@ class SharedMemory:
     def malloc(self, obj_type: ObjectType, size: Size, loop_allowed: bool = True, zero_mem: bool = False) -> Tuple[Optional[Offset], Size]:
         start_time = cpu_clock()
         try:
+            if self._get_in_line_on_write:
+                is_in_line: bool = self.is_in_line()
+                if not is_in_line:
+                    self.wait_my_turn(self._get_in_line_on_write__time_limit, self._get_in_line_on_write__periodic_sleep_time)
+            
             size += bs * len(BaseObjOffsets)
             size = nearest_size(size)
             adjusted_size = size
@@ -6362,6 +7146,9 @@ class SharedMemory:
             self.set_free_memory_search_start(free_mem_block_offset)
             return free_mem_block_offset, obj_size
         finally:
+            if self._get_in_line_on_write and (not is_in_line):
+                self.release()
+            
             self._malloc_time += cpu_clock() - start_time
     
     # def zero_memory(self, offset: Offset, size: Size):
@@ -6375,6 +7162,11 @@ class SharedMemory:
         start_time: float = cpu_clock()
         internal_malloc_time: float = 0.0
         try:
+            if self._get_in_line_on_write:
+                is_in_line: bool = self.is_in_line()
+                if not is_in_line:
+                    self.wait_my_turn(self._get_in_line_on_write__time_limit, self._get_in_line_on_write__periodic_sleep_time)
+            
             new_size += bs * len(BaseObjOffsets)
             new_size = nearest_size(new_size)
             data_end_offset: Offset = self.get_data_end_offset()
@@ -6415,10 +7207,23 @@ class SharedMemory:
             
             return result_offset, result_obj_size
         finally:
+            if self._get_in_line_on_write and (not is_in_line):
+                self.release()
+            
             self._realloc_time += cpu_clock() - start_time - internal_malloc_time
     
     def free(self, offset: Offset) -> bool:
-        write_uint64(self.base_address, offset, ObjectType.tfree_memory.value)
+        try:
+            if self._get_in_line_on_write:
+                is_in_line: bool = self.is_in_line()
+                if not is_in_line:
+                    self.wait_my_turn(self._get_in_line_on_write__time_limit, self._get_in_line_on_write__periodic_sleep_time)
+            
+            write_uint64(self.base_address, offset, ObjectType.tfree_memory.value)
+        finally:
+            if self._get_in_line_on_write and (not is_in_line):
+                self.release()
+            
         return True
 
     # ----------------------------
@@ -6516,42 +7321,39 @@ class SharedMemory:
     def has_messages(self) -> bool:
         return self.get_last_message_offset() != 0
 
-    def read_message_info(self, queue_type: QueueType = QueueType.fifo) -> Tuple[Any, Optional[Offset], Optional[Offset]]:
-        # print(0)
+    def read_message_info(self, queue_type: QueueType = QueueType.fifo, remove_from_queue: bool = False) -> Tuple[Any, Optional[Offset], Optional[Offset]]:
         if QueueType.fifo == queue_type:
             message_offset = self.get_first_message_offset()
             # print(f'0.0| {message_offset=}')
             if not message_offset:
                 return None, None, None
             
-            next_message_offset = read_uint64(self.base_address, message_offset + bs * len(BaseObjOffsets) + bs * MessageOffsets.next_message_offset)
-            self.set_first_message_offset(next_message_offset)
-            if next_message_offset:
-                write_uint64(self.base_address, next_message_offset + bs * len(BaseObjOffsets) + bs * MessageOffsets.previous_message_offset, 0)
-            else:
-                self.set_last_message_offset(0)
+            if remove_from_queue:
+                next_message_offset = read_uint64(self.base_address, message_offset + bs * len(BaseObjOffsets) + bs * MessageOffsets.next_message_offset)
+                self.set_first_message_offset(next_message_offset)
+                if next_message_offset:
+                    write_uint64(self.base_address, next_message_offset + bs * len(BaseObjOffsets) + bs * MessageOffsets.previous_message_offset, 0)
+                else:
+                    self.set_last_message_offset(0)
         else:
             message_offset = self.get_last_message_offset()
             # print(f'0.1| {message_offset=}')
             if not message_offset:
                 return None, None, None
             
-            prev_message_offset = read_uint64(self.base_address, message_offset + bs * len(BaseObjOffsets) + bs * MessageOffsets.previous_message_offset)
-            self.set_last_message_offset(prev_message_offset)
-            if prev_message_offset:
-                write_uint64(self.base_address, prev_message_offset + bs * len(BaseObjOffsets) + bs * MessageOffsets.next_message_offset, 0)
-            else:
-                self.set_first_message_offset(0)
+            if remove_from_queue:
+                prev_message_offset = read_uint64(self.base_address, message_offset + bs * len(BaseObjOffsets) + bs * MessageOffsets.previous_message_offset)
+                self.set_last_message_offset(prev_message_offset)
+                if prev_message_offset:
+                    write_uint64(self.base_address, prev_message_offset + bs * len(BaseObjOffsets) + bs * MessageOffsets.next_message_offset, 0)
+                else:
+                    self.set_first_message_offset(0)
         
-        # print(1)
         obj_offset = read_uint64(self.base_address, message_offset + bs * len(BaseObjOffsets) + bs * MessageOffsets.item_offset)
-        # print(2)
         if not obj_offset:
             return None, None, message_offset
 
-        # print(3)
         obj = self.get_obj(obj_offset)
-        # print(4)
         return obj, obj_offset, message_offset
 
     def destroy_message(self, message_offset: Offset):
@@ -6567,21 +7369,21 @@ class SharedMemory:
         self.free(message_offset)
     
     def read_message(self, queue_type: QueueType = QueueType.fifo) -> Any:
-        obj, obj_offset, message_offset = self.read_message_info(queue_type)
+        obj, obj_offset, message_offset = self.read_message_info(queue_type, remove_from_queue=False)
         if message_offset:
             return obj
         else:
             raise NoMessagesInQueueError
     
     def read_message_2(self, queue_type: QueueType = QueueType.fifo) -> Tuple[Any, Offset]:
-        obj, obj_offset, message_offset = self.read_message_info(queue_type)
+        obj, obj_offset, message_offset = self.read_message_info(queue_type, remove_from_queue=False)
         if message_offset:
             return obj, obj_offset
         else:
             raise NoMessagesInQueueError
 
     def take_message(self, queue_type: QueueType = QueueType.fifo) -> Any:
-        obj, obj_offset, message_offset = self.read_message_info(queue_type)
+        obj, obj_offset, message_offset = self.read_message_info(queue_type, remove_from_queue=True)
         if message_offset:
             self.destroy_message(message_offset)
         else:
@@ -6590,7 +7392,7 @@ class SharedMemory:
         return obj
 
     def take_message_2(self, queue_type: QueueType = QueueType.fifo) -> Tuple[Any, Offset]:
-        obj, obj_offset, message_offset = self.read_message_info(queue_type)
+        obj, obj_offset, message_offset = self.read_message_info(queue_type, remove_from_queue=True)
         if message_offset:
             self.destroy_message(message_offset)
         else:
@@ -6599,21 +7401,21 @@ class SharedMemory:
         return obj, obj_offset
     
     def get_message(self, default = None, queue_type: QueueType = QueueType.fifo) -> Any:
-        obj, obj_offset, message_offset = self.read_message_info(queue_type)
+        obj, obj_offset, message_offset = self.read_message_info(queue_type, remove_from_queue=False)
         if message_offset:
             return obj
         else:
             return default
     
     def get_message_2(self, default = None, queue_type: QueueType = QueueType.fifo) -> Tuple[Any, Optional[Offset]]:
-        obj, obj_offset, message_offset = self.read_message_info(queue_type)
+        obj, obj_offset, message_offset = self.read_message_info(queue_type, remove_from_queue=False)
         if message_offset:
             return obj, obj_offset
         else:
             return default, None
 
     def pop_message(self, default = None, queue_type: QueueType = QueueType.fifo) -> Any:
-        obj, obj_offset, message_offset = self.read_message_info(queue_type)
+        obj, obj_offset, message_offset = self.read_message_info(queue_type, remove_from_queue=True)
         if message_offset:
             self.destroy_message(message_offset)
         else:
@@ -6622,7 +7424,7 @@ class SharedMemory:
         return obj
 
     def pop_message_2(self, default = None, queue_type: QueueType = QueueType.fifo) -> Tuple[Any, Optional[Offset]]:
-        obj, obj_offset, message_offset = self.read_message_info(queue_type)
+        obj, obj_offset, message_offset = self.read_message_info(queue_type, remove_from_queue=True)
         if message_offset:
             self.destroy_message(message_offset)
         else:
@@ -6633,6 +7435,13 @@ class SharedMemory:
 
     # ----------------------------
 
+    def is_in_line(self) -> bool:
+        full_memory_barrier()
+        if self._create:
+            return self.creator_in_charge()
+        else:
+            return self.consumer_in_charge()
+            
     def get_in_line(self) -> bool:
         if self._create:
             write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.creator_in_charge, 0)
@@ -6655,25 +7464,46 @@ class SharedMemory:
 
                 return True
         else:
-            write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_in_charge, 0)
-            write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_wants_to_be_in_charge, 1)
-            full_memory_barrier()
-            if self.creator_in_charge():
-                return False
-            else:
-                write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_in_charge, 1)
+            if 0 > self._consumer_id:
+                write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_in_charge, 0)
+                write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_wants_to_be_in_charge, 1)
                 full_memory_barrier()
-                write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_wants_to_be_in_charge, 0)
-                full_memory_barrier()
-                self.update_free_memory_search_start()
-                if self.creator_in_charge():
-                    write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_in_charge, 0)
-                    full_memory_barrier()
-                    write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_wants_to_be_in_charge, 1)
-                    full_memory_barrier()
+                if self.creator_in_charge() or self.consumer_in_charge_except(self._consumer_id):
                     return False
-                
-                return True
+                else:
+                    write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_in_charge, 1)
+                    full_memory_barrier()
+                    write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_wants_to_be_in_charge, 0)
+                    full_memory_barrier()
+                    self.update_free_memory_search_start()
+                    if self.creator_in_charge() or self.consumer_in_charge_except(self._consumer_id):
+                        write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_in_charge, 0)
+                        full_memory_barrier()
+                        write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_wants_to_be_in_charge, 1)
+                        full_memory_barrier()
+                        return False
+                    
+                    return True
+            else:
+                write_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * self._consumer_id + bs * AdditionalConsumersFields.consumer_in_charge, 0)
+                write_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * self._consumer_id + bs * AdditionalConsumersFields.consumer_wants_to_be_in_charge, 1)
+                full_memory_barrier()
+                if self.creator_in_charge() or self.consumer_in_charge_except(self._consumer_id):
+                    return False
+                else:
+                    write_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * self._consumer_id + bs * AdditionalConsumersFields.consumer_in_charge, 1)
+                    full_memory_barrier()
+                    write_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * self._consumer_id + bs * AdditionalConsumersFields.consumer_wants_to_be_in_charge, 0)
+                    full_memory_barrier()
+                    self.update_free_memory_search_start()
+                    if self.creator_in_charge() or self.consumer_in_charge_except(self._consumer_id):
+                        write_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * self._consumer_id + bs * AdditionalConsumersFields.consumer_in_charge, 0)
+                        full_memory_barrier()
+                        write_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * self._consumer_id + bs * AdditionalConsumersFields.consumer_wants_to_be_in_charge, 1)
+                        full_memory_barrier()
+                        return False
+                    
+                    return True
             
     def release(self):
         self.commit_free_memory_search_start()
@@ -6682,8 +7512,13 @@ class SharedMemory:
             write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.creator_wants_to_be_in_charge, 0)
             full_memory_barrier()
         else:
-            write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_in_charge, 0)
-            write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_wants_to_be_in_charge, 0)
+            if 0 > self._consumer_id:
+                write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_in_charge, 0)
+                write_uint64(self.base_address, self.sys_values_offset + bs * SysValuesOffsets.consumer_wants_to_be_in_charge, 0)
+            else:
+                write_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * self._consumer_id + bs * AdditionalConsumersFields.consumer_in_charge, 0)
+                write_uint64(self.base_address, self.sys_values_offset + bs * len(SysValuesOffsets) + bs * len(AdditionalConsumersFields) * self._consumer_id + bs * AdditionalConsumersFields.consumer_wants_to_be_in_charge, 0)
+
             full_memory_barrier()
 
     def wait_my_turn(self, time_limit: Optional[RationalNumber] = None, periodic_sleep_time: Optional[RationalNumber] = 0.000000001) -> bool:
@@ -6710,6 +7545,9 @@ class SharedMemory:
             await self._asleep_func()
         
         return True
+    
+    def get_in_line_on_write(self, time_limit: Optional[RationalNumber] = None, periodic_sleep_time: Optional[RationalNumber] = 0.000000001) -> 'GetInLineOnWrite':
+        return get_in_line_on_write(self, time_limit, periodic_sleep_time)
 
     # ----------------------------
 
@@ -6779,6 +7617,8 @@ class SharedMemory:
             obj_type_atom = ObjectType.tdatetime
         elif issubclass(obj_type, FastLimitedSet):
             obj_type_atom = ObjectType.tfastset
+        elif issubclass(obj_type, RWLock):
+            obj_type_atom = ObjectType.trwlock
         elif issubclass(obj_type, AbsMutableSet):
             obj_type_atom = ObjectType.tmutableset
         elif issubclass(obj_type, AbsSet):
@@ -6818,6 +7658,9 @@ class SharedMemory:
         return obj_type_atom
 
 
+SharedMemorySMP = SharedMemory
+
+
 # @contextmanager
 # def get_in_line(shared_memory: SharedMemory):
 #     shared_memory.get_in_line()
@@ -6828,18 +7671,55 @@ class SharedMemory:
 
 
 class GetInLine:
+    __slots__ = ('shared_memory', 'is_in_line')
+
     def __init__(self, shared_memory: SharedMemory):
         self.shared_memory: SharedMemory = shared_memory
+        self.is_in_line: bool = False
     
     def __enter__(self):
-        self.shared_memory.get_in_line()
-        return
+        self.is_in_line = self.shared_memory.is_in_line()
+        if not self.is_in_line:
+            return self.shared_memory.get_in_line()
     
     def __exit__(self, exc_type, exc_value, traceback):
-        self.shared_memory.release()
+        if not self.is_in_line:
+            self.shared_memory.release()
 
 
 get_in_line = GetInLine
+
+
+class GetInLineOnWrite:
+    __slots__ = ('shared_memory', 'time_limit', 'periodic_sleep_time', 'get_in_line_on_write_buff', 'get_in_line_on_write_buff__time_limit', 'get_in_line_on_write_buff__periodic_sleep_time')
+
+    def __init__(self, shared_memory: SharedMemory, time_limit: Optional[RationalNumber] = None, periodic_sleep_time: Optional[RationalNumber] = 0.000000001):
+        self.shared_memory: SharedMemory = shared_memory
+        self.time_limit: Optional[RationalNumber] = time_limit
+        self.periodic_sleep_time: Optional[RationalNumber] = periodic_sleep_time
+        
+        self.get_in_line_on_write_buff: bool = self.shared_memory._get_in_line_on_write
+        self.get_in_line_on_write_buff__time_limit: bool = self.shared_memory._get_in_line_on_write__time_limit
+        self.get_in_line_on_write_buff__periodic_sleep_time: bool = self.shared_memory._get_in_line_on_write__periodic_sleep_time
+    
+    def __enter__(self):
+        self.get_in_line_on_write_buff = self.shared_memory._get_in_line_on_write
+        self.get_in_line_on_write_buff__time_limit: bool = self.shared_memory._get_in_line_on_write__time_limit
+        self.get_in_line_on_write_buff__periodic_sleep_time: bool = self.shared_memory._get_in_line_on_write__periodic_sleep_time
+        self.shared_memory._get_in_line_on_write = True
+        self.shared_memory._get_in_line_on_write__time_limit = self.time_limit
+        self.shared_memory._get_in_line_on_write__periodic_sleep_time = self.periodic_sleep_time
+        full_memory_barrier()
+        return self.shared_memory
+    
+    def __exit__(self, exc_type, exc_value, traceback):
+        full_memory_barrier()
+        self.shared_memory._get_in_line_on_write = self.get_in_line_on_write_buff
+        self.shared_memory._get_in_line_on_write__time_limit = self.shared_memory._get_in_line_on_write__time_limit
+        self.shared_memory._get_in_line_on_write__periodic_sleep_time = self.shared_memory._get_in_line_on_write__periodic_sleep_time
+
+
+get_in_line_on_write = GetInLineOnWrite
 
 
 # @contextmanager
@@ -6852,17 +7732,24 @@ get_in_line = GetInLine
 
 
 class WaitMyTurn:
+    __slots__ = ('shared_memory', 'time_limit', 'periodic_sleep_time', 'is_in_line')
+
     def __init__(self, shared_memory: SharedMemory, time_limit: Optional[RationalNumber] = None, periodic_sleep_time: Optional[RationalNumber] = 0.000000001):
         self.shared_memory: SharedMemory = shared_memory
         self.time_limit: Optional[RationalNumber] = time_limit
         self.periodic_sleep_time: Optional[RationalNumber] = periodic_sleep_time
+        self.is_in_line: bool = False
     
     def __enter__(self):
-        self.shared_memory.wait_my_turn(self.time_limit, self.periodic_sleep_time)
-        return
+        self.is_in_line = self.shared_memory.is_in_line()
+        if not self.is_in_line:
+            self.shared_memory.wait_my_turn(self.time_limit, self.periodic_sleep_time)
+        
+        return self.shared_memory
     
     def __exit__(self, exc_type, exc_value, traceback):
-        self.shared_memory.release()
+        if not self.is_in_line:
+            self.shared_memory.release()
 
 
 wait_my_turn = WaitMyTurn
@@ -6885,38 +7772,62 @@ wait_my_turn = WaitMyTurn
 
 
 class WaitMyTurnWhenHasMessages:
+    __slots__ = ('shared_memory', 'time_limit', 'periodic_sleep_time', 'is_in_line')
+
     def __init__(self, shared_memory: SharedMemory, time_limit: Optional[RationalNumber] = None, periodic_sleep_time: Optional[RationalNumber] = 0.000000001):
         self.shared_memory: SharedMemory = shared_memory
         self.time_limit: Optional[RationalNumber] = time_limit
         self.periodic_sleep_time: Optional[RationalNumber] = periodic_sleep_time
+        self.is_in_line: bool = False
     
     def __enter__(self):
         while True:
-            if not self.shared_memory.wait_my_turn(self.time_limit, self.periodic_sleep_time):
-                raise OperationTimedOutError
+            self.is_in_line = self.shared_memory.is_in_line()
+            if not self.is_in_line:
+                if not self.shared_memory.wait_my_turn(self.time_limit, self.periodic_sleep_time):
+                    raise OperationTimedOutError
             
             if self.shared_memory.has_messages():
-                return
+                return self.shared_memory
             else:
-                self.shared_memory.release()
+                if not self.is_in_line:
+                    self.shared_memory.release()
     
     def __exit__(self, exc_type, exc_value, traceback):
-        self.shared_memory.release()
+        if not self.is_in_line:
+            self.shared_memory.release()
 
 
 wait_my_turn_when_has_messages = WaitMyTurnWhenHasMessages
 
 
 class await_my_turn:
+    __slots__ = ('shared_memory', 'time_limit', 'is_in_line')
+
     def __init__(self, shared_memory: SharedMemory, time_limit: Optional[RationalNumber] = None):
         self.shared_memory: SharedMemory = shared_memory
         self.time_limit: Optional[RationalNumber] = time_limit
+        self.is_in_line: bool = False
     
     async def __aenter__(self):
-        await self.shared_memory.await_my_turn(self.time_limit)
+        self.is_in_line = self.shared_memory.is_in_line()
+        if not self.is_in_line:
+            await self.shared_memory.await_my_turn(self.time_limit)
     
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        self.shared_memory.release()
+        if not self.is_in_line:
+            self.shared_memory.release()
+
+
+class FullMemoryBarrier:
+    def __enter__(self):
+        full_memory_barrier()
+    
+    def __exit__(self, exc_type, exc_value, traceback):
+        full_memory_barrier()
+
+
+FMB = FullMemoryBarrier
 
 
 def numpy_array_memory_size(np_shape, np_dtype):
@@ -6961,44 +7872,3 @@ def zero_bytes_from_numpy_array(np: np.ndarray) -> bytes:
 
 def bytes_from_numpy_array(np: np.ndarray) -> bytes:
     return np.tobytes()
-
-
-def dict_to_list(mapping: AbsMapping) -> List:
-    items_num = max(mapping.keys())
-    result = [None] * items_num
-    for key, value in mapping.items():
-        result[key] = value
-    
-    return result
-
-
-def list_to_dict(data_list: List) -> Dict:
-    return {key: value for key, value in enumerate(data_list)}
-
-
-def intenum_dict_to_list(mapping: AbsMapping, int_enum_class: Optional[Type] = None) -> List:
-    if int_enum_class:
-        items_num = len(int_enum_class)
-    else:
-        first_key_type_detected: bool = False
-        for first_key in mapping.keys():
-            first_key_type = type(first_key)
-            if issubclass(first_key_type, IntEnum):
-                items_num = len(first_key_type)
-                first_key_type_detected = True
-        
-        if not first_key_type_detected:
-            items_num = max(mapping.keys(), key=lambda value: int(value))
-    
-    result = [None] * items_num
-    for key, value in mapping.items():
-        result[int(key)] = value
-    
-    return result
-
-
-def intenum_list_to_dict(data_list: List, int_enum_class: Optional[Type] = None) -> Dict:
-    if int_enum_class:
-        return {int_enum_class(key): value for key, value in enumerate(data_list)}
-    else:
-        return {key: value for key, value in enumerate(data_list)}

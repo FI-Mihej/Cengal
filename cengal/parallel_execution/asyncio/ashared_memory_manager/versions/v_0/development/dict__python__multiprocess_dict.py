@@ -108,24 +108,24 @@ def sender(control: List, shared_players: List[Dict]):
                 pass
     
     increments_num: int = mt.iterations * len(shared_players) * (len(shared_players[0]) - 2) * control[ControlFields.sub_iterations_num]
-    print(f'It was used {mt.time_spent} seconds to made {increments_num} increments')
+    print(f'It took {mt.time_spent} seconds to made {increments_num} increments')
     increments_per_second: float = increments_num / mt.time_spent
     if mt.time_spent:
-        print(f'There is {increments_per_second} increments/seconds')
+        print(f'There are {increments_per_second} increments/seconds')
     
     print()
     increments_num: int = mt.iterations * len(shared_players) * (len(shared_players[0]) - 2)
-    print(f'It was used {mt.time_spent} seconds to adjust {increments_num} player fields')
+    print(f'It took {mt.time_spent} seconds to adjust {increments_num} player fields')
     increments_per_second: float = increments_num / mt.time_spent
     if mt.time_spent:
-        print(f'There is {increments_per_second} adjustments/seconds')
+        print(f'There are {increments_per_second} adjustments/seconds')
 
     print()
     increments_num: int = mt.iterations * len(shared_players)
-    print(f'It was used {mt.time_spent} seconds to update {increments_num} players')
+    print(f'It took {mt.time_spent} seconds to update {increments_num} players')
     increments_per_second: float = increments_num / mt.time_spent
     if mt.time_spent:
-        print(f'There is {increments_per_second} player_updates/seconds')
+        print(f'There are {increments_per_second} player_updates/seconds')
 
     print()
     print(dict(shared_players[0]))

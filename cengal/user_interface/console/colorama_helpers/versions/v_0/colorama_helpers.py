@@ -15,9 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import colorama
+
+from cengal.introspection.inspect import exception_to_printable_text
 from cengal.system import IS_RUNNING_IN_PYCHARM
 from contextlib import contextmanager
+
+
+import warnings
+try:
+    import colorama
+except ImportError as ex:
+    warnings.warn(exception_to_printable_text(ex))
 
 """
 Module Docstring

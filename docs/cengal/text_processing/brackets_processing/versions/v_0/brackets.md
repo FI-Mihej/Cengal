@@ -61,8 +61,8 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 </span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>
 </span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>
 </span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a><span class="k">class</span> <span class="nc">BracketAbsentType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>    <span class="n">out_of_data_bounds</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>    <span class="n">out_of_accessible_data_bounds</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>    <span class="n">data_bounds</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>    <span class="n">accessible_data_bounds</span> <span class="o">=</span> <span class="mi">1</span>
 </span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>
 </span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>
 </span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a><span class="k">class</span> <span class="nc">BracketType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
@@ -291,8 +291,8 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
     </div>
     <a class="headerlink" href="#BracketAbsentType"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="BracketAbsentType-46"><a href="#BracketAbsentType-46"><span class="linenos">46</span></a><span class="k">class</span> <span class="nc">BracketAbsentType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-</span><span id="BracketAbsentType-47"><a href="#BracketAbsentType-47"><span class="linenos">47</span></a>    <span class="n">out_of_data_bounds</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="BracketAbsentType-48"><a href="#BracketAbsentType-48"><span class="linenos">48</span></a>    <span class="n">out_of_accessible_data_bounds</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span id="BracketAbsentType-47"><a href="#BracketAbsentType-47"><span class="linenos">47</span></a>    <span class="n">data_bounds</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="BracketAbsentType-48"><a href="#BracketAbsentType-48"><span class="linenos">48</span></a>    <span class="n">accessible_data_bounds</span> <span class="o">=</span> <span class="mi">1</span>
 </span></pre></div>
 
 
@@ -300,26 +300,26 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 </div>
 
 
-                            <div id="BracketAbsentType.out_of_data_bounds" class="classattr">
+                            <div id="BracketAbsentType.data_bounds" class="classattr">
                                 <div class="attr variable">
-            <span class="name">out_of_data_bounds</span>        =
-<span class="default_value">&lt;<a href="#BracketAbsentType.out_of_data_bounds">BracketAbsentType.out_of_data_bounds</a>: 0&gt;</span>
+            <span class="name">data_bounds</span>        =
+<span class="default_value">&lt;<a href="#BracketAbsentType.data_bounds">BracketAbsentType.data_bounds</a>: 0&gt;</span>
 
         
     </div>
-    <a class="headerlink" href="#BracketAbsentType.out_of_data_bounds"></a>
+    <a class="headerlink" href="#BracketAbsentType.data_bounds"></a>
     
     
 
                             </div>
-                            <div id="BracketAbsentType.out_of_accessible_data_bounds" class="classattr">
+                            <div id="BracketAbsentType.accessible_data_bounds" class="classattr">
                                 <div class="attr variable">
-            <span class="name">out_of_accessible_data_bounds</span>        =
-<span class="default_value">&lt;<a href="#BracketAbsentType.out_of_accessible_data_bounds">BracketAbsentType.out_of_accessible_data_bounds</a>: 1&gt;</span>
+            <span class="name">accessible_data_bounds</span>        =
+<span class="default_value">&lt;<a href="#BracketAbsentType.accessible_data_bounds">BracketAbsentType.accessible_data_bounds</a>: 1&gt;</span>
 
         
     </div>
-    <a class="headerlink" href="#BracketAbsentType.out_of_accessible_data_bounds"></a>
+    <a class="headerlink" href="#BracketAbsentType.accessible_data_bounds"></a>
     
     
 

@@ -48,29 +48,29 @@ from typing import Dict, List
 <<< from cengal.time_management.timer.versions.v_1>>>:
 
 >>> "Creation"
-         It was used 2.9399991035461426e-05 seconds
+         It took 2.9399991035461426e-05 seconds
          It is 34013.61581348201 iterations/seconds
 
 >>> "Registration"
-         It was used 3.017069897032343 seconds
+         It took 3.017069897032343 seconds
          It is 0.33144740895251457 iterations/seconds
 
 >>> "Execution - all tasks"
-         It was used 3.0000364980078302 seconds
+         It took 3.0000364980078302 seconds
          It is 0.33332927804846657 iterations/seconds
 
 Max call num: 1
 ========================================
 >>> "Creation"
-         It was used 0.0029741000034846365 seconds
+         It took 0.0029741000034846365 seconds
          It is 336.2361718934599 iterations/seconds
 
 >>> "Registration"
-         It was used 2.4924262979766354 seconds
+         It took 2.4924262979766354 seconds
          It is 0.40121547458065465 iterations/seconds
 
 >>> "Execution - wait for first"
-         It was used 0.20197610004106537 seconds
+         It took 0.20197610004106537 seconds
          It is 4.951080844697378 iterations/seconds
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -79,29 +79,29 @@ Max call num: 1
 <<< from cengal.time_management.timer.versions.v_0>>>:
 
 >>> "Creation"
-         It was used 8.500006515532732e-06 seconds
+         It took 8.500006515532732e-06 seconds
          It is 117646.9686432147 iterations/seconds
 
 >>> "Registration"
-         It was used 0.15310529700946063 seconds
+         It took 0.15310529700946063 seconds
          It is 6.531452663837022 iterations/seconds
 
 >>> "Execution - all tasks"
-         It was used 3.017543933005072 seconds
+         It took 3.017543933005072 seconds
          It is 0.3313953407810481 iterations/seconds
 
 Max call num: 1
 ========================================
 >>> "Creation"
-         It was used 0.0003347999881953001 seconds
+         It took 0.0003347999881953001 seconds
          It is 2986.857930881008 iterations/seconds
 
 >>> "Registration"
-         It was used 0.1904736960423179 seconds
+         It took 0.1904736960423179 seconds
          It is 5.250068753733997 iterations/seconds
 
 >>> "Execution - wait for first"
-         It was used 0.09782769798766822 seconds
+         It took 0.09782769798766822 seconds
          It is 10.22205388218433 iterations/seconds
 """
 

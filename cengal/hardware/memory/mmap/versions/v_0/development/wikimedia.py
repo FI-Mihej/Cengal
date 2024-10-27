@@ -40,7 +40,7 @@ __status__ = "Development"
 
 # from file_system import filtered_file_list_traversal, filtered_file_list, FilteringType, change_current_dir
 
-from cengal.os.execute import handle_spaces
+from cengal.os.process.prepare_cmd_line import handle_spaces
 
 import os
 import sys

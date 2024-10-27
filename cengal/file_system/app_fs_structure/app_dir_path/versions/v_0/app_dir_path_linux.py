@@ -16,7 +16,7 @@
 # limitations under the License.
 
 
-__all__ = ['AppDirPath']
+__all__ = ['AppDirPath', 'app_dir_path', 'adp']
 
 
 """
@@ -167,3 +167,7 @@ class AppDirPath(AppDirPathBase):
             result_path = os.environ.get('XDG_DATA_HOME', os.path.join(os.path.expanduser('~'), '.local', 'share'))
 
         return result_path
+
+
+app_dir_path: AppDirPath = AppDirPath()
+adp: AppDirPath = app_dir_path

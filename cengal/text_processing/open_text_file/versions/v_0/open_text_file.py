@@ -126,6 +126,7 @@ class OpenTextFile:
     
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.writtable and self.text_value_holder:
+            self.file.seek(0)
             self.file.write(self.bom_bytes + self.text_value_holder.value.encode(self.detected_encoding))
         
         self.file.close()

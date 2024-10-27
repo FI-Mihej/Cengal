@@ -16,7 +16,7 @@
 # limitations under the License.
 
 
-__all__ = ['AppDirPath']
+__all__ = ['AppDirPath', 'app_dir_path', 'adp']
 
 
 """
@@ -129,3 +129,7 @@ class AppDirPath(AppDirPathBase):
             return result_path[0]
         else:
             raise RuntimeError('NSSearchPathForDirectoriesInDomains returned None for domain_mask: {0}, directory: {1}'.format(domain_mask, directory))
+
+
+app_dir_path: AppDirPath = AppDirPath()
+adp: AppDirPath = app_dir_path

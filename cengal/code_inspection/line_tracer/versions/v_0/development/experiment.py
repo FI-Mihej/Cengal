@@ -34,7 +34,7 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-from cengal.code_inspection.line_tracer import LineTracer
+from cengal.code_inspection.line_tracer.versions.v_0 import LineTracer
 
 lt = LineTracer()
 

@@ -46,7 +46,7 @@ from cengal.file_system.directory_manager import filtered_file_list, FilteringTy
 from cengal.build_tools.prepare_cflags import prepare_cflags, concat_cflags, prepare_compile_time_env, prepare_cflags_dict, prepare_given_cflags_dict, \
     prepare_pyx_flags_dict
 from cengal.introspection.inspect import get_exception, entity_repr_limited_try_qualname, pifrl, pdi, class_properties_values_including_overrided
-from cengal.hardware.info.cpu import cpu_info
+from cengal.hardware.cpu.info import cpu_info
 from cengal.system import OS_TYPE, TEMPLATE_MODULE_NAME
 from shutil import rmtree
 from os import remove, getcwd
@@ -67,7 +67,7 @@ import platform
 from cengal.file_system.path_manager import RelativePath, get_relative_path_part
 from cengal.file_system.directory_manager import current_src_dir
 from cengal.file_system.directory_manager import file_list_traversal, FilteringEntity
-from cengal.os.execute import prepare_params
+from cengal.os.process.prepare_cmd_line import prepare_params
 from setuptools.discovery import find_package_path
 import subprocess
 from cengal.build_tools.build_extensions import *

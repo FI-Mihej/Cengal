@@ -16,7 +16,8 @@
 # limitations under the License.
 
 
-__all__ = ['module_dir', 'module_rel_path', 'module_import_str', 'current_module_dir', 'current_module_rel_path', 'current_module_import_str']
+__all__ = ['module_dir', 'module_rel_path', 'module_import_str', 'current_module_dir', 'current_module_rel_path', 
+           'current_module_import_str', 'parent_module_import_str']
 
 
 """
@@ -80,11 +81,20 @@ def current_module_rel_path(library_top_module, depth: Optional[int] = 1) -> str
 
 
 def current_module_import_str(library_top_module, depth: Optional[int] = 1) -> str:
-    result: str = f'{entity_name(library_top_module)}/{current_module_rel_path(library_top_module, depth + 1)}'
+    result: str = f'{entity_name(library_top_module)}{os.path.sep}{current_module_rel_path(library_top_module, depth + 1)}'
     result = result.replace('\\', '/')
     result = result.replace('//', '/')
     result = result.strip('/')
     result = removesuffix(result, '.py')
     result = result.strip('/')
     result = result.replace('/', '.')
+    return result
+
+
+def parent_module_import_str(library_top_module, depth: Optional[int] = 1, fallback_to_current_module_if_no_parent: bool = False) -> str:
+    current_result: str = current_module_import_str(library_top_module, depth + 1)
+    result = current_result.rsplit('.', 1)[0]
+    if not result and fallback_to_current_module_if_no_parent:
+        result = current_result
+    
     return result

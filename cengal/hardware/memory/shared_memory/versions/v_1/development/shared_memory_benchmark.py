@@ -340,31 +340,35 @@ def consumer_2():
         Wait time - is a time your application would spend to other operations in an async environment.
         '''
 
-try:
-    # def write_message():
-    #     creator.wait_my_turn()
-    #     creator.put_message(None)
-    #     creator.release()
+
+if '__main__' == __name__:
+    ensure_adjusted_pythonhashseed()  # Ensure that the hash seed is adjusted for this process group
+    # ensure_adjusted_scientific()  # Ensure (for this process group) that: 1) the hash seed is adjusted; 2) interpreter optimizations ('-OO') are turned on; 3) the integer string conversion length limitation is turned off
+    try:
+        # def write_message():
+        #     creator.wait_my_turn()
+        #     creator.put_message(None)
+        #     creator.release()
 
 
-    # def read_message():
-    #     consumer.wait_my_turn()
-    #     consumer.read_message_info()
-    #     consumer.release()
+        # def read_message():
+        #     consumer.wait_my_turn()
+        #     consumer.read_message_info()
+        #     consumer.release()
 
 
-    # def full_cycle():
-    #     write_message()
-    #     read_message()
+        # def full_cycle():
+        #     write_message()
+        #     read_message()
 
 
-    # func_perf_test(full_cycle)
+        # func_perf_test(full_cycle)
 
-    p = Process(target=consumer_2)
-    
-    if with_consumer: p.start()
-    creator_2()
-    if with_consumer: p.join()
-finally:
-    if with_consumer: p.kill()
-    creator.close()
+        p = Process(target=consumer_2)
+        
+        if with_consumer: p.start()
+        creator_2()
+        if with_consumer: p.join()
+    finally:
+        if with_consumer: p.kill()
+        creator.close()

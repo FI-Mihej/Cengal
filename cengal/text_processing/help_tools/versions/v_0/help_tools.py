@@ -18,7 +18,6 @@
 from cengal.code_flow_control.smart_values.versions.v_0 import ResultExistence
 import string
 from cengal.data_manipulation.conversion.binary import ubyte_to_bytes
-from cengal.data_manipulation.conversion.sequence import get_slice_from_array
 from typing import Tuple, Union
 
 """

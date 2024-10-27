@@ -1,6 +1,6 @@
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/cengal-light?color=darkgreen)
 
-![GitHub tag (with filter)](https://img.shields.io/github/v/tag/FI-Mihej/Cengal) ![Static Badge](https://img.shields.io/badge/OS-Linux_%7C_Windows_%7C_macOS-blue) ![Static Badge](https://img.shields.io/badge/coverage-38%25-blue) ![Static Badge](https://img.shields.io/badge/covered_lines_of_code-15855-blue)
+![GitHub tag (with filter)](https://img.shields.io/github/v/tag/FI-Mihej/Cengal) ![Static Badge](https://img.shields.io/badge/OS-Linux_%7C_Windows_%7C_macOS-blue) ![Static Badge](https://img.shields.io/badge/coverage-41%25-blue) ![Static Badge](https://img.shields.io/badge/covered_lines_of_code-15855-blue)
 
 ![PyPI - Version](https://img.shields.io/pypi/v/cengal-light) ![PyPI - Format](https://img.shields.io/pypi/format/cengal-light?color=darkgreen) ![Static Badge](https://img.shields.io/badge/wheels-Linux_%7C_Windows_%7C_macOS-blue) ![Static Badge](https://img.shields.io/badge/Architecture-x86__64_%7C_ARM__64-blue) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cengal-light) ![Static Badge](https://img.shields.io/badge/PyPy-3.8_%7C_3.9_%7C_3.10-blue) ![PyPI - Implementation](https://img.shields.io/pypi/implementation/cengal-light) 
 
@@ -8,8 +8,8 @@
 
 # Cengal
 
-<!-- ![CengalLogo](https://github.com/FI-Mihej/Cengal/raw/master/docs/assets/CengalLogoRound128.png) -->
-![CengalLogo](./docs/assets/CengalLogoRound128.png) 
+![CengalLogo](https://github.com/FI-Mihej/Cengal/raw/master/docs/assets/CengalLogoRound128.png)
+<!-- ![CengalLogo](./docs/assets/CengalLogoRound128.png)  -->
 
 Cengal is a versatile Python library designed for a wide range of applications. To enhance performance, certain modules within Cengal have been implemented using Cython, C/C++, Nim or Go.
 
@@ -86,7 +86,7 @@ Below, you'll find a list of these stand-alone packages, each corresponding to a
 * [CengalPolyBuild](https://github.com/FI-Mihej/CengalPolyBuild): A Comprehensive and Hackable Build System for Multilingual Python Packages: Cython (including automatic conversion from Python to Cython), C/C++, Objective-C, Go, and Nim, with ongoing expansions to include additional languages. (Planned to be released soon) 
 * [InterProcessPyObjects](https://github.com/FI-Mihej/InterProcessPyObjects) (package for `cengal.parallel_execution.asyncio.ashared_memory_manager` module): High-performance package delivers blazing-fast inter-process communication through shared memory, enabling Python objects to be shared across processes with exceptional efficiency. 
 * [cengal_memory_barriers](https://github.com/FI-Mihej/cengal_memory_barriers) (package for `cengal.hardware.memory.barriers` module): Fast crossplatform memory barriers for Python.
-* [cengal_cpu_info](https://github.com/FI-Mihej/cengal_cpu_info) (package for `cengal.hardware.info.cpu` module): Extended, cached CPU info with consistent output format.
+* [cengal_cpu_info](https://github.com/FI-Mihej/cengal_cpu_info) (package for `cengal.hardware.cpu.info` module): Extended, cached CPU info with consistent output format.
 * [cengal_app_dir_path_finder](https://github.com/FI-Mihej/cengal_app_dir_path_finder) (package for `cengal.file_system.app_fs_structure.app_dir_path` module): Offering a unified API for easy retrieval of OS-specific application directories, enhancing data management across Windows, Linux, and macOS.
 
 Stay tuned for future additions to our collection of stand-alone packages!

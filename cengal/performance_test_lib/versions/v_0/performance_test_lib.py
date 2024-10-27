@@ -66,9 +66,9 @@ def test_run_time(test_name: str, number_of_iterations: int, throw_result: bool=
         end_time = perf_counter()
         result_time = end_time - start_time
         if result_time > 0:
-            text_result = f'>>> "{test_name}"\n\tIt was used {result_time} seconds to process {number_of_iterations} iterations.\n\tThere is {number_of_iterations / result_time} iterations per second\n'
+            text_result = f'>>> "{test_name}"\n\tIt took {result_time} seconds to process {number_of_iterations} iterations.\n\tThere are {number_of_iterations / result_time} iterations per second\n'
         else:
-            text_result = f'>>> "{test_name}"\n\tIt was used {result_time} seconds to process {number_of_iterations} iterations.\n'
+            text_result = f'>>> "{test_name}"\n\tIt took {result_time} seconds to process {number_of_iterations} iterations.\n'
 
         lprint(text_result)
 
@@ -119,8 +119,8 @@ def process_performance_test_results(tracer: Tracer, test_name: str, throw_resul
     result_time = tracer.time_spent
     iterations_per_time_unit = tracer.iter_per_time_unit
     print('>>> "{}"'.format(test_name))
-    print('\t' + 'It was used', result_time, 'seconds to process', number_of_iterations, 'iterations.')
-    print('\t' + 'There is', iterations_per_time_unit, 'iterations per second')
+    print('\t' + 'It took', result_time, 'seconds to process', number_of_iterations, 'iterations.')
+    print('\t' + 'There are', iterations_per_time_unit, 'iterations per second')
 
     if throw_result:
         result_data = (test_name, result_time, iterations_per_time_unit)

@@ -16,17 +16,19 @@
 # limitations under the License.
 
 
+from cengal.system import PYTHON_VERSION_INT
+from cengal.entities.copyable import CopyableMixin
+from cengal.data_manipulation.front_triggerable_variable import FrontTriggerableVariableType, FrontTriggerableVariable
+
+import sys
+
 from collections import namedtuple
 from dis import Instruction, dis, get_instructions, _get_code_object, code_info, show_code, findlabels, _unpack_opargs
 from opcode import hasjrel, hasjabs, opname, opmap, HAVE_ARGUMENT, EXTENDED_ARG
-from cengal.system import PYTHON_VERSION_INT
 from enum import Enum
-from typing import Optional, Callable, List, Tuple, Dict, Set, Union, Any, Sequence
 from types import CodeType
 from copy import copy
-from cengal.entities.copyable import CopyableMixin
-from cengal.data_manipulation.front_triggerable_variable import FrontTriggerableVariableType, FrontTriggerableVariable
-import sys
+from typing import Optional, Callable, List, Tuple, Dict, Set, Union, Any, Sequence
 
 
 """

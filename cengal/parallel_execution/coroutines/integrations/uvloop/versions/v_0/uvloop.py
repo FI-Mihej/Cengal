@@ -16,7 +16,10 @@
 # limitations under the License.
 
 
-__alt__ = ['uvloop_install']
+__alt__ = [
+    'uvloop_install', 
+    'uvloop_silent_install', 
+    ]
 
 
 """
@@ -42,6 +45,11 @@ with alt_import('uvloop') as uvloop:
     if uvloop:
         def uvloop_install():
             uvloop.install()
+        
+        uvloop_silent_install = uvloop_install
     else:
         def uvloop_install():
             warnings.warn(f'Uvloop is not awailable.')
+
+        def uvloop_silent_install():
+            pass

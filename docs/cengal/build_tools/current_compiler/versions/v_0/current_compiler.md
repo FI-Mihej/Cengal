@@ -52,7 +52,7 @@ cengal<wbr>.build_tools<wbr>.current_compiler<wbr>.versions<wbr>.v_0<wbr>.curren
 </span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>
 </span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>
 </span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a><span class="kn">from</span> <span class="nn">distutils</span> <span class="kn">import</span> <span class="n">sysconfig</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="kn">from</span> <span class="nn">cengal.os.execute</span> <span class="kn">import</span> <span class="n">escape_text</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="kn">from</span> <span class="nn">cengal.os.process.prepare_cmd_line</span> <span class="kn">import</span> <span class="n">escape_text</span>
 </span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>
 </span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>
 </span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a><span class="n">compiler_name_raw</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">sysconfig</span><span class="o">.</span><span class="n">get_config_var</span><span class="p">(</span><span class="s2">&quot;CC&quot;</span><span class="p">)</span>

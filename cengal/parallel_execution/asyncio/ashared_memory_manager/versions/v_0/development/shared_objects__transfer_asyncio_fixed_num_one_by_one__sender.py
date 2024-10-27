@@ -76,6 +76,8 @@ async def sender():
         print('Sender is done.')
 
 if __name__ == '__main__':
+    ensure_adjusted_pythonhashseed(pythonhashseed=0)  # Ensure that the hash seed is adjusted for this process group
+    # ensure_adjusted_scientific()  # Ensure (for this process group) that: 1) the hash seed is adjusted; 2) interpreter optimizations ('-OO') are turned on; 3) the integer string conversion length limitation is turned off
     print('Sender is starting its work.')
     asyncio.run(sender())
     print('Sender has finished its work.')

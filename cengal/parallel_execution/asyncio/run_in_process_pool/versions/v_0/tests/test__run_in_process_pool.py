@@ -42,7 +42,7 @@ async def aworker(text: str) -> str:
     return text.upper()
 
 
-async def worker(text: str) -> str:
+def worker(text: str) -> str:
     return text.upper()
 
 
@@ -55,7 +55,7 @@ async def aworker_ex(text: str) -> str:
     return text.upper()
 
 
-async def worker_ex(text: str) -> str:
+def worker_ex(text: str) -> str:
     raise MyException('test')
     return text.upper()
 

@@ -37,6 +37,8 @@ __status__ = "Development"
 from cengal.unittest.behavior_stabilizer import UnittestTestCaseWithState, UnittestTestCaseState
 from cengal.performance_test_lib import PrecisePerformanceTestTracer
 from cengal.introspection.inspect import func_name, pdi, pifrl
+
+import numpy as np
 from threading import Lock, RLock
 from pprint import pprint
 from typing import Callable
@@ -54,7 +56,7 @@ def func_perf_test(func: Callable, *args, **kwargs):
     print('{}(): {} iter/s; {} seconds; {} iterations'.format(func_name(func), tr.iter_per_time_unit, tr.time_spent, tr.iterations_made))
 
 
-from cengal.hardware.memory.shared_memory import *
+from cengal.hardware.memory.shared_memory.versions.v_1 import *
 from cengal.time_management.cpu_clock import cpu_clock
 from cengal.time_management.high_precision_sync_sleep import hps_sleep
 

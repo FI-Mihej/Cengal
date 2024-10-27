@@ -15,7 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .bysiness_relativedelta import *
+try:
+    import bdateutil
+    from .bysiness_relativedelta import *
+except ImportError:
+    from warnings import warn
+    warn('bdateutil is not installed. RelativeDelta will not work. \nPlease install latest fixed fork by running `python3 -m pip install git+https://github.com/YouCannotBurnMyShadow/python-bdateutil.git`')
+    pass
 
 """
 Module Docstring

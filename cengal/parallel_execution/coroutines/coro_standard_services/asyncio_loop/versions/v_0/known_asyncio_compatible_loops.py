@@ -48,7 +48,12 @@ try:
 except ImportError:
     pass
 
-from uvloop import Loop as UVLoop
+try:
+    from uvloop import Loop as UVLoop
+except ImportError:
+    class UVLoop:
+        pass
+
 from typing import Type, Tuple, Dict, Callable, Any
 
 

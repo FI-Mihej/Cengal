@@ -18,7 +18,7 @@
 # import pip
 # from pip._internal import main as pip_main
 
-from cengal.os.execute import prepare_py_params
+from cengal.os.process.prepare_cmd_line import prepare_py_params
 from cengal.cross_version.console_print.universal import cross_print
 
 import platform

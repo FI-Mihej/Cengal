@@ -43,10 +43,10 @@ with dir(dir1_name):
 with file(full_file1_name) as file1_data:  # provides brackets for a file content (decoded and without BOM)
     var db_path
     with inner(file1_data):
-        commented_text = Bracket('#', line_brake)
+        commented_text = Bracket('#', line_break)
 
         # uncomment only lines with env-var export command
-        text_to_uncomment = Bracket('export', line_brake)
+        text_to_uncomment = Bracket('export', line_break)
         for inner(line):
             with outer(commented_text):
                 clean_line = data

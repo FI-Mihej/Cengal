@@ -89,7 +89,7 @@ else:
 # HEX DWORD:
 
 
-def hex_dword_to_int(dword: str, byteorder=None, signed=False)->bytes:
+def hex_dword_to_int(dword: str, byteorder: str = None, signed: bool = False) -> int:
     """
     "0x008A151D" is big endian; so dword = '008A151D', byteorder = 'big'
     :param dword: str(); '008A151D'
@@ -97,13 +97,13 @@ def hex_dword_to_int(dword: str, byteorder=None, signed=False)->bytes:
     :param signed: bool();
     :return: 9049373
     """
-    byteorder = byteorder or 'big'
-    bin_dword = binascii.unhexlify(dword)
+    byteorder: str = byteorder or 'big'
+    bin_dword: bytes = binascii.unhexlify(dword)
     result = int.from_bytes(bin_dword, byteorder=byteorder, signed=signed)
     return result
 
 
-def int_to_hex_dword(int_value, byteorder=None, signed=False):
-    byteorder = byteorder or 'big'
+def int_to_hex_dword(int_value: int, byteorder: str = None, signed: bool = False):
+    byteorder: str = byteorder or 'big'
     result = (binascii.hexlify(int_value.to_bytes(4, byteorder=byteorder, signed=signed))).decode()
     return result

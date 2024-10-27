@@ -75,7 +75,7 @@ from cengal.file_system.path_manager import RelativePath, get_relative_path_part
 from cengal.file_system.directory_manager import current_src_dir
 from cengal.file_system.directory_manager import file_list_traversal, FilteringEntity
 from cengal.build_tools.prepare_cflags import prepare_compile_time_flags, prepare_compile_time_env
-from cengal.os.execute import prepare_params, escape_text, escape_param, prepare_command
+from cengal.os.process.prepare_cmd_line import prepare_params, escape_text, escape_param, prepare_command
 from setuptools.discovery import find_package_path
 import subprocess
 from pprint import pprint

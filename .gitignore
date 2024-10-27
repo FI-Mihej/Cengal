@@ -292,6 +292,7 @@ dmypy.json
 /rename_wheel.sh
 /rename_wheel.cmd
 /setup_shell_main_sdist
+/readme_update.py
 
 # Other
 .vscode/settings.json

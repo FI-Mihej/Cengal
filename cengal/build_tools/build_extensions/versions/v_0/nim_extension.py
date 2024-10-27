@@ -47,6 +47,7 @@ from cengal.file_system.path_manager import path_relative_to_src, RelativePath, 
 from cengal.file_system.directory_manager import current_src_dir, change_current_dir
 from cengal.file_system.directory_manager import filtered_file_list, FilteringType, filtered_file_list_traversal, file_list_traversal, file_list_traversal_ex, FilteringEntity
 from cengal.file_system.file_manager import current_src_file_dir, file_exists, full_ext, file_name as get_file_name, last_ext
+from cengal.build_tools.current_compiler import compiler_name, assume_compiler
 from cengal.build_tools.prepare_cflags import prepare_cflags, concat_cflags, prepare_compile_time_env, adjust_definition_names, \
     dict_of_tuples_to_dict, list_to_dict
 from cengal.introspection.inspect import get_exception, exception_to_printable_text, entity_repr_limited_try_qualname, pifrl, pdi
@@ -65,6 +66,7 @@ import importlib
 
 from os.path import isdir, exists, isfile, dirname
 
+import os
 import setuptools
 import platform
 
@@ -72,7 +74,7 @@ from cengal.file_system.path_manager import RelativePath, get_relative_path_part
 from cengal.file_system.directory_manager import current_src_dir
 from cengal.file_system.directory_manager import file_list_traversal, FilteringEntity
 from cengal.build_tools.prepare_cflags import prepare_compile_time_flags, prepare_compile_time_env
-from cengal.os.execute import prepare_params, escape_text, escape_param, prepare_command
+from cengal.os.process.prepare_cmd_line import prepare_params, escape_text, escape_param, prepare_command
 from setuptools.discovery import find_package_path
 import subprocess
 from pprint import pprint
@@ -188,8 +190,8 @@ class CengalNimBuildExtension(CengalBuildExtension):
             print('==================================================')
             print(f'<<< NIM COMPILATION: {self.module_name} -> {out_file_name} >>>')
             print('=======================')
-            params = ['nim', 'c', '--forceBuild:on', '--app:lib', f'--out:{out_file_name}', '--threads:on']
-            params_v = ['nim', 'c', '--forceBuild:on', '--app:lib', f'--out:{out_file_name}', '--threads:on']
+            params = ['nim', 'c', '--forceBuild:on', '--app:lib', f'--out:{out_file_name}', '--threads:on', '-d:release']
+            params_v = ['nim', 'c', '--forceBuild:on', '--app:lib', f'--out:{out_file_name}', '--threads:on', '-d:release']
             for name, value in self.result_definitions.items():
                 params.append(prepare_definition(name, value))
                 params_v.append(prepare_definition_v(name, value))
@@ -199,8 +201,10 @@ class CengalNimBuildExtension(CengalBuildExtension):
                 params_v.extend(self.additional_compilation_params)
             
             if 'Windows' == OS_TYPE:
-                params.extend(['--tlsEmulation:off', '--passL:-static', self.module_name])
-                params_v.extend(['--tlsEmulation:off', '--passL:-static', self.module_name])
+                # params.extend(['--tlsEmulation:off', '--passL:-static', self.module_name])
+                # params_v.extend(['--tlsEmulation:off', '--passL:-static', self.module_name])
+                params.extend(['--tlsEmulation:off', self.module_name])
+                params_v.extend(['--tlsEmulation:off', self.module_name])
             else:
                 params.extend([self.module_name,])
                 params_v.extend([self.module_name,])
@@ -212,7 +216,19 @@ class CengalNimBuildExtension(CengalBuildExtension):
                 print(prepare_command(params_v[0], params_v[1:]))
                 print('> NIM compiler params:')
                 pprint(params)
-                result = subprocess.run(params, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+
+                env = os.environ.copy()
+                additional_env = dict()
+                if 'Windows' == OS_TYPE:
+                    nim_bin_dir_path = env.get('NIM_BIN_DIR_PATH', '') # For example 'C:/Program Files/Nim/bin'
+                    if nim_bin_dir_path:
+                        additional_env['PATH'] = env.get('PATH', '') + os.pathsep + nim_bin_dir_path
+
+                env.update(additional_env)
+                with assume_compiler(env):
+                    print(f'{compiler_name=}')
+
+                result = subprocess.run(params, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
             
             successed: bool = find_text(result.stdout, '[SuccessX]') is not None
             print(f'{successed=}')

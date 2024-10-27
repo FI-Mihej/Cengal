@@ -2,6 +2,10 @@
 
 cp -R ./cengal_setup_scripts/setup/setup_shell_main/* .
 
+export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+python3 ./readme_update.py
+rm ./readme_update.py
+
 mkdir -p ./setup_shell_main_sdist
 cp -R ./cengal_setup_scripts/setup/setup_shell_main/* ./setup_shell_main_sdist
 cp -fr ./LICENSE.md ./setup_shell_main_sdist/LICENSE.md

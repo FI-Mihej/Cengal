@@ -41,7 +41,7 @@ from typing import Tuple, Optional
 from threading import current_thread, main_thread, Thread
 from cengal.time_management.sleep_tools import sleep
 from cengal.math.numbers import RationalNumber
-from signal import SIG_IGN, SIGUSR1, raise_signal, signal
+from signal import raise_signal, signal
 from cengal.system import OS_API_TYPE
 
 
@@ -63,8 +63,10 @@ class Watchdog(TypedService[None]):
         self.keyboard_interrupt_emited: bool = False
         self.period: RationalNumber = 5
         if 'nt' == OS_API_TYPE:
+            from signal import SIG_IGN
             self.raised_signal = SIG_IGN
         else:
+            from signal import SIGUSR1
             self.raised_signal = SIGUSR1
         
         self.hunged_coro: Optional[HungedCoroInfo] = None
@@ -113,7 +115,7 @@ class Watchdog(TypedService[None]):
         if self.is_in_main_thread():
             self._loop.set_coro_time_measurement(True)
             if not self.handler_set:
-                self.previous_handler = signal.signal(self.raised_signal, self.interrupt_handler)
+                self.previous_handler = signal(self.raised_signal, self.interrupt_handler)
                 self.handler_set = True
             
             if self.watchdog_thread is None:
@@ -161,5 +163,5 @@ class Watchdog(TypedService[None]):
             self.watchdog_thread = None
 
         if self.handler_set:
-            signal.signal(self.raised_signal, self.previous_handler)
+            signal(self.raised_signal, self.previous_handler)
             self.handler_set = False

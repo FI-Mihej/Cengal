@@ -15,8 +15,8 @@ SETLOCAL
     REM Normalizing the path to the internal Python library root directory
     FOR /f "tokens=*" %%i IN ('cd /D "%CURRENT_PROJECT_DIR_PATH%\..\..\..\..\..\.." ^&^& cd') DO SET "CENGAL_ROOT_DIR_PATH=%%i"
     
-    SET "PYTHON_INTERPRETER=python3"
-    IF NOT "%~1"=="" SET "PYTHON_INTERPRETER=%~1"
+    SET "PYTHON_INTERPRETER=python"
+    IF NOT "%~2"=="" SET "PYTHON_INTERPRETER=%~2"
 
     REM Make the variables available outside of the script
     ENDLOCAL & SET "SCRIPT_PATH=%SCRIPT_PATH%" & SET "SCRIPT_DIR_PATH=%SCRIPT_DIR_PATH%" & SET "COMMAND_DIR_PATH=%COMMAND_DIR_PATH%" & SET "CURRENT_PROJECT_DIR_PATH=%CURRENT_PROJECT_DIR_PATH%" & SET "CENGAL_ROOT_DIR_PATH=%CENGAL_ROOT_DIR_PATH%" & SET "PYTHON_INTERPRETER=%PYTHON_INTERPRETER%"

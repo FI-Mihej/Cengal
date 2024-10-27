@@ -113,6 +113,7 @@ def ubigint_to_bytes(int_data: int, byteorder: str = 'little') -> bytes:
     return int_data.to_bytes((int_data.bit_length() + 7) // 8, byteorder)  # Add 7 to handle cases where bit_length is not a multiple of 8
 
 
+unsigned_bigint_to_bytes = ubigint_to_bytes
 ubint_to_bytes = ubigint_to_bytes
 
 
@@ -120,6 +121,7 @@ def bytes_to_ubigint(bytes_data: bytes, byteorder: str = 'little') -> int:
     return int.from_bytes(bytes_data, byteorder)
 
 
+bytes_to_unsigned_bigint = bytes_to_ubigint
 bytes_to_ubint = bytes_to_ubigint
 
 

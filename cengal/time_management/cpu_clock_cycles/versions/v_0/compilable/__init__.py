@@ -38,7 +38,7 @@ from cengal.modules_management.ignore_in_build_mode import ignore_in_build_mode
 with ignore_in_build_mode():
     from .cpu_clock_cycles__cython import cpu_clock_cycles, set_cycles_per_second, cpu_clock, perf_counter
     try:
-        from cengal.hardware.info.cpu import cpu_info
+        from cengal.hardware.cpu.info import cpu_info
 
         CPU_TICKS_PER_SECOND = cpu_info().hz_advertised[0]
 

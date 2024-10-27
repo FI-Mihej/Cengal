@@ -79,7 +79,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 </span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="c1"># from cengal.io.asock_io.versions.v_1.base import IOCoreMemoryManagement</span>
 </span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="kn">from</span> <span class="nn">cengal.parallel_execution.asyncio.atasks</span> <span class="kn">import</span> <span class="n">create_task</span>
 </span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="kn">from</span> <span class="nn">cengal.parallel_execution.asyncio.timed_yield</span> <span class="kn">import</span> <span class="n">TimedYield</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="kn">from</span> <span class="nn">cengal.hardware.info.cpu</span> <span class="kn">import</span> <span class="n">cpu_info</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="kn">from</span> <span class="nn">cengal.hardware.cpu.info</span> <span class="kn">import</span> <span class="n">cpu_info</span>
 </span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="c1"># from cengal.data_containers.dynamic_list_of_pieces import DynamicListOfPiecesDequeWithLengthControl</span>
 </span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="c1"># from cengal.data_containers.fast_fifo import FIFODequeWithLengthControl, FIFOIsEmpty</span>
 </span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="c1"># from cengal.data_manipulation.front_triggerable_variable import FrontTriggerableVariable, FrontTriggerableVariableType</span>

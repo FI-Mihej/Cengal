@@ -186,24 +186,24 @@ def sender(shared_memory_name: str):
         
         fields_per_player: int = len(shared_dict_per_index[0]) - 2
         increments_num: int = mt.iterations * len(shared_players) * fields_per_player * control[ControlFields.sub_iterations_num]
-        print(f'It was used {mt.time_spent} seconds to made {increments_num} increments')
+        print(f'It took {mt.time_spent} seconds to made {increments_num} increments')
         increments_per_second: float = increments_num / mt.time_spent
         if mt.time_spent:
-            print(f'There is {increments_per_second} increments/seconds')
+            print(f'There are {increments_per_second} increments/seconds')
         
         print()
         increments_num: int = mt.iterations * len(shared_players) * fields_per_player
-        print(f'It was used {mt.time_spent} seconds to adjust {increments_num} player fields')
+        print(f'It took {mt.time_spent} seconds to adjust {increments_num} player fields')
         increments_per_second: float = increments_num / mt.time_spent
         if mt.time_spent:
-            print(f'There is {increments_per_second} adjustments/seconds')
+            print(f'There are {increments_per_second} adjustments/seconds')
 
         print()
         increments_num: int = mt.iterations * len(shared_players)
-        print(f'It was used {mt.time_spent} seconds to update {increments_num} players')
+        print(f'It took {mt.time_spent} seconds to update {increments_num} players')
         increments_per_second: float = increments_num / mt.time_spent
         if mt.time_spent:
-            print(f'There is {increments_per_second} player_updates/seconds')
+            print(f'There are {increments_per_second} player_updates/seconds')
         
         print()
         print(list(shared_dict_per_index[0]))
@@ -230,4 +230,6 @@ def main():
         process_receiver.join()
 
 if __name__ == '__main__':
+    ensure_adjusted_pythonhashseed()  # Ensure that the hash seed is adjusted for this process group
+    # ensure_adjusted_scientific()  # Ensure (for this process group) that: 1) the hash seed is adjusted; 2) interpreter optimizations ('-OO') are turned on; 3) the integer string conversion length limitation is turned off
     main()

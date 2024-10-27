@@ -240,20 +240,20 @@ class PyPiModules(ModulesLists):
         
         if (PYTHON_VERSION_INT[:3] >= (3, 12, 0)):
             self.windows_allowed.add('patch-ng')  # `Exception: Building py-lmdb from source on Windows requires the "patch-ng" python module.`. 2023.11.18: py-lmdb does not support 3.12 yet. Testing required
-            self._forbidden.add('lmdb')  # 2023.11.21: There is no wheels for pypy3.12 and above.
+            self._forbidden.add('lmdb')  # 2023.11.21: There are no wheels for pypy3.12 and above.
         
         if 'PyPy'.lower() == PLATFORM_NAME.lower():
             if (PYTHON_VERSION_INT[:2] == (3, 10)):
-                self.windows_forbidden.add('lmdb')  # 2023.11.21: There is no wheels for pypy3.9 on Windows.
+                self.windows_forbidden.add('lmdb')  # 2023.11.21: There are no wheels for pypy3.9 on Windows.
 
             if (PYTHON_VERSION_INT[:2] != (3, 9)) and (PYTHON_VERSION_INT[:2] != (2, 7)):
-                self.windows_allowed.add('patch-ng')  # 2023.11.21: There is only wheels for pypy2.7 and pypy3.9 on Windows
+                self.windows_allowed.add('patch-ng')  # 2023.11.21: There are only wheels for PyPy 2.7 and PyPy 3.9 on Windows
 
             if (PYTHON_VERSION_INT[:2] != (2, 7)):
-                self.osx_allowed.add('patch-ng')  # 2023.11.21: There is only wheel for pypy2.7 on OSX
+                self.osx_allowed.add('patch-ng')  # 2023.11.21: There are only wheels for pypy2.7 on OSX
             
-            self._forbidden.add('orjson')  # 2023.11.21: There is no wheels for PyPy on Windows. And for build it requires Rust build tools to be installed
-            self.arch__ARM__allowed.add('patch-ng')  # 2023.11.21: There is no prebuilt wheel for ARM
+            self._forbidden.add('orjson')  # 2023.11.21: There are no wheels for PyPy on Windows. And for build it requires Rust build tools to be installed
+            self.arch__ARM__allowed.add('patch-ng')  # 2023.11.21: There are no prebuilt wheels for ARM
             self.windows_forbidden.add('psutil')  # 2023.11.21: It won't compile under PyPy3.9 or PyPy3.10 on Windows
 
 

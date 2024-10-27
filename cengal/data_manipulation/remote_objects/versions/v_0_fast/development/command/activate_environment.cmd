@@ -1,5 +1,5 @@
 @echo off
-SETLOCAL
+@REM SETLOCAL
 
 SET "ORIGINAL_DIR=%CD%"
 SET "SCRIPT_DIR=%~dp0"
@@ -9,7 +9,7 @@ CALL "%SCRIPT_DIR%\_common.cmd" :setup_environment %*
 CALL :executeCommands
 
 cd /D "%ORIGINAL_DIR%"
-ENDLOCAL
+@REM ENDLOCAL
 GOTO :EOF
 
 :executeCommands

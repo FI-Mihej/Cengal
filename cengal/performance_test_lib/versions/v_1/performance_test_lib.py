@@ -20,14 +20,15 @@ import gc
 from cengal.code_flow_control.gc import DisableGC
 from contextlib import contextmanager
 from cengal.code_flow_control.smart_values.versions.v_2 import ValueExistence
-from cengal.parallel_execution.coroutines.coro_standard_services.lazy_print.versions.v_0.lazy_print import lprint
+from cengal.code_flow_control.context_management import Combine, Conditional
 from cengal.time_management.cpu_clock_cycles import perf_counter
 from cengal.time_management.load_best_timer import process_time
 from cengal.time_management.repeat_for_a_time import Tracer, ClockType
 from cengal.math.numbers import RationalNumber
-from cengal.introspection.inspect import is_async
-from cengal.introspection.inspect import func_name, entity_properties
-from cengal.code_inspection.auto_line_tracer import alt, LineType, OutputFields, AutoLineTracer
+from cengal.introspection.inspect import func_name, is_async, entity_properties, current_entity, entity_class
+# from cengal.code_inspection.auto_line_tracer.versions.v_0 import alt, LineType, OutputFields, AutoLineTracer
+from cengal.code_inspection.auto_line_tracer import tr, alt, LineType, OutputFields, AutoLineTracer
+from cengal.code_inspection.line_tracer import cln
 
 from typing import Union, Callable, Awaitable, List, Optional, Type, Set
 
@@ -56,6 +57,8 @@ class PerformanceTestResult(Exception):
 
 @contextmanager
 def test_run_time(test_name: str, number_of_iterations: int, throw_result: bool=False, throw_result_anyway: bool=True, ignore_index=False):
+    from cengal.parallel_execution.coroutines.coro_standard_services.lazy_print.versions.v_0.lazy_print import lprint
+
     index = ValueExistence(True, copy.copy(number_of_iterations))
     start_time = perf_counter()
     exception_occures = False
@@ -72,9 +75,9 @@ def test_run_time(test_name: str, number_of_iterations: int, throw_result: bool=
         end_time = perf_counter()
         result_time = end_time - start_time
         if result_time > 0:
-            text_result = f'>>> "{test_name}"\n\tIt was used {result_time} seconds to process {number_of_iterations} iterations.\n\tThere is {number_of_iterations / result_time} iterations per second\n'
+            text_result = f'>>> "{test_name}"\n\tIt took {result_time} seconds to process {number_of_iterations} iterations.\n\tThere are {number_of_iterations / result_time} iterations per second\n'
         else:
-            text_result = f'>>> "{test_name}"\n\tIt was used {result_time} seconds to process {number_of_iterations} iterations.\n'
+            text_result = f'>>> "{test_name}"\n\tIt took {result_time} seconds to process {number_of_iterations} iterations.\n'
 
         lprint(text_result)
 
@@ -136,8 +139,8 @@ def process_performance_test_results(tracer: Tracer, test_name: str, throw_resul
     result_time = tracer.time_spent
     iterations_per_time_unit = tracer.iter_per_time_unit
     print('>>> "{}"'.format(test_name))
-    print('\t' + 'It was used', result_time, 'seconds to process', number_of_iterations, 'iterations.')
-    print('\t' + 'There is', iterations_per_time_unit, 'iterations per second')
+    print('\t' + 'It took', result_time, 'seconds to process', number_of_iterations, 'iterations.')
+    print('\t' + 'There are', iterations_per_time_unit, 'iterations per second')
 
     if throw_result:
         result_data = (test_name, result_time, iterations_per_time_unit)
@@ -215,6 +218,8 @@ class PrecisePerformanceTestTracer(Tracer):
 
     """
 
+    __slots__ = ('suppress_exceptions', 'turn_off_gc', 'gc_was_enabled', 'while_phase', '_last_tracked_number_of_iterations_buff')
+
     def __init__(self,
                  run_time: float,
                  clock_type: ClockType=ClockType.perf_counter,
@@ -225,6 +230,8 @@ class PrecisePerformanceTestTracer(Tracer):
         self.suppress_exceptions = suppress_exceptions
         self.turn_off_gc = turn_off_gc
         self.gc_was_enabled = None
+        self.while_phase: int = 0
+        self._last_tracked_number_of_iterations_buff: int = None
 
     def __enter__(self):
         self._relevant_start_time = self._start_time = self._relevant_stop_time = self._end_time = self._clock()
@@ -244,7 +251,250 @@ class PrecisePerformanceTestTracer(Tracer):
             return True
 
 
+class PreciseWhilePerformanceTestTracer(Tracer):
+    """
+    Precise tracer.
+    At first you need to use it as a usual Tracer. After tracing was done - use it as a fast `for i in range(...)` block
+
+    Example of use:
+
+        tr = PrecisePerformanceTestTracer(10.0)
+        while tr.iter():
+            i = '456'
+            k = int('1243' + i)
+
+        with tr as fast_iter:
+            for i in fast_iter:
+                i = '456'
+                k = int('1243' + i)
+
+        print('{} iter/s; {} seconds; {} iterations'.format(tr.iter_per_time_unit, tr.time_spent, tr.iterations_made))
+
+    """
+
+    __slots__ = ('suppress_exceptions', 'turn_off_gc', 'gc_was_enabled', 'while_phase', '_last_tracked_number_of_iterations_buff')
+
+    def __init__(self,
+                 run_time: float,
+                 clock_type: ClockType=ClockType.perf_counter,
+                 suppress_exceptions: bool=False,
+                 turn_off_gc: bool=False
+                 ):
+        super().__init__(run_time, clock_type)
+        self.suppress_exceptions = suppress_exceptions
+        self.turn_off_gc = turn_off_gc
+        self.gc_was_enabled = None
+        self.while_phase: int = 0
+        self._last_tracked_number_of_iterations_buff: int = None
+
+    def __enter__(self):
+        self._relevant_start_time = self._start_time = self._relevant_stop_time = self._end_time = self._clock()
+        self._relevant_number_of_iterations_at_start = 0
+        if self.turn_off_gc:
+            self.gc_was_enabled = gc.isenabled()
+            gc.disable()
+        
+        return range(1, 1 + self._last_tracked_number_of_iterations).__iter__().__next__
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._relevant_stop_time = self._end_time = self._clock()
+        exception_handled: bool = False
+        if exc_type is not None:
+            exception_handled = issubclass(exc_type, StopIteration)
+        
+        if self.turn_off_gc and self.gc_was_enabled:
+            gc.enable()
+        
+        if exception_handled or self.suppress_exceptions:
+            return True
+
+
+class PreciseAutoWhilePerformanceTestTracer:
+    """
+    Precise tracer.
+    At first you need to use it as a usual Tracer. After tracing was done - use it as a fast `for i in range(...)` block
+
+    Example of use:
+
+        tr = PrecisePerformanceTestTracer(10.0)
+        while tr.iter():
+            i = '456'
+            k = int('1243' + i)
+
+        with tr as fast_iter:
+            for i in fast_iter:
+                i = '456'
+                k = int('1243' + i)
+
+        print('{} iter/s; {} seconds; {} iterations'.format(tr.iter_per_time_unit, tr.time_spent, tr.iterations_made))
+
+    """
+
+    __slots__ = ('__call__', 'tr', 'suppress_exceptions', 'turn_off_gc', 'gc_was_enabled', 'while_phase', '_beginning_time', '_start_time', '_end_time')
+
+    def __init__(self,
+                 run_time: float,
+                 clock_type: ClockType=ClockType.perf_counter,
+                 suppress_exceptions: bool=False,
+                 turn_off_gc: bool=False
+                 ):
+        print('PreciseAutoWhilePerformanceTestTracer')
+        self.tr: Tracer = Tracer(run_time, clock_type)
+        self.suppress_exceptions: bool = suppress_exceptions
+        self.turn_off_gc = turn_off_gc
+        self.gc_was_enabled = None
+        self.while_phase: int = 0
+        # self._iterations_made_buf = None
+        self._beginning_time: float = perf_counter()
+        self._start_time: float = None
+        self._end_time: float = None
+        self.__call__ = self._call_first
+
+    def __enter__(self):
+        self.__call__ = self._call_first
+        self._beginning_time = perf_counter()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._end_time = perf_counter()
+        exception_handled: bool = False
+        if exc_type is not None:
+            exception_handled = issubclass(exc_type, StopIteration)
+        
+        if self.turn_off_gc and self.gc_was_enabled:
+            gc.enable()
+
+        if exception_handled or self.suppress_exceptions:
+            return True
+
+    def _call_first(self):
+        result: bool = self.tr.iter()
+        if result:
+            return result
+        else:
+            self.while_phase = 1
+            # self._iterations_made_buf = self.tr._last_tracked_number_of_iterations
+            if self.turn_off_gc:
+                self.gc_was_enabled = gc.isenabled()
+                gc.disable()
+            
+            _next = range(1, 1 + self.tr._last_tracked_number_of_iterations).__iter__().__next__
+            self.__call__ = _next
+            self._start_time = perf_counter()
+            return _next()
+
+    @property
+    def iter_per_time_unit(self):
+        if self.time_spent:
+            return self.iterations_made / self.time_spent
+        else:
+            return 0
+
+    @property
+    def iterations_made(self):
+        return self.tr._last_tracked_number_of_iterations
+
+    @property
+    def total_number_of_iterations_made(self):
+        return self.tr._number_of_iterations
+
+    @property
+    def time_spent(self):
+        return self._end_time - self._start_time
+
+    @property
+    def total_time_spent(self):
+        return self._beginning_time - self._start_time
+
+
+# try:
+#     from .performance_test_lib__cython import PreciseAutoWhilePerformanceTestTracer
+# except ImportError:
+#     pass
+
+
+class MeasurePerformanceTraceLine:
+    """Example:
+        with MeasurePerformanceTraceLine(0.5, turn_off_gc=True) as pt:
+            while pt():
+                i = '456'
+                k = int('1243' + i)
+
+
+    Returns:
+        _type_: _description_
+    """    
+    __slots__ = ('name', 'measuring_obj', 'depth', 'output_fields', 'line_type', 'line_num', 'do_print', 'auto_line_tracer', 'first_line_num')
+
+    def __init__(self, measuring_time: float, name: str=None, clock_type: ClockType=ClockType.perf_counter, turn_off_gc: bool=False, raise_exceptions: bool = True, 
+                 line_type: Optional[LineType] = None, line_num: Optional[Union[int, slice]] = None, output_fields: Optional[Set[OutputFields]] = None, 
+                 do_print: Union[bool, Callable] = True, auto_line_tracer: AutoLineTracer = None, depth: int = 1) -> None:
+        self.name: str = name
+        self.measuring_obj: PreciseAutoWhilePerformanceTestTracer = PreciseAutoWhilePerformanceTestTracer(measuring_time, clock_type, not raise_exceptions, turn_off_gc)
+        self.depth: int = depth
+        self.output_fields: Set[OutputFields] = None if output_fields is None else output_fields
+        self.line_type: LineType = line_type
+        self.line_num: Optional[Union[int, slice]] = line_num
+        self.do_print: bool = do_print
+        self.auto_line_tracer: AutoLineTracer = alt if auto_line_tracer is None else auto_line_tracer
+        self.first_line_num: int = None
+
+    def __enter__(self):
+        self.first_line_num = cln(self.depth + 1) + 1
+        return self.measuring_obj.__enter__()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        last_line_num = cln(self.depth + 1)
+        # last_line_num += 2
+        suppress_exc: bool = self.measuring_obj.__exit__(exc_type, exc_val, exc_tb)
+        if not self.do_print:
+            return suppress_exc
+
+        # print('='*70)
+        # if self.name is not None:
+        #     print(f'>>> "{self.name}"')
+
+        line_num: Optional[Union[int, slice]] = self.line_num
+        line_type: LineType = self.line_type
+        if line_type is None:
+            if line_num is None:
+                line_type = LineType.exact_line
+                fln: int = min(self.first_line_num, last_line_num)
+                lln: int = max(self.first_line_num, last_line_num)
+                line_num = slice(fln, lln)
+            else:
+                line_type = LineType.relative_line
+        
+        with Combine(self.auto_line_tracer.different_output_fields(alt.default_output_fields), self.auto_line_tracer.different_print_setting(True)):
+            self.auto_line_tracer.pl(self.name, line_type=line_type, line_num=line_num, output_fields=self.output_fields, depth=self.depth + 1)
+
+        if (exc_type is not None) and (not suppress_exc):
+            print(f'\t{alt.additional_lines_prefix}Exception: {exc_type}')
+            print(f'\t{alt.additional_lines_prefix}Exception value: {exc_val}')
+            print(f'\t{alt.additional_lines_prefix}Exception traceback: {exc_tb}')
+        
+        if self.measuring_obj.iterations_made > 1:
+            print(f'{alt.additional_lines_prefix}It took {self.measuring_obj.time_spent} seconds to process {self.measuring_obj.iterations_made} iterations')
+        else:
+            print(f'{alt.additional_lines_prefix}It took {self.measuring_obj.time_spent} seconds')
+        
+        if self.measuring_obj.time_spent:
+            print(f'{alt.additional_lines_prefix}There are {self.measuring_obj.iterations_made / self.measuring_obj.time_spent} iterations/seconds')
+        
+        print()
+        return suppress_exc
+
+
+measure_performance_tl = MeasurePerformanceTraceLine
+measure_performance_trace_line = MeasurePerformanceTraceLine
+measure_performance_tl = MeasurePerformanceTraceLine
+mperformance_tl = MeasurePerformanceTraceLine
+mperformancetl = MeasurePerformanceTraceLine
+
+
 class MeasureTime:
+    __slots__ = ('name', 'iterations', 'do_print', 'raise_exceptions', 'start_time', 'stop_time', 'time_spent', 'exc_type', 'exc_value', 'exc_tb')
+
     def __init__(self, name: str=None, iterations: int = 1, do_print: Union[bool, Callable] = True, raise_exceptions: bool = True):
         self.name: str = name
         self.iterations: int = 1 if iterations < 1 else iterations
@@ -262,11 +512,12 @@ class MeasureTime:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop_time = perf_counter()
+
         self.exc_type = exc_type
         self.exc_value = exc_val
         self.exc_tb = exc_tb
 
-        self.stop_time = perf_counter()
         self.time_spent = self.stop_time - self.start_time
         if self.do_print:
             if isinstance(self.do_print, bool):
@@ -281,12 +532,12 @@ class MeasureTime:
                     print(f'\t Exception traceback: {self.exc_tb}')
                 
                 if self.iterations > 1:
-                    print(f'\t It was used {self.time_spent} secondss to process {self.iterations} iterations')
+                    print(f'\t It took {self.time_spent} seconds to process {self.iterations} iterations')
                 else:
-                    print(f'\t It was used {self.time_spent} seconds')
+                    print(f'\t It took {self.time_spent} seconds')
                 
                 if self.time_spent:
-                    print(f'\t There is {self.iterations / self.time_spent} iterations/seconds')
+                    print(f'\t There are {self.iterations / self.time_spent} iterations/seconds')
                     print()
             else:
                 self.do_print(self)
@@ -295,54 +546,73 @@ class MeasureTime:
 
 
 class MeasureTimeTraceLine:
+    __slots__ = ('measuring_class', 'measuring_obj', 'depth', 'output_fields', 'line_type', 'line_num', 'auto_line_tracer', 'first_line_num', 'last_line_num')
+
     def __init__(self, name: str=None, iterations: int = 1, raise_exceptions: bool = True, measuring_class: Type = MeasureTime, 
-                 line_type: LineType = LineType.current_line, line_num: Optional[int] = None, output_fields: Optional[Set[OutputFields]] = None, 
+                 line_type: Optional[LineType] = None, line_num: Optional[Union[int, slice]] = None, output_fields: Optional[Set[OutputFields]] = None, 
                  do_print: Union[bool, Callable] = True, auto_line_tracer: AutoLineTracer = None, depth: int = 1):
         self.measuring_class: Type = measuring_class
         self.measuring_obj: MeasureTime = self.measuring_class(name, iterations, self.printer if do_print is True else do_print, raise_exceptions)
         self.depth: int = depth
-        self.output_fields: Set[OutputFields] = {
-            OutputFields.trace_name, 
-            OutputFields.file_name,
-            OutputFields.line,
-            OutputFields.func_name,
-            OutputFields.code_line,
-            OutputFields.new_line_after_end,
-        } if output_fields is None else output_fields
+        self.output_fields: Set[OutputFields] = None if output_fields is None else output_fields
         self.line_type: LineType = line_type
-        self.line_num: Optional[int] = line_num
+        self.line_num: Optional[Union[int, slice]] = line_num
         self.auto_line_tracer: AutoLineTracer = alt if auto_line_tracer is None else auto_line_tracer
+        self.first_line_num: int = None
+        self.last_line_num: int = None
     
     def printer(self, measuring_obj: MeasureTime) -> None:
-        print('='*40)
-        if self.measuring_obj.name is not None:
-            print(f'>>> "{measuring_obj.name}"')
+        # print('='*70)
+        # if self.measuring_obj.name is not None:
+        #     print(f'>>> "{measuring_obj.name}"')
 
-        self.auto_line_tracer.pc('', line_type=self.line_type, line_num=self.line_num, output_fields=self.output_fields, depth=self.depth + 3)
+        line_num: Optional[Union[int, slice]] = self.line_num
+        line_type: LineType = self.line_type
+        if line_type is None:
+            if line_num is None:
+                line_type = LineType.exact_line
+                fln: int = min(self.first_line_num, self.last_line_num)
+                lln: int = max(self.first_line_num, self.last_line_num)
+                line_num = slice(fln, lln)
+            else:
+                line_type = LineType.relative_line
+        
+        with Combine(self.auto_line_tracer.different_output_fields(alt.default_output_fields), self.auto_line_tracer.different_print_setting(True)):
+            self.auto_line_tracer.pl(measuring_obj.name, line_type=line_type, line_num=line_num, output_fields=self.output_fields, depth=self.depth + 3)
 
         if measuring_obj.exc_type is not None:
-            print(f'\t Exception: {measuring_obj.exc_type}')
-            print(f'\t Exception value: {measuring_obj.exc_value}')
-            print(f'\t Exception traceback: {measuring_obj.exc_tb}')
+            print(f'\t{alt.additional_lines_prefix}Exception: {measuring_obj.exc_type}')
+            print(f'\t{alt.additional_lines_prefix}Exception value: {measuring_obj.exc_value}')
+            print(f'\t{alt.additional_lines_prefix}Exception traceback: {measuring_obj.exc_tb}')
         
         if measuring_obj.iterations > 1:
-            print(f'It was used {measuring_obj.time_spent} secondss to process {measuring_obj.iterations} iterations')
+            print(f'{alt.additional_lines_prefix}It took {measuring_obj.time_spent} seconds to process {measuring_obj.iterations} iterations')
         else:
-            print(f'It was used {measuring_obj.time_spent} seconds')
+            print(f'{alt.additional_lines_prefix}It took {measuring_obj.time_spent} seconds')
         
         if measuring_obj.time_spent:
-            print(f'There is {measuring_obj.iterations / measuring_obj.time_spent} iterations/seconds')
+            print(f'{alt.additional_lines_prefix}There are {measuring_obj.iterations / measuring_obj.time_spent} iterations/seconds')
         
         print()
 
     def __enter__(self):
+        self.first_line_num = cln(self.depth + 1) + 1
         return self.measuring_obj.__enter__()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        self.last_line_num = cln(self.depth + 1)
         return self.measuring_obj.__exit__(exc_type, exc_val, exc_tb)
 
 
+measure_time_trace_line = MeasureTimeTraceLine
+measure_time_tl = MeasureTimeTraceLine
+mtime_tl = MeasureTimeTraceLine
+mtimetl = MeasureTimeTraceLine
+
+
 class MeasureProcessTime:
+    __slots__ = ('name', 'iterations', 'do_print', 'raise_exceptions', 'start_time', 'stop_time', 'time_spent', 'exc_type', 'exc_value', 'exc_tb')
+
     def __init__(self, name: str=None, iterations: int = 1, do_print: Union[bool, Callable] = False, raise_exceptions: bool = True, depth: int = 1):
         self.name: str = name
         self.iterations: int = 1 if iterations < 1 else iterations
@@ -380,12 +650,12 @@ class MeasureProcessTime:
                     print(f'\t Exception traceback: {self.exc_tb}')
                 
                 if self.iterations > 1:
-                    print(f'\t It was used {self.time_spent} secondss to process {self.iterations} iterations')
+                    print(f'\t It took {self.time_spent} seconds to process {self.iterations} iterations')
                 else:
-                    print(f'\t It was used {self.time_spent} seconds')
+                    print(f'\t It took {self.time_spent} seconds')
                 
                 if self.time_spent:
-                    print(f'\t There is {self.iterations / self.time_spent} iterations/seconds')
+                    print(f'\t There are {self.iterations / self.time_spent} iterations/seconds')
                     print()
             else:
                 self.do_print(self)
@@ -424,9 +694,11 @@ def measure_func_performance(func: Callable,
             else:
                 print(f'>>> {func_name(func)}()')
 
-            print(f'\t It was used {tr.time_spent} seconds to make {tr.iterations_made} iterations. Performance: {tr.iter_per_time_unit} iterations/seconds')
+            print(f'\t It took {tr.time_spent} seconds to make {tr.iterations_made} iterations. Performance: {tr.iter_per_time_unit} iterations/seconds')
         else:
             do_print(func, run_time, name, clock_type, tr)
+    
+    return tr
 
 
 async def measure_afunc_performance(afunc: Awaitable, 
@@ -460,9 +732,11 @@ async def measure_afunc_performance(afunc: Awaitable,
             else:
                 print(f'>>> {func_name(afunc)}()')
 
-            print(f'\t It was used {tr.time_spent} seconds to make {tr.iterations_made} iterations. Performance: {tr.iter_per_time_unit} iterations/seconds')
+            print(f'\t It took {tr.time_spent} seconds to make {tr.iterations_made} iterations. Performance: {tr.iter_per_time_unit} iterations/seconds')
         else:
             do_print(afunc, run_time, name, clock_type, tr)
+    
+    return tr
 
 
 def measure_func_isolated_performance(func: Callable, 
@@ -512,10 +786,12 @@ def measure_func_isolated_performance(func: Callable,
             else:
                 print(f'>>> {func_name(func)}()')
 
-            print(f'\t It was used {tr.time_spent} seconds to make {tr.iterations_made} iterations. Performance: {tr.iter_per_time_unit} iterations/seconds')
+            print(f'\t It took {tr.time_spent} seconds to make {tr.iterations_made} iterations. Performance: {tr.iter_per_time_unit} iterations/seconds')
             print(f'\t Isolated run time: {best_measurement} seconds; Isolated performance: {best_performance} iterations/seconds')
         else:
             do_print(func, run_time, name, clock_type, tr, best_measurement, best_performance)
+    
+    return tr
 
 
 async def measure_afunc_isolated_performance(afunc: Awaitable, 
@@ -565,7 +841,9 @@ async def measure_afunc_isolated_performance(afunc: Awaitable,
             else:
                 print(f'>>> {func_name(afunc)}()')
 
-            print(f'\t It was used {tr.time_spent} seconds to make {tr.iterations_made} iterations. Performance: {tr.iter_per_time_unit} iterations/seconds')
+            print(f'\t It took {tr.time_spent} seconds to make {tr.iterations_made} iterations. Performance: {tr.iter_per_time_unit} iterations/seconds')
             print(f'\t Isolated run time: {best_measurement} seconds; Isolated performance: {best_performance} iterations/seconds')
         else:
             do_print(afunc, run_time, name, clock_type, tr, best_measurement, best_performance)
+    
+    return tr

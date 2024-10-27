@@ -34,7 +34,7 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-from cengal.hardware.memory.shared_memory import SharedMemory, wait_my_turn, FreeMemoryChunkNotFoundError, numpy_array_memory_size
+from cengal.hardware.memory.shared_memory import SharedMemory, wait_my_turn, FreeMemoryChunkNotFoundError, numpy_array_memory_size, ensure_adjusted_pythonhashseed
 from cengal.time_management.cpu_clock_cycles import perf_counter
 from cengal.performance_test_lib import measure_time
 from cengal.time_management.sleep_tools import sleep
@@ -98,6 +98,9 @@ def main():
         with wait_my_turn(creator):
             creator.put_message(None)
 
+
 if '__main__' == __name__:
+    ensure_adjusted_pythonhashseed(pythonhashseed=0)  # Ensure that the hash seed is adjusted for this process group
+    # ensure_adjusted_scientific()  # Ensure (for this process group) that: 1) the hash seed is adjusted; 2) interpreter optimizations ('-OO') are turned on; 3) the integer string conversion length limitation is turned off
     with creator:
         main()

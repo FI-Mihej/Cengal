@@ -59,14 +59,23 @@ from cengal.time_management.cpu_clock import cpu_clock
 from cengal.time_management.high_precision_sync_sleep import hps_sleep
 from multiprocessing import Process
 from multiprocessing.resource_tracker import unregister
-import _posixshmem
+from cengal.system import OS_TYPE
 
-try:
-    shm_name = '/test_shmem'
-    _posixshmem.shm_unlink(shm_name)
-    unregister(shm_name, "shared_memory")
-except FileNotFoundError:
-    pass
+if 'Windows' == OS_TYPE:
+    try:
+        shm_name = 'test_shmem'
+        # unregister(shm_name, "shared_memory")
+    except FileNotFoundError:
+        pass
+else:
+    import _posixshmem
+
+    try:
+        shm_name = '/test_shmem'
+        _posixshmem.shm_unlink(shm_name)
+        unregister(shm_name, "shared_memory")
+    except FileNotFoundError:
+        pass
 
 import unittest
 

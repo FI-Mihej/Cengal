@@ -23,7 +23,7 @@ from cengal.code_flow_control.smart_values.versions.v_0 import ResultExistence
 from cengal.data_containers.dynamic_list_of_pieces import \
     DynamicListOfPiecesDequeWithLengthControl
 from cengal.data_containers.fast_fifo import FIFODequeWithLengthControl
-from cengal.hardware.info.cpu.versions.v_0 import l2_cache_per_core
+from cengal.hardware.cpu.info.versions.v_0 import l2_cache_per_core
 
 from .abstract import *
 from .recv_buff_size_computer import RecvBuffSizeComputer

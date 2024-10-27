@@ -18,10 +18,11 @@
 
 __all__ = [
             'PLATFORM_NAME', 'PYTHON_IMPLEMENTATION', 'PYTHON_VERSION', 'PYTHON_VERSION_STR', 
-            'PYTHON_VERSION_INT', 'IS_RUNNING_IN_PYCHARM', 'RAW_OS_PLATFORM', 'OS_API_TYPE', 
+            'PYTHON_VERSION_INT', 'PVI', 'IS_RUNNING_IN_PYCHARM', 'IS_FROZEN', 'RAW_OS_PLATFORM', 'OS_API_TYPE', 
             'OS_TYPE', 'KIVY_PLATFORM', 'KIVY_TARGET_PLATFORM', 'IS_RUNNING_IN_EMSCRIPTEN', 'IS_RUNNING_IN_PYODIDE', 'IS_BUILDING_FOR_PYODIDE', 
             'CENGAL_IS_IN_BUILD_MODE', 'TEMPLATE_MODULE_NAME', 'cengal_module_rel_path', 
             'cengal_module_import_str', 'current_cengal_module_rel_path', 'current_cengal_module_import_str',
+            'parent_cengal_module_import_str',
             'CENGAL_UNITTESTS_DISCOVER_IS_RUNNING', 'IS_INSIDE_OR_FOR_WEB_BROWSER', 'IS_RUNNING_IN_WASI', 
             'CENGAL_VERSION_STR', 'CENGAL_VERSION_MAJOR_STR', 'CENGAL_VERSION_MINOR_STR', 
             'CENGAL_VERSION_MICRO_STR', 'CENGAL_VERSION', 'CENGAL_VERSION_MAJOR', 'CENGAL_VERSION_MINOR', 
@@ -61,8 +62,11 @@ PYTHON_VERSION_INT: Tuple[int, int, int, str, int] = sys.version_info  # named t
 #       sys.version_info[0] == 3
 #       (3,) > sys.version_info  # Is Python 2
 #       (3, 6) <= sys.version_info  # Is Python 3.6+
+PVI = PYTHON_VERSION_INT
 
 IS_RUNNING_IN_PYCHARM: bool = "PYCHARM_HOSTED" in os.environ
+
+IS_FROZEN: bool = getattr(sys, 'frozen', False)
 
 RAW_OS_PLATFORM: str = sys.platform  # 'emscripten', 'wasi', 'darwin', 'win32', 'cygwin', 'linux', 'linux2', 'linux3', 'darwin', 'freebsd8', 'aix', aix5', 'aix7', ...
 OS_API_TYPE: str = os.name  # The following names have currently been registered: 'posix', 'nt', 'java'. Android and iOS will return 'posix'.
@@ -118,3 +122,9 @@ def current_cengal_module_import_str(depth: Optional[int] = 1) -> str:
     from cengal.modules_management.module_rel_path import current_module_import_str
     import cengal
     return current_module_import_str(cengal, depth + 1)
+
+
+def parent_cengal_module_import_str(depth: Optional[int] = 1, fallback_to_current_module_if_no_parent: bool = False) -> str:
+    from cengal.modules_management.module_rel_path import parent_module_import_str
+    import cengal
+    return parent_module_import_str(cengal, depth + 1, fallback_to_current_module_if_no_parent)

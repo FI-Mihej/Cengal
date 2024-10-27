@@ -217,22 +217,22 @@ class TestTcpEfficientStream(TestCase):
         init_loop()
 
     def test_transmit(self):
-        port = purify_ports(used_ports().port(Protocol.tcp, used_ports().tables[Table.user], {PortStatus.no})())
+        port = purify_ports(used_ports().port(Protocol.tcp, used_ports().tables[Table.ephemeral], {PortStatus.no, PortStatus.na, PortStatus.unofficial})())
         result = asyncio.run(transmit(port))
         self.assertTrue(result)
 
     def test_msg_transmit(self):
-        port = purify_ports(used_ports().port(Protocol.tcp, used_ports().tables[Table.user], {PortStatus.no})())
+        port = purify_ports(used_ports().port(Protocol.tcp, used_ports().tables[Table.ephemeral], {PortStatus.no, PortStatus.na, PortStatus.unofficial})())
         result = asyncio.run(msg_transmit(port))
         self.assertTrue(result)
 
 
 def transmit_test():
-    port = purify_ports(used_ports().port(Protocol.tcp, used_ports().tables[Table.user], {PortStatus.no})())
+    port = purify_ports(used_ports().port(Protocol.tcp, used_ports().tables[Table.ephemeral], {PortStatus.no, PortStatus.na, PortStatus.unofficial})())
     result = asyncio.run(transmit(port))
 
 def msg_transmit_test():
-    port = purify_ports(used_ports().port(Protocol.tcp, used_ports().tables[Table.user], {PortStatus.no})())
+    port = purify_ports(used_ports().port(Protocol.tcp, used_ports().tables[Table.ephemeral], {PortStatus.no, PortStatus.na, PortStatus.unofficial})())
     result = asyncio.run(msg_transmit(port))
 
 

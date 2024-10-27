@@ -16,7 +16,7 @@
 # limitations under the License.
 
 
-__all__ = ['app_dir_path', 'app_dir_path_cached', 'AppDirPath', 'SHGetKnownFolderPathError']
+__all__ = ['app_dir_path', 'app_dir_path_cached', 'AppDirPath', 'SHGetKnownFolderPathError', 'app_dir_path', 'adp']
 
 
 """
@@ -134,3 +134,7 @@ class AppDirPath(AppDirPathBase):
     
     def base_dir_id_to_path(self, base_dir_id: BaseDirID) -> str:
         return SHGetKnownFolderPath(base_dir_id)
+
+
+app_dir_path: AppDirPath = AppDirPath()
+adp: AppDirPath = app_dir_path

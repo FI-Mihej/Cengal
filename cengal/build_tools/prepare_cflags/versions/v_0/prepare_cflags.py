@@ -67,8 +67,8 @@ except ImportError:
     uname_sysname: str = uname().system
     uname_machine: str = uname().machine
 
-from cengal.hardware.info.cpu import cpu_info
-from cengal.os.execute import escape_text, escape_param
+from cengal.hardware.cpu.info import cpu_info
+from cengal.os.process.prepare_cmd_line import escape_text, escape_param
 from cengal.build_tools.current_compiler import compiler_type, compiler_name, compiler_string
 from cengal.system import (
     PYTHON_IMPLEMENTATION,

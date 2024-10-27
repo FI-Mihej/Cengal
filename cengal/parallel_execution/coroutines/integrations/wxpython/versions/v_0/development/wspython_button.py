@@ -38,7 +38,7 @@ import wx
 # import wx.html2
 from cengal.time_management.cpu_clock_cycles import cpu_clock_cycles
 from cengal.user_interface.gui.nt.blur_behind import prepare_for_composition
-from cengal.hardware.info.cpu import cpu_info
+from cengal.hardware.cpu.info import cpu_info
 
 print(cpu_info().is_x86)
 

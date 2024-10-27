@@ -134,8 +134,8 @@ class OptionalFormatterHandy(OptionalFormatter):
         f(word=AK('HELLO!', second='WORLD!'), minutes=15, seconds=54, millisecond=341)
         >> |(word)-<"HELLO!"-"WORLD!">-:15:54.341|
     """
-    def __init__(self, *item_positions: [str, ...], **template_per_item: [str, Union[IT, Tuple[str, str, str, str, str]]]):
+    def __init__(self, *item_positions: Sequence[str], **template_per_item: Dict[str, Union[IT, Tuple[str, str, str, str, str]]]):
         super().__init__(item_positions, template_per_item)
 
-    def __call__(self, **arguments_per_item: [str, Union[AK, Any]]) -> str:
+    def __call__(self, **arguments_per_item: Dict[str, Union[AK, Any]]) -> str:
         return super(OptionalFormatterHandy, self).__call__(arguments_per_item)

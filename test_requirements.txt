@@ -1,0 +1,4 @@
+PyYAML
+tomli
+tomli_w
+git+https://github.com/YouCannotBurnMyShadow/python-bdateutil.git

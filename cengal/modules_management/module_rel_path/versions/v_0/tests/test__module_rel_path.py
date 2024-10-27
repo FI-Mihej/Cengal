@@ -32,8 +32,10 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
-import unittest
 from cengal.modules_management.module_rel_path import *
+
+import unittest
+from os.path import normpath, normcase
 
 
 class TestCaseForModuleRelPath(unittest.TestCase):
@@ -69,7 +71,7 @@ class TestCaseForModuleRelPath(unittest.TestCase):
 
     def test_current_module_rel_path(self):
         import cengal
-        self.assertEqual(current_module_rel_path(cengal), 'modules_management/module_rel_path/versions/v_0/tests/test__module_rel_path.py')
+        self.assertEqual(current_module_rel_path(cengal), normcase(normpath('modules_management/module_rel_path/versions/v_0/tests/test__module_rel_path.py')))
 
     def test_current_module_import_str(self):
         import cengal

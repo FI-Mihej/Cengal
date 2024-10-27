@@ -38,7 +38,7 @@ __status__ = "Development"
 
 try:
     from cengal.time_management.cpu_clock_cycles.versions.v_0.compilable.cpu_clock_cycles__cython import cpu_clock_cycles, set_cycles_per_second
-    from cengal.hardware.info.cpu import cpu_info
+    from cengal.hardware.cpu.info import cpu_info
 
 
     CPU_TICKS_PER_SECOND = cpu_info().hz_advertised[0]

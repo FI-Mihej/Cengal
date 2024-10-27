@@ -18,7 +18,7 @@
 from typing import Dict, List, Union, Set
 from cengal.bulk_pip_actions.install import *
 from cengal.system import IS_INSIDE_OR_FOR_WEB_BROWSER, OS_TYPE, KIVY_PLATFORM, KIVY_TARGET_PLATFORM
-from cengal.hardware.info.cpu import cpu_info
+from cengal.hardware.cpu.info import cpu_info
 
 
 """

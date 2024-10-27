@@ -33,7 +33,7 @@ cengal<wbr>.bulk_pip_actions<wbr>.bulk_install<wbr>.versions<wbr>.v_0<wbr>.bulk_
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Set</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="kn">from</span> <span class="nn">cengal.bulk_pip_actions.install</span> <span class="kn">import</span> <span class="o">*</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="kn">from</span> <span class="nn">cengal.system</span> <span class="kn">import</span> <span class="n">IS_INSIDE_OR_FOR_WEB_BROWSER</span><span class="p">,</span> <span class="n">OS_TYPE</span><span class="p">,</span> <span class="n">KIVY_PLATFORM</span><span class="p">,</span> <span class="n">KIVY_TARGET_PLATFORM</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="kn">from</span> <span class="nn">cengal.hardware.info.cpu</span> <span class="kn">import</span> <span class="n">cpu_info</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="kn">from</span> <span class="nn">cengal.hardware.cpu.info</span> <span class="kn">import</span> <span class="n">cpu_info</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>
 </span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>
 </span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="sd">&quot;&quot;&quot;</span>

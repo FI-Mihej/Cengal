@@ -38,7 +38,7 @@ cengal<wbr>.io<wbr>.asock_io<wbr>.versions<wbr>.v_1<wbr>.base    </h1>
 </span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="kn">from</span> <span class="nn">cengal.data_containers.dynamic_list_of_pieces</span> <span class="kn">import</span> \
 </span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>    <span class="n">DynamicListOfPiecesDequeWithLengthControl</span>
 </span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="kn">from</span> <span class="nn">cengal.data_containers.fast_fifo</span> <span class="kn">import</span> <span class="n">FIFODequeWithLengthControl</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="kn">from</span> <span class="nn">cengal.hardware.info.cpu.versions.v_0</span> <span class="kn">import</span> <span class="n">l2_cache_per_core</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="kn">from</span> <span class="nn">cengal.hardware.cpu.info.versions.v_0</span> <span class="kn">import</span> <span class="n">l2_cache_per_core</span>
 </span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>
 </span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="kn">from</span> <span class="nn">.abstract</span> <span class="kn">import</span> <span class="o">*</span>
 </span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="kn">from</span> <span class="nn">.recv_buff_size_computer</span> <span class="kn">import</span> <span class="n">RecvBuffSizeComputer</span>

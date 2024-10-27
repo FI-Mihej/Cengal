@@ -53,7 +53,7 @@ import asyncio
 # from efficient_streams import *
 from cengal.parallel_execution.asyncio.efficient_streams import *
 from time import perf_counter
-from cengal.hardware.info.cpu import cpu_info
+from cengal.hardware.cpu.info import cpu_info
 from cengal.io.used_ports import *
 
 

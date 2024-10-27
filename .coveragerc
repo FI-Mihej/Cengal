@@ -24,3 +24,24 @@ omit =
     ./cengal/os/help_tools/*
     ./cengal/help_tools/*
     ./cengal/cross_version/console_print/*
+    ./cengal/hardware/memory/shared_memory/versions/v_0/*
+    ./cengal/hardware/memory/shared_memory/versions/v_1/*
+    ./cengal/hardware/memory/shared_memory/versions/v_2/shared_memory.py
+    ./cengal/hardware/memory/shared_memory/versions/v_2/shared_memory_smp.py
+    ./cengal/hardware/memory/shared_memory/versions/v_2/shared_memory_single.py
+    cengal\code_flow_control\chained_flow\versions\v_0\*
+    cengal\parallel_execution\multiprocess\multiprocessing_task_runner\*
+    cengal\data_manipulation\remote_objects\versions\v_0_optimized\*
+    cengal\data_manipulation\remote_objects\versions\v_0\*
+    cengal\data_manipulation\remote_objects\versions\v_0_fast\*
+    cengal\data_containers\fast_fifo\versions\v_0\*
+    cengal\data_containers\dynamic_tag_tree\versions\v_0\*
+    cengal\parallel_execution\coroutines\coro_standard_services\lmdb\versions\v_0\*
+    cengal\data_containers\dynamic_tag_tree\versions\v_2\*
+    cengal\data_containers\dynamic_tag_tree\versions\v_0\*
+
+[report]
+exclude_also =
+    if __debug__:
+    if __name__ == '__main__':
+    if '__main__' == __name__:

@@ -17,8 +17,8 @@
 
 from cengal.modules_management.ignore_in_build_mode import ignore_in_build_mode
 with ignore_in_build_mode():
-    # from .shared_memory import *
-    from .generated_optimized_shared_memory import *
+    from .shared_memory import *
+    # from .generated_optimized_shared_memory import *
 
 """
 Module Docstring

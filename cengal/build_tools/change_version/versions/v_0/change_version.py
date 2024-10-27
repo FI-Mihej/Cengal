@@ -39,7 +39,7 @@ __status__ = "Development"
 from cengal.file_system.file_manager import path_relative_to_current_src
 from cengal.text_processing.brackets_processing import BracketPair, Bracket
 from cengal.build_tools.ensure_copyright import get_version, set_version
-from cengal.os.execute import prepare_py_command
+from cengal.os.process.prepare_cmd_line import prepare_py_command
 from os import system
 from typing import List, Union
 

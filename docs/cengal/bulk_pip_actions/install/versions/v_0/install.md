@@ -33,7 +33,7 @@ cengal<wbr>.bulk_pip_actions<wbr>.install<wbr>.versions<wbr>.v_0<wbr>.install   
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="c1"># import pip</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="c1"># from pip._internal import main as pip_main</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>
-</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="kn">from</span> <span class="nn">cengal.os.execute</span> <span class="kn">import</span> <span class="n">prepare_py_params</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="kn">from</span> <span class="nn">cengal.os.process.prepare_cmd_line</span> <span class="kn">import</span> <span class="n">prepare_py_params</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a><span class="kn">from</span> <span class="nn">cengal.cross_version.console_print.universal</span> <span class="kn">import</span> <span class="n">cross_print</span>
 </span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>
 </span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="kn">import</span> <span class="nn">platform</span>

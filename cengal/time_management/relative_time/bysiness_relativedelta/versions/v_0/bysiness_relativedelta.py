@@ -18,7 +18,7 @@
 import bdateutil.relativedelta
 from math import ceil
 from typing import Union
-from ....constants import SECONDS_PER_DAY
+from cengal.time_management.relative_time.constants import SECONDS_PER_DAY
 
 """
 Module Docstring

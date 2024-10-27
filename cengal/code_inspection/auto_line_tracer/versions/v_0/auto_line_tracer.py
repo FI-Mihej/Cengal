@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cengal.code_inspection.line_tracer import LineTracer
+from cengal.code_inspection.line_tracer.versions.v_0 import LineTracer
 from cengal.data_generation.id_generator import IDGenerator
 from cengal.introspection.inspect import intro_func_repr, intro_func_repr_limited, get_multistr_of_data_value
 from enum import Enum, IntEnum

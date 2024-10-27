@@ -15,8 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import colorama
+
+from cengal.introspection.inspect import exception_to_printable_text
 from cengal.user_interface.console.colorama_helpers import colorama_init
+
+import warnings
+try:
+    import colorama
+except ImportError as ex:
+    warnings.warn(exception_to_printable_text(ex))
 
 """
 Module Docstring

@@ -43,8 +43,8 @@ from cengal.time_management.run_time import RT
 from cengal.performance_test_lib import test_run_time, measure_time
 from cengal.introspection.inspect import pdi, gmsodi
 from cengal.code_inspection.line_tracer import nln
-from cengal.code_inspection.auto_line_tracer import AutoLineTracer, CodeStartReplType, ts, alt
-# from cengal.code_inspection.auto_line_tracer import fts as ts
+from cengal.code_inspection.auto_line_tracer import AutoLineTracer, CodeStartReplType, tr, alt
+# from cengal.code_inspection.auto_line_tracer import ftr as tr
 from cengal.parallel_execution.coroutines.integrations.nim__netty.core.versions.v_0.compilable import serve, client, connect, tick
 # import cengal.parallel_execution.coroutines.integrations.nim__netty.core.versions.v_0.compilable as netty_core
 # import cengal.parall .netty_core as mymodule
@@ -65,42 +65,42 @@ def main():
         warn(f'Can\'t find free port for the server in ther [{ports_range.start}, ..., {ports_range.stop}] range. Exiting...')
         return
     
-    server_reactors: List[NimObj] = ts(serve([{'host': host, 'port': port}]))
+    server_reactors: List[NimObj] = tr(serve([{'host': host, 'port': port}]))
     
-    client_connections: List[NimObj] = ts(connect([{'host': host, 'port': port}]))
+    client_connections: List[NimObj] = tr(connect([{'host': host, 'port': port}]))
     
-    our_connection = ts(client_connections[0])
+    our_connection = tr(client_connections[0])
     with measure_time(f'line: {nln()}'):
-        tick_result = ts(tick(dict(), {our_connection['id']: ['Hello, Nim!']}))
+        tick_result = tr(tick(dict(), {our_connection['id']: ['Hello, Nim!']}))
     
     for connection_id, messages in tick_result['server_received'].items():
         for message in messages:
             print(len(message))
-            ts(message)
+            tr(message)
     
     sleep(0.1)
     with measure_time(f'line: {nln()}'):
-        tick_result = ts(tick(dict(), dict()))
+        tick_result = tr(tick(dict(), dict()))
     
     for connection_id, messages in tick_result['server_received'].items():
         for message in messages:
             print(len(message))
-            ts(message)
+            tr(message)
     
     sleep(0.1)
     with measure_time(f'line: {nln()}'):
-        tick_result = ts(tick(dict(), dict()))
+        tick_result = tr(tick(dict(), dict()))
     
     for connection_id, messages in tick_result['server_received'].items():
         for message in messages:
             print(len(message))
-            ts(message)
+            tr(message)
 
     with RT() as rt:
         client_obj = client()
     
     print(rt.rt, 1 / rt.rt)
-    ts(client_obj)
+    tr(client_obj)
     
     print(len(client_obj))
 
@@ -140,7 +140,7 @@ def main():
     
     # for message in received_messages:
     #     print(len(message))
-    #     ts(message)
+    #     tr(message)
 
     alt.print_end()
 

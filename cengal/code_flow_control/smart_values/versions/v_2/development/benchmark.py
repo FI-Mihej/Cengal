@@ -42,19 +42,19 @@ from typing import Any, Dict, Optional, Callable, Set, Type, Tuple, List, Frozen
 
 '''
 >>> "Create: create__tuple": create__tuple()
-         It was used 15.271485328674316 seconds to make 8388608 iterations. Performance: 549298.75 iterations/seconds
+         It took 15.271485328674316 seconds to make 8388608 iterations. Performance: 549298.75 iterations/seconds
          Isolated run time: 1.1176416592206806e-07 seconds; Isolated performance: 8947411.647998959 iterations/seconds
 
 >>> "Create: create__named_tuple": create__named_tuple()
-         It was used 3.465820074081421 seconds to make 5340024 iterations. Performance: 1540767.75 iterations/seconds
+         It took 3.465820074081421 seconds to make 5340024 iterations. Performance: 1540767.75 iterations/seconds
          Isolated run time: 3.332352207507938e-07 seconds; Isolated performance: 3000883.2732235068 iterations/seconds
 
 >>> "Create: create__value_existence": create__value_existence()
-         It was used 5.389648914337158 seconds to make 1248545 iterations. Performance: 231656.09375 iterations/seconds
+         It took 5.389648914337158 seconds to make 1248545 iterations. Performance: 231656.09375 iterations/seconds
          Isolated run time: 2.481763658579439e-06 seconds; Isolated performance: 402939.2551313286 iterations/seconds
 
 >>> "Create: create__value_cache": create__value_cache()
-         It was used 4.496094226837158 seconds to make 1025354 iterations. Performance: 228054.390625 iterations/seconds
+         It took 4.496094226837158 seconds to make 1025354 iterations. Performance: 228054.390625 iterations/seconds
          Isolated run time: 2.8617650968953967e-06 seconds; Isolated performance: 349434.6901794477 iterations/seconds
 '''
 

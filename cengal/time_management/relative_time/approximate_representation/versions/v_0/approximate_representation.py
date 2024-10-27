@@ -19,9 +19,9 @@ from typing import Union, Set, Tuple, Dict
 from math import modf
 from enum import Enum
 from copy import copy
-from cengal.data_manipulation.conversion.mapping import inverse_mapping
+from cengal.data_manipulation.mapping import inverse_mapping
 from cengal.text_processing.optional_formatter.versions.v_0 import OptionalFormatter
-from ....constants import *
+from cengal.time_management.relative_time.constants import *
 
 """
 Module Docstring

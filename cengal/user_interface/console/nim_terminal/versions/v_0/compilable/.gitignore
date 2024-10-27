@@ -1,0 +1,5 @@
+compile_time_py_definitions.nim
+nim_terminal.pyd
+nim_terminal.so
+nim_terminal.dll
+nim_terminal.dylib

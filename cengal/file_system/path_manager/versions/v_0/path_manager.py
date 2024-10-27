@@ -17,7 +17,7 @@
 
 __all__ = ['RelativePath', 'relative_to_src', 'path_relative_to_src', 'relative_to_cwd', 
            'path_relative_to_cwd', 'WrongBaseDirError', 'get_relative_path_part', 'sep', 
-           'canonical_path']
+           'canonical_path', 'normalize_path_preserve_leading_dot']
 
 import os
 from os.path import normpath, expanduser, realpath, abspath, normcase, sep
@@ -47,7 +47,7 @@ class RelativePath:
         self.base_path: str = base_path
 
     def __call__(self, relative_path: str):
-        return normpath(os.path.join(self.base_path, relative_path))
+        return normcase(normpath(os.path.join(self.base_path, relative_path)))
 
 
 def relative_to_src(depth: Optional[int] = 1) -> RelativePath:
@@ -86,12 +86,14 @@ class WrongBaseDirError(Exception):
 
 
 def get_relative_path_part(path: str, base_dir: str) -> str:
-    path = normpath(path)
-    base_dir = normpath(base_dir)
+    original_path = path
+    path = normcase(normpath(path))
+    base_dir = normcase(normpath(base_dir))
     if not path.startswith(base_dir):
         raise WrongBaseDirError
     
-    relative_part = removeprefix(path, base_dir)
+    relative_part = original_path[len(base_dir):]
+    # relative_part = removeprefix(path, base_dir)
     if relative_part.startswith(sep):
         relative_part = removeprefix(relative_part, sep)
     
@@ -110,3 +112,12 @@ def canonical_path(path: str, resolve_symlinks: bool = True) -> str:
         path = abspath(path)
     
     return normcase(path)
+
+
+def normalize_path_preserve_leading_dot(path: str):
+    leading_dot = path.startswith('./')
+    path = removeprefix(path, './')
+    if leading_dot:
+        return f'.{sep}{normcase(normpath(path))}'
+    else:
+        return normcase(normpath(path))

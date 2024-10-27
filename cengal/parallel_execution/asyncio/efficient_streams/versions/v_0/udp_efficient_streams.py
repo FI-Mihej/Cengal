@@ -61,16 +61,30 @@ from cengal.io.asock_io.versions.v_1.recv_buff_size_computer.recv_buff_size_comp
 # from cengal.io.asock_io.versions.v_1.base import IOCoreMemoryManagement
 from cengal.parallel_execution.asyncio.atasks import create_task
 from cengal.parallel_execution.asyncio.timed_yield import TimedYield
-from cengal.hardware.info.cpu import cpu_info
+from cengal.hardware.cpu.info import cpu_info
 # from cengal.data_containers.dynamic_list_of_pieces import DynamicListOfPiecesDequeWithLengthControl
 # from cengal.data_containers.fast_fifo import FIFODequeWithLengthControl, FIFOIsEmpty
 # from cengal.data_manipulation.front_triggerable_variable import FrontTriggerableVariable, FrontTriggerableVariableType
 from cengal.data_containers.dynamic_list_of_pieces.versions.v_1.dynamic_list_of_pieces__python import DynamicListOfPiecesDequeWithLengthControl
 from cengal.code_flow_control.smart_values.versions import ValueExistence
+from cengal.system import OS_TYPE
 from typing import Sequence, Tuple, Type, Set, Optional, Union, List
 from .efficient_streams_base_internal import *
 from .efficient_streams_base import *
 from .efficient_streams_abstract import *
+
+
+if 'Windows' == OS_TYPE:
+    known_transport_classes: Tuple = (
+            proactor_events._ProactorDatagramTransport,
+            proactor_events._ProactorSocketTransport,
+            selector_events._SelectorTransport,
+            )
+else:
+    known_transport_classes = (
+            selector_events._SelectorTransport,
+            unix_events._UnixReadPipeTransport
+            )
 
 
 class UdpStreamManager(StreamManagerAbstract):
@@ -318,11 +332,7 @@ class UdpStreamReader(OriginalStreamReader, StreamReaderAbstract):
         return '<{}>'.format(' '.join(info))
 
     def _maybe_resume_transport(self):
-        if isinstance(self._transport, (
-            proactor_events._ProactorDatagramTransport,
-            selector_events._SelectorTransport,
-            unix_events._UnixReadPipeTransport
-            )):
+        if isinstance(self._transport, known_transport_classes):
             # if hasattr(self._transport, 'max_size'):
             try:
                 self._transport.max_size = self.recv_buff_size_computer.recv_buff_size

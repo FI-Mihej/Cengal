@@ -34,9 +34,10 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
+from cengal.data_manipulation.get_dict_key_with_callable_default import get_dict_key_with_callable_default
+
 from copy import deepcopy
 from typing import Callable, Dict, Hashable, Any
-from cengal.data_manipulation.get_dict_key_with_callable_default import get_dict_key_with_callable_default
 
 
 def copy__impl(self):

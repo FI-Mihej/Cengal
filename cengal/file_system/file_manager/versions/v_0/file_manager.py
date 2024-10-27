@@ -19,6 +19,7 @@
 __all__ = [
     'get_file_hash', 
     'get_file_modification_date', 
+    'get_executable_src_path',
     'current_src_file_dir', 
     'path_relative_to_current_src', 
     'path_relative_to_current_dir', 
@@ -28,16 +29,24 @@ __all__ = [
     'last_ext', 
     'has_ext', 
     'file_name', 
+    'gen_random_file_name', 
+    'gen_random_file_path', 
+    'AtomicFileCreator', 
+    'atomic_file_creator', 
+    'RemoveFileAfterUsage', 
+    'remove_file_after_usage', 
 ]
 
 
+import sys
 import hashlib
-# import os
 import datetime
 import inspect
+import uuid
+
+from os import getcwd, extsep, rename, remove
+from os.path import exists, isfile, isdir, normpath, dirname, getmtime, realpath, join, basename, abspath
 from typing import Optional
-from os import getcwd, extsep
-from os.path import exists, isfile, normpath, dirname, getmtime, realpath, join, basename
 
 """
 Module Docstring
@@ -68,6 +77,15 @@ def get_file_hash(full_file_name, hash_format_string=None):
 def get_file_modification_date(full_file_name):
     time_stamp = getmtime(full_file_name)
     return datetime.datetime.fromtimestamp(time_stamp)
+
+
+def get_executable_src_path():
+    if getattr(sys, 'frozen', False):
+        # If the application is run as a frozen executable (e.g., with PyInstaller)
+        return normpath(realpath(abspath(sys.executable)))
+    else:
+        # If the application is run as a normal Python script
+        return normpath(realpath(abspath(sys.argv[0])))
 
 
 def current_src_file_dir() -> str:
@@ -106,3 +124,103 @@ def has_ext(file_path: str) -> str:
 
 def file_name(file_path: str) -> str:
     return basename(normpath(file_path)).split(extsep)[0]
+
+
+def gen_random_file_name(dir_path: str, prefix: str = str(), ext: Optional[str] = None) -> str:
+    """Returns a random file name (without path) that does not exist in the specified directory.
+    Does not create a file.
+
+    Args:
+        dir_path (str): _description_
+        prefix (str, optional): _description_. Defaults to str().
+        ext (Optional[str], optional): _description_. Defaults to None.
+
+    Raises:
+        ValueError: _description_
+
+    Returns:
+        str: _description_
+    """
+    if exists(dir_path):
+        if isdir(dir_path):
+            pass
+        else:
+            raise ValueError('dir_path is not a directory')
+    
+    if ext is not None:
+        if not ext.startswith(extsep):
+            ext = extsep + ext
+    else:
+        ext = str()
+    
+    file_name: str = str()
+    while True:
+        file_name = prefix + str(uuid.uuid4()) + ext
+        if not exists(join(dir_path, file_name)):
+            break
+    
+    return file_name
+
+
+def gen_random_file_path(dir_path: str, prefix: str = str(), ext: Optional[str] = None) -> str:
+    """Returns a random full file name (with given path) that does not exist in the specified directory.
+    Does not create a file.
+
+    Args:
+        dir_path (str): _description_
+        prefix (str, optional): _description_. Defaults to str().
+        ext (Optional[str], optional): _description_. Defaults to None.
+
+    Raises:
+        ValueError: _description_
+
+    Returns:
+        str: _description_
+    """
+    file_name: str = gen_random_file_name(dir_path, prefix, ext)
+    return join(dir_path, file_name)
+
+
+class AtomicFileCreator:
+    def __init__(self, file_path: str, prefix: str = str(), ext: Optional[str] = None):
+        self.file_path: str = normpath(file_path)
+        self.dir_path: str = dirname(self.file_path)
+        self.prefix: str = prefix if prefix else 'atomic__'
+        self.ext: str = 'tmp' if ext is None else ext
+        self.temp_file_path: str = None
+    
+    def __enter__(self):
+        self.temp_file_path = join(self.dir_path, gen_random_file_name(self.dir_path, self.prefix, self.ext))
+        return self.temp_file_path
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is None:
+            if self.temp_file_path is not None:
+                if file_exists(self.temp_file_path):
+                    rename(self.temp_file_path, self.file_path)
+        else:
+            if self.temp_file_path is not None:
+                if file_exists(self.temp_file_path):
+                    remove(self.temp_file_path)
+
+        return False
+
+
+atomic_file_creator = AtomicFileCreator
+
+
+class RemoveFileAfterUsage:
+    def __init__(self, file_path: str):
+        self.file_path: str = file_path
+    
+    def __enter__(self):
+        return self.file_path
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if file_exists(self.file_path):
+            remove(self.file_path)
+        
+        return False
+
+
+remove_file_after_usage = RemoveFileAfterUsage

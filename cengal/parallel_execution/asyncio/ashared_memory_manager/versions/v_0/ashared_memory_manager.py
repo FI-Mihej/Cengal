@@ -47,10 +47,13 @@ from cengal.time_management.sleep_tools import get_usable_min_sleep_interval
 from cengal.code_flow_control.smart_values import ValueHolder
 
 import asyncio
-from typing import Any, Coroutine
+from typing import Any, Coroutine, Optional
 
 
 class ASharedMemoryContextManager:
+    __slots__ = ('ashared_memory_management', '_if_has_messages_value', 'shared_memory', 'shared_memory_holder', 
+                    'client_iteration_done', '_entered', '_if_has_messages_original_value', '_if_has_messages_value')
+
     def __init__(self, ashared_memory_management: 'ASharedMemoryManager', if_has_messages: Optional[bool] = None):
         self.ashared_memory_management: 'ASharedMemoryManager' = ashared_memory_management
         self._if_has_messages_original_value: Optional[bool] = if_has_messages
@@ -72,10 +75,12 @@ class ASharedMemoryContextManager:
         return self.shared_memory_holder
     
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        self.client_iteration_done.set_result(bool(self.shared_memory_holder))
+        release_readyness = self.ashared_memory_management._loop.create_future()
+        self.client_iteration_done.set_result((bool(self.shared_memory_holder), release_readyness))
         self.client_iteration_done = None
         self.if_has_messages_value = self._if_has_messages_original_value
         self._entered = False
+        await release_readyness
 
     @property
     def save_cpu_time(self):
@@ -121,7 +126,42 @@ class ASharedMemoryContextManager:
 ASMCM = ASharedMemoryContextManager
 
 
+class HighPerformance:
+    __slots__ = ('ashared_memory_management', 'save_cpu_time_value')
+
+    def __init__(self, ashared_memory_management: 'ASharedMemoryManager'):
+        self.ashared_memory_management: 'ASharedMemoryManager' = ashared_memory_management
+        self.save_cpu_time_value: bool = None
+
+    def __enter__(self) -> ValueHolder[SharedMemory]:
+        self.save_cpu_time_value = self.ashared_memory_management.save_cpu_time
+        self.ashared_memory_management.save_cpu_time = False
+        return self.save_cpu_time_value
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.ashared_memory_management.save_cpu_time = self.save_cpu_time_value
+
+
+class SaveCPU:
+    __slots__ = ('ashared_memory_management', 'save_cpu_time_value')
+
+    def __init__(self, ashared_memory_management: 'ASharedMemoryManager'):
+        self.ashared_memory_management: 'ASharedMemoryManager' = ashared_memory_management
+        self.save_cpu_time_value: bool = None
+
+    def __enter__(self) -> ValueHolder[SharedMemory]:
+        self.save_cpu_time_value = self.ashared_memory_management.save_cpu_time
+        self.ashared_memory_management.save_cpu_time = True
+        return self.save_cpu_time_value
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.ashared_memory_management.save_cpu_time = self.save_cpu_time_value
+
+
 class ASharedMemoryManager:
+    __slots__ = ('shared_memory', '_save_cpu_time', '_asleep_func', '_save_cpu_time', 'time_limit', '_loop', 'requests_from_clients', 
+                    'clients_readyness', 'closed', 'close_requested', 'close_requests', 'has_messages_requests', 'worker_task', 'initiation_readyness')
+
     def __init__(self, shared_memory: SharedMemory, save_cpu_time: bool = False, time_limit: Optional[RationalNumber] = None):
         self.shared_memory: SharedMemory = shared_memory
         self._save_cpu_time: bool = None
@@ -136,10 +176,12 @@ class ASharedMemoryManager:
         self.close_requests: List[asyncio.Future] = list()
         self.has_messages_requests: List[asyncio.Future] = list()
         self.worker_task: asyncio.Task = None
+        self.initiation_readyness: asyncio.Future = None
     
     async def __aenter__(self) -> 'ASharedMemoryManager':
         self.closed = False
         self.run()
+        await self.initiation_readyness
         return self
     
     async def __aexit__(self, exc_type, exc_val, exc_tb):
@@ -164,6 +206,12 @@ class ASharedMemoryManager:
             self.shared_memory._asleep_func = self._asleep_func = self._sleep_for_minimal_time
         else:
             self.shared_memory._asleep_func = self._asleep_func = self._sleep_till_next_loop_iteration
+    
+    def high_performance(self) -> HighPerformance:
+        return HighPerformance(self)
+    
+    def save_cpu(self) -> SaveCPU:
+        return SaveCPU(self)
 
     async def aclose(self) -> None:
         if self.closed:
@@ -188,6 +236,7 @@ class ASharedMemoryManager:
             return
         
         self._loop = asyncio.get_event_loop()
+        self.initiation_readyness = self._loop.create_future()
         self.worker_task = create_task_awaitable(self.worker())
     
     def get_in_line(self) -> asyncio.Future:
@@ -211,9 +260,14 @@ class ASharedMemoryManager:
                 else:
                     await self.shared_memory.ainit_consumer(self.time_limit)
                 
+                self.initiation_readyness.set_result(True)
+                await asyncio.sleep(0)
                 while not self.close_requested:
                     if self.requests_from_clients or self.has_messages_requests:
-                        if self.shared_memory.get_in_line():
+                        is_in_line: bool = self.shared_memory.is_in_line()
+                        if is_in_line or self.shared_memory.get_in_line():
+                            client_results: List[Tuple[bool, asyncio.Future]] = None
+                            fast_sleep_required_poll: bool = False
                             try:
                                 if self.shared_memory.has_messages():
                                     has_messages_requests_buff = self.has_messages_requests
@@ -231,9 +285,17 @@ class ASharedMemoryManager:
                                 client_results = await asyncio.gather(*self.clients_readyness, return_exceptions=True)
                                 self.clients_readyness.clear()
                             finally:
-                                self.shared_memory.release()
+                                if not is_in_line:
+                                    self.shared_memory.release()
                             
-                            if any(client_results):
+                            if client_results is not None:
+                                for fast_sleep_required, release_readyness in client_results:
+                                    if fast_sleep_required:
+                                        fast_sleep_required_poll = True
+                                    
+                                    release_readyness.set_result(None)
+
+                            if fast_sleep_required_poll:
                                 await asyncio.sleep(0)
                             else:
                                 await asyncio.sleep(get_usable_min_sleep_interval())

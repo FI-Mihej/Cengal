@@ -254,6 +254,8 @@ def consumer_process():
 
 
 if '__main__' == __name__:
+    ensure_adjusted_pythonhashseed()  # Ensure that the hash seed is adjusted for this process group
+    # ensure_adjusted_scientific()  # Ensure (for this process group) that: 1) the hash seed is adjusted; 2) interpreter optimizations ('-OO') are turned on; 3) the integer string conversion length limitation is turned off
     try:
         p = Process(target=consumer_process)
         p.start()

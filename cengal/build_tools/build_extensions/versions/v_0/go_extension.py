@@ -47,6 +47,7 @@ from cengal.file_system.path_manager import path_relative_to_src, RelativePath, 
 from cengal.file_system.directory_manager import current_src_dir, change_current_dir, ensure_dir
 from cengal.file_system.directory_manager import filtered_file_list, FilteringType, filtered_file_list_traversal, file_list_traversal, file_list_traversal_ex, FilteringEntity
 from cengal.file_system.file_manager import current_src_file_dir, file_exists, full_ext, file_name as get_file_name, last_ext
+from cengal.build_tools.current_compiler import compiler_name, assume_compiler
 from cengal.build_tools.prepare_cflags import prepare_cflags, concat_cflags, prepare_compile_time_env, adjust_definition_names, \
     dict_of_tuples_to_dict, list_to_dict
 from cengal.introspection.inspect import get_exception, exception_to_printable_text, entity_repr_limited_try_qualname, pifrl, pdi
@@ -70,11 +71,11 @@ import platform
 import sys
 import os
 
-from cengal.file_system.path_manager import RelativePath, get_relative_path_part
+from cengal.file_system.path_manager import RelativePath, get_relative_path_part, normalize_path_preserve_leading_dot
 from cengal.file_system.directory_manager import current_src_dir
 from cengal.file_system.directory_manager import file_list_traversal, FilteringEntity
 from cengal.build_tools.prepare_cflags import prepare_compile_time_flags, prepare_compile_time_env
-from cengal.os.execute import prepare_params, escape_text, escape_param, prepare_command
+from cengal.os.process.prepare_cmd_line import prepare_params, escape_text, escape_param, prepare_command
 from setuptools.discovery import find_package_path
 import subprocess
 from pprint import pprint
@@ -146,6 +147,10 @@ def prepare_definition_v(name: str, value: Optional[Union[bool, int, str]] = Non
     return wrap_definition_pair(name, prepare_definition_value_v(value))
 
 
+# def normalize_path_preserve_leading_dot(path: str) -> str:
+#     return path
+
+
 class CengalGoBuildExtension(CengalBuildExtension):
     base_class: Optional[Type] = None
     store_as_data: bool = True
@@ -215,14 +220,110 @@ class CengalGoBuildExtension(CengalBuildExtension):
 
             env = os.environ.copy()
             additional_env = dict()
+            additional_env['GOPY_PYTHON'] = normpath(sys.executable)
             additional_env['LD_LIBRARY_PATH'] = f"{env.get('LD_LIBRARY_PATH', '')}{os.pathsep}."
+
+            # Go compiler have no support for Visual Studio C/C++ compiler (cl.exe) and MSVC environment. Even clang/clang-cl is not supported.
+            # We need to use MinGW compiler instead. I've successfully tested it with LLVM-MinGW compiler (https://www.mingw-w64.org/downloads/).
+            # We need to add an appropriate bin directory to the PATH environment variable.
+            # https://github.com/mstorsjo/llvm-mingw/releases
+            #
+            # Discussion and suggestions for Go compiler support for MSVC compiler and environment variables:
+            # https://github.com/golang/go/issues/20982
+            #
+            # Alternative solutions:
+            # https://github.com/swig/cccl
+            # https://trac.ffmpeg.org/wiki/CompilationGuide/MSVC
+            # 
+            # Suggested solution for UWP apps for Microsoft Store (from the https://github.com/golang/go/issues/20982 discussion 
+            #   by this comment: https://github.com/golang/go/issues/20982#issuecomment-729541323):
+            # https://github.com/status-im/mingw-windows10-uwp/blob/master/README.md
+            # 
+            # An additional links:
+            # https://learn.microsoft.com/en-us/vcpkg/users/platforms/mingw
+            # https://stackoverflow.com/questions/41566495/golang-how-to-cross-compile-on-linux-for-windows
+            # https://stackoverflow.com/questions/76570143/is-there-a-way-to-call-go-code-from-microsoft-visual-studio-c
+
+            if 'Windows' == OS_TYPE:
+                additional_env['NoDefaultCurrentDirectoryInExePath'] = '1'
+                gopath = env.get('GOPATH', '') # For example 'C:/Program Files/LLVM/mingw-w64/bin'
+                if gopath:
+                    additional_env['PATH'] = env.get('PATH', '') + os.pathsep + gopath
+
+                go_bin_dir_path = env.get('GO_BIN_DIR_PATH', '') # For example 'C:/Program Files/Go/bin'
+                if go_bin_dir_path:
+                    additional_env['PATH'] = env.get('PATH', '') + os.pathsep + go_bin_dir_path
+
+                mingw_bin_dir_path = env.get('MINGW_BIN_DIR_PATH', '') # For example 'C:/Program Files/LLVM/mingw-w64/bin'
+                if mingw_bin_dir_path:
+                    additional_env['PATH'] = env.get('PATH', '') + os.pathsep + mingw_bin_dir_path
+
+            # print(f'{compiler_name=}')
+            # if 'msvc' in compiler_name.lower():
+            #     additional_env['NoDefaultCurrentDirectoryInExePath'] = '1'
+            #     additional_env['CC'] = 'clang'
+            #     additional_env['CXX'] = 'clang++'
+            #     additional_env['CGO_ENABLED'] = '1'
+            #     additional_env['CGO_CFLAGS'] = ''
+            #     additional_env['CGO_CPPFLAGS'] = ''
+            #     additional_env['CGO_CXXFLAGS'] = ''
+            #     additional_env['CGO_LDFLAGS'] = ''
+
+            # print(f'{compiler_name=}')
+            # if 'msvc' in compiler_name.lower():
+            #     additional_env['NoDefaultCurrentDirectoryInExePath'] = '1'
+            #     additional_env['CC'] = 'clang'
+            #     additional_env['CXX'] = 'clang'
+
+            # print(f'{compiler_name=}')
+            # wrapper_script = 'clang-cl-wrapper.bat'
+            # if 'msvc' in compiler_name.lower():
+            #     additional_env['NoDefaultCurrentDirectoryInExePath'] = '1'
+            #     additional_env['CC'] = wrapper_script
+            #     additional_env['CXX'] = wrapper_script
+            #     additional_env['CGO_ENABLED'] = '1'
+            #     additional_env['CGO_CFLAGS'] = ''
+            #     additional_env['CGO_CPPFLAGS'] = ''
+            #     additional_env['CGO_CXXFLAGS'] = ''
+            #     additional_env['CGO_LDFLAGS'] = ''
+            #     additional_env.pop('GOGCCFLAGS', None)
+
+            # print(f'{compiler_name=}')
+            # if 'msvc' in compiler_name.lower():
+            #     additional_env['NoDefaultCurrentDirectoryInExePath'] = '1'
+            #     additional_env['CC'] = 'clang-cl'
+            #     additional_env['CXX'] = 'clang-cl'
+            #     additional_env['CGO_ENABLED'] = '1'
+            #     additional_env['CGO_CFLAGS'] = ''
+            #     additional_env['CGO_CPPFLAGS'] = ''
+            #     additional_env['CGO_CXXFLAGS'] = ''
+            #     additional_env['CGO_LDFLAGS'] = ''
+            #     additional_env.pop('GOGCCFLAGS', None)
+
+            # print(f'{compiler_name=}')
+            # if 'msvc' in compiler_name.lower():
+            #     additional_env['NoDefaultCurrentDirectoryInExePath'] = '1'
+            #     additional_env['CC'] = 'cl.exe'
+            #     additional_env['CXX'] = 'cl.exe'
+            #     additional_env['CGO_ENABLED'] = '1'
+            #     additional_env['CGO_CFLAGS'] = '-O2'
+            #     additional_env['CGO_CPPFLAGS'] = ''
+            #     additional_env['CGO_CXXFLAGS'] = '-O2'
+            #     additional_env['CGO_LDFLAGS'] = '-O2'
+            #     additional_env.pop('GOGCCFLAGS', None)
+            # else:
+            #     additional_env['LD_LIBRARY_PATH'] = f"{env.get('LD_LIBRARY_PATH', '')}{os.pathsep}."
+
             env.update(additional_env)
-            params = ['gopy', 'build', f'-output={self.out_dir_name}', f'-vm={sys.executable}']
+            with assume_compiler(env):
+                print(f'{compiler_name=}')
+
+            params = ['gopy', 'build', f'-output={normalize_path_preserve_leading_dot(self.out_dir_name)}', f'-vm={normalize_path_preserve_leading_dot(sys.executable)}']
             if self.additional_build_params:
                 params.extend(self.additional_build_params)
             
-            params.append(self.src_dir)
-            params.append(f'./{get_file_name(self.definitions_module_name)}')
+            params.append(normalize_path_preserve_leading_dot(self.src_dir))
+            params.append(normalize_path_preserve_leading_dot(f'./{get_file_name(self.definitions_module_name)}'))
             if self.additional_go_packages:
                 params.extend(self.additional_go_packages)
                 
@@ -239,7 +340,8 @@ class CengalGoBuildExtension(CengalBuildExtension):
                 result = subprocess.run(params, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
                 compiler_output = result.stdout
 
-            successed: bool = find_text(compiler_output, 'cmd had error:') is None
+            # successed: bool = find_text(compiler_output, 'cmd had error:') is None
+            successed: bool = (result.returncode == 0)
             print(f'{successed=}')
             print('> Go compiler output:')
             print(compiler_output)

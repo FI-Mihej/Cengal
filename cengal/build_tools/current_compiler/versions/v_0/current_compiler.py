@@ -16,7 +16,7 @@
 # limitations under the License.
 
 
-__all__ = ['compiler_type', 'compiler_name', 'compiler_string', 'compiler_string_escaped']
+__all__ = ['compiler_type', 'compiler_name', 'compiler_string', 'compiler_string_escaped', 'assume_compiler']
 
 
 """
@@ -36,36 +36,68 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
+from cengal.os.process.prepare_cmd_line import escape_text
+
+import os
 from distutils import sysconfig
-from cengal.os.execute import escape_text
+from contextlib import contextmanager
+from typing import Union, Dict, Optional
 
 
-compiler_name_raw: str = sysconfig.get_config_var("CC")
-if compiler_name_raw is None:
-    if sysconfig.get_config_var("VSINSTALLDIR") is None:
-        compiler_name_raw = str()
+compiler_name_raw: Union[str, None] = None
+compiler_name: str = str()
+compiler_string: str = str()
+compiler_string_escaped: str = str()
+compiler_type: str = str()
+
+
+def check_compiler():
+    global compiler_name_raw, compiler_name, compiler_string, compiler_string_escaped, compiler_type
+    compiler_name_raw = sysconfig.get_config_var("CC")
+    if compiler_name_raw is None:
+        if sysconfig.get_config_var("VSINSTALLDIR") is None:
+            if 'VSCMD_ARG_TGT_ARCH' in os.environ:
+                compiler_name_raw = 'msvc'
+            else:
+                compiler_name_raw = str()
+        else:
+            compiler_name_raw = 'msvc'
+
+    compiler_name = compiler_name_raw.split()[0] if compiler_name_raw else str()
+    compiler_string = compiler_name_raw
+    compiler_string_escaped = escape_text(compiler_name_raw)
+
+    if "gcc" in compiler_name_raw.lower():
+        compiler_type = 'gcc'
+    elif "msvc" in compiler_name_raw.lower():
+        compiler_type = 'msvc'
+    elif "clang" in compiler_name_raw.lower():
+        compiler_type = 'clang'
+    elif "icc" in compiler_name_raw.lower():
+        compiler_type = 'icc'
+    elif "llvm" in compiler_name_raw.lower():
+        compiler_type = 'llvm'
+    elif "intel" in compiler_name_raw.lower():
+        compiler_type = 'intel'
+    elif "arm" in compiler_name_raw.lower():
+        compiler_type = 'arm'
+    elif "mingw" in compiler_name_raw.lower():
+        compiler_type = 'mingw'
     else:
-        compiler_name_raw = 'msvc'
+        compiler_type = 'unknown'
 
-compiler_name: str = compiler_name_raw.split()[0] if compiler_name_raw else str()
-compiler_string: str = compiler_name_raw
-compiler_string_escaped: str = escape_text(compiler_name_raw)
 
-if "gcc" in compiler_name_raw.lower():
-    compiler_type: str = 'gcc'
-elif "msvc" in compiler_name_raw.lower():
-    compiler_type = 'msvc'
-elif "clang" in compiler_name_raw.lower():
-    compiler_type = 'clang'
-elif "icc" in compiler_name_raw.lower():
-    compiler_type = 'icc'
-elif "llvm" in compiler_name_raw.lower():
-    compiler_type = 'llvm'
-elif "intel" in compiler_name_raw.lower():
-    compiler_type = 'intel'
-elif "arm" in compiler_name_raw.lower():
-    compiler_type = 'arm'
-elif "mingw" in compiler_name_raw.lower():
-    compiler_type = 'mingw'
-else:
-    compiler_type = 'unknown'
+@contextmanager
+def assume_compiler(env: Optional[Dict[str, str]] = None):
+    env = env or dict()
+    old_env = os.environ
+    os.environ = env
+    try:
+        check_compiler()
+        yield
+    finally:
+        os.environ = old_env
+        check_compiler()
+
+
+check_compiler()

@@ -32,6 +32,12 @@ __status__ = "Development"
 # __status__ = "Production"
 
 
+from unittest import TestCase, main, SkipTest
+try:
+    import numba
+except ImportError:
+    raise SkipTest('numba is not installed')
+
 from cengal.data_manipulation.remote_objects.versions.v_0_fast_optimized_numba.remote_objects import *
 from cengal.data_manipulation.remote_objects.versions.v_0_fast.remote_objects import RemoteObjectsManager as FastRemoteObjectsManager
 from cengal.data_manipulation.remote_objects.versions.v_0.remote_objects import RemoteObjectsManager as UniversalRemoteObjectsManager
@@ -49,49 +55,48 @@ from dataclasses import dataclass
 from pickle import loads as pickle_loads, dumps as pickle_dumps
 from marshal import loads as marshal_loads, dumps as marshal_dumps
 from pprint import pprint
-from unittest import TestCase, main, SkipTest
 from typing import Any, Dict, Optional, Callable, Set, Type, Tuple, List, FrozenSet, Deque, Generator
 
 
 '''
 >>> "DataClass": func()
-         It was used 0.375 seconds to make 1842 iterations. Performance: 4912.0 iterations/seconds
+         It took 0.375 seconds to make 1842 iterations. Performance: 4912.0 iterations/seconds
          Isolated run time: 6.055354606360197e-05 seconds; Isolated performance: 16514.309483207762 iterations/seconds
 
 >>> "DataClass": func_marshal()
-         It was used 1.75 seconds to make 5318 iterations. Performance: 3038.857177734375 iterations/seconds
+         It took 1.75 seconds to make 5318 iterations. Performance: 3038.857177734375 iterations/seconds
          Isolated run time: 4.380743484944105e-05 seconds; Isolated performance: 22827.175419807973 iterations/seconds
 
 >>> "TestDataType.small": func()
-         It was used 0.0625 seconds to make 97 iterations. Performance: 1552.0 iterations/seconds
+         It took 0.0625 seconds to make 97 iterations. Performance: 1552.0 iterations/seconds
          Isolated run time: 0.00015537731815129519 seconds; Isolated performance: 6435.945811770753 iterations/seconds
 
 >>> "TestDataType.small": func_marshal()
-         It was used 0.0625 seconds to make 223 iterations. Performance: 3568.0 iterations/seconds
+         It took 0.0625 seconds to make 223 iterations. Performance: 3568.0 iterations/seconds
          Isolated run time: 0.0001032799482345581 seconds; Isolated performance: 9682.421584186986 iterations/seconds
 
 >>> "TestDataType.deep_small": func()
-         It was used 0.4375 seconds to make 2 iterations. Performance: 4.5714287757873535 iterations/seconds
+         It took 0.4375 seconds to make 2 iterations. Performance: 4.5714287757873535 iterations/seconds
          Isolated run time: 0.21644665556959808 seconds; Isolated performance: 4.620076006110668 iterations/seconds
 
 >>> "TestDataType.deep_small": func_marshal()
-         It was used 0.5 seconds to make 2 iterations. Performance: 4.0 iterations/seconds
+         It took 0.5 seconds to make 2 iterations. Performance: 4.0 iterations/seconds
          Isolated run time: 0.15614438650663942 seconds; Isolated performance: 6.404328854675022 iterations/seconds
 
 >>> "TestDataType.large": func()
-         It was used 0.0625 seconds to make 63 iterations. Performance: 1008.0 iterations/seconds
+         It took 0.0625 seconds to make 63 iterations. Performance: 1008.0 iterations/seconds
          Isolated run time: 0.00015381828416138887 seconds; Isolated performance: 6501.177707526514 iterations/seconds
 
 >>> "TestDataType.large": func_marshal()
-         It was used 0.125 seconds to make 96 iterations. Performance: 768.0 iterations/seconds
+         It took 0.125 seconds to make 96 iterations. Performance: 768.0 iterations/seconds
          Isolated run time: 0.000106387073174119 seconds; Isolated performance: 9399.638228258656 iterations/seconds
 
 >>> "TestDataType.deep_large": func()
-         It was used 0.6875 seconds to make 2 iterations. Performance: 2.909090995788574 iterations/seconds
+         It took 0.6875 seconds to make 2 iterations. Performance: 2.909090995788574 iterations/seconds
          Isolated run time: 0.28062836138997227 seconds; Isolated performance: 3.5634317039337318 iterations/seconds
 
 >>> "TestDataType.deep_large": func_marshal()
-         It was used 0.25 seconds to make 2 iterations. Performance: 8.0 iterations/seconds
+         It took 0.25 seconds to make 2 iterations. Performance: 8.0 iterations/seconds
          Isolated run time: 0.12075315089896321 seconds; Isolated performance: 8.28135740190102 iterations/seconds
 
 === Serializers on DataClass: ==========================================================================
@@ -221,451 +226,451 @@ from typing import Any, Dict, Optional, Callable, Set, Type, Tuple, List, Frozen
 
 === RemoteObjectsManager: ==============================================================================
 >>> "0, Serializers.marshal, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 256 iterations. Performance: 4096.0 iterations/seconds
+         It took 0.0625 seconds to make 256 iterations. Performance: 4096.0 iterations/seconds
          Isolated run time: 0.0002806582488119602 seconds; Isolated performance: 3563.0522325035795 iterations/seconds
 
 >>> "0, Serializers.marshal, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 798 iterations. Performance: 12768.0 iterations/seconds
+         It took 0.0625 seconds to make 798 iterations. Performance: 12768.0 iterations/seconds
          Isolated run time: 9.579467587172985e-05 seconds; Isolated performance: 10438.993512948582 iterations/seconds
 
 >>> "0, Serializers.marshal, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 200 iterations. Performance: 1600.0 iterations/seconds
+         It took 0.125 seconds to make 200 iterations. Performance: 1600.0 iterations/seconds
          Isolated run time: 0.0003355335211381316 seconds; Isolated performance: 2980.328155017103 iterations/seconds
 
 >>> "0, Serializers.marshal, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 216 iterations. Performance: 3456.0 iterations/seconds
+         It took 0.0625 seconds to make 216 iterations. Performance: 3456.0 iterations/seconds
          Isolated run time: 0.00012660003267228603 seconds; Isolated performance: 7898.892116312302 iterations/seconds
 
 >>> "0, Serializers.pickle, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 377 iterations. Performance: 6032.0 iterations/seconds
+         It took 0.0625 seconds to make 377 iterations. Performance: 6032.0 iterations/seconds
          Isolated run time: 0.00017896434292197227 seconds; Isolated performance: 5587.705258337388 iterations/seconds
 
 >>> "0, Serializers.pickle, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.1875 seconds to make 1008 iterations. Performance: 5376.0 iterations/seconds
+         It took 0.1875 seconds to make 1008 iterations. Performance: 5376.0 iterations/seconds
          Isolated run time: 7.234816439449787e-05 seconds; Isolated performance: 13822.050750966264 iterations/seconds
 
 >>> "0, Serializers.pickle, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 125 iterations. Performance: 1000.0 iterations/seconds
+         It took 0.125 seconds to make 125 iterations. Performance: 1000.0 iterations/seconds
          Isolated run time: 0.00019822618924081326 seconds; Isolated performance: 5044.742088973719 iterations/seconds
 
 >>> "0, Serializers.pickle, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 408 iterations. Performance: 6528.0 iterations/seconds
+         It took 0.0625 seconds to make 408 iterations. Performance: 6528.0 iterations/seconds
          Isolated run time: 8.212903048843145e-05 seconds; Isolated performance: 12175.962556149474 iterations/seconds
 
 >>> "0, Serializers.cloudpickle, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 50 iterations. Performance: 800.0 iterations/seconds
+         It took 0.0625 seconds to make 50 iterations. Performance: 800.0 iterations/seconds
          Isolated run time: 0.0009289330337196589 seconds; Isolated performance: 1076.5038637885154 iterations/seconds
 
 >>> "0, Serializers.cloudpickle, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.125 seconds to make 98 iterations. Performance: 784.0 iterations/seconds
+         It took 0.125 seconds to make 98 iterations. Performance: 784.0 iterations/seconds
          Isolated run time: 0.0007491244468837976 seconds; Isolated performance: 1334.891691440311 iterations/seconds
 
 >>> "0, Serializers.cloudpickle, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.1875 seconds to make 88 iterations. Performance: 469.3333435058594 iterations/seconds
+         It took 0.1875 seconds to make 88 iterations. Performance: 469.3333435058594 iterations/seconds
          Isolated run time: 0.0009302576072514057 seconds; Isolated performance: 1074.9710533995624 iterations/seconds
 
 >>> "0, Serializers.cloudpickle, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.125 seconds to make 92 iterations. Performance: 736.0 iterations/seconds
+         It took 0.125 seconds to make 92 iterations. Performance: 736.0 iterations/seconds
          Isolated run time: 0.000772637315094471 seconds; Isolated performance: 1294.2683202890987 iterations/seconds
 
 >>> "0, Serializers.msgspec_messagepack, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 263 iterations. Performance: 2104.0 iterations/seconds
+         It took 0.125 seconds to make 263 iterations. Performance: 2104.0 iterations/seconds
          Isolated run time: 0.00028666818980127573 seconds; Isolated performance: 3488.353558492906 iterations/seconds
 
 >>> "0, Serializers.msgspec_messagepack, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 697 iterations. Performance: 11152.0 iterations/seconds
+         It took 0.0625 seconds to make 697 iterations. Performance: 11152.0 iterations/seconds
          Isolated run time: 0.00010353734251111746 seconds; Isolated performance: 9658.351042693836 iterations/seconds
 
 >>> "0, Serializers.msgspec_messagepack, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 201 iterations. Performance: 1608.0 iterations/seconds
+         It took 0.125 seconds to make 201 iterations. Performance: 1608.0 iterations/seconds
          Isolated run time: 0.0003793839132413268 seconds; Isolated performance: 2635.8524046429407 iterations/seconds
 
 >>> "0, Serializers.msgspec_messagepack, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 335 iterations. Performance: 5360.0 iterations/seconds
+         It took 0.0625 seconds to make 335 iterations. Performance: 5360.0 iterations/seconds
          Isolated run time: 0.0001441108761355281 seconds; Isolated performance: 6939.101522494088 iterations/seconds
 
 >>> "0, Serializers.orjson, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 211 iterations. Performance: 3376.0 iterations/seconds
+         It took 0.0625 seconds to make 211 iterations. Performance: 3376.0 iterations/seconds
          Isolated run time: 0.0003095826832577586 seconds; Isolated performance: 3230.154831261669 iterations/seconds
 
 >>> "0, Serializers.orjson, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.125 seconds to make 658 iterations. Performance: 5264.0 iterations/seconds
+         It took 0.125 seconds to make 658 iterations. Performance: 5264.0 iterations/seconds
          Isolated run time: 0.00011941057164222002 seconds; Isolated performance: 8374.46790721526 iterations/seconds
 
 >>> "0, Serializers.orjson, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 132 iterations. Performance: 2112.0 iterations/seconds
+         It took 0.0625 seconds to make 132 iterations. Performance: 2112.0 iterations/seconds
          Isolated run time: 0.00040324265137314796 seconds; Isolated performance: 2479.8964013224677 iterations/seconds
 
 >>> "0, Serializers.orjson, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 207 iterations. Performance: 3312.0 iterations/seconds
+         It took 0.0625 seconds to make 207 iterations. Performance: 3312.0 iterations/seconds
          Isolated run time: 0.00016040436457842588 seconds; Isolated performance: 6234.24432762909 iterations/seconds
 
 >>> "0, Serializers.msgspec_json, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 130 iterations. Performance: 2080.0 iterations/seconds
+         It took 0.0625 seconds to make 130 iterations. Performance: 2080.0 iterations/seconds
          Isolated run time: 0.00029032560996711254 seconds; Isolated performance: 3444.408504345441 iterations/seconds
 
 >>> "0, Serializers.msgspec_json, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 442 iterations. Performance: 7072.0 iterations/seconds
+         It took 0.0625 seconds to make 442 iterations. Performance: 7072.0 iterations/seconds
          Isolated run time: 0.00011189084034413099 seconds; Isolated performance: 8937.282059232053 iterations/seconds
 
 >>> "0, Serializers.msgspec_json, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 212 iterations. Performance: 1696.0 iterations/seconds
+         It took 0.125 seconds to make 212 iterations. Performance: 1696.0 iterations/seconds
          Isolated run time: 0.00037433707620948553 seconds; Isolated performance: 2671.389139771938 iterations/seconds
 
 >>> "0, Serializers.msgspec_json, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 563 iterations. Performance: 9008.0 iterations/seconds
+         It took 0.0625 seconds to make 563 iterations. Performance: 9008.0 iterations/seconds
          Isolated run time: 0.00014174007810652256 seconds; Isolated performance: 7055.167552881307 iterations/seconds
 
 >>> "0, Serializers.cbor, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 242 iterations. Performance: 3872.0 iterations/seconds
+         It took 0.0625 seconds to make 242 iterations. Performance: 3872.0 iterations/seconds
          Isolated run time: 0.00027696089819073677 seconds; Isolated performance: 3610.6179844611943 iterations/seconds
 
 >>> "0, Serializers.cbor, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.125 seconds to make 696 iterations. Performance: 5568.0 iterations/seconds
+         It took 0.125 seconds to make 696 iterations. Performance: 5568.0 iterations/seconds
          Isolated run time: 9.596534073352814e-05 seconds; Isolated performance: 10420.428796024922 iterations/seconds
 
 >>> "0, Serializers.cbor, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 209 iterations. Performance: 1672.0 iterations/seconds
+         It took 0.125 seconds to make 209 iterations. Performance: 1672.0 iterations/seconds
          Isolated run time: 0.00035776791628450155 seconds; Isolated performance: 2795.108097968146 iterations/seconds
 
 >>> "0, Serializers.cbor, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.125 seconds to make 373 iterations. Performance: 2984.0 iterations/seconds
+         It took 0.125 seconds to make 373 iterations. Performance: 2984.0 iterations/seconds
          Isolated run time: 0.00013779383152723312 seconds; Isolated performance: 7257.218911155419 iterations/seconds
 
 >>> "0, Serializers.msgpack, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 155 iterations. Performance: 2480.0 iterations/seconds
+         It took 0.0625 seconds to make 155 iterations. Performance: 2480.0 iterations/seconds
          Isolated run time: 0.0003367925528436899 seconds; Isolated performance: 2969.186793343717 iterations/seconds
 
 >>> "0, Serializers.msgpack, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 492 iterations. Performance: 7872.0 iterations/seconds
+         It took 0.0625 seconds to make 492 iterations. Performance: 7872.0 iterations/seconds
          Isolated run time: 0.00013641652185469866 seconds; Isolated performance: 7330.490371724402 iterations/seconds
 
 >>> "0, Serializers.msgpack, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 192 iterations. Performance: 1536.0 iterations/seconds
+         It took 0.125 seconds to make 192 iterations. Performance: 1536.0 iterations/seconds
          Isolated run time: 0.00042097328696399927 seconds; Isolated performance: 2375.447637573065 iterations/seconds
 
 >>> "0, Serializers.msgpack, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.1875 seconds to make 288 iterations. Performance: 1536.0 iterations/seconds
+         It took 0.1875 seconds to make 288 iterations. Performance: 1536.0 iterations/seconds
          Isolated run time: 0.0001829200191423297 seconds; Isolated performance: 5466.870191074614 iterations/seconds
 
 >>> "0, Serializers.ujson, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 97 iterations. Performance: 1552.0 iterations/seconds
+         It took 0.0625 seconds to make 97 iterations. Performance: 1552.0 iterations/seconds
          Isolated run time: 0.00034592265728861094 seconds; Isolated performance: 2890.8196064349663 iterations/seconds
 
 >>> "0, Serializers.ujson, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 202 iterations. Performance: 3232.0 iterations/seconds
+         It took 0.0625 seconds to make 202 iterations. Performance: 3232.0 iterations/seconds
          Isolated run time: 0.00013985077384859324 seconds; Isolated performance: 7150.478845992164 iterations/seconds
 
 >>> "0, Serializers.ujson, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 170 iterations. Performance: 2720.0 iterations/seconds
+         It took 0.0625 seconds to make 170 iterations. Performance: 2720.0 iterations/seconds
          Isolated run time: 0.00041919376235455275 seconds; Isolated performance: 2385.5316796298202 iterations/seconds
 
 >>> "0, Serializers.ujson, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.125 seconds to make 440 iterations. Performance: 3520.0 iterations/seconds
+         It took 0.125 seconds to make 440 iterations. Performance: 3520.0 iterations/seconds
          Isolated run time: 0.00017518852837383747 seconds; Isolated performance: 5708.136310535612 iterations/seconds
 
 >>> "0, Serializers.cbor2, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 124 iterations. Performance: 1984.0 iterations/seconds
+         It took 0.0625 seconds to make 124 iterations. Performance: 1984.0 iterations/seconds
          Isolated run time: 0.0004588782321661711 seconds; Isolated performance: 2179.227363388803 iterations/seconds
 
 >>> "0, Serializers.cbor2, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 311 iterations. Performance: 4976.0 iterations/seconds
+         It took 0.0625 seconds to make 311 iterations. Performance: 4976.0 iterations/seconds
          Isolated run time: 0.00023057474754750729 seconds; Isolated performance: 4336.988376378734 iterations/seconds
 
 >>> "0, Serializers.cbor2, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 124 iterations. Performance: 1984.0 iterations/seconds
+         It took 0.0625 seconds to make 124 iterations. Performance: 1984.0 iterations/seconds
          Isolated run time: 0.0005508470349013805 seconds; Isolated performance: 1815.386008529632 iterations/seconds
 
 >>> "0, Serializers.cbor2, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.125 seconds to make 281 iterations. Performance: 2248.0 iterations/seconds
+         It took 0.125 seconds to make 281 iterations. Performance: 2248.0 iterations/seconds
          Isolated run time: 0.0002779026981443167 seconds; Isolated performance: 3598.381759793831 iterations/seconds
 
 >>> "0, Serializers.json, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 115 iterations. Performance: 1840.0 iterations/seconds
+         It took 0.0625 seconds to make 115 iterations. Performance: 1840.0 iterations/seconds
          Isolated run time: 0.00043530913535505533 seconds; Isolated performance: 2297.218042953223 iterations/seconds
 
 >>> "0, Serializers.json, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.125 seconds to make 377 iterations. Performance: 3016.0 iterations/seconds
+         It took 0.125 seconds to make 377 iterations. Performance: 3016.0 iterations/seconds
          Isolated run time: 0.00020241155289113522 seconds; Isolated performance: 4940.429465198752 iterations/seconds
 
 >>> "0, Serializers.json, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 156 iterations. Performance: 1248.0 iterations/seconds
+         It took 0.125 seconds to make 156 iterations. Performance: 1248.0 iterations/seconds
          Isolated run time: 0.000503272982314229 seconds; Isolated performance: 1986.9932127125971 iterations/seconds
 
 >>> "0, Serializers.json, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.125 seconds to make 307 iterations. Performance: 2456.0 iterations/seconds
+         It took 0.125 seconds to make 307 iterations. Performance: 2456.0 iterations/seconds
          Isolated run time: 0.00023740611504763365 seconds; Isolated performance: 4212.191416380989 iterations/seconds
 
 >>> "0, Serializers.simplejson, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.1875 seconds to make 128 iterations. Performance: 682.6666870117188 iterations/seconds
+         It took 0.1875 seconds to make 128 iterations. Performance: 682.6666870117188 iterations/seconds
          Isolated run time: 0.0004994800547137856 seconds; Isolated performance: 2002.0819461410217 iterations/seconds
 
 >>> "0, Serializers.simplejson, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.1875 seconds to make 133 iterations. Performance: 709.3333129882812 iterations/seconds
+         It took 0.1875 seconds to make 133 iterations. Performance: 709.3333129882812 iterations/seconds
          Isolated run time: 0.00026223529130220413 seconds; Isolated performance: 3813.369264808771 iterations/seconds
 
 >>> "0, Serializers.simplejson, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 50 iterations. Performance: 800.0 iterations/seconds
+         It took 0.0625 seconds to make 50 iterations. Performance: 800.0 iterations/seconds
          Isolated run time: 0.0006034626858308911 seconds; Isolated performance: 1657.1032865489067 iterations/seconds
 
 >>> "0, Serializers.simplejson, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 237 iterations. Performance: 3792.0 iterations/seconds
+         It took 0.0625 seconds to make 237 iterations. Performance: 3792.0 iterations/seconds
          Isolated run time: 0.0003024700563400984 seconds; Isolated performance: 3306.112387123691 iterations/seconds
 
 >>> "0, Serializers.msgspec_toml, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 23 iterations. Performance: 184.0 iterations/seconds
+         It took 0.125 seconds to make 23 iterations. Performance: 184.0 iterations/seconds
          Isolated run time: 0.003502200823277235 seconds; Isolated performance: 285.53473957105507 iterations/seconds
 
 >>> "0, Serializers.msgspec_toml, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 24 iterations. Performance: 384.0 iterations/seconds
+         It took 0.0625 seconds to make 24 iterations. Performance: 384.0 iterations/seconds
          Isolated run time: 0.00302437343634665 seconds; Isolated performance: 330.64699880712124 iterations/seconds
 
 >>> "0, Serializers.msgspec_toml, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 24 iterations. Performance: 384.0 iterations/seconds
+         It took 0.0625 seconds to make 24 iterations. Performance: 384.0 iterations/seconds
          Isolated run time: 0.0033045709133148193 seconds; Isolated performance: 302.611148688257 iterations/seconds
 
 >>> "0, Serializers.msgspec_toml, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.125 seconds to make 26 iterations. Performance: 208.0 iterations/seconds
+         It took 0.125 seconds to make 26 iterations. Performance: 208.0 iterations/seconds
          Isolated run time: 0.00302398344501853 seconds; Isolated performance: 330.6896410584921 iterations/seconds
 
 >>> "0, Serializers.msgspec_yaml, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 16 iterations. Performance: 128.0 iterations/seconds
+         It took 0.125 seconds to make 16 iterations. Performance: 128.0 iterations/seconds
          Isolated run time: 0.0025470209075137973 seconds; Isolated performance: 392.61554432080493 iterations/seconds
 
 >>> "0, Serializers.msgspec_yaml, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 39 iterations. Performance: 624.0 iterations/seconds
+         It took 0.0625 seconds to make 39 iterations. Performance: 624.0 iterations/seconds
          Isolated run time: 0.0019713385263457894 seconds; Isolated performance: 507.2695463694253 iterations/seconds
 
 >>> "0, Serializers.msgspec_yaml, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 34 iterations. Performance: 544.0 iterations/seconds
+         It took 0.0625 seconds to make 34 iterations. Performance: 544.0 iterations/seconds
          Isolated run time: 0.0024683665251359344 seconds; Isolated performance: 405.12622003935553 iterations/seconds
 
 >>> "0, Serializers.msgspec_yaml, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 44 iterations. Performance: 704.0 iterations/seconds
+         It took 0.0625 seconds to make 44 iterations. Performance: 704.0 iterations/seconds
          Isolated run time: 0.0020248856162652373 seconds; Isolated performance: 493.85505628926904 iterations/seconds
 
 >>> "1, Serializers.marshal, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 91 iterations. Performance: 1456.0 iterations/seconds
+         It took 0.0625 seconds to make 91 iterations. Performance: 1456.0 iterations/seconds
          Isolated run time: 0.0008453736081719398 seconds; Isolated performance: 1182.908941482605 iterations/seconds
 
 >>> "1, Serializers.marshal, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 128 iterations. Performance: 2048.0 iterations/seconds
+         It took 0.0625 seconds to make 128 iterations. Performance: 2048.0 iterations/seconds
          Isolated run time: 0.0002721799537539482 seconds; Isolated performance: 3674.0398629944807 iterations/seconds
 
 >>> "1, Serializers.marshal, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 40 iterations. Performance: 320.0 iterations/seconds
+         It took 0.125 seconds to make 40 iterations. Performance: 320.0 iterations/seconds
          Isolated run time: 0.0009854146046563983 seconds; Isolated performance: 1014.8012778323774 iterations/seconds
 
 >>> "1, Serializers.marshal, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 129 iterations. Performance: 2064.0 iterations/seconds
+         It took 0.0625 seconds to make 129 iterations. Performance: 2064.0 iterations/seconds
          Isolated run time: 0.00032548257149755955 seconds; Isolated performance: 3072.3611264313054 iterations/seconds
 
 >>> "1, Serializers.pickle, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 81 iterations. Performance: 648.0 iterations/seconds
+         It took 0.125 seconds to make 81 iterations. Performance: 648.0 iterations/seconds
          Isolated run time: 0.0009101399919018149 seconds; Isolated performance: 1098.7320729752958 iterations/seconds
 
 >>> "1, Serializers.pickle, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.125 seconds to make 266 iterations. Performance: 2128.0 iterations/seconds
+         It took 0.125 seconds to make 266 iterations. Performance: 2128.0 iterations/seconds
          Isolated run time: 0.00029449432622641325 seconds; Isolated performance: 3395.6511584239474 iterations/seconds
 
 >>> "1, Serializers.pickle, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 79 iterations. Performance: 632.0 iterations/seconds
+         It took 0.125 seconds to make 79 iterations. Performance: 632.0 iterations/seconds
          Isolated run time: 0.001000366173684597 seconds; Isolated performance: 999.6339603494905 iterations/seconds
 
 >>> "1, Serializers.pickle, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.25 seconds to make 205 iterations. Performance: 820.0 iterations/seconds
+         It took 0.25 seconds to make 205 iterations. Performance: 820.0 iterations/seconds
          Isolated run time: 0.000346930930390954 seconds; Isolated performance: 2882.4181195752913 iterations/seconds
 
 >>> "1, Serializers.cloudpickle, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 34 iterations. Performance: 544.0 iterations/seconds
+         It took 0.0625 seconds to make 34 iterations. Performance: 544.0 iterations/seconds
          Isolated run time: 0.001132475328631699 seconds; Isolated performance: 883.0214440152432 iterations/seconds
 
 >>> "1, Serializers.cloudpickle, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 165 iterations. Performance: 2640.0 iterations/seconds
+         It took 0.0625 seconds to make 165 iterations. Performance: 2640.0 iterations/seconds
          Isolated run time: 0.0004302131710574031 seconds; Isolated performance: 2324.429067436828 iterations/seconds
 
 >>> "1, Serializers.cloudpickle, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 60 iterations. Performance: 480.0 iterations/seconds
+         It took 0.125 seconds to make 60 iterations. Performance: 480.0 iterations/seconds
          Isolated run time: 0.0011957543902099133 seconds; Isolated performance: 836.2921417536684 iterations/seconds
 
 >>> "1, Serializers.cloudpickle, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 176 iterations. Performance: 2816.0 iterations/seconds
+         It took 0.0625 seconds to make 176 iterations. Performance: 2816.0 iterations/seconds
          Isolated run time: 0.000480318209156394 seconds; Isolated performance: 2081.953132187822 iterations/seconds
 
 >>> "1, Serializers.msgspec_messagepack, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 93 iterations. Performance: 1488.0 iterations/seconds
+         It took 0.0625 seconds to make 93 iterations. Performance: 1488.0 iterations/seconds
          Isolated run time: 0.0008552558720111847 seconds; Isolated performance: 1169.2407298513378 iterations/seconds
 
 >>> "1, Serializers.msgspec_messagepack, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.125 seconds to make 199 iterations. Performance: 1592.0 iterations/seconds
+         It took 0.125 seconds to make 199 iterations. Performance: 1592.0 iterations/seconds
          Isolated run time: 0.0002988508203998208 seconds; Isolated performance: 3346.1510952592976 iterations/seconds
 
 >>> "1, Serializers.msgspec_messagepack, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 38 iterations. Performance: 304.0 iterations/seconds
+         It took 0.125 seconds to make 38 iterations. Performance: 304.0 iterations/seconds
          Isolated run time: 0.0011214744299650192 seconds; Isolated performance: 891.6832816519872 iterations/seconds
 
 >>> "1, Serializers.msgspec_messagepack, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.125 seconds to make 100 iterations. Performance: 800.0 iterations/seconds
+         It took 0.125 seconds to make 100 iterations. Performance: 800.0 iterations/seconds
          Isolated run time: 0.0003879438154399395 seconds; Isolated performance: 2577.6928519042663 iterations/seconds
 
 >>> "1, Serializers.orjson, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 68 iterations. Performance: 544.0 iterations/seconds
+         It took 0.125 seconds to make 68 iterations. Performance: 544.0 iterations/seconds
          Isolated run time: 0.0009632299188524485 seconds; Isolated performance: 1038.173732385055 iterations/seconds
 
 >>> "1, Serializers.orjson, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.1875 seconds to make 235 iterations. Performance: 1253.3333740234375 iterations/seconds
+         It took 0.1875 seconds to make 235 iterations. Performance: 1253.3333740234375 iterations/seconds
          Isolated run time: 0.0003308698069304228 seconds; Isolated performance: 3022.336819661172 iterations/seconds
 
 >>> "1, Serializers.orjson, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 60 iterations. Performance: 960.0 iterations/seconds
+         It took 0.0625 seconds to make 60 iterations. Performance: 960.0 iterations/seconds
          Isolated run time: 0.0011929599568247795 seconds; Isolated performance: 838.2511032990848 iterations/seconds
 
 >>> "1, Serializers.orjson, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.125 seconds to make 101 iterations. Performance: 808.0 iterations/seconds
+         It took 0.125 seconds to make 101 iterations. Performance: 808.0 iterations/seconds
          Isolated run time: 0.00044839445035904646 seconds; Isolated performance: 2230.1792522170203 iterations/seconds
 
 >>> "1, Serializers.msgspec_json, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 57 iterations. Performance: 912.0 iterations/seconds
+         It took 0.0625 seconds to make 57 iterations. Performance: 912.0 iterations/seconds
          Isolated run time: 0.0008861626265570521 seconds; Isolated performance: 1128.4610409324443 iterations/seconds
 
 >>> "1, Serializers.msgspec_json, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 250 iterations. Performance: 4000.0 iterations/seconds
+         It took 0.0625 seconds to make 250 iterations. Performance: 4000.0 iterations/seconds
          Isolated run time: 0.000300672953017056 seconds; Isolated performance: 3325.872812854151 iterations/seconds
 
 >>> "1, Serializers.msgspec_json, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 76 iterations. Performance: 1216.0 iterations/seconds
+         It took 0.0625 seconds to make 76 iterations. Performance: 1216.0 iterations/seconds
          Isolated run time: 0.0011155385291203856 seconds; Isolated performance: 896.4280245779686 iterations/seconds
 
 >>> "1, Serializers.msgspec_json, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 214 iterations. Performance: 3424.0 iterations/seconds
+         It took 0.0625 seconds to make 214 iterations. Performance: 3424.0 iterations/seconds
          Isolated run time: 0.00038392271380871534 seconds; Isolated performance: 2604.690902706625 iterations/seconds
 
 >>> "1, Serializers.cbor, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 101 iterations. Performance: 808.0 iterations/seconds
+         It took 0.125 seconds to make 101 iterations. Performance: 808.0 iterations/seconds
          Isolated run time: 0.0008222202304750681 seconds; Isolated performance: 1216.219162379662 iterations/seconds
 
 >>> "1, Serializers.cbor, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.125 seconds to make 313 iterations. Performance: 2504.0 iterations/seconds
+         It took 0.125 seconds to make 313 iterations. Performance: 2504.0 iterations/seconds
          Isolated run time: 0.00027243385557085276 seconds; Isolated performance: 3670.6157459931655 iterations/seconds
 
 >>> "1, Serializers.cbor, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.25 seconds to make 43 iterations. Performance: 172.0 iterations/seconds
+         It took 0.25 seconds to make 43 iterations. Performance: 172.0 iterations/seconds
          Isolated run time: 0.0011006708955392241 seconds; Isolated performance: 908.5367879288705 iterations/seconds
 
 >>> "1, Serializers.cbor, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 93 iterations. Performance: 1488.0 iterations/seconds
+         It took 0.0625 seconds to make 93 iterations. Performance: 1488.0 iterations/seconds
          Isolated run time: 0.0003714247141033411 seconds; Isolated performance: 2692.3356524998794 iterations/seconds
 
 >>> "1, Serializers.msgpack, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 48 iterations. Performance: 768.0 iterations/seconds
+         It took 0.0625 seconds to make 48 iterations. Performance: 768.0 iterations/seconds
          Isolated run time: 0.0010566673008725047 seconds; Isolated performance: 946.3716717402784 iterations/seconds
 
 >>> "1, Serializers.msgpack, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 202 iterations. Performance: 3232.0 iterations/seconds
+         It took 0.0625 seconds to make 202 iterations. Performance: 3232.0 iterations/seconds
          Isolated run time: 0.0003928329097107053 seconds; Isolated performance: 2545.611569907501 iterations/seconds
 
 >>> "1, Serializers.msgpack, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.1875 seconds to make 53 iterations. Performance: 282.6666564941406 iterations/seconds
+         It took 0.1875 seconds to make 53 iterations. Performance: 282.6666564941406 iterations/seconds
          Isolated run time: 0.0013008699752390385 seconds; Isolated performance: 768.7163352480691 iterations/seconds
 
 >>> "1, Serializers.msgpack, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 48 iterations. Performance: 768.0 iterations/seconds
+         It took 0.0625 seconds to make 48 iterations. Performance: 768.0 iterations/seconds
          Isolated run time: 0.0005075300578027964 seconds; Isolated performance: 1970.3266528276351 iterations/seconds
 
 >>> "1, Serializers.ujson, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 28 iterations. Performance: 448.0 iterations/seconds
+         It took 0.0625 seconds to make 28 iterations. Performance: 448.0 iterations/seconds
          Isolated run time: 0.0010799691081047058 seconds; Isolated performance: 925.9524115045774 iterations/seconds
 
 >>> "1, Serializers.ujson, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 123 iterations. Performance: 1968.0 iterations/seconds
+         It took 0.0625 seconds to make 123 iterations. Performance: 1968.0 iterations/seconds
          Isolated run time: 0.00039702479261904955 seconds; Isolated performance: 2518.734392890957 iterations/seconds
 
 >>> "1, Serializers.ujson, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 54 iterations. Performance: 864.0 iterations/seconds
+         It took 0.0625 seconds to make 54 iterations. Performance: 864.0 iterations/seconds
          Isolated run time: 0.001291462336666882 seconds; Isolated performance: 774.3160381903871 iterations/seconds
 
 >>> "1, Serializers.ujson, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.125 seconds to make 174 iterations. Performance: 1392.0 iterations/seconds
+         It took 0.125 seconds to make 174 iterations. Performance: 1392.0 iterations/seconds
          Isolated run time: 0.0004812729312106967 seconds; Isolated performance: 2077.8230711716665 iterations/seconds
 
 >>> "1, Serializers.cbor2, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 56 iterations. Performance: 448.0 iterations/seconds
+         It took 0.125 seconds to make 56 iterations. Performance: 448.0 iterations/seconds
          Isolated run time: 0.0014327315147966146 seconds; Isolated performance: 697.9674765805346 iterations/seconds
 
 >>> "1, Serializers.cbor2, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.1875 seconds to make 121 iterations. Performance: 645.3333129882812 iterations/seconds
+         It took 0.1875 seconds to make 121 iterations. Performance: 645.3333129882812 iterations/seconds
          Isolated run time: 0.0006749002495780587 seconds; Isolated performance: 1481.7004448067557 iterations/seconds
 
 >>> "1, Serializers.cbor2, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 47 iterations. Performance: 376.0 iterations/seconds
+         It took 0.125 seconds to make 47 iterations. Performance: 376.0 iterations/seconds
          Isolated run time: 0.0017391329165548086 seconds; Isolated performance: 574.9991794652374 iterations/seconds
 
 >>> "1, Serializers.cbor2, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.125 seconds to make 54 iterations. Performance: 432.0 iterations/seconds
+         It took 0.125 seconds to make 54 iterations. Performance: 432.0 iterations/seconds
          Isolated run time: 0.0008115472737699747 seconds; Isolated performance: 1232.2141079404826 iterations/seconds
 
 >>> "1, Serializers.json, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 31 iterations. Performance: 248.0 iterations/seconds
+         It took 0.125 seconds to make 31 iterations. Performance: 248.0 iterations/seconds
          Isolated run time: 0.0013661317061632872 seconds; Isolated performance: 731.9938447285219 iterations/seconds
 
 >>> "1, Serializers.json, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 51 iterations. Performance: 816.0 iterations/seconds
+         It took 0.0625 seconds to make 51 iterations. Performance: 816.0 iterations/seconds
          Isolated run time: 0.0006226717960089445 seconds; Isolated performance: 1605.9824877400345 iterations/seconds
 
 >>> "1, Serializers.json, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 43 iterations. Performance: 344.0 iterations/seconds
+         It took 0.125 seconds to make 43 iterations. Performance: 344.0 iterations/seconds
          Isolated run time: 0.0016000053146854043 seconds; Isolated performance: 624.9979239579098 iterations/seconds
 
 >>> "1, Serializers.json, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 70 iterations. Performance: 1120.0 iterations/seconds
+         It took 0.0625 seconds to make 70 iterations. Performance: 1120.0 iterations/seconds
          Isolated run time: 0.0007193082710728049 seconds; Isolated performance: 1390.224525721858 iterations/seconds
 
 >>> "1, Serializers.simplejson, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.0 seconds to make 22 iterations. Performance: 0.0 iterations/seconds
+         It took 0.0 seconds to make 22 iterations. Performance: 0.0 iterations/seconds
          Isolated run time: 0.0015618717297911644 seconds; Isolated performance: 640.2574429935476 iterations/seconds
 
 >>> "1, Serializers.simplejson, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 109 iterations. Performance: 1744.0 iterations/seconds
+         It took 0.0625 seconds to make 109 iterations. Performance: 1744.0 iterations/seconds
          Isolated run time: 0.000766547629609704 seconds; Isolated performance: 1304.550378049125 iterations/seconds
 
 >>> "1, Serializers.simplejson, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 49 iterations. Performance: 784.0 iterations/seconds
+         It took 0.0625 seconds to make 49 iterations. Performance: 784.0 iterations/seconds
          Isolated run time: 0.0017996785463765264 seconds; Isolated performance: 555.6547873582205 iterations/seconds
 
 >>> "1, Serializers.simplejson, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 93 iterations. Performance: 1488.0 iterations/seconds
+         It took 0.0625 seconds to make 93 iterations. Performance: 1488.0 iterations/seconds
          Isolated run time: 0.0008633049437776208 seconds; Isolated performance: 1158.339248729694 iterations/seconds
 
 >>> "1, Serializers.msgspec_toml, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.0625 seconds to make 10 iterations. Performance: 160.0 iterations/seconds
+         It took 0.0625 seconds to make 10 iterations. Performance: 160.0 iterations/seconds
          Isolated run time: 0.010459218523465097 seconds; Isolated performance: 95.60943752695435 iterations/seconds
 
 >>> "1, Serializers.msgspec_toml, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.125 seconds to make 11 iterations. Performance: 88.0 iterations/seconds
+         It took 0.125 seconds to make 11 iterations. Performance: 88.0 iterations/seconds
          Isolated run time: 0.009011557092890143 seconds; Isolated performance: 110.96861393565058 iterations/seconds
 
 >>> "1, Serializers.msgspec_toml, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 9 iterations. Performance: 72.0 iterations/seconds
+         It took 0.125 seconds to make 9 iterations. Performance: 72.0 iterations/seconds
          Isolated run time: 0.01117266295477748 seconds; Isolated performance: 89.50417676140455 iterations/seconds
 
 >>> "1, Serializers.msgspec_toml, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.25 seconds to make 10 iterations. Performance: 40.0 iterations/seconds
+         It took 0.25 seconds to make 10 iterations. Performance: 40.0 iterations/seconds
          Isolated run time: 0.009097612579353154 seconds; Isolated performance: 109.9189475565798 iterations/seconds
 
 >>> "1, Serializers.msgspec_yaml, universal=False, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 7 iterations. Performance: 56.0 iterations/seconds
+         It took 0.125 seconds to make 7 iterations. Performance: 56.0 iterations/seconds
          Isolated run time: 0.016271531814709306 seconds; Isolated performance: 61.457028839534935 iterations/seconds
 
 >>> "1, Serializers.msgspec_yaml, universal=False, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 7 iterations. Performance: 112.0 iterations/seconds
+         It took 0.0625 seconds to make 7 iterations. Performance: 112.0 iterations/seconds
          Isolated run time: 0.006149194668978453 seconds; Isolated performance: 162.62292118426737 iterations/seconds
 
 >>> "1, Serializers.msgspec_yaml, universal=True, optimized=False": benchmark_single_item()
-         It was used 0.125 seconds to make 7 iterations. Performance: 56.0 iterations/seconds
+         It took 0.125 seconds to make 7 iterations. Performance: 56.0 iterations/seconds
          Isolated run time: 0.007870391476899385 seconds; Isolated performance: 127.05848278768967 iterations/seconds
 
 >>> "1, Serializers.msgspec_yaml, universal=True, optimized=True": benchmark_single_item()
-         It was used 0.0625 seconds to make 9 iterations. Performance: 144.0 iterations/seconds
+         It took 0.0625 seconds to make 9 iterations. Performance: 144.0 iterations/seconds
          Isolated run time: 0.005934227025136352 seconds; Isolated performance: 168.513943899378 iterations/seconds
 '''
 

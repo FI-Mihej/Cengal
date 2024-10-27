@@ -56,7 +56,7 @@ Docstrings: <a href="http://www.python.org/dev/peps/pep-0257/">http://www.python
 </span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>
 </span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>
 </span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="kn">from</span> <span class="nn">cengal.hardware.info.cpu.versions.v_1</span> <span class="kn">import</span> <span class="n">cpu_info</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="kn">from</span> <span class="nn">cengal.hardware.cpu.info.versions.v_1</span> <span class="kn">import</span> <span class="n">cpu_info</span>
 </span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a><span class="kn">from</span> <span class="nn">cengal.io.core.memory_management</span> <span class="kn">import</span> <span class="n">IOCoreMemoryManagement</span>
 </span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a><span class="kn">from</span> <span class="nn">cengal.code_flow_control.smart_values.versions</span> <span class="kn">import</span> <span class="n">ValueExistence</span>
 </span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>

@@ -50,183 +50,183 @@ from typing import Any, Dict, Optional, Callable, Set, Type, Tuple, List, Frozen
 
 '''
 >>> "tuple(tuple_of_tuple_gen())": func()
-         It was used 0.09375 seconds to make 2067 iterations. Performance: 22048.0 iterations/seconds
+         It took 0.09375 seconds to make 2067 iterations. Performance: 22048.0 iterations/seconds
          Isolated run time: 7.294700480997562e-06 seconds; Isolated performance: 137085.82039865307 iterations/seconds
 
 >>> "result.append((i, i + 1))": func1()
-         It was used 0.15625 seconds to make 2551 iterations. Performance: 16326.400390625 iterations/seconds
+         It took 0.15625 seconds to make 2551 iterations. Performance: 16326.400390625 iterations/seconds
          Isolated run time: 8.169969078153372e-06 seconds; Isolated performance: 122399.4840658597 iterations/seconds
 
 >>> "result.append((i, i + 1))": func3()
-         It was used 0.03125 seconds to make 1286 iterations. Performance: 41152.0 iterations/seconds
+         It took 0.03125 seconds to make 1286 iterations. Performance: 41152.0 iterations/seconds
          Isolated run time: 8.511764463037252e-06 seconds; Isolated performance: 117484.4539393152 iterations/seconds
 
 >>> "result[i] = i + 1": func4()
-         It was used 0.125 seconds to make 1559 iterations. Performance: 12472.0 iterations/seconds
+         It took 0.125 seconds to make 1559 iterations. Performance: 12472.0 iterations/seconds
          Isolated run time: 5.966227035969496e-06 seconds; Isolated performance: 167610.1150645372 iterations/seconds
 
 >>> "result[i] = i + 1": func5()
-         It was used 0.09375 seconds to make 1702 iterations. Performance: 18154.666015625 iterations/seconds
+         It took 0.09375 seconds to make 1702 iterations. Performance: 18154.666015625 iterations/seconds
          Isolated run time: 8.310889825224876e-06 seconds; Isolated performance: 120324.0592800112 iterations/seconds
 
 >>> "dict(tuple_of_tuple_gen())": func6()
-         It was used 0.0625 seconds to make 2048 iterations. Performance: 32768.0 iterations/seconds
+         It took 0.0625 seconds to make 2048 iterations. Performance: 32768.0 iterations/seconds
          Isolated run time: 9.921728633344173e-06 seconds; Isolated performance: 100788.88840390956 iterations/seconds
 
 >>> "result[i] = (i, i + 1)": func7()
-         It was used 0.03125 seconds to make 709 iterations. Performance: 22688.0 iterations/seconds
+         It took 0.03125 seconds to make 709 iterations. Performance: 22688.0 iterations/seconds
          Isolated run time: 6.438232958316803e-06 seconds; Isolated performance: 155322.1212208882 iterations/seconds
 
 >>> "result.append((i, i + 1))": func8()
-         It was used 0.34375 seconds to make 3224 iterations. Performance: 9378.9091796875 iterations/seconds
+         It took 0.34375 seconds to make 3224 iterations. Performance: 9378.9091796875 iterations/seconds
          Isolated run time: 7.481721695512533e-06 seconds; Isolated performance: 133659.0748356479 iterations/seconds
 
 >>> "deque(tuple_of_tuple_gen())": func9()
-         It was used 0.09375 seconds to make 3843 iterations. Performance: 40992.0 iterations/seconds
+         It took 0.09375 seconds to make 3843 iterations. Performance: 40992.0 iterations/seconds
          Isolated run time: 6.908201612532139e-06 seconds; Isolated performance: 144755.47415783355 iterations/seconds
 
 >>> "result[i] = (i, i + 1)": func10()
-         It was used 0.1875 seconds to make 4549 iterations. Performance: 24261.333984375 iterations/seconds
+         It took 0.1875 seconds to make 4549 iterations. Performance: 24261.333984375 iterations/seconds
          Isolated run time: 6.4435298554599285e-06 seconds; Isolated performance: 155194.43882961906 iterations/seconds
 
 >>> "result[i] = (i, i + 1)": func11()
-         It was used 0.125 seconds to make 2812 iterations. Performance: 22496.0 iterations/seconds
+         It took 0.125 seconds to make 2812 iterations. Performance: 22496.0 iterations/seconds
          Isolated run time: 6.4391642808914185e-06 seconds; Isolated performance: 155299.6563494359 iterations/seconds
 
 >>> "result[i] = (i, i + 1)": func12()
-         It was used 0.0625 seconds to make 3375 iterations. Performance: 54000.0 iterations/seconds
+         It took 0.0625 seconds to make 3375 iterations. Performance: 54000.0 iterations/seconds
          Isolated run time: 6.4444029703736305e-06 seconds; Isolated performance: 155173.41243203208 iterations/seconds
 
 >>> "result[i[0]] = i": func13()
-         It was used 0.09375 seconds to make 1987 iterations. Performance: 21194.666015625 iterations/seconds
+         It took 0.09375 seconds to make 1987 iterations. Performance: 21194.666015625 iterations/seconds
          Isolated run time: 1.0837335139513016e-05 seconds; Isolated performance: 92273.60666867186 iterations/seconds
 
 >>> "result.append(i)": func14()
-         It was used 0.0625 seconds to make 1468 iterations. Performance: 23488.0 iterations/seconds
+         It took 0.0625 seconds to make 1468 iterations. Performance: 23488.0 iterations/seconds
          Isolated run time: 1.1144380550831556e-05 seconds; Isolated performance: 89731.3220271703 iterations/seconds
 
 >>> "result.add(i)": func15()
-         It was used 0.0625 seconds to make 1066 iterations. Performance: 17056.0 iterations/seconds
+         It took 0.0625 seconds to make 1066 iterations. Performance: 17056.0 iterations/seconds
          Isolated run time: 1.4020886737853289e-05 seconds; Isolated performance: 71322.16518804202 iterations/seconds
 
 >>> "set(tuple_of_tuple_gen())": func16()
-         It was used 0.03125 seconds to make 885 iterations. Performance: 28320.0 iterations/seconds
+         It took 0.03125 seconds to make 885 iterations. Performance: 28320.0 iterations/seconds
          Isolated run time: 9.859970305114985e-06 seconds; Isolated performance: 101420.18373840714 iterations/seconds
 
 >>> "set(tuple_of_tuple_gen())": func17()
-         It was used 0.09375 seconds to make 1125 iterations. Performance: 12000.0 iterations/seconds
+         It took 0.09375 seconds to make 1125 iterations. Performance: 12000.0 iterations/seconds
          Isolated run time: 9.884708561003208e-06 seconds; Isolated performance: 101166.36154000164 iterations/seconds
 
 >>> "2 in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)": func18()
-         It was used 0.53125 seconds to make 110834 iterations. Performance: 208628.703125 iterations/seconds
+         It took 0.53125 seconds to make 110834 iterations. Performance: 208628.703125 iterations/seconds
          Isolated run time: 1.3085082173347473e-07 seconds; Isolated performance: 7642290.56227758 iterations/seconds
 
 >>> "2 in data_tuple": func19()
-         It was used 0.09375 seconds to make 33893 iterations. Performance: 361525.34375 iterations/seconds
+         It took 0.09375 seconds to make 33893 iterations. Performance: 361525.34375 iterations/seconds
          Isolated run time: 1.3352837413549423e-07 seconds; Isolated performance: 7489044.97994769 iterations/seconds
 
 >>> "2 in data_tuple": func20()
-         It was used 0.40625 seconds to make 131072 iterations. Performance: 322638.78125 iterations/seconds
+         It took 0.40625 seconds to make 131072 iterations. Performance: 322638.78125 iterations/seconds
          Isolated run time: 1.3440148904919624e-07 seconds; Isolated performance: 7440393.75660459 iterations/seconds
 
 >>> "2 in {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}": func21()
-         It was used 0.15625 seconds to make 131072 iterations. Performance: 838860.8125 iterations/seconds
+         It took 0.15625 seconds to make 131072 iterations. Performance: 838860.8125 iterations/seconds
          Isolated run time: 1.2264354154467583e-07 seconds; Isolated performance: 8153711.050783104 iterations/seconds
 
 >>> "2 in data_set": func22()
-         It was used 0.09375 seconds to make 192098 iterations. Performance: 2049045.375 iterations/seconds
+         It took 0.09375 seconds to make 192098 iterations. Performance: 2049045.375 iterations/seconds
          Isolated run time: 1.2438977137207985e-07 seconds; Isolated performance: 8039246.225549837 iterations/seconds
 
 >>> "2 in data_set": func23()
-         It was used 0.0625 seconds to make 88178 iterations. Performance: 1410848.0 iterations/seconds
+         It took 0.0625 seconds to make 88178 iterations. Performance: 1410848.0 iterations/seconds
          Isolated run time: 1.2700911611318588e-07 seconds; Isolated performance: 7873450.588450963 iterations/seconds
 
 >>> "2 in (1, 2, 3)": func24()
-         It was used 0.25 seconds to make 262144 iterations. Performance: 1048576.0 iterations/seconds
+         It took 0.25 seconds to make 262144 iterations. Performance: 1048576.0 iterations/seconds
          Isolated run time: 1.3085082173347473e-07 seconds; Isolated performance: 7642290.56227758 iterations/seconds
 
 >>> "2 in (1, 2)": func25()
-         It was used 0.28125 seconds to make 213497 iterations. Performance: 759100.4375 iterations/seconds
+         It took 0.28125 seconds to make 213497 iterations. Performance: 759100.4375 iterations/seconds
          Isolated run time: 1.3085082173347473e-07 seconds; Isolated performance: 7642290.56227758 iterations/seconds
 
 >>> "2 in {1, 2, 3}": func26()
-         It was used 0.1875 seconds to make 126525 iterations. Performance: 674800.0 iterations/seconds
+         It took 0.1875 seconds to make 126525 iterations. Performance: 674800.0 iterations/seconds
          Isolated run time: 1.2264354154467583e-07 seconds; Isolated performance: 8153711.050783104 iterations/seconds
 
 >>> "2 in {1, 2}": func27()
-         It was used 0.15625 seconds to make 77555 iterations. Performance: 496352.0 iterations/seconds
+         It took 0.15625 seconds to make 77555 iterations. Performance: 496352.0 iterations/seconds
          Isolated run time: 1.2351665645837784e-07 seconds; Isolated performance: 8096074.073515551 iterations/seconds
 
 >>> "(2 == 1) or (2 == 2)": func28()
-         It was used 0.34375 seconds to make 131072 iterations. Performance: 381300.375 iterations/seconds
+         It took 0.34375 seconds to make 131072 iterations. Performance: 381300.375 iterations/seconds
          Isolated run time: 1.4441320672631264e-07 seconds; Isolated performance: 6924574.4393389765 iterations/seconds
 
 >>> "(2 == 1) or (2 == 2) or (2 == 3)": func29()
-         It was used 0.1875 seconds to make 46990 iterations. Performance: 250613.328125 iterations/seconds
+         It took 0.1875 seconds to make 46990 iterations. Performance: 250613.328125 iterations/seconds
          Isolated run time: 1.4615943655371666e-07 seconds; Isolated performance: 6841843.561927519 iterations/seconds
 
 >>> "math_impl()": func30()
-         It was used 0.09375 seconds to make 65536 iterations. Performance: 699050.6875 iterations/seconds
+         It took 0.09375 seconds to make 65536 iterations. Performance: 699050.6875 iterations/seconds
          Isolated run time: 1.5436671674251556e-07 seconds; Isolated performance: 6478080.3861236805 iterations/seconds
 
 >>> "k = 56 + 15": func31()
-         It was used 0.125 seconds to make 241808 iterations. Performance: 1934464.0 iterations/seconds
+         It took 0.125 seconds to make 241808 iterations. Performance: 1934464.0 iterations/seconds
          Isolated run time: 1.100124791264534e-07 seconds; Isolated performance: 9089877.875132276 iterations/seconds
 
 >>> "sc.func()": func32()
-         It was used 0.125 seconds to make 124743 iterations. Performance: 997944.0 iterations/seconds
+         It took 0.125 seconds to make 124743 iterations. Performance: 997944.0 iterations/seconds
          Isolated run time: 1.8998980522155762e-07 seconds; Isolated performance: 5263440.31372549 iterations/seconds
 
 >>> "sc.func0()": func33()
-         It was used 0.09375 seconds to make 110931 iterations. Performance: 1183264.0 iterations/seconds
+         It took 0.09375 seconds to make 110931 iterations. Performance: 1183264.0 iterations/seconds
          Isolated run time: 2.0529842004179955e-07 seconds; Isolated performance: 4870958.09016161 iterations/seconds
 
 >>> "sc.func1()": func34()
-         It was used 0.0625 seconds to make 115833 iterations. Performance: 1853328.0 iterations/seconds
+         It took 0.0625 seconds to make 115833 iterations. Performance: 1853328.0 iterations/seconds
          Isolated run time: 2.1175947040319443e-07 seconds; Isolated performance: 4722338.973062122 iterations/seconds
 
 >>> "sc.func2()": func35()
-         It was used 0.21875 seconds to make 270553 iterations. Performance: 1236813.75 iterations/seconds
+         It took 0.21875 seconds to make 270553 iterations. Performance: 1236813.75 iterations/seconds
          Isolated run time: 1.9173603504896164e-07 seconds; Isolated performance: 5215503.698846388 iterations/seconds
 
 >>> "sc.func3()": func36()
-         It was used 0.09375 seconds to make 98726 iterations. Performance: 1053077.375 iterations/seconds
+         It took 0.09375 seconds to make 98726 iterations. Performance: 1053077.375 iterations/seconds
          Isolated run time: 2.00001522898674e-07 seconds; Isolated performance: 4999961.92782305 iterations/seconds
 
 >>> "sc.func4()": func37()
-         It was used 0.59375 seconds to make 131072 iterations. Performance: 220752.84375 iterations/seconds
+         It took 0.59375 seconds to make 131072 iterations. Performance: 220752.84375 iterations/seconds
          Isolated run time: 2.2177118808031082e-07 seconds; Isolated performance: 4509152.0167979 iterations/seconds
 
 >>> "result[i * 2 + 1] = i + 1": func38()
-         It was used 0.0 seconds to make 165 iterations. Performance: 0.0 iterations/seconds
+         It took 0.0 seconds to make 165 iterations. Performance: 0.0 iterations/seconds
          Isolated run time: 1.179176615551114e-05 seconds; Isolated performance: 84804.93819262419 iterations/seconds
 
 >>> "result[j + 1] = i + 1": func39()
-         It was used 0.0 seconds to make 275 iterations. Performance: 0.0 iterations/seconds
+         It took 0.0 seconds to make 275 iterations. Performance: 0.0 iterations/seconds
          Isolated run time: 1.0835588909685612e-05 seconds; Isolated performance: 92288.47719629983 iterations/seconds
 
 >>> "result[j: j + 1] = i, i + 1": func40()
-         It was used 0.125 seconds to make 335 iterations. Performance: 2680.0 iterations/seconds
+         It took 0.125 seconds to make 335 iterations. Performance: 2680.0 iterations/seconds
          Isolated run time: 1.9381754100322723e-05 seconds; Isolated performance: 51594.91730334919 iterations/seconds
 
 >>> "result = {i: i + 1 for i in range(100)}": func41()
-         It was used 0.1875 seconds to make 1524 iterations. Performance: 8128.0 iterations/seconds
+         It took 0.1875 seconds to make 1524 iterations. Performance: 8128.0 iterations/seconds
          Isolated run time: 5.629146471619606e-06 seconds; Isolated performance: 177646.82532985896 iterations/seconds
 
 >>> "result = {(i, i + 1) for i in range(100)}": func42()
-         It was used 0.9375 seconds to make 50775 iterations. Performance: 54160.0 iterations/seconds
+         It took 0.9375 seconds to make 50775 iterations. Performance: 54160.0 iterations/seconds
          Isolated run time: 7.962633389979601e-06 seconds; Isolated performance: 125586.59315628267 iterations/seconds
 
 >>> "result = [(i, i + 1) for i in range(100)]": func43()
-         It was used 0.4375 seconds to make 38632 iterations. Performance: 88301.7109375 iterations/seconds
+         It took 0.4375 seconds to make 38632 iterations. Performance: 88301.7109375 iterations/seconds
          Isolated run time: 5.753536242991686e-06 seconds; Isolated performance: 173806.15290606505 iterations/seconds
 
 >>> "result = tuple((i, i + 1) for i in range(100))": func44()
-         It was used 1.75 seconds to make 60073 iterations. Performance: 34327.4296875 iterations/seconds
+         It took 1.75 seconds to make 60073 iterations. Performance: 34327.4296875 iterations/seconds
          Isolated run time: 7.323513273149729e-06 seconds; Isolated performance: 136546.4856418449 iterations/seconds
 
 >>> "result = tuple([(i, i + 1) for i in range(100)])": func45()
-         It was used 1.375 seconds to make 126056 iterations. Performance: 91677.09375 iterations/seconds
+         It took 1.375 seconds to make 126056 iterations. Performance: 91677.09375 iterations/seconds
          Isolated run time: 5.792942829430103e-06 seconds; Isolated performance: 172623.8337653986 iterations/seconds
 '''
 

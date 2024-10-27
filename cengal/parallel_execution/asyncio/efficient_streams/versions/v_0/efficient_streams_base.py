@@ -38,7 +38,7 @@ __all__ = ['StreamType', 'GateSecurityPolicy', 'IOCoreMemoryManagement', 'Stream
 
 
 from enum import Enum
-from cengal.hardware.info.cpu.versions.v_1 import cpu_info
+from cengal.hardware.cpu.info.versions.v_1 import cpu_info
 from cengal.io.core.memory_management import IOCoreMemoryManagement
 from cengal.code_flow_control.smart_values.versions import ValueExistence
 from typing import Optional

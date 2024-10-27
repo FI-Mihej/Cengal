@@ -17,7 +17,6 @@
 
 import time
 import json
-from cengal.parallel_execution.coroutines.coro_standard_services.loop_yield import gly, CoroPriority
 
 """
 Module Docstring
@@ -39,15 +38,22 @@ __status__ = "Development"
 class RequestCache:
     # TODO: add GC which will clean lists every X seconds (really - every Y hours)
 
-    def __init__(self, itemsQntLimit, timeLimitInSeconds=None, clock_function=None, default_priority: CoroPriority = CoroPriority.normal):
+    def __init__(self, itemsQntLimit, timeLimitInSeconds = None, clock_function = None, default_priority = None):
         # timeLimitInSeconds:
         # - number - limit in seconds (remember that the accuracy of the server clock is
         #   approximately 1 second);
         # - 0 (zero) - cache is not used (try_to_get_data_for_request() will return 'None'
         #   on every request);
         # - None - cache is trying to be permanent (time limit is not used at all)
+
+        # from cengal.parallel_execution.coroutines.coro_standard_services.loop_yield import gly, CoroPriority
+
         super().__init__()
-        self.default_priority: CoroPriority = default_priority
+        # default_priority = CoroPriority.normal if default_priority is None else default_priority
+        # if not isinstance(default_priority, CoroPriority):
+        #     raise ValueError('default_priority must be an instance of CoroPriority!')
+        
+        # self.default_priority: CoroPriority = CoroPriority.normal if default_priority is None else default_priority
         self._clock_function = clock_function or time.perf_counter
         self._itemsQntLimit = itemsQntLimit
         self._timeLimitInSeconds = timeLimitInSeconds

@@ -36,8 +36,9 @@ __status__ = "Development"
 
 from typing import Dict
 from cengal.build_tools.current_compiler import compiler_type
-from cengal.hardware.info.cpu import cpu_info
+from cengal.hardware.cpu.info import cpu_info
 from cengal.system import (
+    parent_cengal_module_import_str,
     PYTHON_IMPLEMENTATION,
     PYTHON_VERSION,
     PYTHON_VERSION_INT,
@@ -62,3 +63,10 @@ def build_config() -> CengalGoBuildExtension:
             'ApiEndpointDoc': "URL: https://api.production.com; Path: \\usr\\bin"
         }
         )
+
+
+if '__main__' == __name__:
+    config = build_config()
+    config.path = __file__
+    config.module_import_str = parent_cengal_module_import_str(fallback_to_current_module_if_no_parent=True)
+    config()

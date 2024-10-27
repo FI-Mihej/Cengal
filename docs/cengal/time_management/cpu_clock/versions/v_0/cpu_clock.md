@@ -53,7 +53,7 @@ cengal<wbr>.time_management<wbr>.cpu_clock<wbr>.versions<wbr>.v_0<wbr>.cpu_clock
 </span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>
 </span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a><span class="k">try</span><span class="p">:</span>
 </span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a>    <span class="kn">from</span> <span class="nn">cengal.time_management.cpu_clock_cycles.versions.v_0.compilable.cpu_clock_cycles__cython</span> <span class="kn">import</span> <span class="n">cpu_clock_cycles</span><span class="p">,</span> <span class="n">set_cycles_per_second</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>    <span class="kn">from</span> <span class="nn">cengal.hardware.info.cpu</span> <span class="kn">import</span> <span class="n">cpu_info</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>    <span class="kn">from</span> <span class="nn">cengal.hardware.cpu.info</span> <span class="kn">import</span> <span class="n">cpu_info</span>
 </span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>
 </span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>
 </span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>    <span class="n">CPU_TICKS_PER_SECOND</span> <span class="o">=</span> <span class="n">cpu_info</span><span class="p">()</span><span class="o">.</span><span class="n">hz_advertised</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
