@@ -15,7 +15,7 @@ Cengal is a versatile Python library designed for a wide range of applications. 
 
 Cengal features an extensive codebase with over 200 projects and more than 80,000 lines of code. I am continually focused on developing new features and making improvements. Contributions are very welcome, especially Pull Requests that include unit tests and documentation enhancements.
 
-If you have any questions or would like to participate in discussions, feel free to join the [Cengal Discord](https://discord.gg/TAy7xNgR). Your support and involvement are greatly appreciated as Cengal evolves.
+If you have any questions or would like to participate in discussions, feel free to join the [Cengal Discord](https://discord.gg/sQ6enWBNgt). Your support and involvement are greatly appreciated as Cengal evolves.
 
 ## Architecture & API Design Rationale
 
