@@ -6,7 +6,7 @@
 
 ![GitHub License](https://img.shields.io/github/license/FI-Mihej/Cengal?color=darkgreen) ![PyPI - Status](https://img.shields.io/pypi/status/cengal) 
 
-> *Version 5 is ready.* The core wheels (`cengal-light`) have already been deployed to PyPI. `cengal-light` is the version that, by default, installs no dependencies, although they can be installed using extras (for example, installing with `[all]` installs all available dependencies).
+> **Version 5 is ready.** The core wheels (`cengal-light`) have already been deployed to PyPI. `cengal-light` is the version that, by default, installs no dependencies, although they can be installed using extras (for example, installing with `[all]` installs all available dependencies).
 >
 > I'm currently finishing the deployment scripts needed to publish the `cengal` wheels. After that, the code for the new version will be pushed to this mirror repository.
 
